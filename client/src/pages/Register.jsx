@@ -13,14 +13,28 @@ function Register() {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
+
     if (formData.password !== formData.confirmPassword) {
       alert('Passwords do not match')
       return
     }
-    console.log('Register data:', formData)
-    // backend connection comes in Week 4
+
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      })
+
+      const data = await response.json()
+      console.log('Server response:', data)
+    } catch (error) {
+      console.error('Error connecting to server:', error)
+    }
   }
 
   return (
