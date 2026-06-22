@@ -1,8 +1,10 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 function Login() {
   const [formData, setFormData] = useState({ identifier: '', password: '' })
+  const [error, setError] = useState('')
+  const navigate = useNavigate()
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -10,6 +12,7 @@ function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    setError('')
 
     try {
       const response = await fetch('http://localhost:5000/api/auth/login', {
@@ -21,16 +24,35 @@ function Login() {
       })
 
       const data = await response.json()
-      console.log('Server response:', data)
-    } catch (error) {
-      console.error('Error connecting to server:', error)
-    }
+
+      if (!response.ok) {
+        setError(data.message)
+        return
+      }
+
+      // Store token and user info in localStorage
+      localStorage.setItem('token', data.token)
+      localStorage.setItem('userId', data.userId)
+      localStorage.setItem('username', data.username)
+
+      // Redirect to dashboard
+      navigate('/dashboard')
+
+   } catch {
+  setError('Cannot connect to server. Please try again.')
+}
   }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="w-full max-w-md bg-white rounded-xl shadow-md p-8">
         <h1 className="text-2xl font-bold text-center mb-6">Log In</h1>
+
+        {error && (
+          <div className="bg-red-100 text-red-700 px-4 py-2 rounded-lg mb-4 text-sm">
+            {error}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
