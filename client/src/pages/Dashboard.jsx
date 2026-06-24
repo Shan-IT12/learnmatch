@@ -1,21 +1,16 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 function Dashboard() {
-  const [username, setUsername] = useState('')
   const navigate = useNavigate()
+  const token = localStorage.getItem('token')
+  const username = localStorage.getItem('username')
 
   useEffect(() => {
-  const token = localStorage.getItem('token')
-
-  if (!token) {
-    navigate('/login')
-    return
-  }
-
-  const storedUsername = localStorage.getItem('username')
-  setUsername(storedUsername)
-}, [navigate])
+    if (!token) {
+      navigate('/login')
+    }
+  }, [navigate, token])
 
   const handleLogout = () => {
     localStorage.removeItem('token')
@@ -32,6 +27,12 @@ function Dashboard() {
         </h1>
         <div className="flex items-center gap-4">
           <span className="text-sm text-gray-600">Welcome, <strong>{username}</strong></span>
+          <button
+            onClick={() => navigate('/profile')}
+            className="bg-orange-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-orange-700 transition"
+          >
+            Edit Profile
+          </button>
           <button
             onClick={handleLogout}
             className="bg-red-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-red-600 transition"
