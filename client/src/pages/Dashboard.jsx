@@ -47,7 +47,16 @@ function Dashboard() {
         <p className="text-gray-600 mb-8">You're now logged in to LearnMatch.</p>
 
         <div className="bg-white rounded-xl shadow p-8">
-          <p className="text-gray-500">Your dashboard is being built. Check back soon!</p>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">Ready to find your course?</h3>
+          <p className="text-gray-500 text-sm mb-6">
+            Take the assessment to get personalized course recommendations based on your skills, interests, and personality.
+          </p>
+          <button 
+            onClick={() => navigate('/onboarding/profile')}
+            className="bg-orange-500 text-white px-6 py-3 rounded-xl font-medium hover:bg-orange-600 transition text-sm"
+          >
+            Start Assessment →
+          </button>
         </div>
       </div>
     </div>

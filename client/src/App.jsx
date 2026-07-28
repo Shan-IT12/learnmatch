@@ -4,6 +4,10 @@ import Login from './pages/Login'
 import Register from './pages/Register'
 import Dashboard from './pages/Dashboard'
 import Profile from './pages/Profile'
+import OnboardingProfile from './pages/onboarding/OnboardingProfile'
+import OnboardingInterests from './pages/onboarding/OnboardingInterests'
+import OnboardingSkills from './pages/onboarding/OnboardingSkills'
+import OnboardingPersonality from './pages/onboarding/OnboardingPersonality'
 
 function App() {
   return (
@@ -13,6 +17,10 @@ function App() {
       <Route path="/register" element={<Register />} />
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/profile" element={<Profile />} />
+      <Route path="/onboarding/profile" element={<OnboardingProfile />} />
+      <Route path="/onboarding/interests" element={<OnboardingInterests />} />
+      <Route path="/onboarding/skills" element={<OnboardingSkills />} />
+      <Route path="/onboarding/personality" element={<OnboardingPersonality />} />
     </Routes>
   )
 }

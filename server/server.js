@@ -32,3 +32,33 @@ app.get('/api/db-test', async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`)
 })
+
+app.get('/api/search', async (req, res) => {
+  const { q } = req.query
+  if (!q) return res.json({ courses: [], schools: [] })
+
+  try {
+    const searchTerm = `%${q}%`
+
+    const [courses] = await pool.query(
+      `SELECT course_name, cluster_category 
+       FROM COURSE 
+       WHERE course_name LIKE ? AND is_active = 1
+       LIMIT 5`,
+      [searchTerm]
+    )
+
+    const [schools] = await pool.query(
+      `SELECT school_name, hei_type, address 
+       FROM SCHOOL 
+       WHERE school_name LIKE ? AND is_active = 1
+       LIMIT 3`,
+      [searchTerm]
+    )
+
+    res.json({ courses, schools })
+  } catch (error) {
+    console.error('Search error:', error)
+    res.status(500).json({ courses: [], schools: [] })
+  }
+})
