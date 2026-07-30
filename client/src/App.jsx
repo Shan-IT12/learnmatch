@@ -8,6 +8,7 @@ import OnboardingProfile from './pages/onboarding/OnboardingProfile'
 import OnboardingInterests from './pages/onboarding/OnboardingInterests'
 import OnboardingSkills from './pages/onboarding/OnboardingSkills'
 import OnboardingPersonality from './pages/onboarding/OnboardingPersonality'
+import CollegeSetup from './pages/college/CollegeSetup'
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
       <Route path="/onboarding/interests" element={<OnboardingInterests />} />
       <Route path="/onboarding/skills" element={<OnboardingSkills />} />
       <Route path="/onboarding/personality" element={<OnboardingPersonality />} />
+      <Route path="/college/setup" element={<CollegeSetup />} />
     </Routes>
   )
 }
