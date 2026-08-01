@@ -41,7 +41,7 @@ app.get('/api/search', async (req, res) => {
     const searchTerm = `%${q}%`
 
     const [courses] = await pool.query(
-      `SELECT course_name, cluster_category 
+      `SELECT course_id, course_name, cluster_category 
        FROM COURSE 
        WHERE course_name LIKE ? AND is_active = 1
        LIMIT 5`,
@@ -60,5 +60,22 @@ app.get('/api/search', async (req, res) => {
   } catch (error) {
     console.error('Search error:', error)
     res.status(500).json({ courses: [], schools: [] })
+  }
+})
+
+app.post('/api/college/setup', async (req, res) => {
+  const { userId, courseId, yearLevel, semester } = req.body
+
+  try {
+    await pool.query(
+      `INSERT INTO SEMESTER_CHECKIN 
+        (user_id, course_id, semester, phase, comments) 
+       VALUES (?, ?, ?, 'Early', ?)`,
+      [userId, courseId, semester, `Initial setup: ${yearLevel}`]
+    )
+    res.json({ message: 'College phase setup successful' })
+  } catch (error) {
+    console.error('College setup error:', error)
+    res.status(500).json({ message: 'Server error during college setup' })
   }
 })
