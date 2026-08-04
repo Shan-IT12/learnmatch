@@ -63,6 +63,97 @@ app.get('/api/search', async (req, res) => {
   }
 })
 
+app.get('/api/quiz', async (req, res) => {
+  const dimensions = [
+    'Verbal',
+    'Numerical',
+    'Abstract/Logical',
+    'Spatial',
+    'Scientific Reasoning',
+    'Practical/Applied',
+  ]
+
+  try {
+    const questionSets = await Promise.all(
+      dimensions.map((dim) =>
+        pool.query(
+          `SELECT question_id, question_text, image_url, dimension, choice_a, choice_b, choice_c, choice_d
+           FROM QUESTION
+           WHERE dimension = ? AND is_active = 1
+           ORDER BY RAND()
+           LIMIT 5`,
+          [dim]
+        )
+      )
+    )
+
+ 
+    const questions = questionSets.flatMap(([rows]) => rows)
+
+    res.json({ questions })
+  } catch (error) {
+    console.error('Quiz fetch error:', error)
+    res.status(500).json({ message: 'Server error fetching quiz questions' })
+  }
+})
+
+app.post('/api/quiz', async (req, res) => {
+  const { userId, answers } = req.body
+
+  if (!userId || !Array.isArray(answers) || answers.length === 0) {
+    return res.status(400).json({ message: 'Missing userId or answers' })
+  }
+
+  try {
+    const questionIds = answers.map((a) => a.question_id)
+    const placeholders = questionIds.map(() => '?').join(',')
+
+    const [questions] = await pool.query(
+      `SELECT question_id, correct_answer, dimension FROM QUESTION WHERE question_id IN (${placeholders})`,
+      questionIds
+    )
+
+    // Build a lookup map: question_id -> { correct_answer, dimension }
+    const questionMap = {}
+    questions.forEach((q) => {
+      questionMap[q.question_id] = q
+    })
+
+    let correctCount = 0
+    const domainScores = {} // e.g. { Verbal: { correct: 4, total: 5 }, ... }
+
+    for (const answer of answers) {
+      const question = questionMap[answer.question_id]
+      if (!question) continue // skip if question_id somehow doesn't exist
+
+      const isCorrect = question.correct_answer === answer.selected_option ? 1 : 0
+      if (isCorrect) correctCount++
+
+      if (!domainScores[question.dimension]) {
+        domainScores[question.dimension] = { correct: 0, total: 0 }
+      }
+      domainScores[question.dimension].total++
+      if (isCorrect) domainScores[question.dimension].correct++
+
+      await pool.query(
+        `INSERT INTO SKILL_RESPONSE (user_id, question_id, selected_option, is_correct)
+         VALUES (?, ?, ?, ?)`,
+        [userId, answer.question_id, answer.selected_option, isCorrect]
+      )
+    }
+
+    res.json({
+      message: 'Quiz submitted successfully',
+      totalCorrect: correctCount,
+      totalQuestions: answers.length,
+      domainScores,
+    })
+  } catch (error) {
+    console.error('Quiz submit error:', error)
+    res.status(500).json({ message: 'Server error submitting quiz' })
+  }
+})
+
 app.post('/api/college/setup', async (req, res) => {
   const { userId, courseId, yearLevel, semester } = req.body
 
