@@ -1,0 +1,24 @@
+<svg viewBox="0 0 640 200" xmlns="http://www.w3.org/2000/svg">
+  <rect width="640" height="200" fill="#ffffff"/>
+  <!-- Triangle (3 sides) -->
+  <polygon points="60,140 100,50 140,140" fill="none" stroke="#1a1a1a" stroke-width="4"/>
+  <text x="100" y="175" font-size="16" text-anchor="middle" fill="#555" font-family="Arial, sans-serif">3 sides</text>
+
+  <text x="185" y="105" font-size="28" text-anchor="middle" fill="#555" font-family="Arial, sans-serif">&#8594;</text>
+
+  <!-- Square (4 sides) -->
+  <rect x="230" y="60" width="80" height="80" fill="none" stroke="#1a1a1a" stroke-width="4"/>
+  <text x="270" y="175" font-size="16" text-anchor="middle" fill="#555" font-family="Arial, sans-serif">4 sides</text>
+
+  <text x="345" y="105" font-size="28" text-anchor="middle" fill="#555" font-family="Arial, sans-serif">&#8594;</text>
+
+  <!-- Pentagon (5 sides) -->
+  <polygon points="430,55 468,85 454,135 406,135 392,85" fill="none" stroke="#1a1a1a" stroke-width="4"/>
+  <text x="430" y="175" font-size="16" text-anchor="middle" fill="#555" font-family="Arial, sans-serif">5 sides</text>
+
+  <text x="505" y="105" font-size="28" text-anchor="middle" fill="#555" font-family="Arial, sans-serif">&#8594;</text>
+
+  <!-- Blank -->
+  <rect x="550" y="65" width="70" height="70" fill="none" stroke="#f97316" stroke-width="4" stroke-dasharray="8,6"/>
+  <text x="585" y="112" font-size="30" text-anchor="middle" fill="#f97316" font-family="Arial, sans-serif" font-weight="bold">?</text>
+</svg>

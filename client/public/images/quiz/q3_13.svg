@@ -1,0 +1,19 @@
+<svg viewBox="0 0 640 220" xmlns="http://www.w3.org/2000/svg">
+  <rect width="640" height="220" fill="#ffffff"/>
+
+  <!-- A: Square -->
+  <rect x="40" y="40" width="90" height="90" fill="none" stroke="#1a1a1a" stroke-width="4"/>
+  <text x="85" y="165" font-size="20" text-anchor="middle" fill="#1a1a1a" font-family="Arial, sans-serif" font-weight="bold">A</text>
+
+  <!-- B: Rectangle -->
+  <rect x="190" y="55" width="120" height="60" fill="none" stroke="#1a1a1a" stroke-width="4"/>
+  <text x="250" y="165" font-size="20" text-anchor="middle" fill="#1a1a1a" font-family="Arial, sans-serif" font-weight="bold">B</text>
+
+  <!-- C: Triangle -->
+  <polygon points="410,40 460,130 360,130" fill="none" stroke="#1a1a1a" stroke-width="4"/>
+  <text x="410" y="165" font-size="20" text-anchor="middle" fill="#1a1a1a" font-family="Arial, sans-serif" font-weight="bold">C</text>
+
+  <!-- D: Rhombus -->
+  <polygon points="550,40 595,85 550,130 505,85" fill="none" stroke="#1a1a1a" stroke-width="4"/>
+  <text x="550" y="165" font-size="20" text-anchor="middle" fill="#1a1a1a" font-family="Arial, sans-serif" font-weight="bold">D</text>
+</svg>

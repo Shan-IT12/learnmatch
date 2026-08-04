@@ -1,0 +1,20 @@
+<svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <rect width="400" height="400" fill="#ffffff"/>
+  <!-- grid lines -->
+  <line x1="200" y1="20" x2="200" y2="380" stroke="#ccc" stroke-width="2"/>
+  <line x1="20" y1="200" x2="380" y2="200" stroke="#ccc" stroke-width="2"/>
+  <rect x="20" y="20" width="360" height="360" fill="none" stroke="#999" stroke-width="2"/>
+
+  <!-- top-left: empty circle -->
+  <circle cx="110" cy="110" r="45" fill="none" stroke="#1a1a1a" stroke-width="5"/>
+
+  <!-- top-right: filled circle -->
+  <circle cx="290" cy="110" r="45" fill="#1a1a1a" stroke="#1a1a1a" stroke-width="5"/>
+
+  <!-- bottom-left: empty square -->
+  <rect x="65" y="245" width="90" height="90" fill="none" stroke="#1a1a1a" stroke-width="5"/>
+
+  <!-- bottom-right: blank -->
+  <rect x="255" y="255" width="70" height="70" fill="none" stroke="#f97316" stroke-width="4" stroke-dasharray="8,6"/>
+  <text x="290" y="308" font-size="34" text-anchor="middle" fill="#f97316" font-family="Arial, sans-serif" font-weight="bold">?</text>
+</svg>
