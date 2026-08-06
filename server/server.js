@@ -63,6 +63,37 @@ app.get('/api/search', async (req, res) => {
   }
 })
 
+// Add this route to server.js, alongside your other routes.
+
+app.post('/api/interests', async (req, res) => {
+  const { userId, interests } = req.body
+
+  if (!userId) {
+    return res.status(400).json({ message: 'Missing userId' })
+  }
+  if (!Array.isArray(interests)) {
+    return res.status(400).json({ message: 'interests must be an array' })
+  }
+
+  try {
+    // Clear previous selections for this user first (in case they're retaking this step)
+    await pool.query('DELETE FROM INTEREST_RESPONSE WHERE user_id = ?', [userId])
+
+    // Insert one row per selected interest. If the user selected nothing, we just skip inserting.
+    for (const interestName of interests) {
+      await pool.query(
+        `INSERT INTO INTEREST_RESPONSE (user_id, interest_name) VALUES (?, ?)`,
+        [userId, interestName]
+      )
+    }
+
+    res.json({ message: 'Interests saved successfully', count: interests.length })
+  } catch (error) {
+    console.error('Interests save error:', error)
+    res.status(500).json({ message: 'Server error saving interests' })
+  }
+})
+
 app.get('/api/quiz', async (req, res) => {
   const dimensions = [
     'Verbal',
