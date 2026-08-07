@@ -16,31 +16,34 @@ function OnboardingInterests() {
     )
   }
 
-  const handleNext = async () => {
-    setSubmitting(true)
-    setError('')
-    const userId = localStorage.getItem('userId')
+ const handleNext = async () => {
+  setSubmitting(true)
+  setError('')
+  const token = localStorage.getItem('token')
 
-    try {
-      const response = await fetch('http://localhost:5000/api/interests', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, interests: selected }),
-      })
-      const data = await response.json()
+  try {
+    const response = await fetch('http://localhost:5000/api/interests', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ interests: selected }),
+    })
+    const data = await response.json()
 
-      if (!response.ok) {
-        setError(data.message || 'Something went wrong saving your interests.')
-        setSubmitting(false)
-        return
-      }
-
-      navigate('/onboarding/skills')
-    } catch {
-      setError('Cannot connect to server. Please try again.')
+    if (!response.ok) {
+      setError(data.message || 'Something went wrong saving your interests.')
       setSubmitting(false)
+      return
     }
+
+    navigate('/onboarding/skills')
+  } catch {
+    setError('Cannot connect to server. Please try again.')
+    setSubmitting(false)
   }
+}
 
   return (
     <OnboardingLayout currentStep={2} isComplete={true}>

@@ -44,42 +44,44 @@ function OnboardingSkills() {
   }
 
   const handleSubmit = async () => {
-    if (Object.keys(answers).length < questions.length) {
-      setError('Please answer all questions before submitting.')
+  if (Object.keys(answers).length < questions.length) {
+    setError('Please answer all questions before submitting.')
+    return
+  }
+
+  setSubmitting(true)
+  setError('')
+  const token = localStorage.getItem('token')
+
+  const formattedAnswers = Object.entries(answers).map(([questionId, selectedOption]) => ({
+    question_id: Number(questionId),
+    selected_option: selectedOption,
+  }))
+
+  try {
+    const response = await fetch('http://localhost:5000/api/quiz', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ answers: formattedAnswers }),
+    })
+    const data = await response.json()
+
+    if (!response.ok) {
+      setError(data.message || 'Something went wrong submitting the quiz.')
+      setSubmitting(false)
       return
     }
 
-    setSubmitting(true)
-    setError('')
-    const userId = localStorage.getItem('userId')
-
-    const formattedAnswers = Object.entries(answers).map(([questionId, selectedOption]) => ({
-      question_id: Number(questionId),
-      selected_option: selectedOption,
-    }))
-
-    try {
-      const response = await fetch('http://localhost:5000/api/quiz', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, answers: formattedAnswers }),
-      })
-      const data = await response.json()
-
-      if (!response.ok) {
-        setError(data.message || 'Something went wrong submitting the quiz.')
-        setSubmitting(false)
-        return
-      }
-
-      console.log('Quiz result:', data)
-      setResults(data)
-    } catch {
-      setError('Cannot connect to server. Please try again.')
-      setSubmitting(false)
-    }
+    console.log('Quiz result:', data)
+    setResults(data)
+  } catch {
+    setError('Cannot connect to server. Please try again.')
+    setSubmitting(false)
   }
-
+}
   const handleContinue = () => {
     navigate('/onboarding/personality')
   }

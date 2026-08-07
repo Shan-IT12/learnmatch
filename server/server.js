@@ -4,6 +4,7 @@ import dotenv from 'dotenv'
 import authRoutes from './routes/authRoutes.js'
 import profileRoutes from './routes/profileRoutes.js'
 import pool from './config/db.js'
+import authenticateToken from './middleware/authenticateToken.js'
 
 dotenv.config()
 
@@ -65,21 +66,17 @@ app.get('/api/search', async (req, res) => {
 
 // Add this route to server.js, alongside your other routes.
 
-app.post('/api/interests', async (req, res) => {
-  const { userId, interests } = req.body
+app.post('/api/interests', authenticateToken, async (req, res) => {
+  const { interests } = req.body
+  const userId = req.user.userId
 
-  if (!userId) {
-    return res.status(400).json({ message: 'Missing userId' })
-  }
   if (!Array.isArray(interests)) {
     return res.status(400).json({ message: 'interests must be an array' })
   }
 
   try {
-    // Clear previous selections for this user first (in case they're retaking this step)
     await pool.query('DELETE FROM INTEREST_RESPONSE WHERE user_id = ?', [userId])
 
-    // Insert one row per selected interest. If the user selected nothing, we just skip inserting.
     for (const interestName of interests) {
       await pool.query(
         `INSERT INTO INTEREST_RESPONSE (user_id, interest_name) VALUES (?, ?)`,
@@ -128,11 +125,12 @@ app.get('/api/quiz', async (req, res) => {
   }
 })
 
-app.post('/api/quiz', async (req, res) => {
-  const { userId, answers } = req.body
+app.post('/api/quiz', authenticateToken, async (req, res) => {
+  const { answers } = req.body
+  const userId = req.user.userId
 
-  if (!userId || !Array.isArray(answers) || answers.length === 0) {
-    return res.status(400).json({ message: 'Missing userId or answers' })
+  if (!Array.isArray(answers) || answers.length === 0) {
+    return res.status(400).json({ message: 'Missing answers' })
   }
 
   try {
@@ -144,18 +142,17 @@ app.post('/api/quiz', async (req, res) => {
       questionIds
     )
 
-    // Build a lookup map: question_id -> { correct_answer, dimension }
     const questionMap = {}
     questions.forEach((q) => {
       questionMap[q.question_id] = q
     })
 
     let correctCount = 0
-    const domainScores = {} // e.g. { Verbal: { correct: 4, total: 5 }, ... }
+    const domainScores = {}
 
     for (const answer of answers) {
       const question = questionMap[answer.question_id]
-      if (!question) continue // skip if question_id somehow doesn't exist
+      if (!question) continue
 
       const isCorrect = question.correct_answer === answer.selected_option ? 1 : 0
       if (isCorrect) correctCount++
@@ -223,8 +220,9 @@ app.get('/api/results', async (req, res) => {
   }
 })
 
-app.post('/api/college/setup', async (req, res) => {
-  const { userId, courseId, yearLevel, semester } = req.body
+app.post('/api/college/setup', authenticateToken, async (req, res) => {
+  const { courseId, yearLevel, semester } = req.body
+  const userId = req.user.userId
 
   try {
     await pool.query(

@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom'
 function CollegeSetup() {
   const navigate = useNavigate()
   const token = localStorage.getItem('token')
-  const userId = localStorage.getItem('userId')
 
   const [courses, setCourses] = useState([])
   const [search, setSearch] = useState('')
@@ -41,54 +40,55 @@ function CollegeSetup() {
   }
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setError('')
+  e.preventDefault()
+  setError('')
 
-    if (!selectedCourse) {
-      setError('Please select a course from the list.')
-      return
-    }
-    if (!yearLevel) {
-      setError('Please select your year level.')
-      return
-    }
-    if (!semester) {
-      setError('Please select your current semester.')
-      return
-    }
-
-    setLoading(true)
-    try {
-      const response = await fetch('http://localhost:5000/api/college/setup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId,
-          courseId: selectedCourse.course_id,
-          courseName: selectedCourse.course_name,
-          yearLevel,
-          semester,
-        }),
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        setError(data.message)
-        return
-      }
-
-      // Save to localStorage for easy access
-      localStorage.setItem('enrolledCourse', selectedCourse.course_name)
-      localStorage.setItem('yearLevel', yearLevel)
-      localStorage.setItem('semester', semester)
-
-      navigate('/college')
-    } catch {
-      setError('Cannot connect to server. Please try again.')
-    }
-    setLoading(false)
+  if (!selectedCourse) {
+    setError('Please select a course from the list.')
+    return
   }
+  if (!yearLevel) {
+    setError('Please select your year level.')
+    return
+  }
+  if (!semester) {
+    setError('Please select your current semester.')
+    return
+  }
+
+  setLoading(true)
+  try {
+    const response = await fetch('http://localhost:5000/api/college/setup', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        courseId: selectedCourse.course_id,
+        courseName: selectedCourse.course_name,
+        yearLevel,
+        semester,
+      }),
+    })
+
+    const data = await response.json()
+
+    if (!response.ok) {
+      setError(data.message)
+      return
+    }
+
+    localStorage.setItem('enrolledCourse', selectedCourse.course_name)
+    localStorage.setItem('yearLevel', yearLevel)
+    localStorage.setItem('semester', semester)
+
+    navigate('/college')
+  } catch {
+    setError('Cannot connect to server. Please try again.')
+  }
+  setLoading(false)
+}
 
   return (
     <div className="min-h-screen bg-gray-50">
