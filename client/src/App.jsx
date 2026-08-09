@@ -11,6 +11,7 @@ import OnboardingPersonality from './pages/onboarding/OnboardingPersonality'
 import Results from './pages/Results'
 import CollegeSetup from './pages/college/CollegeSetup' 
 import CollegeDashboard from './pages/college/CollegeDashboard'
+import './App.css'
 
 
 function App() {
