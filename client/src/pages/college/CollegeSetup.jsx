@@ -30,7 +30,7 @@ function CollegeSetup() {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/search?q=${encodeURIComponent(query)}`
+        `${import.meta.env.VITE_API_URL}/api/search?q=${encodeURIComponent(query)}`
       )
       const data = await response.json()
       setCourses(data.courses || [])
@@ -58,7 +58,7 @@ function CollegeSetup() {
 
   setLoading(true)
   try {
-    const response = await fetch('http://localhost:5000/api/college/setup', {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/college/setup`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -32,7 +32,7 @@ function Profile() {
     // Load existing profile if it exists
     const fetchProfile = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/profile?userId=${userId}`)
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/profile?userId=${userId}`)
         const data = await response.json()
 
         if (data.profile) {
@@ -93,7 +93,7 @@ function Profile() {
     setError('')
 
     try {
-      const response = await fetch('http://localhost:5000/api/profile', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/profile`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...formData, userId }),

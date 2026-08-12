@@ -8,7 +8,7 @@ function Results() {
   const [error, setError] = useState('')
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/results')
+    fetch(`${import.meta.env.VITE_API_URL}/api/results`)
       .then((res) => res.json())
       .then((data) => {
         setRecommendations(data.recommendations || [])

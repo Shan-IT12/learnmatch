@@ -15,7 +15,7 @@ function OnboardingSkills() {
 
   // Fetch 30 questions once when the page loads
   useEffect(() => {
-    fetch('http://localhost:5000/api/quiz')
+    fetch(`${import.meta.env.VITE_API_URL}/api/quiz`)
       .then((res) => res.json())
       .then((data) => {
         setQuestions(data.questions || [])
@@ -59,7 +59,7 @@ function OnboardingSkills() {
   }))
 
   try {
-    const response = await fetch('http://localhost:5000/api/quiz', {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/quiz`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
