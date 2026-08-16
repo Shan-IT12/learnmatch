@@ -237,3 +237,50 @@ app.post('/api/college/setup', authenticateToken, async (req, res) => {
     res.status(500).json({ message: 'Server error during college setup' })
   }
 })
+
+app.get('/api/dashboard/status', authenticateToken, async (req, res) => {
+  const userId = req.user.userId
+
+  try {
+    const [[interestCount]] = await pool.query(
+      'SELECT COUNT(*) AS count FROM INTEREST_RESPONSE WHERE user_id = ?',
+      [userId]
+    )
+    const [[skillCount]] = await pool.query(
+      'SELECT COUNT(*) AS count FROM SKILL_RESPONSE WHERE user_id = ?',
+      [userId]
+    )
+    const [[personalityCount]] = await pool.query(
+      'SELECT COUNT(*) AS count FROM PERSONALITY_ASSESSMENT WHERE user_id = ?',
+      [userId]
+    )
+    const [checkins] = await pool.query(
+      `SELECT sc.semester, sc.comments, c.course_name
+       FROM SEMESTER_CHECKIN sc
+       JOIN COURSE c ON sc.course_id = c.course_id
+       WHERE sc.user_id = ?
+       ORDER BY sc.checkin_id DESC
+       LIMIT 1`,
+      [userId]
+    )
+
+    const isCollegePhase = checkins.length > 0
+
+    res.json({
+      hasInterests: interestCount.count > 0,
+      hasSkills: skillCount.count > 0,
+      hasPersonality: personalityCount.count > 0,
+      isCollegePhase,
+      collegeInfo: isCollegePhase
+        ? {
+            courseName: checkins[0].course_name,
+            semester: checkins[0].semester,
+            comments: checkins[0].comments,
+          }
+        : null,
+    })
+  } catch (error) {
+    console.error('Dashboard status error:', error)
+    res.status(500).json({ message: 'Server error fetching dashboard status' })
+  }
+})
