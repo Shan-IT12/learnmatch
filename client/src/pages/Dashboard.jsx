@@ -13,8 +13,6 @@ function Dashboard() {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(true)
   const [loadingTextIndex, setLoadingTextIndex] = useState(0)
-  const [collegeInfo, setCollegeInfo] = useState(null)       // set kung State 3
-  const [showCollegeConfirm, setShowCollegeConfirm] = useState(false)
   const token = localStorage.getItem('token')
   const username = localStorage.getItem('username')
 
@@ -41,9 +39,7 @@ function Dashboard() {
         const data = await res.json()
 
         if (data.isCollegePhase) {
-          setCollegeInfo(data.collegeInfo)
-          setShowCollegeConfirm(true)
-          setLoading(false)
+          navigate('/college')
         } else if (data.hasInterests && data.hasSkills) {
           navigate('/dashboard/summary')
         } else {
@@ -78,58 +74,7 @@ function Dashboard() {
       </div>
     )
   }
-
-  // ---------- College phase confirmation popup ----------
-  if (showCollegeConfirm) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-white px-6">
-        <div className="max-w-sm w-full bg-white rounded-2xl border border-gray-100 shadow-lg p-7 text-center">
-          <IconSchool size={28} stroke={1.75} className="text-orange-500 mx-auto mb-3" />
-          <h2 className="text-lg font-bold text-gray-900 mb-1">Ready to continue?</h2>
-          <p className="text-sm text-gray-500 mb-6">
-            You're enrolled in <strong>{collegeInfo?.courseName}</strong> ({collegeInfo?.semester}).
-            Go to your College Dashboard?
-          </p>
-          <div className="flex gap-3">
-            <button
-              onClick={() => setShowCollegeConfirm(false)}
-              className="flex-1 bg-gray-100 text-gray-700 px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-200 transition"
-            >
-              Stay here
-            </button>
-            <button
-              onClick={() => navigate('/college')}
-              className="flex-1 bg-gray-900 text-white px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-800 transition"
-            >
-              Go to College
-            </button>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  // ---------- Fallback: user chose "Stay here" while enrolled in college ----------
-  if (collegeInfo) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center px-6">
-        <div className="max-w-md w-full bg-white rounded-2xl border border-gray-100 shadow-sm p-7">
-          <p className="text-xs font-semibold text-orange-500 uppercase tracking-widest mb-2">
-            Currently Enrolled
-          </p>
-          <h2 className="text-lg font-bold text-gray-900 mb-1">{collegeInfo.courseName}</h2>
-          <p className="text-sm text-gray-500 mb-5">{collegeInfo.semester}</p>
-          <button
-            onClick={() => navigate('/college')}
-            className="inline-flex items-center gap-1.5 bg-gray-900 text-white px-5 py-3 rounded-xl text-sm font-medium hover:bg-gray-800 transition"
-          >
-            Go to College Dashboard <IconArrowRight size={16} stroke={2} />
-          </button>
-        </div>
-      </div>
-    )
-  }
-
+  
   // ---------- State 1: no assessment yet ----------
   const steps = [
     { label: 'Profile', done: false },
