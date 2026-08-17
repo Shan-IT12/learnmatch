@@ -11,6 +11,7 @@ import OnboardingPersonality from './pages/onboarding/OnboardingPersonality'
 import Results from './pages/Results'
 import CollegeSetup from './pages/college/CollegeSetup' 
 import CollegeDashboard from './pages/college/CollegeDashboard'
+import SummaryDashboard from './pages/SummaryDashboard'
 import './App.css'
 
 
@@ -29,6 +30,7 @@ function App() {
       <Route path="/college/setup" element={<CollegeSetup />} />
       <Route path="/college" element={<CollegeDashboard />} />
       <Route path="/results" element={<Results />} />
+      <Route path="/dashboard/summary" element={<SummaryDashboard />} />
     </Routes>
   )
 }
