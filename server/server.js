@@ -284,3 +284,49 @@ app.get('/api/dashboard/status', authenticateToken, async (req, res) => {
     res.status(500).json({ message: 'Server error fetching dashboard status' })
   }
 })
+
+app.get('/api/interests', authenticateToken, async (req, res) => {
+  const userId = req.user.userId
+
+  try {
+    const [rows] = await pool.query(
+      'SELECT interest_name FROM INTEREST_RESPONSE WHERE user_id = ?',
+      [userId]
+    )
+    res.json({ interests: rows.map((r) => r.interest_name) })
+  } catch (error) {
+    console.error('Interests fetch error:', error)
+    res.status(500).json({ message: 'Server error fetching interests' })
+  }
+})
+
+app.get('/api/quiz/results', authenticateToken, async (req, res) => {
+  const userId = req.user.userId
+
+  try {
+    const [rows] = await pool.query(
+      `SELECT sr.is_correct, q.dimension
+       FROM SKILL_RESPONSE sr
+       JOIN QUESTION q ON sr.question_id = q.question_id
+       WHERE sr.user_id = ?
+       ORDER BY sr.skill_response_id DESC
+       LIMIT 30`,
+      [userId]
+    )
+
+    const domainScores = {}
+    rows.forEach((row) => {
+      if (!domainScores[row.dimension]) {
+        domainScores[row.dimension] = { correct: 0, total: 0 }
+      }
+      domainScores[row.dimension].total++
+      if (row.is_correct) domainScores[row.dimension].correct++
+    })
+
+    res.json({ domainScores })
+  } catch (error) {
+    console.error('Quiz results fetch error:', error)
+    res.status(500).json({ message: 'Server error fetching quiz results' })
+  }
+})
+
