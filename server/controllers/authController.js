@@ -2,8 +2,28 @@ import pool from '../config/db.js'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 
+const isValidEmail = (email) => {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+}
+
+const isValidPassword = (password) => {
+  if (password.length < 8) return 'Password must be at least 8 characters'
+  if (!/[A-Z]/.test(password)) return 'Password must include at least one uppercase letter'
+  if (!/[0-9]/.test(password)) return 'Password must include at least one number'
+  return null
+}
+
 export const registerUser = async (req, res) => {
   const { email, username, password } = req.body
+
+  if (!isValidEmail(email)) {
+    return res.status(400).json({ message: 'Please enter a valid email address' })
+  }
+
+  const passwordError = isValidPassword(password)
+  if (passwordError) {
+    return res.status(400).json({ message: passwordError })
+  }
 
   try {
     const [existingEmail] = await pool.query(
