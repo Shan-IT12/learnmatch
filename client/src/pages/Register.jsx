@@ -1,6 +1,18 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
+const isValidEmail = (email) => {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+}
+
+const isValidPassword = (password) => {
+  if (password.length < 8) return 'Password must be at least 8 characters'
+  if (!/[A-Z]/.test(password)) return 'Password must include at least one uppercase letter'
+  if (!/[0-9]/.test(password)) return 'Password must include at least one number'
+  return null
+}
+
+
 function Register() {
   const navigate = useNavigate()
   const [formData, setFormData] = useState({
@@ -17,15 +29,26 @@ function Register() {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
 
-  const handleSubmit = async (e) => {
+    const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
+
+    if (!isValidEmail(formData.email)) {
+      setError('Please enter a valid email address')
+      return
+    }
+
+    const passwordError = isValidPassword(formData.password)
+    if (passwordError) {
+      setError(passwordError)
+      return
+    }
 
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match')
       return
     }
-
+    
     setSubmitting(true)
 
     try {
@@ -147,7 +170,10 @@ function Register() {
                 minLength={8}
                 disabled={success}
               />
-            </div>
+              <p className="text-xs text-gray-400 mt-1.5">
+                At least 8 characters, with 1 uppercase letter and 1 number
+              </p>
+          </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
