@@ -84,6 +84,12 @@ function Results() {
                 </div>
 
                 <p className="text-sm text-gray-600 leading-relaxed">{rec.ai_narrative}</p>
+                <button
+                onClick={() => navigate(`/results/career-path/${rec.course_id}`)}
+                className="mt-4 text-sm font-medium text-orange-500 hover:text-orange-600 transition inline-flex items-center gap-1"
+              >
+                View Career Path →
+              </button>
               </div>
             ))}
           </div>

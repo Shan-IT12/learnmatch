@@ -12,6 +12,7 @@ import Results from './pages/Results'
 import CollegeSetup from './pages/college/CollegeSetup' 
 import CollegeDashboard from './pages/college/CollegeDashboard'
 import SummaryDashboard from './pages/SummaryDashboard'
+import CareerPath from './pages/CareerPath'
 import './App.css'
 
 
@@ -31,6 +32,7 @@ function App() {
       <Route path="/college" element={<CollegeDashboard />} />
       <Route path="/results" element={<Results />} />
       <Route path="/dashboard/summary" element={<SummaryDashboard />} />
+      <Route path="/results/career-path/:courseId" element={<CareerPath />} />
     </Routes>
   )
 }
