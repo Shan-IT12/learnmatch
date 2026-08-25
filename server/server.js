@@ -330,3 +330,103 @@ app.get('/api/quiz/results', authenticateToken, async (req, res) => {
   }
 })
 
+app.get('/api/courses/:id', async (req, res) => {
+  try {
+    const [rows] = await pool.query(
+      'SELECT course_id, course_name, description, cluster_category FROM COURSE WHERE course_id = ?',
+      [req.params.id]
+    )
+    if (rows.length === 0) {
+      return res.status(404).json({ message: 'Course not found' })
+    }
+    res.json({ course: rows[0] })
+  } catch (error) {
+    console.error('Course fetch error:', error)
+    res.status(500).json({ message: 'Server error fetching course' })
+  }
+})
+
+app.post('/api/mbti', authenticateToken, async (req, res) => {
+  const { answers } = req.body
+  const userId = req.user.userId
+ 
+  if (!Array.isArray(answers) || answers.length === 0) {
+    return res.status(400).json({ message: 'Missing answers' })
+  }
+ 
+  try {
+    // Sum ratings per dimension per pole, e.g. totals.EI.E, totals.EI.I
+    const totals = {
+      EI: { E: 0, I: 0 },
+      SN: { S: 0, N: 0 },
+      TF: { T: 0, F: 0 },
+      JP: { J: 0, P: 0 },
+    }
+ 
+    for (const a of answers) {
+      if (totals[a.dimension] && totals[a.dimension][a.pole] !== undefined) {
+        totals[a.dimension][a.pole] += Number(a.rating)
+      }
+    }
+ 
+    // % leaning toward the first-listed letter of each dichotomy (E, N, T, J)
+    const scoreEI = (totals.EI.E / (totals.EI.E + totals.EI.I)) * 100
+    const scoreNS = (totals.SN.N / (totals.SN.N + totals.SN.S)) * 100
+    const scoreTF = (totals.TF.T / (totals.TF.T + totals.TF.F)) * 100
+    const scoreJP = (totals.JP.J / (totals.JP.J + totals.JP.P)) * 100
+ 
+    const mbtiType =
+      (scoreEI >= 50 ? 'E' : 'I') +
+      (scoreNS >= 50 ? 'N' : 'S') +
+      (scoreTF >= 50 ? 'T' : 'F') +
+      (scoreJP >= 50 ? 'J' : 'P')
+ 
+    await pool.query(
+      `INSERT INTO PERSONALITY_ASSESSMENT (user_id, mbti_type, score_ei, score_ns, score_tf, score_jp)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+      [userId, mbtiType, scoreEI, scoreNS, scoreTF, scoreJP]
+    )
+ 
+    res.json({
+      message: 'Personality assessment saved successfully',
+      mbtiType,
+      scores: { EI: scoreEI, NS: scoreNS, TF: scoreTF, JP: scoreJP },
+    })
+  } catch (error) {
+    console.error('MBTI submit error:', error)
+    res.status(500).json({ message: 'Server error saving personality assessment' })
+  }
+})
+ 
+// Returns the user's saved MBTI result, if any (used by SummaryDashboard).
+app.get('/api/mbti', authenticateToken, async (req, res) => {
+  const userId = req.user.userId
+ 
+  try {
+    const [rows] = await pool.query(
+      `SELECT mbti_type, score_ei, score_ns, score_tf, score_jp
+       FROM PERSONALITY_ASSESSMENT
+       WHERE user_id = ?
+       ORDER BY assessment_id DESC
+       LIMIT 1`,
+      [userId]
+    )
+ 
+    if (rows.length === 0) {
+      return res.json({ mbtiType: null })
+    }
+ 
+    res.json({
+      mbtiType: rows[0].mbti_type,
+      scores: {
+        EI: rows[0].score_ei,
+        NS: rows[0].score_ns,
+        TF: rows[0].score_tf,
+        JP: rows[0].score_jp,
+      },
+    })
+  } catch (error) {
+    console.error('MBTI fetch error:', error)
+    res.status(500).json({ message: 'Server error fetching personality assessment' })
+  }
+})
