@@ -63,9 +63,12 @@ function CareerPath() {
     return (
     <div className="min-h-screen bg-gray-50">
       <nav className="bg-white border-b border-gray-100 px-8 py-5 flex justify-between items-center">
-        <span className="text-lg font-bold">
+        <button
+          onClick={() => navigate('/dashboard')}
+          className="text-lg font-bold text-gray-900 hover:opacity-80 transition"
+        >
           Learn<span className="text-orange-500">Match</span>
-        </span>
+        </button>
         <button
           onClick={() => navigate('/results')}
           className="text-sm text-gray-500 hover:text-gray-900 transition"

@@ -10,9 +10,12 @@ function CollegeDashboard() {
   return (
     <div className="min-h-screen bg-gray-50">
       <nav className="bg-white border-b border-gray-100 px-8 py-5 flex justify-between items-center">
-        <span className="text-lg font-bold">
+        <button
+          onClick={() => navigate('/dashboard')}
+          className="text-lg font-bold text-gray-900 hover:opacity-80 transition"
+        >
           Learn<span className="text-orange-500">Match</span>
-        </span>
+        </button>
         <div className="flex items-center gap-4">
           <span className="text-sm text-gray-500">Welcome, <strong>{username}</strong></span>
           <button
@@ -42,9 +45,9 @@ function CollegeDashboard() {
         {/* Feature cards */}
         <div className="grid grid-cols-3 gap-4">
           {[
-            { title: 'Semester Check-in', desc: 'Rate your alignment this semester', icon: '📋' },
-            { title: 'Career Roadmap', desc: 'See your year-by-year academic path', icon: '🗺️' },
-            { title: 'Mismatch Detection', desc: 'AI analysis of your alignment score', icon: '🤖' },
+            { title: 'Semester Check-in', desc: 'Rate your alignment this semester' },
+            { title: 'Career Roadmap', desc: 'See your year-by-year academic path' },
+            { title: 'Mismatch Detection', desc: 'AI analysis of your alignment score' },
           ].map((card) => (
             <div key={card.title} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
               <span className="text-2xl mb-3 block">{card.icon}</span>

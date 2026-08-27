@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useNavigate } from "react-router-dom";
 
 const steps = [
@@ -9,6 +10,7 @@ const steps = [
 
 function OnboardingLayout({ children, currentStep, isComplete }) {
   const navigate = useNavigate()
+  const [showExitConfirm, setShowExitConfirm] = useState(false)
 
   const handleBack = () => {
     if (currentStep === 1) {
@@ -26,14 +28,51 @@ function OnboardingLayout({ children, currentStep, isComplete }) {
     }
   }
 
+  const handleLogoClick = () => {
+    setShowExitConfirm(true)
+  }
+
+  const confirmExit = () => {
+    navigate('/dashboard')
+  }
+
   return (
     <div className="min-h-screen bg-white flex flex-col">
 
+      {/* Exit confirmation modal */}
+      {showExitConfirm && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-6">
+          <div className="max-w-sm w-full bg-white rounded-2xl shadow-lg p-7 text-center">
+            <h3 className="text-lg font-bold text-gray-900 mb-1">Leave this assessment?</h3>
+            <p className="text-sm text-gray-500 mb-6">
+              Your progress on this step hasn't been saved yet. If you leave now, you'll need to redo it.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowExitConfirm(false)}
+                className="flex-1 bg-gray-100 text-gray-700 px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-200 transition"
+              >
+                Stay
+              </button>
+              <button
+                onClick={confirmExit}
+                className="flex-1 bg-orange-500 text-white px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-orange-600 transition"
+              >
+                Leave anyway
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Top bar */}
       <div className="flex justify-between items-center px-8 py-5 border-b border-gray-100">
-        <span className="text-lg font-bold tracking-tight text-gray-900">
+        <button
+          onClick={handleLogoClick}
+          className="text-lg font-bold tracking-tight text-gray-900 hover:opacity-80 transition"
+        >
           Learn<span className="text-orange-500">Match</span>
-        </span>
+        </button>
         <span className="text-sm text-gray-400">
           Step {currentStep} of {steps.length}
         </span>

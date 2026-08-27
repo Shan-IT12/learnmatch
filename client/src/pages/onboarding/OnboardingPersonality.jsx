@@ -122,7 +122,7 @@ function OnboardingPersonality() {
             onClick={handleContinue}
             className="w-full bg-orange-500 text-white py-3 rounded-xl font-medium hover:bg-orange-600 transition text-sm"
           >
-            Continue to Dashboard →
+            See Your Recommendations →
           </button>
         </div>
       </OnboardingLayout>

@@ -242,6 +242,10 @@ app.get('/api/dashboard/status', authenticateToken, async (req, res) => {
   const userId = req.user.userId
 
   try {
+    const [[profileCount]] = await pool.query(
+      'SELECT COUNT(*) AS count FROM PROFILE WHERE user_id = ?',
+      [userId]
+    )
     const [[interestCount]] = await pool.query(
       'SELECT COUNT(*) AS count FROM INTEREST_RESPONSE WHERE user_id = ?',
       [userId]
@@ -267,6 +271,7 @@ app.get('/api/dashboard/status', authenticateToken, async (req, res) => {
     const isCollegePhase = checkins.length > 0
 
     res.json({
+      hasProfile: profileCount.count > 0,
       hasInterests: interestCount.count > 0,
       hasSkills: skillCount.count > 0,
       hasPersonality: personalityCount.count > 0,

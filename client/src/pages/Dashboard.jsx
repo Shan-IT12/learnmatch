@@ -108,9 +108,12 @@ function Dashboard() {
   return (
     <div className="min-h-screen bg-white">
       <nav className="bg-white border-b border-gray-100 px-14 py-[18px] flex justify-between items-center">
-        <span className="text-lg font-bold text-gray-900">
+        <button
+          onClick={() => navigate('/dashboard')}
+          className="text-lg font-bold text-gray-900 hover:opacity-80 transition"
+        >
           Learn<span className="text-orange-500">Match</span>
-        </span>
+        </button>
         <div className="flex items-center gap-4">
           <span className="text-sm text-gray-500">
             Welcome, <strong className="text-gray-900">{username}</strong>
@@ -119,7 +122,7 @@ function Dashboard() {
             onClick={() => navigate('/profile')}
             className="bg-orange-500 text-white px-4 py-2.5 rounded-xl text-xs font-medium hover:bg-orange-600 transition"
           >
-            Edit Profile
+            View Profile
           </button>
           <button
             onClick={handleLogout}

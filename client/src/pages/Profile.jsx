@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useLocation } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { IconInfoCircle, IconArrowLeft } from '@tabler/icons-react'
 
 const personalFactors = [
@@ -38,10 +37,11 @@ const personalFactors = [
 
 function Profile() {
   const navigate = useNavigate()
-  const location = useLocation()
-  const fromOnboarding = location.state?.fromOnboarding
   const userId = localStorage.getItem('userId')
   const token = localStorage.getItem('token')
+  const location = useLocation()
+  const assessmentComplete = location.state?.assessmentComplete
+  const [showRetakePrompt, setShowRetakePrompt] = useState(false)
 
   const [formData, setFormData] = useState({
     full_name: '',
@@ -142,12 +142,17 @@ function Profile() {
         return
       }
 
-      setMessage(data.message)
-      setTimeout(() => {
-        navigate(fromOnboarding ? '/onboarding/interests' : '/dashboard', {
-          state: fromOnboarding ? undefined : { profileUpdated: true },
-        })
-      }, 800)
+      if (assessmentComplete) {
+        // User already finished their assessment — don't auto-navigate away.
+        // Show a recommendation to retake instead, since their info just changed.
+        setMessage(data.message)
+        setShowRetakePrompt(true)
+      } else {
+        setMessage(data.message)
+        setTimeout(() => {
+          navigate('/dashboard', { state: { profileUpdated: true } })
+        }, 800)
+      }
     } catch {
       setError('Cannot connect to server. Please try again.')
     }
@@ -156,9 +161,12 @@ function Profile() {
   return (
     <div className="min-h-screen bg-white">
       <nav className="bg-white border-b border-gray-100 px-14 py-[18px] flex justify-between items-center">
-        <span className="text-lg font-bold text-gray-900">
+        <button
+          onClick={() => navigate('/dashboard')}
+          className="text-lg font-bold text-gray-900 hover:opacity-80 transition"
+        >
           Learn<span className="text-orange-500">Match</span>
-        </span>
+        </button>
         <button
           onClick={() => navigate('/dashboard')}
           className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 transition"
@@ -182,6 +190,36 @@ function Profile() {
         {error && (
           <div className="bg-red-50 text-red-600 px-4 py-3 rounded-xl text-sm mb-6">
             {error}
+          </div>
+        )}
+
+        {/* Retake-assessment recommendation, shown only after editing a
+            profile that already has a completed assessment */}
+        {showRetakePrompt && (
+          <div className="bg-orange-50 border border-orange-100 rounded-2xl px-5 py-4 mb-6">
+            <p className="text-sm font-semibold text-gray-900 mb-1">
+              Your profile has changed
+            </p>
+            <p className="text-xs text-gray-500 mb-4">
+              Since you've already completed your assessment, we recommend retaking it so your
+              course recommendations reflect your updated information.
+            </p>
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => navigate('/dashboard')}
+                className="flex-1 bg-white border border-gray-200 text-gray-700 px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-50 transition"
+              >
+                Not now
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate('/onboarding/profile')}
+                className="flex-1 bg-orange-500 text-white px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-orange-600 transition"
+              >
+                Retake Assessment
+              </button>
+            </div>
           </div>
         )}
 
