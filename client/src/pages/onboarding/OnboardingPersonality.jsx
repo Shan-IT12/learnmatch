@@ -74,7 +74,7 @@ function OnboardingPersonality() {
   }
 
   const handleContinue = () => {
-    navigate('/dashboard')
+    navigate('/dashboard/summary')
   }
 
   // ---------- Results screen ----------

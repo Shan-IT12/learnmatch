@@ -2,15 +2,40 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { IconArrowRight, IconRefresh, IconSchool, IconHistory } from '@tabler/icons-react'
 
+const personalFactorLabels = {
+  factor_physical: 'Physical / Mobility Condition',
+  factor_health: 'Health Condition',
+  factor_financial: 'Financial Constraint',
+  factor_family: 'Family Obligation',
+  factor_distance: 'Distance / Commute',
+  factor_working_student: 'Working Student',
+}
+
+// Same placeholder data used in CareerPath.jsx — replace once
+// CAREER_ROADMAP / CAREER_OPPORTUNITY tables are populated.
+const placeholderSkills = [
+  'Problem Solving', 'Technical Communication', 'Analytical Thinking',
+  'Project Management', 'Research Methods',
+]
+ 
+const placeholderOpportunities = [
+  { title: 'Entry-Level Role in the Field', salary: '₱18,000 - ₱28,000/month' },
+  { title: 'Mid-Level Specialist', salary: '₱30,000 - ₱50,000/month' },
+]
+
 function SummaryDashboard() {
   const navigate = useNavigate()
   const token = localStorage.getItem('token')
+  const userId = localStorage.getItem('userId')
   const username = localStorage.getItem('username')
 
   const [loading, setLoading] = useState(true)
   const [topRecommendation, setTopRecommendation] = useState(null)
+  const [topCourseDetail, setTopCourseDetail] = useState(null)
   const [interests, setInterests] = useState([])
   const [domainScores, setDomainScores] = useState({})
+  const [profile, setProfile] = useState(null)
+  const [mbti, setMbti] = useState(null)
 
   useEffect(() => {
     if (!token) {
@@ -21,38 +46,50 @@ function SummaryDashboard() {
     const fetchSummary = async () => {
       try {
         const headers = { Authorization: `Bearer ${token}` }
-        const [resultsRes, interestsRes, quizRes] = await Promise.all([
+        const [resultsRes, interestsRes, quizRes, profileRes, mbtiRes] = await Promise.all([
           fetch(`${import.meta.env.VITE_API_URL}/api/results`, { headers }),
           fetch(`${import.meta.env.VITE_API_URL}/api/interests`, { headers }),
           fetch(`${import.meta.env.VITE_API_URL}/api/quiz/results`, { headers }),
+          fetch(`${import.meta.env.VITE_API_URL}/api/profile?userId=${userId}`, { headers }),
+          fetch(`${import.meta.env.VITE_API_URL}/api/mbti`, { headers }),
         ])
 
         const resultsData = await resultsRes.json()
         const interestsData = await interestsRes.json()
         const quizData = await quizRes.json()
-
-        if (resultsData.recommendations?.length > 0) {
-          setTopRecommendation(resultsData.recommendations[0])
+        const profileData = await profileRes.json()
+        const mbtiData = await mbtiRes.json()
+ 
+        const top = resultsData.recommendations?.[0] || null
+        if (top) {
+          setTopRecommendation(top)
+          // Fetch course description for the top recommendation's career path preview
+          const courseRes = await fetch(`${import.meta.env.VITE_API_URL}/api/courses/${top.course_id}`)
+          const courseData = await courseRes.json()
+          setTopCourseDetail(courseData.course || null)
         }
+ 
         setInterests(interestsData.interests || [])
         setDomainScores(quizData.domainScores || {})
+        setProfile(profileData.profile || null)
+        setMbti(mbtiData.mbtiType ? mbtiData : null)
       } catch (error) {
         console.error('Summary fetch error:', error)
       } finally {
         setLoading(false)
       }
     }
-
+ 
     fetchSummary()
-  }, [navigate, token])
-
+  }, [navigate, token, userId])
+ 
   const handleLogout = () => {
     localStorage.removeItem('token')
     localStorage.removeItem('userId')
     localStorage.removeItem('username')
     navigate('/login')
   }
-
+ 
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-white">
@@ -63,7 +100,35 @@ function SummaryDashboard() {
       </div>
     )
   }
-
+ 
+  // Compute BMI for the profile summary card, if height/weight are set
+  let bmi = null
+  let bmiLabel = ''
+  if (profile?.height_cm && profile?.weight_kg) {
+    const heightInMeters = profile.height_cm / 100
+    bmi = (profile.weight_kg / (heightInMeters * heightInMeters)).toFixed(1)
+    if (bmi < 18.5) bmiLabel = 'Underweight'
+    else if (bmi < 25) bmiLabel = 'Normal'
+    else if (bmi < 30) bmiLabel = 'Overweight'
+    else bmiLabel = 'Obese'
+  }
+ 
+  const checkedFactors = profile
+    ? Object.entries(personalFactorLabels)
+        .filter(([key]) => profile[key])
+        .map(([, label]) => label)
+    : []
+  if (profile?.factor_others) {
+    checkedFactors.push(`Other: ${profile.factor_others}`)
+  }
+ 
+  const mbtiDimensionLabels = {
+    EI: ['E', 'I'],
+    NS: ['N', 'S'],
+    TF: ['T', 'F'],
+    JP: ['J', 'P'],
+  }
+ 
   return (
     <div className="min-h-screen bg-white">
       <nav className="bg-white border-b border-gray-100 px-14 py-[18px] flex justify-between items-center">
@@ -88,9 +153,9 @@ function SummaryDashboard() {
           </button>
         </div>
       </nav>
-
+ 
       <div className="max-w-[1320px] mx-auto px-14 py-11">
-
+ 
         {/* Top recommendation preview */}
         {topRecommendation && (
           <div
@@ -116,11 +181,52 @@ function SummaryDashboard() {
             </button>
           </div>
         )}
-
-        {/* Assessment summary: Interests + Skills */}
+ 
+        {/* Profile + Personal Factors */}
         <div className="grid grid-cols-2 gap-5 mb-5">
-
-          {/* Interests card */}
+ 
+          <div className="rounded-[20px] px-7 py-6 border border-gray-100 shadow-sm">
+            <p className="text-[11px] font-semibold uppercase tracking-wide mb-4 text-gray-400">
+              Your Profile
+            </p>
+            {profile ? (
+              <div className="space-y-1.5">
+                <p className="text-sm text-gray-900 font-medium">{profile.full_name}</p>
+                {bmi && (
+                  <p className="text-xs text-gray-500">
+                    BMI: {bmi} ({bmiLabel})
+                  </p>
+                )}
+              </div>
+            ) : (
+              <p className="text-sm text-gray-400">No profile info yet.</p>
+            )}
+          </div>
+ 
+          <div className="rounded-[20px] px-7 py-6 border border-gray-100 shadow-sm">
+            <p className="text-[11px] font-semibold uppercase tracking-wide mb-4 text-gray-400">
+              Personal Factors
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {checkedFactors.length > 0 ? (
+                checkedFactors.map((label) => (
+                  <span
+                    key={label}
+                    className="text-xs px-3 py-1.5 rounded-full bg-gray-100 text-gray-600 font-medium"
+                  >
+                    {label}
+                  </span>
+                ))
+              ) : (
+                <p className="text-sm text-gray-400">No personal factors selected.</p>
+              )}
+            </div>
+          </div>
+        </div>
+ 
+        {/* Interests + Skills */}
+        <div className="grid grid-cols-2 gap-5 mb-5">
+ 
           <div className="rounded-[20px] px-7 py-6 border border-gray-100 shadow-sm">
             <p className="text-[11px] font-semibold uppercase tracking-wide mb-4 text-gray-400">
               Your Interests
@@ -140,8 +246,7 @@ function SummaryDashboard() {
               )}
             </div>
           </div>
-
-          {/* Skills card */}
+ 
           <div className="rounded-[20px] px-7 py-6 border border-gray-100 shadow-sm">
             <p className="text-[11px] font-semibold uppercase tracking-wide mb-4 text-gray-400">
               Skills Quiz Results
@@ -170,15 +275,88 @@ function SummaryDashboard() {
             </div>
           </div>
         </div>
-
-        {/* MBTI placeholder */}
+ 
+        {/* MBTI */}
         <div className="rounded-[20px] px-7 py-6 border border-gray-100 shadow-sm mb-5">
-          <p className="text-[11px] font-semibold uppercase tracking-wide mb-2 text-gray-400">
+          <p className="text-[11px] font-semibold uppercase tracking-wide mb-4 text-gray-400">
             Personality Type
           </p>
-          <p className="text-sm text-gray-400">Coming soon — take the Personality assessment to see your MBTI type here.</p>
+          {mbti ? (
+            <div>
+              <p className="text-2xl font-bold text-orange-500 mb-4">{mbti.mbtiType}</p>
+              <div className="grid grid-cols-4 gap-4">
+                {Object.entries(mbtiDimensionLabels).map(([key, [first, second]]) => {
+                  const percent = Math.round(mbti.scores[key])
+                  return (
+                    <div key={key}>
+                      <div className="flex justify-between text-[11px] text-gray-500 mb-1">
+                        <span>{first}</span>
+                        <span>{second}</span>
+                      </div>
+                      <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-orange-500 rounded-full"
+                          style={{ width: `${percent}%` }}
+                        />
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          ) : (
+            <p className="text-sm text-gray-400">
+              Coming soon — take the Personality assessment to see your MBTI type here.
+            </p>
+          )}
         </div>
-
+ 
+        {/* Career Path preview for top recommendation */}
+        {topRecommendation && (
+          <div className="rounded-[20px] px-7 py-6 border border-gray-100 shadow-sm mb-5">
+            <div className="flex justify-between items-start mb-1">
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-gray-400">
+                Career Path — {topRecommendation.course_name}
+              </p>
+              <button
+                onClick={() => navigate(`/results/career-path/${topRecommendation.course_id}`)}
+                className="text-xs font-medium text-orange-500 hover:text-orange-600 transition inline-flex items-center gap-1 shrink-0"
+              >
+                View Full Career Path →
+              </button>
+            </div>
+            <p className="text-sm text-gray-600 leading-relaxed mb-4 max-w-3xl">
+              {topCourseDetail?.description || 'Course description not yet available.'}
+            </p>
+ 
+            <p className="text-xs font-semibold text-gray-700 mb-2">Obtainable Skills</p>
+            <p className="text-xs text-orange-400 mb-3">Placeholder — actual skills coming soon</p>
+            <div className="flex flex-wrap gap-2 mb-5">
+              {placeholderSkills.map((skill) => (
+                <span
+                  key={skill}
+                  className="text-xs px-3 py-1.5 rounded-full bg-orange-50 text-orange-700 font-medium"
+                >
+                  {skill}
+                </span>
+              ))}
+            </div>
+ 
+            <p className="text-xs font-semibold text-gray-700 mb-2">Career Opportunities</p>
+            <p className="text-xs text-orange-400 mb-3">Placeholder — actual opportunities coming soon</p>
+            <div className="space-y-2">
+              {placeholderOpportunities.map((job) => (
+                <div key={job.title} className="flex justify-between items-center text-sm">
+                  <span className="text-gray-700">{job.title}</span>
+                  <span className="text-xs text-gray-400">{job.salary}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+ 
+        {/* MBTI placeholder removed — replaced with real section above */}
+ 
         {/* Action buttons */}
         <div className="grid grid-cols-3 gap-4">
           <button
@@ -200,10 +378,10 @@ function SummaryDashboard() {
             <IconHistory size={16} stroke={2} /> Assessment History
           </button>
         </div>
-
+ 
       </div>
     </div>
   )
 }
-
+ 
 export default SummaryDashboard

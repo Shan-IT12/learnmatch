@@ -1,8 +1,45 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
+import { IconInfoCircle, IconArrowLeft } from '@tabler/icons-react'
+
+const personalFactors = [
+  {
+    name: 'factor_physical',
+    label: 'Physical / Mobility Condition',
+    meaning: 'Physical limitations, disabilities, or conditions that affect mobility, stamina, or your ability to do certain hands-on or physically demanding tasks.',
+  },
+  {
+    name: 'factor_health',
+    label: 'Health Condition',
+    meaning: 'Chronic illness, mental health conditions, or medical needs that may require ongoing management, treatment, or accommodation.',
+  },
+  {
+    name: 'factor_financial',
+    label: 'Financial Constraint',
+    meaning: 'Limited financial resources for tuition, school materials, transportation, or other costs related to pursuing this course.',
+  },
+  {
+    name: 'factor_family',
+    label: 'Family Obligation',
+    meaning: 'Responsibilities like caring for siblings, parents, or other family members that may affect your available time or flexibility.',
+  },
+  {
+    name: 'factor_distance',
+    label: 'Distance / Commute',
+    meaning: 'Living far from schools that offer your preferred course, which may affect your daily commute or ability to enroll locally.',
+  },
+  {
+    name: 'factor_working_student',
+    label: 'Working Student',
+    meaning: 'Needing to work, hold a job, or take on income-generating responsibilities alongside school, which may affect your available time and schedule flexibility.',
+  },
+]
 
 function Profile() {
   const navigate = useNavigate()
+  const location = useLocation()
+  const fromOnboarding = location.state?.fromOnboarding
   const userId = localStorage.getItem('userId')
   const token = localStorage.getItem('token')
 
@@ -29,7 +66,6 @@ function Profile() {
       return
     }
 
-    // Load existing profile if it exists
     const fetchProfile = async () => {
       try {
         const response = await fetch(`${import.meta.env.VITE_API_URL}/api/profile?userId=${userId}`)
@@ -107,133 +143,149 @@ function Profile() {
       }
 
       setMessage(data.message)
+      setTimeout(() => {
+        navigate(fromOnboarding ? '/onboarding/interests' : '/dashboard', {
+          state: fromOnboarding ? undefined : { profileUpdated: true },
+        })
+      }, 800)
     } catch {
       setError('Cannot connect to server. Please try again.')
     }
   }
 
-  const personalFactors = [
-    { name: 'factor_physical', label: 'Physical / Mobility Condition' },
-    { name: 'factor_health', label: 'Health Condition' },
-    { name: 'factor_financial', label: 'Financial Constraint' },
-    { name: 'factor_family', label: 'Family Obligation' },
-    { name: 'factor_distance', label: 'Distance / Commute' },
-    { name: 'factor_working_student', label: 'Working Student' },
-  ]
-
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow px-8 py-4 flex justify-between items-center">
-        <h1 className="text-xl font-bold">
-          Learn<span className="text-orange-600">Match</span>
-        </h1>
+    <div className="min-h-screen bg-white">
+      <nav className="bg-white border-b border-gray-100 px-14 py-[18px] flex justify-between items-center">
+        <span className="text-lg font-bold text-gray-900">
+          Learn<span className="text-orange-500">Match</span>
+        </span>
         <button
           onClick={() => navigate('/dashboard')}
-          className="text-sm text-gray-600 hover:text-orange-600 transition"
+          className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 transition"
         >
-          Back to Dashboard
+          <IconArrowLeft size={16} stroke={2} /> Back to Dashboard
         </button>
       </nav>
 
-      <div className="max-w-2xl mx-auto py-12 px-4">
-        <h2 className="text-2xl font-bold mb-8">Personal Information</h2>
+      <div className="max-w-[900px] mx-auto px-14 py-11">
+        <h1 className="text-2xl font-bold text-gray-900 mb-1">Personal Information</h1>
+        <p className="text-sm text-gray-500 mb-8">
+          This helps LearnMatch personalize your course recommendations.
+        </p>
 
         {message && (
-          <div className="bg-green-100 text-green-700 px-4 py-2 rounded-lg mb-4 text-sm">
+          <div className="bg-green-50 text-green-700 px-4 py-3 rounded-xl text-sm mb-6">
             {message}
           </div>
         )}
 
         {error && (
-          <div className="bg-red-100 text-red-700 px-4 py-2 rounded-lg mb-4 text-sm">
+          <div className="bg-red-50 text-red-600 px-4 py-3 rounded-xl text-sm mb-6">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-5">
 
           {/* Name */}
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Name <span className="text-red-500">*</span>
+          <div
+            className="rounded-[20px] px-7 py-6 border border-gray-100 shadow-sm"
+          >
+            <label className="block text-sm font-semibold text-gray-900 mb-3">
+              Name <span className="text-orange-500">*</span>
             </label>
             <input
               type="text"
               name="full_name"
               value={formData.full_name}
               onChange={handleChange}
-              placeholder="Enter your name"
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400"
+              placeholder="Enter your full name"
+              className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
               required
             />
           </div>
 
           {/* BMI Section */}
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              BMI <span className="text-gray-400 font-normal">(optional — for holistic profiling)</span>
+          <div className="rounded-[20px] px-7 py-6 border border-gray-100 shadow-sm">
+            <label className="block text-sm font-semibold text-gray-900 mb-1">
+              BMI <span className="text-gray-400 font-normal text-xs">(optional — for holistic profiling)</span>
             </label>
-            <div className="flex gap-4 mb-2">
+            <div className="flex gap-4 mb-3 mt-3">
               <div className="flex-1">
-                <label className="block text-xs text-gray-500 mb-1">Height (cm)</label>
+                <label className="block text-xs text-gray-500 mb-1.5">Height (cm)</label>
                 <input
                   type="number"
                   name="height_cm"
                   value={formData.height_cm}
                   onChange={handleChange}
                   placeholder="e.g. 165"
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400"
+                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
                 />
               </div>
               <div className="flex-1">
-                <label className="block text-xs text-gray-500 mb-1">Weight (kg)</label>
+                <label className="block text-xs text-gray-500 mb-1.5">Weight (kg)</label>
                 <input
                   type="number"
                   name="weight_kg"
                   value={formData.weight_kg}
                   onChange={handleChange}
                   placeholder="e.g. 60"
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400"
+                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
                 />
               </div>
             </div>
             <button
               type="button"
               onClick={computeBmi}
-              className="border border-gray-300 text-sm px-4 py-1.5 rounded-lg hover:bg-gray-100 transition"
+              className="border border-gray-200 text-sm font-medium px-4 py-2 rounded-xl hover:bg-gray-50 transition"
             >
               Compute BMI
             </button>
 
             {bmi && (
-              <div className="mt-2 bg-gray-100 rounded-lg px-4 py-3 text-sm">
-                <p className="font-medium">BMI: {bmi} — {getBmiLabel(parseFloat(bmi))}</p>
+              <div className="mt-4 bg-orange-50 rounded-xl px-4 py-3 text-sm">
+                <p className="font-semibold text-gray-900">BMI: {bmi} — {getBmiLabel(parseFloat(bmi))}</p>
                 <p className="text-gray-500 text-xs mt-1">Advisory only — will not disqualify any course.</p>
               </div>
             )}
           </div>
 
           {/* Personal Factors */}
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Personal Factors <span className="text-gray-400 font-normal">(optional — influences your recommendations)</span>
+          <div className="rounded-[20px] px-7 py-6 border border-gray-100 shadow-sm">
+            <label className="block text-sm font-semibold text-gray-900 mb-1">
+              Personal Factors <span className="text-gray-400 font-normal text-xs">(optional — influences your recommendations)</span>
             </label>
-            <div className="border border-gray-200 rounded-lg p-4 space-y-3">
+            <p className="text-xs text-gray-400 mb-4">
+              Hover the <IconInfoCircle size={12} stroke={2} className="inline -mt-0.5" /> icon on any factor to see what it covers.
+            </p>
+
+            <div className="space-y-1">
               {personalFactors.map((factor) => (
-                <label key={factor.name} className="flex items-center gap-3 cursor-pointer">
+                <label
+                  key={factor.name}
+                  className="flex items-center gap-3 cursor-pointer px-3 py-2.5 rounded-xl hover:bg-gray-50 transition"
+                >
                   <input
                     type="checkbox"
                     name={factor.name}
                     checked={formData[factor.name]}
                     onChange={handleChange}
-                    className="w-4 h-4 accent-orange-500"
+                    className="w-4 h-4 accent-orange-500 shrink-0"
                   />
-                  <span className="text-sm">{factor.label}</span>
+                  <span className="text-sm text-gray-700">{factor.label}</span>
+
+                  {/* Info icon + hover tooltip */}
+                  <span className="relative group ml-auto shrink-0">
+                    <IconInfoCircle size={16} stroke={1.75} className="text-gray-300 hover:text-orange-500 transition" />
+                    <span className="pointer-events-none absolute right-0 top-6 z-10 w-64 rounded-xl bg-gray-900 text-white text-xs leading-relaxed p-3 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
+                      {factor.meaning}
+                    </span>
+                  </span>
                 </label>
               ))}
 
               {/* Others */}
-              <div>
+              <div className="px-3 py-2.5">
                 <label className="flex items-center gap-3 cursor-pointer mb-2">
                   <input
                     type="checkbox"
@@ -245,7 +297,7 @@ function Profile() {
                     }}
                     className="w-4 h-4 accent-orange-500"
                   />
-                  <span className="text-sm">Others, please specify</span>
+                  <span className="text-sm text-gray-700">Others, please specify</span>
                 </label>
                 {formData.factor_others !== undefined && (
                   <input
@@ -254,19 +306,20 @@ function Profile() {
                     value={formData.factor_others}
                     onChange={handleChange}
                     placeholder="Please specify..."
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
                   />
                 )}
               </div>
             </div>
-            <p className="text-xs text-gray-400 mt-2">
+
+            <p className="text-xs text-gray-400 mt-4">
               This helps LearnMatch suggest courses that are realistic and accessible for your situation. Your information is kept private.
             </p>
           </div>
 
           <button
             type="submit"
-            className="bg-orange-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-orange-700 transition"
+            className="bg-orange-500 text-white px-6 py-3 rounded-xl font-medium hover:bg-orange-600 hover:-translate-y-0.5 hover:shadow-lg transition-all duration-200 text-sm"
           >
             Save Profile
           </button>

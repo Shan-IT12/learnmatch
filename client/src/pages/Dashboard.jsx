@@ -11,8 +11,15 @@ const loadingMessages = [
 
 function Dashboard() {
   const navigate = useNavigate()
+
   const [loading, setLoading] = useState(true)
   const [loadingTextIndex, setLoadingTextIndex] = useState(0)
+
+  const [hasProfile, setHasProfile] = useState(false)
+  const [hasInterests, setHasInterests] = useState(false)
+  const [hasSkills, setHasSkills] = useState(false)
+  const [hasPersonality, setHasPersonality] = useState(false)
+
   const token = localStorage.getItem('token')
   const username = localStorage.getItem('username')
 
@@ -26,33 +33,48 @@ function Dashboard() {
   }, [loading])
 
   useEffect(() => {
-    if (!token) {
-      navigate('/login')
-      return
-    }
+  if (!token) {
+    navigate('/login')
+    return
+  }
 
-    const checkStatus = async () => {
-      try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/dashboard/status`, {
-          headers: { Authorization: `Bearer ${token}` },
-        })
-        const data = await res.json()
-
-        if (data.isCollegePhase) {
-          navigate('/college')
-        } else if (data.hasInterests && data.hasSkills) {
-          navigate('/dashboard/summary')
-        } else {
-          setLoading(false)
+  const checkStatus = async () => {
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/dashboard/status`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
-      } catch (error) {
-        console.error('Dashboard status fetch error:', error)
+      )
+
+      const data = await res.json()
+
+      if (data.isCollegePhase) {
+        navigate('/college')
+      } else if (
+        data.hasInterests &&
+        data.hasSkills &&
+        data.hasPersonality
+      ) {
+        navigate('/dashboard/summary')
+      } else {
+        setHasProfile(data.hasProfile)
+        setHasInterests(data.hasInterests)
+        setHasSkills(data.hasSkills)
+        setHasPersonality(data.hasPersonality)
+
         setLoading(false)
       }
+    } catch (error) {
+      console.error('Dashboard status fetch error:', error)
+      setLoading(false)
     }
+  }
 
-    checkStatus()
-  }, [navigate, token])
+  checkStatus()
+}, [navigate, token])
 
   const handleLogout = () => {
     localStorage.removeItem('token')
@@ -77,11 +99,11 @@ function Dashboard() {
   
   // ---------- State 1: no assessment yet ----------
   const steps = [
-    { label: 'Profile', done: false },
-    { label: 'Interests', done: false },
-    { label: 'Skills quiz', done: false },
-    { label: 'Personality', done: false },
-  ]
+  { label: 'Profile', done: hasProfile },
+  { label: 'Interests', done: hasInterests },
+  { label: 'Skills quiz', done: hasSkills },
+  { label: 'Personality', done: hasPersonality },
+]
 
   return (
     <div className="min-h-screen bg-white">
@@ -110,10 +132,36 @@ function Dashboard() {
 
       <div className="max-w-[1320px] mx-auto px-14 py-11">
 
-        {/* Hero + Steps row */}
-        <div className="grid grid-cols-[1.6fr_1fr] gap-5 mb-4 items-stretch">
+      {/* Profile setup banner */}
+      {!hasProfile && (
+        <div className="rounded-2xl bg-orange-50 border border-orange-100 px-6 py-4 mb-5 flex justify-between items-center">
+          <div>
+            <p className="text-sm font-semibold text-gray-900">
+              Let's set up your profile first
+            </p>
 
-          {/* Hero card */}
+            <p className="text-xs text-gray-500 mt-0.5">
+              Add your basic info so we can personalize your assessment.
+            </p>
+          </div>
+
+          <button
+            onClick={() =>
+              navigate('/profile', {
+                state: { fromOnboarding: true }
+              })
+            }
+            className="bg-gray-900 text-white px-4 py-2.5 rounded-xl text-xs font-medium hover:bg-gray-800 transition shrink-0 ml-4"
+          >
+            Set Up Profile
+          </button>
+        </div>
+      )}
+
+          {/* Hero + Steps row */}
+          <div className="grid grid-cols-[1.6fr_1fr] gap-5 mb-4 items-stretch">
+
+            {/* Hero card */}
           <div
             className="rounded-[20px] p-10 relative overflow-hidden flex flex-col justify-between shadow-[0_8px_30px_-8px_rgba(249,115,22,0.35)]"
             style={{ background: 'linear-gradient(135deg, #ffe4c4 0%, #ffd0a8 40%, #ffb8a8 100%)' }}
@@ -157,7 +205,17 @@ function Dashboard() {
             <div className="flex flex-col gap-[18px]">
               {steps.map((step) => (
                 <div key={step.label} className="group flex items-center gap-2.5 cursor-default">
-                  <div className="w-[22px] h-[22px] rounded-full border-2 border-[#e0d4c8] bg-white shrink-0 transition-all group-hover:bg-orange-500 group-hover:border-orange-500" />
+                  <div
+                    className={`w-[22px] h-[22px] rounded-full shrink-0 flex items-center justify-center transition-all ${
+                      step.done
+                        ? 'bg-orange-500 border-2 border-orange-500'
+                        : 'border-2 border-[#e0d4c8] bg-white'
+                    }`}
+                  >
+                    {step.done && (
+                      <span className="text-white text-xs font-bold">✓</span>
+                    )}
+                  </div>
                   <span className="text-sm text-[#8a6a4a] transition-colors group-hover:text-[#2b1002]">
                     {step.label}
                   </span>
