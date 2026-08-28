@@ -1,6 +1,12 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
+const semesterProgressOptions = [
+  { label: "Just starting / early in the semester", phase: 'Early' },
+  { label: "I'm around the middle of the semester", phase: 'Mid' },
+  { label: "The semester is almost over", phase: 'End' },
+]
+
 function CollegeSetup() {
   const navigate = useNavigate()
   const token = localStorage.getItem('token')
@@ -10,6 +16,7 @@ function CollegeSetup() {
   const [selectedCourse, setSelectedCourse] = useState(null)
   const [yearLevel, setYearLevel] = useState('')
   const [semester, setSemester] = useState('')
+  const [startingPhase, setStartingPhase] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -40,55 +47,56 @@ function CollegeSetup() {
   }
 
   const handleSubmit = async (e) => {
-  e.preventDefault()
-  setError('')
+    e.preventDefault()
+    setError('')
 
-  if (!selectedCourse) {
-    setError('Please select a course from the list.')
-    return
-  }
-  if (!yearLevel) {
-    setError('Please select your year level.')
-    return
-  }
-  if (!semester) {
-    setError('Please select your current semester.')
-    return
-  }
-
-  setLoading(true)
-  try {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/college/setup`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        courseId: selectedCourse.course_id,
-        courseName: selectedCourse.course_name,
-        yearLevel,
-        semester,
-      }),
-    })
-
-    const data = await response.json()
-
-    if (!response.ok) {
-      setError(data.message)
+    if (!selectedCourse) {
+      setError('Please select a course from the list.')
+      return
+    }
+    if (!yearLevel) {
+      setError('Please select your year level.')
+      return
+    }
+    if (!semester) {
+      setError('Please select your current semester.')
+      return
+    }
+    if (!startingPhase) {
+      setError('Please tell us where you are in the semester.')
       return
     }
 
-    localStorage.setItem('enrolledCourse', selectedCourse.course_name)
-    localStorage.setItem('yearLevel', yearLevel)
-    localStorage.setItem('semester', semester)
+    setLoading(true)
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/college/setup`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          courseId: selectedCourse.course_id,
+          courseName: selectedCourse.course_name,
+          yearLevel,
+          semester,
+          startingPhase,
+        }),
+      })
 
-    navigate('/college')
-  } catch {
-    setError('Cannot connect to server. Please try again.')
+      const data = await response.json()
+
+      if (!response.ok) {
+        setError(data.message)
+        return
+      }
+
+      navigate('/college')
+    } catch {
+      setError('Cannot connect to server. Please try again.')
+    }
+    setLoading(false)
   }
-  setLoading(false)
-}
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -223,6 +231,32 @@ function CollegeSetup() {
                   }`}
                 >
                   {sem}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Where are you in the semester right now */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Where are you in the semester right now?
+            </label>
+            <p className="text-xs text-gray-400 mb-3">
+              This helps us time your alignment check-ins correctly.
+            </p>
+            <div className="space-y-2">
+              {semesterProgressOptions.map((option) => (
+                <button
+                  key={option.phase}
+                  type="button"
+                  onClick={() => setStartingPhase(option.phase)}
+                  className={`w-full text-left py-3 px-4 rounded-xl text-sm font-medium border transition ${
+                    startingPhase === option.phase
+                      ? 'bg-orange-500 text-white border-orange-500'
+                      : 'bg-white text-gray-600 border-gray-200 hover:border-orange-300'
+                  }`}
+                >
+                  {option.label}
                 </button>
               ))}
             </div>

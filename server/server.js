@@ -221,15 +221,15 @@ app.get('/api/results', async (req, res) => {
 })
 
 app.post('/api/college/setup', authenticateToken, async (req, res) => {
-  const { courseId, yearLevel, semester } = req.body
+  const { courseId, yearLevel, semester, startingPhase } = req.body
   const userId = req.user.userId
 
   try {
     await pool.query(
       `INSERT INTO SEMESTER_CHECKIN 
         (user_id, course_id, semester, phase, year_level) 
-       VALUES (?, ?, ?, 'Early', ?)`,
-      [userId, courseId, semester, yearLevel]
+       VALUES (?, ?, ?, ?, ?)`,
+      [userId, courseId, semester, startingPhase, yearLevel]
     )
     res.json({ message: 'College phase setup successful' })
   } catch (error) {
