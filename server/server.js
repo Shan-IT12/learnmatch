@@ -227,9 +227,9 @@ app.post('/api/college/setup', authenticateToken, async (req, res) => {
   try {
     await pool.query(
       `INSERT INTO SEMESTER_CHECKIN 
-        (user_id, course_id, semester, phase, comments) 
+        (user_id, course_id, semester, phase, year_level) 
        VALUES (?, ?, ?, 'Early', ?)`,
-      [userId, courseId, semester, `Initial setup: ${yearLevel}`]
+      [userId, courseId, semester, yearLevel]
     )
     res.json({ message: 'College phase setup successful' })
   } catch (error) {
@@ -287,6 +287,35 @@ app.get('/api/dashboard/status', authenticateToken, async (req, res) => {
   } catch (error) {
     console.error('Dashboard status error:', error)
     res.status(500).json({ message: 'Server error fetching dashboard status' })
+  }
+})
+
+app.get('/api/college/status', authenticateToken, async (req, res) => {
+  const userId = req.user.userId
+
+  try {
+    const [rows] = await pool.query(
+      `SELECT sc.year_level, sc.semester, c.course_name
+       FROM SEMESTER_CHECKIN sc
+       JOIN COURSE c ON sc.course_id = c.course_id
+       WHERE sc.user_id = ?
+       ORDER BY sc.checkin_id DESC
+       LIMIT 1`,
+      [userId]
+    )
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: 'No college enrollment found' })
+    }
+
+    res.json({
+      courseName: rows[0].course_name,
+      yearLevel: rows[0].year_level,
+      semester: rows[0].semester,
+    })
+  } catch (error) {
+    console.error('College status fetch error:', error)
+    res.status(500).json({ message: 'Server error fetching college status' })
   }
 })
 
