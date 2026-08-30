@@ -319,6 +319,225 @@ app.get('/api/college/status', authenticateToken, async (req, res) => {
   }
 })
 
+app.get('/api/college/checkin/pending', authenticateToken, async (req, res) => {
+  const userId = req.user.userId
+ 
+  try {
+    const [rows] = await pool.query(
+      `SELECT sc.checkin_id, sc.phase, c.course_name
+       FROM SEMESTER_CHECKIN sc
+       JOIN COURSE c ON sc.course_id = c.course_id
+       LEFT JOIN CHECKIN_ALIGNMENT_RESPONSE car ON car.checkin_id = sc.checkin_id
+       WHERE sc.user_id = ? AND car.response_id IS NULL
+       ORDER BY sc.checkin_id DESC
+       LIMIT 1`,
+      [userId]
+    )
+ 
+    if (rows.length === 0) {
+      return res.json({ checkinId: null })
+    }
+ 
+    res.json({
+      checkinId: rows[0].checkin_id,
+      phase: rows[0].phase,
+      courseName: rows[0].course_name,
+    })
+  } catch (error) {
+    console.error('Pending check-in fetch error:', error)
+    res.status(500).json({ message: 'Server error fetching pending check-in' })
+  }
+})
+
+app.post('/api/college/checkin', authenticateToken, async (req, res) => {
+  const { checkinId, answers, gwa } = req.body
+ 
+  if (!checkinId || !Array.isArray(answers) || answers.length !== 5) {
+    return res.status(400).json({ message: 'Missing checkin ID or incomplete answers' })
+  }
+ 
+  try {
+    // Save each of the 5 answers
+    for (const answer of answers) {
+      await pool.query(
+        `INSERT INTO CHECKIN_ALIGNMENT_RESPONSE (checkin_id, question_number, answer_score)
+         VALUES (?, ?, ?)`,
+        [checkinId, answer.question_number, answer.score]
+      )
+    }
+ 
+    // Deterministic mismatch score: average of the 5 ratings (1-5),
+    // converted to a 0-100 alignment percentage.
+    const total = answers.reduce((sum, a) => sum + a.score, 0)
+    const average = total / answers.length
+    const alignmentPercent = Math.round(((average - 1) / 4) * 100)
+    const mismatchScore = 100 - alignmentPercent
+ 
+    let status
+    let usedGwaLogic = false
+ 
+    if (gwa !== undefined && gwa !== null && gwa !== '') {
+      // GWA + survey 4-quadrant logic (End-of-semester only)
+      usedGwaLogic = true
+      const passing = Number(gwa) >= 75
+      const highAlignment = alignmentPercent >= 70
+ 
+      if (passing && highAlignment) status = 'Good Alignment'
+      else if (passing && !highAlignment) status = 'Emotional / Interest Mismatch'
+      else if (!passing && highAlignment) status = 'Academic Support Needed'
+      else status = 'High Mismatch'
+ 
+      // Save GWA to the SEMESTER_CHECKIN row it belongs to
+      await pool.query('UPDATE SEMESTER_CHECKIN SET gwa = ? WHERE checkin_id = ?', [gwa, checkinId])
+    } else {
+      // Survey-only status bucket
+      if (mismatchScore < 30) status = 'Good Alignment'
+      else if (mismatchScore < 60) status = 'Moderate Mismatch'
+      else status = 'High Mismatch'
+    }
+ 
+    // Placeholder narrative — swap this for a real OpenAI call later
+    const placeholderFeedback = `This is placeholder feedback. Once AI narrative generation is ` +
+      `connected, this will explain your "${status}" result (${alignmentPercent}% aligned` +
+      `${usedGwaLogic ? `, GWA: ${gwa}` : ''}) in plain language based on your specific answers.`
+    const placeholderRecommendation = `This is a placeholder recommendation. Once AI narrative ` +
+      `generation is connected, this will suggest a concrete next step based on your lowest-scoring ` +
+      `question${usedGwaLogic ? ' and GWA' : ''}.`
+ 
+    await pool.query(
+      `INSERT INTO AI_MISMATCH_ANALYSIS (checkin_id, mismatch_score, status, ai_feedback, recommendation)
+       VALUES (?, ?, ?, ?, ?)`,
+      [checkinId, mismatchScore, status, placeholderFeedback, placeholderRecommendation]
+    )
+ 
+    res.json({
+      message: 'Check-in submitted successfully',
+      alignmentPercent,
+      mismatchScore,
+      status,
+      feedback: placeholderFeedback,
+      recommendation: placeholderRecommendation,
+    })
+  } catch (error) {
+    console.error('Check-in submit error:', error)
+    res.status(500).json({ message: 'Server error submitting check-in' })
+  }
+})
+
+app.get('/api/college/checkin/status', authenticateToken, async (req, res) => {
+  const userId = req.user.userId
+ 
+  try {
+    // Any unanswered check-in?
+    const [pendingRows] = await pool.query(
+      `SELECT sc.checkin_id, sc.phase, c.course_name
+       FROM SEMESTER_CHECKIN sc
+       JOIN COURSE c ON sc.course_id = c.course_id
+       LEFT JOIN CHECKIN_ALIGNMENT_RESPONSE car ON car.checkin_id = sc.checkin_id
+       WHERE sc.user_id = ? AND car.response_id IS NULL
+       ORDER BY sc.checkin_id DESC
+       LIMIT 1`,
+      [userId]
+    )
+ 
+    if (pendingRows.length > 0) {
+      return res.json({
+        state: 'pending',
+        checkinId: pendingRows[0].checkin_id,
+        phase: pendingRows[0].phase,
+        courseName: pendingRows[0].course_name,
+      })
+    }
+ 
+    // No pending check-in — look at the most recent COMPLETED one
+    const [completedRows] = await pool.query(
+      `SELECT sc.checkin_id, sc.phase, sc.checkin_date, sc.course_id, sc.year_level, sc.semester, c.course_name
+       FROM SEMESTER_CHECKIN sc
+       JOIN COURSE c ON sc.course_id = c.course_id
+       WHERE sc.user_id = ?
+       ORDER BY sc.checkin_id DESC
+       LIMIT 1`,
+      [userId]
+    )
+ 
+    if (completedRows.length === 0) {
+      // No enrollment at all — shouldn't normally happen if they're on /college
+      return res.json({ state: 'complete' })
+    }
+ 
+    const last = completedRows[0]
+    const currentIndex = PHASE_ORDER.indexOf(last.phase)
+    const nextPhase = PHASE_ORDER[currentIndex + 1]
+ 
+    if (!nextPhase) {
+      return res.json({ state: 'complete', courseName: last.course_name })
+    }
+ 
+    const weeksNeeded = WEEKS_UNTIL_NEXT_PHASE[last.phase]
+    const weeksElapsed = (Date.now() - new Date(last.checkin_date).getTime()) / (1000 * 60 * 60 * 24 * 7)
+ 
+    if (weeksElapsed >= weeksNeeded) {
+      return res.json({
+        state: 'due',
+        nextPhase,
+        courseName: last.course_name,
+      })
+    }
+ 
+    res.json({
+      state: 'not_due',
+      nextPhase,
+      courseName: last.course_name,
+    })
+  } catch (error) {
+    console.error('Check-in status error:', error)
+    res.status(500).json({ message: 'Server error checking check-in status' })
+  }
+})
+
+const WEEKS_UNTIL_NEXT_PHASE = { Early: 0.001, Mid: 0.001, End: 0.001 } // Placeholder values for testing; replace with real durations later
+const PHASE_ORDER = ['Early', 'Mid', 'End']
+
+app.post('/api/college/checkin/start', authenticateToken, async (req, res) => {
+  const userId = req.user.userId
+ 
+  try {
+    const [rows] = await pool.query(
+      `SELECT course_id, year_level, semester, phase
+       FROM SEMESTER_CHECKIN
+       WHERE user_id = ?
+       ORDER BY checkin_id DESC
+       LIMIT 1`,
+      [userId]
+    )
+ 
+    if (rows.length === 0) {
+      return res.status(400).json({ message: 'No prior enrollment found' })
+    }
+ 
+    const last = rows[0]
+    const currentIndex = PHASE_ORDER.indexOf(last.phase)
+    const nextPhase = PHASE_ORDER[currentIndex + 1]
+ 
+    if (!nextPhase) {
+      return res.status(400).json({ message: 'All check-ins already completed' })
+    }
+ 
+    const [result] = await pool.query(
+      `INSERT INTO SEMESTER_CHECKIN (user_id, course_id, semester, phase, year_level)
+       VALUES (?, ?, ?, ?, ?)`,
+      [userId, last.course_id, last.semester, nextPhase, last.year_level]
+    )
+ 
+    res.json({ checkinId: result.insertId, phase: nextPhase })
+  } catch (error) {
+    console.error('Check-in start error:', error)
+    res.status(500).json({ message: 'Server error starting next check-in' })
+  }
+})
+ 
+ 
+
 app.get('/api/interests', authenticateToken, async (req, res) => {
   const userId = req.user.userId
 

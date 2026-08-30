@@ -8,6 +8,8 @@ function CollegeDashboard() {
 
   const [loading, setLoading] = useState(true)
   const [collegeInfo, setCollegeInfo] = useState(null)
+  const [checkinStatus, setCheckinStatus] = useState(null)
+  const [startingCheckin, setStartingCheckin] = useState(false)
 
   useEffect(() => {
     if (!token) {
@@ -15,29 +17,57 @@ function CollegeDashboard() {
       return
     }
 
-    const fetchCollegeStatus = async () => {
+    const fetchData = async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/college/status`, {
-          headers: { Authorization: `Bearer ${token}` },
-        })
+        const [collegeRes, statusRes] = await Promise.all([
+          fetch(`${import.meta.env.VITE_API_URL}/api/college/status`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          fetch(`${import.meta.env.VITE_API_URL}/api/college/checkin/status`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+        ])
 
-        if (!res.ok) {
-          // No enrollment found — send them back to set up college phase
+        if (!collegeRes.ok) {
           navigate('/college/setup')
           return
         }
 
-        const data = await res.json()
-        setCollegeInfo(data)
+        const collegeData = await collegeRes.json()
+        const statusData = await statusRes.json()
+
+        setCollegeInfo(collegeData)
+        setCheckinStatus(statusData)
         setLoading(false)
       } catch (error) {
-        console.error('College status fetch error:', error)
+        console.error('College dashboard fetch error:', error)
         setLoading(false)
       }
     }
 
-    fetchCollegeStatus()
+    fetchData()
   }, [navigate, token])
+
+  const handleStartCheckin = async () => {
+    if (checkinStatus?.state === 'pending') {
+      navigate('/college/checkin')
+      return
+    }
+
+    setStartingCheckin(true)
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/college/checkin/start`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      if (res.ok) {
+        navigate('/college/checkin')
+      }
+    } catch (error) {
+      console.error('Start check-in error:', error)
+      setStartingCheckin(false)
+    }
+  }
 
   if (loading) {
     return (
@@ -46,6 +76,9 @@ function CollegeDashboard() {
       </div>
     )
   }
+
+  const checkinCardIsActionable =
+    checkinStatus?.state === 'pending' || checkinStatus?.state === 'due'
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -73,7 +106,26 @@ function CollegeDashboard() {
           Track your academic alignment and career roadmap.
         </p>
 
-        {/* Enrollment info card */}
+        {checkinStatus?.state === 'due' && (
+          <div className="rounded-2xl bg-orange-50 border border-orange-100 px-6 py-4 mb-6 flex justify-between items-center">
+            <div>
+              <p className="text-sm font-semibold text-gray-900">
+                Your {checkinStatus.nextPhase} check-in is ready
+              </p>
+              <p className="text-xs text-gray-500 mt-0.5">
+                It's been a while — let's see how things are going this semester.
+              </p>
+            </div>
+            <button
+              onClick={handleStartCheckin}
+              disabled={startingCheckin}
+              className="bg-gray-900 text-white px-4 py-2.5 rounded-xl text-xs font-medium hover:bg-gray-800 transition shrink-0 ml-4 disabled:opacity-50"
+            >
+              {startingCheckin ? 'Starting...' : `Start ${checkinStatus.nextPhase} Check-in`}
+            </button>
+          </div>
+        )}
+
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6">
           <p className="text-xs font-semibold text-orange-500 uppercase tracking-widest mb-3">
             Currently Enrolled
@@ -82,19 +134,46 @@ function CollegeDashboard() {
           <p className="text-sm text-gray-500">{collegeInfo?.yearLevel} · {collegeInfo?.semester}</p>
         </div>
 
-        {/* Feature cards */}
         <div className="grid grid-cols-3 gap-4">
-          {[
-            { title: 'Semester Check-in', desc: 'Rate your alignment this semester' },
-            { title: 'Career Roadmap', desc: 'See your year-by-year academic path' },
-            { title: 'Mismatch Detection', desc: 'AI analysis of your alignment score' },
-          ].map((card) => (
-            <div key={card.title} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-              <h3 className="text-sm font-semibold text-gray-900 mb-1">{card.title}</h3>
-              <p className="text-xs text-gray-400">{card.desc}</p>
-              <p className="text-xs text-orange-400 mt-3">Coming soon</p>
-            </div>
-          ))}
+
+          <div
+            onClick={checkinCardIsActionable ? handleStartCheckin : undefined}
+            className={`bg-white rounded-2xl border border-gray-100 shadow-sm p-6 transition ${
+              checkinCardIsActionable ? 'cursor-pointer hover:border-orange-300' : ''
+            }`}
+          >
+            <h3 className="text-sm font-semibold text-gray-900 mb-1">Semester Check-in</h3>
+            <p className="text-xs text-gray-400">Rate your alignment this semester</p>
+            {checkinStatus?.state === 'pending' && (
+              <p className="text-xs text-orange-500 mt-3 font-medium">Start check-in →</p>
+            )}
+            {checkinStatus?.state === 'due' && (
+              <p className="text-xs text-orange-500 mt-3 font-medium">
+                {checkinStatus.nextPhase} check-in ready →
+              </p>
+            )}
+            {checkinStatus?.state === 'not_due' && (
+              <p className="text-xs text-gray-400 mt-3">
+                Next up: {checkinStatus.nextPhase} check-in
+              </p>
+            )}
+            {checkinStatus?.state === 'complete' && (
+              <p className="text-xs text-gray-400 mt-3">All check-ins done this semester</p>
+            )}
+          </div>
+
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+            <h3 className="text-sm font-semibold text-gray-900 mb-1">Career Roadmap</h3>
+            <p className="text-xs text-gray-400">See your year-by-year academic path</p>
+            <p className="text-xs text-orange-400 mt-3">Coming soon</p>
+          </div>
+
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+            <h3 className="text-sm font-semibold text-gray-900 mb-1">Mismatch Detection</h3>
+            <p className="text-xs text-gray-400">AI analysis of your alignment score</p>
+            <p className="text-xs text-orange-400 mt-3">Coming soon</p>
+          </div>
+
         </div>
       </div>
     </div>
