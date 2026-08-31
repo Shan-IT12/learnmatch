@@ -5,7 +5,15 @@ import authRoutes from './routes/authRoutes.js'
 import profileRoutes from './routes/profileRoutes.js'
 import pool from './config/db.js'
 import authenticateToken from './middleware/authenticateToken.js'
+import nodemailer from 'nodemailer'
 
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_APP_PASSWORD,
+  },
+})
 dotenv.config()
 
 const app = express()
@@ -440,16 +448,37 @@ app.get('/api/college/checkin/status', authenticateToken, async (req, res) => {
       [userId]
     )
  
+    // Most recent AI_MISMATCH_ANALYSIS result, regardless of check-in state
+    const [resultRows] = await pool.query(
+      `SELECT ama.status, ama.mismatch_score, ama.ai_feedback, ama.recommendation
+       FROM AI_MISMATCH_ANALYSIS ama
+       JOIN SEMESTER_CHECKIN sc ON ama.checkin_id = sc.checkin_id
+       WHERE sc.user_id = ?
+       ORDER BY ama.analysis_id DESC
+       LIMIT 1`,
+      [userId]
+    )
+    const latestResult = resultRows.length > 0
+      ? {
+          status: resultRows[0].status,
+          mismatchScore: resultRows[0].mismatch_score,
+          alignmentPercent: 100 - resultRows[0].mismatch_score,
+          feedback: resultRows[0].ai_feedback,
+          recommendation: resultRows[0].recommendation,
+        }
+      : null
+ 
     if (pendingRows.length > 0) {
       return res.json({
         state: 'pending',
         checkinId: pendingRows[0].checkin_id,
         phase: pendingRows[0].phase,
+        currentPhase: pendingRows[0].phase,
         courseName: pendingRows[0].course_name,
+        latestResult,
       })
     }
  
-    // No pending check-in — look at the most recent COMPLETED one
     const [completedRows] = await pool.query(
       `SELECT sc.checkin_id, sc.phase, sc.checkin_date, sc.course_id, sc.year_level, sc.semester, c.course_name
        FROM SEMESTER_CHECKIN sc
@@ -461,8 +490,7 @@ app.get('/api/college/checkin/status', authenticateToken, async (req, res) => {
     )
  
     if (completedRows.length === 0) {
-      // No enrollment at all — shouldn't normally happen if they're on /college
-      return res.json({ state: 'complete' })
+      return res.json({ state: 'complete', latestResult })
     }
  
     const last = completedRows[0]
@@ -470,24 +498,23 @@ app.get('/api/college/checkin/status', authenticateToken, async (req, res) => {
     const nextPhase = PHASE_ORDER[currentIndex + 1]
  
     if (!nextPhase) {
-      return res.json({ state: 'complete', courseName: last.course_name })
+      return res.json({
+        state: 'complete',
+        currentPhase: last.phase,
+        courseName: last.course_name,
+        latestResult,
+      })
     }
  
     const weeksNeeded = WEEKS_UNTIL_NEXT_PHASE[last.phase]
     const weeksElapsed = (Date.now() - new Date(last.checkin_date).getTime()) / (1000 * 60 * 60 * 24 * 7)
  
-    if (weeksElapsed >= weeksNeeded) {
-      return res.json({
-        state: 'due',
-        nextPhase,
-        courseName: last.course_name,
-      })
-    }
- 
     res.json({
-      state: 'not_due',
+      state: weeksElapsed >= weeksNeeded ? 'due' : 'not_due',
       nextPhase,
+      currentPhase: last.phase,
       courseName: last.course_name,
+      latestResult,
     })
   } catch (error) {
     console.error('Check-in status error:', error)
