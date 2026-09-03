@@ -41,6 +41,7 @@ function Profile() {
   const token = localStorage.getItem('token')
   const location = useLocation()
   const assessmentComplete = location.state?.assessmentComplete
+  const fromOnboarding = location.state?.fromOnboarding
   const [showRetakePrompt, setShowRetakePrompt] = useState(false)
 
   const [formData, setFormData] = useState({
@@ -123,7 +124,7 @@ function Profile() {
     return 'Obese'
   }
 
-  const handleSubmit = async (e) => {
+    const handleSubmit = async (e) => {
     e.preventDefault()
     setMessage('')
     setError('')
@@ -143,10 +144,13 @@ function Profile() {
       }
 
       if (assessmentComplete) {
-        // User already finished their assessment — don't auto-navigate away.
-        // Show a recommendation to retake instead, since their info just changed.
         setMessage(data.message)
         setShowRetakePrompt(true)
+      } else if (fromOnboarding) {
+        setMessage(data.message)
+        setTimeout(() => {
+          navigate('/onboarding/interests')
+        }, 800)
       } else {
         setMessage(data.message)
         setTimeout(() => {

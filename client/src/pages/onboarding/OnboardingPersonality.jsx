@@ -74,7 +74,7 @@ function OnboardingPersonality() {
   }
 
   const handleContinue = () => {
-    navigate('/dashboard/summary')
+    navigate('/results')
   }
 
   // ---------- Results screen ----------
@@ -122,7 +122,7 @@ function OnboardingPersonality() {
             onClick={handleContinue}
             className="w-full bg-orange-500 text-white py-3 rounded-xl font-medium hover:bg-orange-600 transition text-sm"
           >
-            See Your Recommendations →
+            See Your Results →
           </button>
         </div>
       </OnboardingLayout>
