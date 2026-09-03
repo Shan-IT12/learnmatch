@@ -14,6 +14,7 @@ import CollegeDashboard from './pages/college/CollegeDashboard'
 import SemesterCheckin from './pages/college/SemesterCheckin'
 import SummaryDashboard from './pages/SummaryDashboard'
 import CareerPath from './pages/CareerPath'
+import Feedback from './pages/Feedback'
 import './App.css'
 
 
@@ -35,6 +36,7 @@ function App() {
       <Route path="/results" element={<Results />} />
       <Route path="/dashboard/summary" element={<SummaryDashboard />} />
       <Route path="/results/career-path/:courseId" element={<CareerPath />} />
+      <Route path="/feedback" element={<Feedback />} />
     </Routes>
   )
 }

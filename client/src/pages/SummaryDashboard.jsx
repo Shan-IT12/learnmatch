@@ -146,7 +146,13 @@ function SummaryDashboard() {
             onClick={() => navigate('/profile', { state: { assessmentComplete: true } })}
             className="bg-orange-500 text-white px-4 py-2.5 rounded-xl text-xs font-medium hover:bg-orange-600 transition"
           >
-            View Profile
+             View Profile
+          </button>
+          <button
+            onClick={() => navigate('/feedback')}
+            className="text-sm text-gray-500 hover:text-gray-900 transition"
+          >
+            Feedback
           </button>
           <button
             onClick={handleLogout}

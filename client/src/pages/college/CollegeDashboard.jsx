@@ -146,6 +146,12 @@ function CollegeDashboard() {
             Welcome, <strong className="text-gray-900">{username}</strong>
           </span>
           <button
+            onClick={() => navigate('/feedback')}
+            className="text-sm text-gray-500 hover:text-gray-900 transition"
+          >
+            Feedback
+          </button>
+          <button
             onClick={() => navigate('/dashboard')}
             className="text-sm text-gray-500 hover:text-gray-900 transition"
           >

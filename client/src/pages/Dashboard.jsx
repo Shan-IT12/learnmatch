@@ -125,6 +125,12 @@ function Dashboard() {
             View Profile
           </button>
           <button
+            onClick={() => navigate('/feedback')}
+            className="text-sm text-gray-500 hover:text-gray-900 transition"
+          >
+            Feedback
+          </button>
+          <button
             onClick={handleLogout}
             className="bg-red-50 text-red-600 px-4 py-2.5 rounded-xl text-xs font-medium hover:bg-red-100 transition"
           >

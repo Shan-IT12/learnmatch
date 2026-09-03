@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import FeedbackPopup from '../components/FeedbackPopup'
 
 function Results() {
   const navigate = useNavigate()
@@ -93,6 +94,7 @@ function Results() {
               >
                 View Career Path →
               </button>
+              <FeedbackPopup />
               </div>
             ))}
           </div>

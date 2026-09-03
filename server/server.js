@@ -710,3 +710,23 @@ app.get('/api/mbti', authenticateToken, async (req, res) => {
     res.status(500).json({ message: 'Server error fetching personality assessment' })
   }
 })
+
+app.post('/api/feedback', authenticateToken, async (req, res) => {
+  const { rating, category, comment } = req.body
+  const userId = req.user.userId
+
+  if (!rating || !category) {
+    return res.status(400).json({ message: 'Rating and category are required' })
+  }
+
+  try {
+    await pool.query(
+      `INSERT INTO FEEDBACK (user_id, rating, comment, category) VALUES (?, ?, ?, ?)`,
+      [userId, rating, comment || null, category]
+    )
+    res.json({ message: 'Thanks for your feedback!' })
+  } catch (error) {
+    console.error('Feedback submit error:', error)
+    res.status(500).json({ message: 'Server error submitting feedback' })
+  }
+})
