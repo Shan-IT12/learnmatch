@@ -16,6 +16,7 @@ import SummaryDashboard from './pages/SummaryDashboard'
 import CareerPath from './pages/CareerPath'
 import Feedback from './pages/Feedback'
 import AdminLogin from "./pages/AdminLogin";
+import ManageCourses from './pages/admin/ManageCourses'
 import './App.css'
 
 
@@ -39,6 +40,7 @@ function App() {
       <Route path="/results/career-path/:courseId" element={<CareerPath />} />
       <Route path="/feedback" element={<Feedback />} />
       <Route path="/admin/login" element={<AdminLogin />} />
+      <Route path="/admin/courses" element={<ManageCourses />} />
     </Routes>
   )
 }

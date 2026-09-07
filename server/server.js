@@ -8,6 +8,7 @@ import authenticateToken from './middleware/authenticateToken.js'
 import nodemailer from 'nodemailer'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
+import authenticateAdmin from './middleware/authenticateAdmin.js'
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -74,7 +75,6 @@ app.get('/api/search', async (req, res) => {
   }
 })
 
-// Add this route to server.js, alongside your other routes.
 
 app.post('/api/interests', authenticateToken, async (req, res) => {
   const { interests } = req.body
@@ -192,7 +192,6 @@ app.post('/api/quiz', authenticateToken, async (req, res) => {
   }
 })
 
-// Add this route to server.js, alongside your other routes.
 // TEMPORARY / PLACEHOLDER: returns 3 random courses with fake match scores and
 // static narrative text. Replace this with real WSM engine output once it's built.
 
@@ -769,3 +768,144 @@ app.post('/api/admin/login', async (req, res) => {
     res.status(500).json({ message: 'Server error during admin login' })
   }
 })
+
+// ============ ADMIN: COURSE MANAGEMENT ============
+
+// Get all courses (for the admin course list table)
+app.get('/api/admin/courses', authenticateAdmin, async (req, res) => {
+  try {
+    const [courses] = await pool.query(
+      `SELECT course_id, course_name, program_type, cluster_category, psced_group, is_active
+       FROM COURSE
+       ORDER BY course_name ASC`
+    )
+    res.json({ courses })
+  } catch (error) {
+    console.error('Admin courses fetch error:', error)
+    res.status(500).json({ message: 'Server error fetching courses' })
+  }
+})
+
+// Get one course's full details, including its career opportunities
+app.get('/api/admin/courses/:id', authenticateAdmin, async (req, res) => {
+  try {
+    const [courseRows] = await pool.query(
+      'SELECT * FROM COURSE WHERE course_id = ?',
+      [req.params.id]
+    )
+
+    if (courseRows.length === 0) {
+      return res.status(404).json({ message: 'Course not found' })
+    }
+
+    const [careerRows] = await pool.query(
+      'SELECT * FROM CAREER_OPPORTUNITY WHERE course_id = ? ORDER BY opportunity_id ASC',
+      [req.params.id]
+    )
+
+    res.json({ course: courseRows[0], careers: careerRows })
+  } catch (error) {
+    console.error('Admin course detail fetch error:', error)
+    res.status(500).json({ message: 'Server error fetching course' })
+  }
+})
+
+// Create a new course
+app.post('/api/admin/courses', authenticateAdmin, async (req, res) => {
+  const { course_name, program_type, cluster_category, psced_group, description, obtainable_skills } = req.body
+
+  if (!course_name || !cluster_category) {
+    return res.status(400).json({ message: 'Course name and cluster category are required' })
+  }
+
+  try {
+    const [result] = await pool.query(
+      `INSERT INTO COURSE (course_name, program_type, cluster_category, psced_group, description, obtainable_skills, is_active)
+       VALUES (?, ?, ?, ?, ?, ?, 1)`,
+      [course_name, program_type || null, cluster_category, psced_group || null, description || null, obtainable_skills || null]
+    )
+    res.status(201).json({ message: 'Course created successfully', courseId: result.insertId })
+  } catch (error) {
+    console.error('Admin course create error:', error)
+    res.status(500).json({ message: 'Server error creating course' })
+  }
+})
+
+// Update an existing course
+app.put('/api/admin/courses/:id', authenticateAdmin, async (req, res) => {
+  const { course_name, program_type, cluster_category, psced_group, description, obtainable_skills, is_active } = req.body
+
+  try {
+    await pool.query(
+      `UPDATE COURSE
+       SET course_name = ?, program_type = ?, cluster_category = ?, psced_group = ?,
+           description = ?, obtainable_skills = ?, is_active = ?
+       WHERE course_id = ?`,
+      [course_name, program_type || null, cluster_category, psced_group || null,
+       description || null, obtainable_skills || null, is_active ? 1 : 0, req.params.id]
+    )
+    res.json({ message: 'Course updated successfully' })
+  } catch (error) {
+    console.error('Admin course update error:', error)
+    res.status(500).json({ message: 'Server error updating course' })
+  }
+})
+
+// Delete a course
+app.delete('/api/admin/courses/:id', authenticateAdmin, async (req, res) => {
+  try {
+    await pool.query('DELETE FROM COURSE WHERE course_id = ?', [req.params.id])
+    res.json({ message: 'Course deleted successfully' })
+  } catch (error) {
+    console.error('Admin course delete error:', error)
+    res.status(500).json({ message: 'Server error deleting course' })
+  }
+})
+
+// ============ ADMIN: CAREER OPPORTUNITIES (per course) ============
+
+app.post('/api/admin/courses/:id/careers', authenticateAdmin, async (req, res) => {
+  const { job_title, salary_range, description } = req.body
+
+  if (!job_title) {
+    return res.status(400).json({ message: 'Job title is required' })
+  }
+
+  try {
+    const [result] = await pool.query(
+      `INSERT INTO CAREER_OPPORTUNITY (course_id, job_title, salary_range, description)
+       VALUES (?, ?, ?, ?)`,
+      [req.params.id, job_title, salary_range || null, description || null]
+    )
+    res.status(201).json({ message: 'Career opportunity added', opportunityId: result.insertId })
+  } catch (error) {
+    console.error('Admin career create error:', error)
+    res.status(500).json({ message: 'Server error adding career opportunity' })
+  }
+})
+
+app.put('/api/admin/careers/:careerId', authenticateAdmin, async (req, res) => {
+  const { job_title, salary_range, description } = req.body
+
+  try {
+    await pool.query(
+      `UPDATE CAREER_OPPORTUNITY SET job_title = ?, salary_range = ?, description = ? WHERE opportunity_id = ?`,
+      [job_title, salary_range || null, description || null, req.params.careerId]
+    )
+    res.json({ message: 'Career opportunity updated' })
+  } catch (error) {
+    console.error('Admin career update error:', error)
+    res.status(500).json({ message: 'Server error updating career opportunity' })
+  }
+})
+
+app.delete('/api/admin/careers/:careerId', authenticateAdmin, async (req, res) => {
+  try {
+    await pool.query('DELETE FROM CAREER_OPPORTUNITY WHERE opportunity_id = ?', [req.params.careerId])
+    res.json({ message: 'Career opportunity deleted' })
+  } catch (error) {
+    console.error('Admin career delete error:', error)
+    res.status(500).json({ message: 'Server error deleting career opportunity' })
+  }
+})
+
