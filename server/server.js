@@ -6,6 +6,8 @@ import profileRoutes from './routes/profileRoutes.js'
 import pool from './config/db.js'
 import authenticateToken from './middleware/authenticateToken.js'
 import nodemailer from 'nodemailer'
+import bcrypt from 'bcrypt'
+import jwt from 'jsonwebtoken'
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -728,5 +730,42 @@ app.post('/api/feedback', authenticateToken, async (req, res) => {
   } catch (error) {
     console.error('Feedback submit error:', error)
     res.status(500).json({ message: 'Server error submitting feedback' })
+  }
+})
+
+app.post('/api/admin/login', async (req, res) => {
+  const { username, password } = req.body
+
+  try {
+    const [rows] = await pool.query(
+      'SELECT * FROM ADMIN WHERE username = ?',
+      [username]
+    )
+
+    if (rows.length === 0) {
+      return res.status(400).json({ message: 'Invalid username or password' })
+    }
+
+    const admin = rows[0]
+    const passwordMatch = await bcrypt.compare(password, admin.password_hash)
+
+    if (!passwordMatch) {
+      return res.status(400).json({ message: 'Invalid username or password' })
+    }
+
+    const token = jwt.sign(
+      { adminId: admin.admin_id, username: admin.username, role: 'admin' },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    )
+
+    res.json({
+      message: 'Login successful',
+      token,
+      username: admin.username,
+    })
+  } catch (error) {
+    console.error('Admin login error:', error)
+    res.status(500).json({ message: 'Server error during admin login' })
   }
 })
