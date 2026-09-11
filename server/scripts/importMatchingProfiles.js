@@ -18,15 +18,11 @@ async function importMatchingProfiles() {
     const rawData = fs.readFileSync(filePath, "utf8");
     const jsonData = JSON.parse(rawData);
 
-    // Accept either:
-    // { profiles: [...] }
-    // { course_matching_profiles: [...] }
-    // or a top-level array
     const profiles =
-        jsonData.courses ||
-        jsonData.profiles ||
-        jsonData.course_matching_profiles ||
-        (Array.isArray(jsonData) ? jsonData : null);
+      jsonData.courses ||
+      jsonData.profiles ||
+      jsonData.course_matching_profiles ||
+      (Array.isArray(jsonData) ? jsonData : null);
 
     if (!Array.isArray(profiles)) {
       throw new Error("Could not find matching profiles array in JSON.");
@@ -41,7 +37,7 @@ async function importMatchingProfiles() {
       const [courseRows] = await connection.execute(
         `
         SELECT course_id
-        FROM course
+        FROM COURSE
         WHERE course_code = ?
         LIMIT 1
         `,
@@ -56,12 +52,11 @@ async function importMatchingProfiles() {
 
       const internalCourseId = courseRows[0].course_id;
 
-      // Skills profile
       if (Array.isArray(profile.skills_profile)) {
         for (const skill of profile.skills_profile) {
           await connection.execute(
             `
-            INSERT INTO course_skill_profile (
+            INSERT INTO COURSE_SKILL_PROFILE (
               course_id,
               skill_domain,
               weight,
@@ -79,7 +74,6 @@ async function importMatchingProfiles() {
         }
       }
 
-      // RIASEC profile
       if (profile.riasec_profile) {
         for (const riasecType of ["R", "I", "A", "S", "E", "C"]) {
           const riasecData = profile.riasec_profile[riasecType];
@@ -90,7 +84,7 @@ async function importMatchingProfiles() {
 
           await connection.execute(
             `
-            INSERT INTO course_riasec_profile (
+            INSERT INTO COURSE_RIASEC_PROFILE (
               course_id,
               riasec_type,
               weight,
@@ -113,11 +107,8 @@ async function importMatchingProfiles() {
 
     await connection.commit();
 
-    console.log("\n==========================================");
-    console.log("Matching profile import completed!");
+    console.log("\nMatching profile import completed!");
     console.log(`Total course profiles processed: ${profiles.length}`);
-    console.log("==========================================");
-
   } catch (error) {
     if (connection) {
       await connection.rollback();
@@ -125,7 +116,6 @@ async function importMatchingProfiles() {
 
     console.error("\nMatching profile import failed:");
     console.error(error);
-
   } finally {
     if (connection) {
       connection.release();

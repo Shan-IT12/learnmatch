@@ -34,7 +34,7 @@ async function importCourses() {
 
       await connection.execute(
         `
-        INSERT INTO course (
+        INSERT INTO COURSE (
           course_code,
           course_name,
           course_abbreviation,
