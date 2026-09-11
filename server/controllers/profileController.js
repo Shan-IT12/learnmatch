@@ -1,8 +1,8 @@
 import pool from '../config/db.js'
 
 export const saveProfile = async (req, res) => {
+  const userId = req.user.userId
   const {
-    userId,
     full_name,
     height_cm,
     weight_kg,
@@ -14,6 +14,28 @@ export const saveProfile = async (req, res) => {
     factor_working_student,
     factor_others
   } = req.body
+
+  const normalizedHeight =
+    height_cm === '' || height_cm === undefined || height_cm === null
+      ? null
+      : Number(height_cm)
+  const normalizedWeight =
+    weight_kg === '' || weight_kg === undefined || weight_kg === null
+      ? null
+      : Number(weight_kg)
+
+  if (normalizedHeight !== null && !Number.isFinite(normalizedHeight)) {
+    return res.status(400).json({ message: 'Height must be a valid number.' })
+  }
+
+  if (normalizedWeight !== null && !Number.isFinite(normalizedWeight)) {
+    return res.status(400).json({ message: 'Weight must be a valid number.' })
+  }
+
+  const normalizedOther =
+    factor_others === '' || factor_others === undefined || factor_others === null
+      ? null
+      : factor_others
 
   try {
     // Check if profile already exists
@@ -32,10 +54,10 @@ export const saveProfile = async (req, res) => {
           factor_others = ?
         WHERE user_id = ?`,
         [
-          full_name, height_cm, weight_kg,
+          full_name, normalizedHeight, normalizedWeight,
           factor_physical, factor_health, factor_financial,
           factor_family, factor_distance, factor_working_student,
-          factor_others, userId
+          normalizedOther, userId
         ]
       )
       return res.json({ message: 'Profile updated successfully' })
@@ -48,10 +70,10 @@ export const saveProfile = async (req, res) => {
          factor_financial, factor_family, factor_distance, factor_working_student, factor_others)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
-        userId, full_name, height_cm, weight_kg,
+        userId, full_name, normalizedHeight, normalizedWeight,
         factor_physical, factor_health, factor_financial,
         factor_family, factor_distance, factor_working_student,
-        factor_others
+        normalizedOther
       ]
     )
 
@@ -64,7 +86,7 @@ export const saveProfile = async (req, res) => {
 }
 
 export const getProfile = async (req, res) => {
-  const { userId } = req.query
+  const userId = req.user.userId
 
   try {
     const [rows] = await pool.query(

@@ -37,7 +37,6 @@ const personalFactors = [
 
 function Profile() {
   const navigate = useNavigate()
-  const userId = localStorage.getItem('userId')
   const token = localStorage.getItem('token')
   const location = useLocation()
   const assessmentComplete = location.state?.assessmentComplete
@@ -69,7 +68,17 @@ function Profile() {
 
     const fetchProfile = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/profile?userId=${userId}`)
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/profile`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+
+        if (response.status === 401 || response.status === 403) {
+          navigate('/login', { replace: true })
+          return
+        }
+
         const data = await response.json()
 
         if (data.profile) {
@@ -92,7 +101,7 @@ function Profile() {
     }
 
     fetchProfile()
-  }, [navigate, token, userId])
+  }, [navigate, token])
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target
@@ -132,11 +141,19 @@ function Profile() {
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/profile`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...formData, userId }),
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(formData),
       })
 
       const data = await response.json()
+
+      if (response.status === 401 || response.status === 403) {
+        navigate('/login', { replace: true })
+        return
+      }
 
       if (!response.ok) {
         setError(data.message)
