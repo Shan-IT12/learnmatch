@@ -104,6 +104,66 @@ export const SKILL_DOMAINS = Object.freeze([
   'Practical/Applied',
 ])
 
+export const CLUSTER_SKILL_DOMAINS = Object.freeze({
+  'HEALTHCARE SCIENCE CLUSTER': Object.freeze([
+    'Verbal',
+    'Abstract/Logical',
+    'Scientific Reasoning',
+    'Numerical',
+  ]),
+  'HUMANITIES & SOCIAL SCIENCE CLUSTER': Object.freeze([
+    'Verbal',
+    'Abstract/Logical',
+  ]),
+  'BUSINESS CLUSTER': Object.freeze([
+    'Numerical',
+    'Verbal',
+    'Abstract/Logical',
+  ]),
+  'HOSPITALITY & TOURISM CLUSTER': Object.freeze([
+    'Verbal',
+    'Practical/Applied',
+  ]),
+  'AVIATION & MARITIME CLUSTER': Object.freeze([
+    'Spatial',
+    'Practical/Applied',
+  ]),
+  'LEGAL & PUBLIC SERVICE CLUSTER': Object.freeze([
+    'Verbal',
+    'Abstract/Logical',
+  ]),
+  'EDUCATION CLUSTER': Object.freeze([
+    'Verbal',
+    'Abstract/Logical',
+  ]),
+  'ARTS & MULTIMEDIA CLUSTER': Object.freeze([
+    'Spatial',
+    'Abstract/Logical',
+    'Verbal',
+  ]),
+  'CRIMINOLOGY CLUSTER': Object.freeze([
+    'Practical/Applied',
+    'Abstract/Logical',
+  ]),
+  'AGRICULTURE & ENVIRONMENTAL CLUSTER': Object.freeze([
+    'Scientific Reasoning',
+    'Abstract/Logical',
+  ]),
+  'SCIENCE & MATHEMATICS CLUSTER': Object.freeze([
+    'Numerical',
+    'Abstract/Logical',
+  ]),
+  'SPORTS & PHYSICAL EDUCATION CLUSTER': Object.freeze([
+    'Verbal',
+    'Practical/Applied',
+  ]),
+  'ENGINEERING / STEM CLUSTER': Object.freeze([
+    'Abstract/Logical',
+    'Numerical',
+    'Spatial',
+  ]),
+})
+
 export const RIASEC_DIMENSIONS = Object.freeze(['R', 'I', 'A', 'S', 'E', 'C'])
 
 export const MBTI_TO_RIASEC = Object.freeze({
@@ -244,6 +304,14 @@ export function validateRecommendationConfig() {
 
     if (!CLUSTER_RIASEC_CODES[cluster]) {
       throw new Error(`Missing RIASEC codes for cluster: ${cluster}`)
+    }
+
+    const clusterSkillDomains = CLUSTER_SKILL_DOMAINS[cluster]
+    if (!clusterSkillDomains || clusterSkillDomains.length === 0) {
+      throw new Error(`Missing skill domains for cluster: ${cluster}`)
+    }
+    if (clusterSkillDomains.some((domain) => !SKILL_DOMAINS.includes(domain))) {
+      throw new Error(`Invalid skill domain configured for cluster: ${cluster}`)
     }
 
     for (const factor of SCORED_PERSONAL_FACTORS) {
