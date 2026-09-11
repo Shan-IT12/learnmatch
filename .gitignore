@@ -3,3 +3,5 @@
 .env.local
 learnmatch_backup.sql
 dist/
+.postman/
+postman/
