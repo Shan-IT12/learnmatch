@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
 const clusterCards = [
@@ -39,20 +39,39 @@ function Landing() {
   const [searching, setSearching] = useState(false)
   const navigate = useNavigate()
 
-  const handleSearch = async (e) => {
+  useEffect(() => {
+    const trimmedQuery = query.trim()
+    const controller = new AbortController()
+    if (!trimmedQuery) {
+      return () => controller.abort()
+    }
+
+    const timer = setTimeout(() => {
+      setSearching(true)
+      fetch(`${import.meta.env.VITE_API_URL || ''}/api/public/courses/search?q=${encodeURIComponent(trimmedQuery)}&limit=6`, { signal: controller.signal })
+        .then(async (response) => {
+          if (!response.ok) throw new Error('Search request failed')
+          return response.json()
+        })
+        .then((data) => setResults({ courses: data.courses || [], schools: [] }))
+        .catch((error) => {
+          if (error.name !== 'AbortError') {
+            setResults({ courses: [], schools: [] })
+          }
+        })
+        .finally(() => setSearching(false))
+    }, 250)
+
+    return () => {
+      clearTimeout(timer)
+      controller.abort()
+    }
+  }, [query])
+
+  const handleSearch = (e) => {
     e.preventDefault()
     if (!query.trim()) return
-    setSearching(true)
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/search?q=${encodeURIComponent(query)}`
-      )
-      const data = await response.json()
-      setResults(data)
-    } catch {
-      setResults({ courses: [], schools: [] })
-    }
-    setSearching(false)
+    navigate(`/courses/search?q=${encodeURIComponent(query.trim())}`)
   }
 
   return (
@@ -66,7 +85,7 @@ function Landing() {
       `}</style>
 
       {/* Nav */}
-      <nav className="flex justify-between items-center px-10 py-5">
+      <nav className="flex justify-between items-center px-5 sm:px-10 py-5">
         <span className="text-xl font-bold tracking-tight text-gray-900">
           Learn<span className="text-orange-500">Match</span>
         </span>
@@ -87,7 +106,7 @@ function Landing() {
       </nav>
 
       {/* Hero — split layout */}
-      <div className="max-w-7xl mx-auto px-10 pt-12 pb-16 grid grid-cols-2 gap-16 items-center min-h-[calc(100vh-80px)]">
+      <div className="max-w-7xl mx-auto px-5 sm:px-10 pt-8 sm:pt-12 pb-16 grid lg:grid-cols-2 gap-12 lg:gap-16 items-center min-h-[calc(100vh-80px)]">
 
         {/* Left side — content */}
         <div className="max-w-lg">
@@ -96,7 +115,7 @@ function Landing() {
             AI-assisted course recommendation
           </div>
 
-          <h1 className="text-5xl font-bold text-gray-900 leading-tight mb-5">
+          <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 leading-tight mb-5">
             Find the right
             <br />
             course for{' '}
@@ -142,9 +161,10 @@ function Landing() {
                 value={query}
                 onChange={(e) => {
                   setQuery(e.target.value)
-                  if (!e.target.value.trim()) setResults(null)
+                  setResults(null)
                 }}
-                placeholder="Search courses, schools or interests..."
+                placeholder="Search courses, skills or careers..."
+                aria-label="Search courses"
                 className="flex-1 text-sm outline-none text-gray-700 placeholder-gray-400 bg-transparent"
               />
               <button
@@ -170,18 +190,19 @@ function Landing() {
                           Courses
                         </div>
                         {results.courses.map((course, i) => (
-                          <div
-                            key={i}
-                            onClick={() => navigate('/register')}
-                            className="px-5 py-3 border-t border-gray-50 hover:bg-orange-50 transition cursor-pointer group"
+                          <button
+                            type="button"
+                            key={course.course_code || i}
+                            onClick={() => navigate(`/courses/${course.course_code}`)}
+                            className="block w-full text-left px-5 py-3 border-t border-gray-50 hover:bg-orange-50 transition cursor-pointer group"
                           >
                             <p className="text-sm font-medium text-gray-800 group-hover:text-orange-600 transition">
-                              {course.course_name}
+                              {course.course_name}{course.course_abbreviation ? ` (${course.course_abbreviation})` : ''}
                             </p>
                             <p className="text-xs text-gray-400 mt-0.5">
                               {course.cluster_category}
                             </p>
-                          </div>
+                          </button>
                         ))}
                       </div>
                     )}
@@ -220,7 +241,7 @@ function Landing() {
             </div>
             <div className="w-px h-8 bg-gray-200" />
             <div>
-              <p className="text-xl font-bold text-gray-900">74</p>
+              <p className="text-xl font-bold text-gray-900">342</p>
               <p className="text-xs text-gray-400">Courses</p>
             </div>
             <div className="w-px h-8 bg-gray-200" />
@@ -232,7 +253,7 @@ function Landing() {
         </div>
 
         {/* Right side — visual */}
-        <div className="relative flex items-center justify-center h-[500px]">
+        <div className="relative hidden lg:flex items-center justify-center h-[500px]">
 
           {/* Geometric background shapes */}
           <div className="absolute w-80 h-80 bg-orange-100 rounded-full opacity-40 top-10 right-10" />
@@ -270,7 +291,7 @@ function Landing() {
       </div>
 
       {/* How it works section */}
-      <div className="border-t border-gray-100 bg-gray-50 px-10 py-20">
+      <div className="border-t border-gray-100 bg-gray-50 px-5 sm:px-10 py-16 sm:py-20">
         <div className="max-w-5xl mx-auto">
           <p className="text-xs font-semibold text-orange-500 uppercase tracking-widest mb-3 text-center">
             How it works
@@ -279,7 +300,7 @@ function Landing() {
             Three steps to your right course
           </h2>
 
-          <div className="grid grid-cols-3 gap-10">
+          <div className="grid md:grid-cols-3 gap-10">
             {[
               {
                 step: '01',
@@ -314,8 +335,8 @@ function Landing() {
       </div>
 
       {/* Footer */}
-      <footer className="border-t border-gray-100 px-10 py-6">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
+      <footer className="border-t border-gray-100 px-5 sm:px-10 py-6">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row gap-2 justify-between items-center">
           <span className="text-sm font-bold text-gray-900">
             Learn<span className="text-orange-500">Match</span>
           </span>

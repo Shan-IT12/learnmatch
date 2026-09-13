@@ -17,6 +17,8 @@ import CareerPath from './pages/CareerPath'
 import Feedback from './pages/Feedback'
 import AdminLogin from "./pages/AdminLogin";
 import ManageCourses from './pages/admin/ManageCourses'
+import CourseSearch from './pages/CourseSearch'
+import PublicCourseDetails from './pages/PublicCourseDetails'
 import './App.css'
 
 
@@ -24,6 +26,8 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<Landing />} />
+      <Route path="/courses/search" element={<CourseSearch />} />
+      <Route path="/courses/:courseCode" element={<PublicCourseDetails />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/dashboard" element={<Dashboard />} />

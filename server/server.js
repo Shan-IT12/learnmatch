@@ -9,6 +9,7 @@ import nodemailer from 'nodemailer'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import authenticateAdmin from './middleware/authenticateAdmin.js'
+import publicCourseRoutes from './routes/publicCourseRoutes.js'
 import {
   RecommendationDataError,
   RecommendationInputError,
@@ -32,6 +33,7 @@ app.use(express.json())
 
 app.use('/api/auth', authRoutes)
 app.use('/api/profile', profileRoutes)
+app.use('/api/public/courses', publicCourseRoutes)
 
 app.get('/api/test', (req, res) => {
   res.json({ message: 'Server is working!' })
