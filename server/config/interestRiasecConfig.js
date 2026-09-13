@@ -1,12 +1,16 @@
-export const INTEREST_RIASEC_MAP = Object.freeze({
+export const CURRENT_INTEREST_RIASEC_MAP = Object.freeze({
   Drawing: Object.freeze({ primary: 'A', secondary: null }),
   Painting: Object.freeze({ primary: 'A', secondary: null }),
   Photography: Object.freeze({ primary: 'A', secondary: 'R' }),
-  'Video Editing / Filmmaking': Object.freeze({ primary: 'A', secondary: 'I' }),
-  'Music / Singing': Object.freeze({ primary: 'A', secondary: null }),
-  'Dancing / Performing Arts': Object.freeze({ primary: 'A', secondary: 'S' }),
+  'Video Editing': Object.freeze({ primary: 'A', secondary: 'I' }),
+  Filmmaking: Object.freeze({ primary: 'A', secondary: 'I' }),
+  Music: Object.freeze({ primary: 'A', secondary: null }),
+  Singing: Object.freeze({ primary: 'A', secondary: null }),
+  Dancing: Object.freeze({ primary: 'A', secondary: 'S' }),
+  'Acting / Theater': Object.freeze({ primary: 'A', secondary: 'S' }),
   'Coding / Programming': Object.freeze({ primary: 'I', secondary: 'C' }),
-  'Building / Fixing Gadgets': Object.freeze({ primary: 'R', secondary: 'I' }),
+  'Building Gadgets': Object.freeze({ primary: 'R', secondary: 'I' }),
+  'Fixing Gadgets': Object.freeze({ primary: 'R', secondary: 'I' }),
   'Science Experiments': Object.freeze({ primary: 'I', secondary: null }),
   'Mathematics / Problem Solving': Object.freeze({ primary: 'I', secondary: 'C' }),
   'Research / Reading Non-Fiction': Object.freeze({ primary: 'I', secondary: null }),
@@ -30,6 +34,18 @@ export const INTEREST_RIASEC_MAP = Object.freeze({
   'Environment / Conservation': Object.freeze({ primary: 'I', secondary: 'S' }),
   'Cooking with Local/Natural Ingredients': Object.freeze({ primary: 'R', secondary: 'A' }),
   'Travel / Exploring New Places': Object.freeze({ primary: 'S', secondary: 'E' }),
+})
+
+export const HISTORICAL_INTEREST_RIASEC_MAP = Object.freeze({
+  'Video Editing / Filmmaking': Object.freeze({ primary: 'A', secondary: 'I' }),
+  'Music / Singing': Object.freeze({ primary: 'A', secondary: null }),
+  'Dancing / Performing Arts': Object.freeze({ primary: 'A', secondary: 'S' }),
+  'Building / Fixing Gadgets': Object.freeze({ primary: 'R', secondary: 'I' }),
+})
+
+export const INTEREST_RIASEC_MAP = Object.freeze({
+  ...CURRENT_INTEREST_RIASEC_MAP,
+  ...HISTORICAL_INTEREST_RIASEC_MAP,
 })
 
 export const PRIMARY_INTEREST_CONTRIBUTION = 1

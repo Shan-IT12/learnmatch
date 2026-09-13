@@ -8,7 +8,15 @@ const steps = [
     { label: 'Personality', path: '/onboarding/personality' },
 ];
 
-function OnboardingLayout({ children, currentStep, isComplete }) {
+function OnboardingLayout({
+  children,
+  currentStep,
+  isComplete,
+  stickyChrome = false,
+  navigationStatus = null,
+  nextLabel,
+  onNext,
+}) {
   const navigate = useNavigate()
   const [showExitConfirm, setShowExitConfirm] = useState(false)
 
@@ -21,6 +29,11 @@ function OnboardingLayout({ children, currentStep, isComplete }) {
   }
 
   const handleNext = () => {
+    if (onNext) {
+      onNext()
+      return
+    }
+
     if (currentStep === 4) {
       navigate('/results')
     } else {
@@ -37,7 +50,7 @@ function OnboardingLayout({ children, currentStep, isComplete }) {
   }
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className={`${stickyChrome ? 'h-dvh overflow-hidden' : 'min-h-screen'} bg-white flex flex-col`}>
 
       {/* Exit confirmation modal */}
       {showExitConfirm && (
@@ -65,8 +78,9 @@ function OnboardingLayout({ children, currentStep, isComplete }) {
         </div>
       )}
 
+      <div className={stickyChrome ? 'sticky top-0 z-40 shrink-0 bg-white' : ''}>
       {/* Top bar */}
-      <div className="flex justify-between items-center px-8 py-5 border-b border-gray-100">
+      <div className="flex justify-between items-center px-4 sm:px-8 py-5 border-b border-gray-100">
         <button
           onClick={handleLogoClick}
           className="text-lg font-bold tracking-tight text-gray-900 hover:opacity-80 transition"
@@ -79,7 +93,7 @@ function OnboardingLayout({ children, currentStep, isComplete }) {
       </div>
 
       {/* Progress bar */}
-      <div className="px-8 py-6 border-b border-gray-100">
+      <div className="px-4 sm:px-8 py-6 border-b border-gray-100">
         <div className="max-w-xl mx-auto">
           <div className="flex items-center justify-between relative">
 
@@ -130,6 +144,7 @@ function OnboardingLayout({ children, currentStep, isComplete }) {
           </div>
         </div>
       </div>
+      </div>
 
  {/* Step content */}
       <div className="flex-1 overflow-y-auto">
@@ -137,10 +152,10 @@ function OnboardingLayout({ children, currentStep, isComplete }) {
       </div>
 
       {/* Bottom navigation */}
-      <div className="border-t border-gray-100 px-8 py-4 flex justify-between items-center bg-white">
+      <div className={`${stickyChrome ? 'sticky bottom-0 z-40 shrink-0 shadow-[0_-4px_12px_rgba(0,0,0,0.04)]' : ''} border-t border-gray-100 px-4 sm:px-8 py-4 grid grid-cols-[auto_minmax(0,1fr)_auto] gap-2 sm:gap-4 items-center bg-white`}>
         <button
           onClick={handleBack}
-          className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900 transition px-4 py-2 rounded-lg hover:bg-gray-50"
+          className="flex items-center gap-1 sm:gap-2 text-sm text-gray-500 hover:text-gray-900 transition px-2 sm:px-4 py-2 rounded-lg hover:bg-gray-50"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -148,16 +163,20 @@ function OnboardingLayout({ children, currentStep, isComplete }) {
           Back
         </button>
 
+        <div className="min-w-0 text-center">
+          {navigationStatus}
+        </div>
+
         <button
           onClick={handleNext}
           disabled={!isComplete}
-          className={`flex items-center gap-2 text-sm px-6 py-2.5 rounded-lg font-medium transition ${
+          className={`flex items-center gap-1 sm:gap-2 text-sm px-4 sm:px-6 py-2.5 rounded-lg font-medium transition ${
             isComplete
               ? 'bg-orange-500 text-white hover:bg-orange-600'
               : 'bg-gray-100 text-gray-400 cursor-not-allowed'
           }`}
         >
-          {currentStep === 4 ? 'See Results' : 'Next'}
+          {nextLabel || (currentStep === 4 ? 'See Results' : 'Next')}
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>

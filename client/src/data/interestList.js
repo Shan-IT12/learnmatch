@@ -1,6 +1,4 @@
-// Auto-generated from LearnMatch_Interest_Hobbies_List.pdf
-// 32 items across 6 groups, RIASEC-tagged (Primary +1.0, Secondary +0.5)
-// NOTE: pending guidance counselor validation — content may change after review.
+// Approved current Interest Assessment options across 6 groups.
 
 const interestGroups = [
   {
@@ -9,16 +7,20 @@ const interestGroups = [
       { name: "Drawing", primary: "A", secondary: null },
       { name: "Painting", primary: "A", secondary: null },
       { name: "Photography", primary: "A", secondary: "R" },
-      { name: "Video Editing / Filmmaking", primary: "A", secondary: "I" },
-      { name: "Music / Singing", primary: "A", secondary: null },
-      { name: "Dancing / Performing Arts", primary: "A", secondary: "S" },
+      { name: "Video Editing", primary: "A", secondary: "I" },
+      { name: "Filmmaking", primary: "A", secondary: "I" },
+      { name: "Music", primary: "A", secondary: null },
+      { name: "Singing", primary: "A", secondary: null },
+      { name: "Dancing", primary: "A", secondary: "S" },
+      { name: "Acting / Theater", primary: "A", secondary: "S" },
     ],
   },
   {
     group: "Technology & Science",
     items: [
       { name: "Coding / Programming", primary: "I", secondary: "C" },
-      { name: "Building / Fixing Gadgets", primary: "R", secondary: "I" },
+      { name: "Building Gadgets", primary: "R", secondary: "I" },
+      { name: "Fixing Gadgets", primary: "R", secondary: "I" },
       { name: "Science Experiments", primary: "I", secondary: null },
       { name: "Mathematics / Problem Solving", primary: "I", secondary: "C" },
       { name: "Research / Reading Non-Fiction", primary: "I", secondary: null },
@@ -65,5 +67,20 @@ const interestGroups = [
     ],
   },
 ]
+
+export const MIN_INTEREST_SELECTIONS = 3
+export const MAX_INTEREST_SELECTIONS = 10
+
+export function updateInterestSelection(selected, name) {
+  if (selected.includes(name)) {
+    return { selected: selected.filter((interest) => interest !== name), maxReached: false }
+  }
+
+  if (selected.length >= MAX_INTEREST_SELECTIONS) {
+    return { selected, maxReached: true }
+  }
+
+  return { selected: [...selected, name], maxReached: false }
+}
 
 export default interestGroups

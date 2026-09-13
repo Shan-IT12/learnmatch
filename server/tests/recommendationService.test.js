@@ -26,7 +26,7 @@ test('canonical interest names produce the expected RIASEC totals', () => {
 test('interest primary and secondary contributions accumulate as 1.0 and 0.5', () => {
   const vector = buildStudentRiasecVector([
     'Photography',
-    'Building / Fixing Gadgets',
+    'Building Gadgets',
   ])
 
   assert.deepEqual(vector, { R: 1.5, I: 0.5, A: 1, S: 0, E: 0, C: 0 })

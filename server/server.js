@@ -10,6 +10,7 @@ import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import authenticateAdmin from './middleware/authenticateAdmin.js'
 import publicCourseRoutes from './routes/publicCourseRoutes.js'
+import { validateInterestSubmission } from './services/interestSubmissionService.js'
 import {
   RecommendationDataError,
   RecommendationInputError,
@@ -87,8 +88,9 @@ app.post('/api/interests', authenticateToken, async (req, res) => {
   const { interests } = req.body
   const userId = req.user.userId
 
-  if (!Array.isArray(interests)) {
-    return res.status(400).json({ message: 'interests must be an array' })
+  const validationError = validateInterestSubmission(interests)
+  if (validationError) {
+    return res.status(400).json({ message: validationError })
   }
 
   try {

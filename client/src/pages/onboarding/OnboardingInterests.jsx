@@ -1,7 +1,11 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import OnboardingLayout from '../../components/OnboardingLayout'
-import interestGroups from '../../data/interestList'
+import interestGroups, {
+  MAX_INTEREST_SELECTIONS,
+  MIN_INTEREST_SELECTIONS,
+  updateInterestSelection,
+} from '../../data/interestList'
 
 function OnboardingInterests() {
   const navigate = useNavigate()
@@ -9,11 +13,14 @@ function OnboardingInterests() {
   const [selected, setSelected] = useState([])
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
+  const [selectionMessage, setSelectionMessage] = useState('')
 
   const toggleInterest = (name) => {
-    setSelected((prev) =>
-      prev.includes(name) ? prev.filter((i) => i !== name) : [...prev, name]
+    const result = updateInterestSelection(selected, name)
+    setSelectionMessage(
+      result.maxReached ? `You can select up to ${MAX_INTEREST_SELECTIONS} interests.` : ''
     )
+    setSelected(result.selected)
   }
 
  const handleNext = async () => {
@@ -46,11 +53,29 @@ function OnboardingInterests() {
 }
 
   return (
-    <OnboardingLayout currentStep={2} isComplete={true}>
-      <div className="max-w-xl mx-auto px-6 py-12">
+    <OnboardingLayout
+      currentStep={2}
+      isComplete={selected.length >= MIN_INTEREST_SELECTIONS && !submitting}
+      stickyChrome
+      onNext={handleNext}
+      nextLabel={submitting ? 'Saving...' : 'Next'}
+      navigationStatus={(
+        <div role="status" className="text-xs leading-tight">
+          <p className="text-gray-500">
+            {selected.length} / {MAX_INTEREST_SELECTIONS} selected
+          </p>
+          {selectionMessage && (
+            <p className="mt-1 text-amber-700">
+              {selectionMessage}
+            </p>
+          )}
+        </div>
+      )}
+    >
+      <div className="max-w-xl mx-auto px-6 pt-12 pb-16">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Interests & Hobbies</h2>
         <p className="text-gray-500 text-sm mb-8">
-          Check anything that applies to you. There's no minimum — pick as many or as few as you like.
+          Choose at least 3 interests that best describe you. Select up to 10.
         </p>
 
         {error && (
@@ -86,18 +111,6 @@ function OnboardingInterests() {
           ))}
         </div>
 
-        <p className="text-xs text-gray-400 mb-4">
-          {selected.length} selected
-        </p>
-
-        <button
-          type="button"
-          onClick={handleNext}
-          disabled={submitting}
-          className="w-full bg-orange-500 text-white py-3 rounded-xl font-medium hover:bg-orange-600 transition text-sm disabled:opacity-50"
-        >
-          {submitting ? 'Saving...' : 'Next →'}
-        </button>
       </div>
     </OnboardingLayout>
   )
