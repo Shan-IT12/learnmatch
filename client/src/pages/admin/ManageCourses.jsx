@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { IconPlus, IconEdit, IconTrash, IconArrowLeft, IconX } from '@tabler/icons-react'
+import { IconPlus, IconEdit, IconArrowLeft, IconX } from '@tabler/icons-react'
+import AdminHeader from '../../components/AdminHeader'
 
 const emptyCourseForm = {
   course_name: '',
@@ -9,10 +10,17 @@ const emptyCourseForm = {
   psced_group: '',
   description: '',
   obtainable_skills: '',
-  is_active: true,
 }
 
 const emptyCareerForm = { job_title: '', salary_range: '', description: '' }
+
+function handleUnauthorized(response, navigate) {
+  if (response.status !== 401 && response.status !== 403) return false
+  localStorage.removeItem('adminToken')
+  localStorage.removeItem('adminUsername')
+  navigate('/admin/login', { replace: true })
+  return true
+}
 
 function ManageCourses() {
   const navigate = useNavigate()
@@ -28,6 +36,7 @@ function ManageCourses() {
   const [showCareerForm, setShowCareerForm] = useState(false)
   const [error, setError] = useState('')
   const [saving, setSaving] = useState(false)
+  const [updatingStatusId, setUpdatingStatusId] = useState(null)
 
   const fetchCourses = async () => {
     setLoading(true)
@@ -36,6 +45,7 @@ function ManageCourses() {
       const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/courses`, {
         headers: { Authorization: `Bearer ${adminToken}` },
       })
+      if (handleUnauthorized(res, navigate)) return
 
       const data = await res.json()
       setCourses(data.courses || [])
@@ -59,6 +69,7 @@ function ManageCourses() {
         const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/courses`, {
           headers: { Authorization: `Bearer ${adminToken}` },
         })
+        if (handleUnauthorized(res, navigate)) return
 
         const data = await res.json()
         setCourses(data.courses || [])
@@ -85,6 +96,7 @@ function ManageCourses() {
       const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/courses/${courseId}`, {
         headers: { Authorization: `Bearer ${adminToken}` },
       })
+      if (handleUnauthorized(res, navigate)) return
       const data = await res.json()
 
       setEditingCourseId(courseId)
@@ -95,7 +107,6 @@ function ManageCourses() {
         psced_group: data.course.psced_group || '',
         description: data.course.description || '',
         obtainable_skills: data.course.obtainable_skills || '',
-        is_active: !!data.course.is_active,
       })
       setCareers(data.careers || [])
       setView('form')
@@ -105,8 +116,8 @@ function ManageCourses() {
   }
 
   const handleCourseFormChange = (e) => {
-    const { name, value, type, checked } = e.target
-    setCourseForm({ ...courseForm, [name]: type === 'checkbox' ? checked : value })
+    const { name, value } = e.target
+    setCourseForm({ ...courseForm, [name]: value })
   }
 
   const handleSaveCourse = async (e) => {
@@ -136,6 +147,11 @@ function ManageCourses() {
 
       const data = await res.json()
 
+      if (handleUnauthorized(res, navigate)) {
+        setSaving(false)
+        return
+      }
+
       if (!res.ok) {
         setError(data.message || 'Something went wrong.')
         setSaving(false)
@@ -154,17 +170,34 @@ function ManageCourses() {
     }
   }
 
-  const handleDeleteCourse = async (courseId) => {
-    if (!window.confirm('Delete this course? This cannot be undone.')) return
+  const handleStatusChange = async (course) => {
+    const nextStatus = !course.is_active
+    if (!nextStatus && !window.confirm(`Deactivate ${course.course_name}? It will be hidden from public course discovery and recommendations.`)) return
 
+    setError('')
+    setUpdatingStatusId(course.course_id)
     try {
-      await fetch(`${import.meta.env.VITE_API_URL}/api/admin/courses/${courseId}`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${adminToken}` },
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/courses/${course.course_id}/status`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${adminToken}`,
+        },
+        body: JSON.stringify({ is_active: nextStatus }),
       })
-      fetchCourses()
+      if (handleUnauthorized(response, navigate)) return
+      const data = await response.json()
+      if (!response.ok) {
+        setError(data.message || 'Could not update course status.')
+        return
+      }
+      setCourses((current) => current.map((item) =>
+        item.course_id === course.course_id ? { ...item, is_active: nextStatus } : item
+      ))
     } catch {
-      setError('Could not delete course.')
+      setError('Could not update course status.')
+    } finally {
+      setUpdatingStatusId(null)
     }
   }
 
@@ -184,6 +217,7 @@ function ManageCourses() {
           body: JSON.stringify(careerForm),
         }
       )
+      if (handleUnauthorized(res, navigate)) return
       const data = await res.json()
 
       setCareers([...careers, { opportunity_id: data.opportunityId, ...careerForm }])
@@ -196,10 +230,11 @@ function ManageCourses() {
 
   const handleDeleteCareer = async (opportunityId) => {
     try {
-      await fetch(`${import.meta.env.VITE_API_URL}/api/admin/careers/${opportunityId}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/careers/${opportunityId}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${adminToken}` },
       })
+      if (handleUnauthorized(response, navigate)) return
       setCareers(careers.filter((c) => c.opportunity_id !== opportunityId))
     } catch {
       setError('Could not delete career opportunity.')
@@ -208,27 +243,17 @@ function ManageCourses() {
 
   if (view === 'list') {
     return (
-      <div className="min-h-screen bg-gray-950">
-        <nav className="bg-gray-900 border-b border-gray-800 px-8 py-5 flex justify-between items-center">
-          <button
-            onClick={() => navigate('/admin')}
-            className="text-lg font-bold text-white hover:opacity-80 transition"
-          >
-            Learn<span className="text-orange-500">Match</span> <span className="text-gray-500 text-sm font-normal">Admin</span>
-          </button>
-          <button
-            onClick={() => navigate('/admin')}
-            className="text-sm text-gray-400 hover:text-white transition"
-          >
-            ← Dashboard
-          </button>
-        </nav>
+      <div className="min-h-screen bg-orange-50/40">
+        <AdminHeader currentPage="courses" />
 
-        <div className="max-w-5xl mx-auto px-6 py-12">
-          <div className="flex justify-between items-center mb-8">
+        <main className="max-w-6xl mx-auto px-5 sm:px-8 py-10 sm:py-12">
+          <button type="button" onClick={() => navigate('/admin')} className="text-sm text-gray-500 hover:text-orange-600 transition mb-6 focus:outline-none focus:ring-2 focus:ring-orange-500 rounded">
+            ← Back to Dashboard
+          </button>
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 mb-8">
             <div>
-              <h1 className="text-2xl font-bold text-white mb-1">Manage Courses</h1>
-              <p className="text-sm text-gray-400">{courses.length} courses total</p>
+              <h1 className="text-3xl font-bold text-gray-900 mb-1">Manage Courses</h1>
+              <p className="text-sm text-gray-500">Manage the validated LearnMatch course catalog. · {courses.length} courses total</p>
             </div>
             <button
               onClick={openNewCourseForm}
@@ -239,18 +264,18 @@ function ManageCourses() {
           </div>
 
           {error && (
-            <div className="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-xl text-sm mb-6">
+            <div className="bg-red-50 border border-red-100 text-red-600 px-4 py-3 rounded-xl text-sm mb-6" role="alert">
               {error}
             </div>
           )}
 
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
+          <div className="bg-white border border-orange-100 rounded-2xl overflow-x-auto shadow-sm">
             {loading ? (
               <p className="text-center text-gray-500 text-sm py-12">Loading courses...</p>
             ) : (
-              <table className="w-full text-sm">
+              <table className="w-full min-w-[760px] text-sm">
                 <thead>
-                  <tr className="border-b border-gray-800 text-left text-gray-500 text-xs uppercase tracking-wide">
+                  <tr className="border-b border-gray-100 bg-orange-50/40 text-left text-gray-500 text-xs uppercase tracking-wide">
                     <th className="px-6 py-3 font-medium">Course Name</th>
                     <th className="px-6 py-3 font-medium">Cluster</th>
                     <th className="px-6 py-3 font-medium">Status</th>
@@ -259,15 +284,15 @@ function ManageCourses() {
                 </thead>
                 <tbody>
                   {courses.map((course) => (
-                    <tr key={course.course_id} className="border-b border-gray-800 last:border-0 hover:bg-gray-800/50 transition">
-                      <td className="px-6 py-4 text-white font-medium">{course.course_name}</td>
-                      <td className="px-6 py-4 text-gray-400">{course.cluster_category}</td>
+                    <tr key={course.course_id} className="border-b border-gray-100 last:border-0 hover:bg-orange-50/30 transition">
+                      <td className="px-6 py-4 text-gray-900 font-medium">{course.course_name}</td>
+                      <td className="px-6 py-4 text-gray-500">{course.cluster_category}</td>
                       <td className="px-6 py-4">
                         <span
                           className={`text-xs px-2.5 py-1 rounded-full font-medium ${
                             course.is_active
                               ? 'bg-green-500/10 text-green-400'
-                              : 'bg-gray-700 text-gray-400'
+                              : 'bg-gray-100 text-gray-500'
                           }`}
                         >
                           {course.is_active ? 'Active' : 'Inactive'}
@@ -277,15 +302,24 @@ function ManageCourses() {
                         <div className="flex justify-end gap-2">
                           <button
                             onClick={() => openEditCourseForm(course.course_id)}
-                            className="text-gray-400 hover:text-orange-400 transition p-1.5"
+                            className="text-gray-400 hover:text-orange-600 hover:bg-orange-50 transition p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                            aria-label={`Edit ${course.course_name}`}
                           >
                             <IconEdit size={16} stroke={1.75} />
                           </button>
                           <button
-                            onClick={() => handleDeleteCourse(course.course_id)}
-                            className="text-gray-400 hover:text-red-400 transition p-1.5"
+                            onClick={() => handleStatusChange(course)}
+                            disabled={updatingStatusId === course.course_id}
+                            aria-label={`${course.is_active ? 'Deactivate' : 'Reactivate'} ${course.course_name}`}
+                            className={`px-3 py-2 rounded-lg text-xs font-medium transition focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:opacity-50 ${
+                              course.is_active
+                                ? 'text-red-600 hover:bg-red-50'
+                                : 'text-green-700 hover:bg-green-50'
+                            }`}
                           >
-                            <IconTrash size={16} stroke={1.75} />
+                            {updatingStatusId === course.course_id
+                              ? 'Updating...'
+                              : course.is_active ? 'Deactivate' : 'Reactivate'}
                           </button>
                         </div>
                       </td>
@@ -295,40 +329,37 @@ function ManageCourses() {
               </table>
             )}
           </div>
-        </div>
+        </main>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-950">
-      <nav className="bg-gray-900 border-b border-gray-800 px-8 py-5 flex justify-between items-center">
-        <button
-          onClick={() => navigate('/admin')}
-          className="text-lg font-bold text-white hover:opacity-80 transition"
-        >
-          Learn<span className="text-orange-500">Match</span> <span className="text-gray-500 text-sm font-normal">Admin</span>
+    <div className="min-h-screen bg-orange-50/40">
+      <AdminHeader currentPage="courses" />
+
+      <main className="max-w-3xl mx-auto px-5 sm:px-8 py-10 sm:py-12">
+        <button type="button" onClick={() => navigate('/admin')} className="text-sm text-gray-500 hover:text-orange-600 transition mb-5 focus:outline-none focus:ring-2 focus:ring-orange-500 rounded">
+          ← Back to Dashboard
         </button>
         <button
+          type="button"
           onClick={() => setView('list')}
-          className="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-white transition"
+          className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-orange-600 transition mb-6 focus:outline-none focus:ring-2 focus:ring-orange-500 rounded"
         >
           <IconArrowLeft size={16} stroke={2} /> Back to Courses
         </button>
-      </nav>
-
-      <div className="max-w-2xl mx-auto px-6 py-12">
-        <h1 className="text-2xl font-bold text-white mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 mb-8">
           {editingCourseId ? 'Edit Course' : 'Add New Course'}
         </h1>
 
         {error && (
-          <div className="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-xl text-sm mb-6">
+          <div className="bg-red-50 border border-red-100 text-red-600 px-4 py-3 rounded-xl text-sm mb-6" role="alert">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSaveCourse} className="space-y-5 mb-10">
+        <form onSubmit={handleSaveCourse} className="space-y-5 mb-8 bg-white border border-orange-100 rounded-2xl p-5 sm:p-7 shadow-sm">
           <div>
             <label className="block text-xs font-medium text-gray-400 mb-2 uppercase tracking-wide">
               Course Name *
@@ -338,12 +369,12 @@ function ManageCourses() {
               name="course_name"
               value={courseForm.course_name}
               onChange={handleCourseFormChange}
-              className="w-full bg-gray-900 border border-gray-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+              className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500"
               required
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-medium text-gray-400 mb-2 uppercase tracking-wide">
                 Cluster Category *
@@ -353,7 +384,7 @@ function ManageCourses() {
                 name="cluster_category"
                 value={courseForm.cluster_category}
                 onChange={handleCourseFormChange}
-                className="w-full bg-gray-900 border border-gray-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500"
                 required
               />
             </div>
@@ -366,7 +397,7 @@ function ManageCourses() {
                 name="program_type"
                 value={courseForm.program_type}
                 onChange={handleCourseFormChange}
-                className="w-full bg-gray-900 border border-gray-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500"
               />
             </div>
           </div>
@@ -380,7 +411,7 @@ function ManageCourses() {
               name="psced_group"
               value={courseForm.psced_group}
               onChange={handleCourseFormChange}
-              className="w-full bg-gray-900 border border-gray-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+              className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500"
             />
           </div>
 
@@ -393,7 +424,7 @@ function ManageCourses() {
               value={courseForm.description}
               onChange={handleCourseFormChange}
               rows={4}
-              className="w-full bg-gray-900 border border-gray-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none"
+              className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none"
             />
           </div>
 
@@ -407,20 +438,9 @@ function ManageCourses() {
               onChange={handleCourseFormChange}
               rows={3}
               placeholder="Separate each skill with a comma, e.g. Programming, Database Design, Project Management"
-              className="w-full bg-gray-900 border border-gray-800 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none"
+              className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none"
             />
           </div>
-
-          <label className="flex items-center gap-2.5 cursor-pointer">
-            <input
-              type="checkbox"
-              name="is_active"
-              checked={courseForm.is_active}
-              onChange={handleCourseFormChange}
-              className="w-4 h-4 accent-orange-500"
-            />
-            <span className="text-sm text-gray-300">Active (visible to students)</span>
-          </label>
 
           <button
             type="submit"
@@ -432,42 +452,42 @@ function ManageCourses() {
         </form>
 
         {editingCourseId && (
-          <div className="border-t border-gray-800 pt-8">
+          <div className="bg-white border border-orange-100 rounded-2xl p-5 sm:p-7 shadow-sm">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-sm font-semibold text-white uppercase tracking-wide">
+              <h2 className="text-sm font-semibold text-gray-900 uppercase tracking-wide">
                 Career Opportunities
               </h2>
               <button
                 onClick={() => setShowCareerForm(!showCareerForm)}
-                className="text-xs text-orange-400 hover:text-orange-300 transition font-medium inline-flex items-center gap-1"
+                className="text-xs text-orange-600 hover:text-orange-700 transition font-medium inline-flex items-center gap-1"
               >
                 <IconPlus size={14} stroke={2} /> Add
               </button>
             </div>
 
             {showCareerForm && (
-              <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 mb-4">
+              <div className="bg-orange-50/40 border border-orange-100 rounded-xl p-5 mb-4">
                 <div className="space-y-3">
                   <input
                     type="text"
                     placeholder="Job title"
                     value={careerForm.job_title}
                     onChange={(e) => setCareerForm({ ...careerForm, job_title: e.target.value })}
-                    className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
                   />
                   <input
                     type="text"
                     placeholder="Salary range, e.g. ₱25,000 - ₱40,000/month"
                     value={careerForm.salary_range}
                     onChange={(e) => setCareerForm({ ...careerForm, salary_range: e.target.value })}
-                    className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
                   />
                   <textarea
                     placeholder="Short description (optional)"
                     value={careerForm.description}
                     onChange={(e) => setCareerForm({ ...careerForm, description: e.target.value })}
                     rows={2}
-                    className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none"
+                    className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none"
                   />
                   <button
                     onClick={handleAddCareer}
@@ -484,10 +504,10 @@ function ManageCourses() {
                 careers.map((career) => (
                   <div
                     key={career.opportunity_id}
-                    className="bg-gray-900 border border-gray-800 rounded-xl px-4 py-3 flex justify-between items-center"
+                    className="bg-white border border-gray-100 rounded-xl px-4 py-3 flex justify-between items-center"
                   >
                     <div>
-                      <p className="text-sm text-white font-medium">{career.job_title}</p>
+                      <p className="text-sm text-gray-900 font-medium">{career.job_title}</p>
                       {career.salary_range && (
                         <p className="text-xs text-gray-500 mt-0.5">{career.salary_range}</p>
                       )}
@@ -506,7 +526,7 @@ function ManageCourses() {
             </div>
           </div>
         )}
-      </div>
+      </main>
     </div>
   )
 }

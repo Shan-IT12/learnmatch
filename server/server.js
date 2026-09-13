@@ -12,6 +12,7 @@ import authenticateAdmin from './middleware/authenticateAdmin.js'
 import publicCourseRoutes from './routes/publicCourseRoutes.js'
 import { validateInterestSubmission } from './services/interestSubmissionService.js'
 import { validatePersonalitySubmission } from './services/personalitySubmissionService.js'
+import { getAdminCourses, setCourseActiveStatus } from './services/adminCourseService.js'
 import {
   RecommendationDataError,
   RecommendationInputError,
@@ -768,11 +769,7 @@ app.post('/api/admin/login', async (req, res) => {
 // Get all courses (for the admin course list table)
 app.get('/api/admin/courses', authenticateAdmin, async (req, res) => {
   try {
-    const [courses] = await pool.query(
-      `SELECT course_id, course_name, program_type, cluster_category, psced_group, is_active
-       FROM COURSE
-       ORDER BY course_name ASC`
-    )
+    const courses = await getAdminCourses(pool)
     res.json({ courses })
   } catch (error) {
     console.error('Admin courses fetch error:', error)
@@ -827,16 +824,16 @@ app.post('/api/admin/courses', authenticateAdmin, async (req, res) => {
 
 // Update an existing course
 app.put('/api/admin/courses/:id', authenticateAdmin, async (req, res) => {
-  const { course_name, program_type, cluster_category, psced_group, description, obtainable_skills, is_active } = req.body
+  const { course_name, program_type, cluster_category, psced_group, description, obtainable_skills } = req.body
 
   try {
     await pool.query(
       `UPDATE COURSE
        SET course_name = ?, program_type = ?, cluster_category = ?, psced_group = ?,
-           description = ?, obtainable_skills = ?, is_active = ?
+           description = ?, obtainable_skills = ?
        WHERE course_id = ?`,
       [course_name, program_type || null, cluster_category, psced_group || null,
-       description || null, obtainable_skills || null, is_active ? 1 : 0, req.params.id]
+       description || null, obtainable_skills || null, req.params.id]
     )
     res.json({ message: 'Course updated successfully' })
   } catch (error) {
@@ -845,15 +842,28 @@ app.put('/api/admin/courses/:id', authenticateAdmin, async (req, res) => {
   }
 })
 
-// Delete a course
-app.delete('/api/admin/courses/:id', authenticateAdmin, async (req, res) => {
+// Activate or deactivate a course without deleting its catalog row
+app.patch('/api/admin/courses/:id/status', authenticateAdmin, async (req, res) => {
   try {
-    await pool.query('DELETE FROM COURSE WHERE course_id = ?', [req.params.id])
-    res.json({ message: 'Course deleted successfully' })
+    const updated = await setCourseActiveStatus(pool, req.params.id, req.body.is_active)
+    if (!updated) return res.status(404).json({ message: 'Course not found' })
+
+    res.json({
+      message: req.body.is_active ? 'Course reactivated successfully' : 'Course deactivated successfully',
+      is_active: req.body.is_active,
+    })
   } catch (error) {
-    console.error('Admin course delete error:', error)
-    res.status(500).json({ message: 'Server error deleting course' })
+    if (error.code === 'INVALID_COURSE_STATUS') {
+      return res.status(400).json({ message: error.message })
+    }
+    console.error('Admin course status update error:', error)
+    res.status(500).json({ message: 'Server error updating course status' })
   }
+})
+
+// Permanent course deletion is intentionally unavailable through the application.
+app.delete('/api/admin/courses/:id', authenticateAdmin, (req, res) => {
+  res.status(405).json({ message: 'Course deletion is disabled. Deactivate the course instead.' })
 })
 
 // ============ ADMIN: CAREER OPPORTUNITIES (per course) ============

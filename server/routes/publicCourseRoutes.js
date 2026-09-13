@@ -1,21 +1,35 @@
 import express from 'express'
-import { getPublicCourse, searchPublicCourses } from '../services/publicCourseService.js'
+import {
+  getAvailablePublicCourse,
+  searchAvailablePublicCourses,
+} from '../services/publicCourseService.js'
 
 const router = express.Router()
 
-router.get('/search', (req, res) => {
+router.get('/search', async (req, res) => {
   const query = typeof req.query.q === 'string' ? req.query.q.trim() : ''
   if (!query) return res.json({ query: '', courses: [] })
 
-  const requestedLimit = Number.parseInt(req.query.limit, 10)
-  const limit = Number.isFinite(requestedLimit) ? requestedLimit : 342
-  res.json({ query, courses: searchPublicCourses(query, { limit }) })
+  try {
+    const requestedLimit = Number.parseInt(req.query.limit, 10)
+    const limit = Number.isFinite(requestedLimit) ? requestedLimit : 342
+    const courses = await searchAvailablePublicCourses(query, { limit })
+    res.json({ query, courses })
+  } catch (error) {
+    console.error('Public course search error:', error)
+    res.status(500).json({ message: 'Server error searching courses' })
+  }
 })
 
-router.get('/:courseCode', (req, res) => {
-  const course = getPublicCourse(req.params.courseCode)
-  if (!course) return res.status(404).json({ message: 'Course not found' })
-  res.json({ course })
+router.get('/:courseCode', async (req, res) => {
+  try {
+    const course = await getAvailablePublicCourse(req.params.courseCode)
+    if (!course) return res.status(404).json({ message: 'Course not found' })
+    res.json({ course })
+  } catch (error) {
+    console.error('Public course detail error:', error)
+    res.status(500).json({ message: 'Server error fetching course' })
+  }
 })
 
 export default router

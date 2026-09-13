@@ -17,6 +17,8 @@ import CareerPath from './pages/CareerPath'
 import Feedback from './pages/Feedback'
 import AdminLogin from "./pages/AdminLogin";
 import ManageCourses from './pages/admin/ManageCourses'
+import AdminDashboard from './pages/admin/AdminDashboard'
+import AdminRoute from './components/AdminRoute'
 import CourseSearch from './pages/CourseSearch'
 import PublicCourseDetails from './pages/PublicCourseDetails'
 import './App.css'
@@ -44,7 +46,8 @@ function App() {
       <Route path="/results/career-path/:courseId" element={<CareerPath />} />
       <Route path="/feedback" element={<Feedback />} />
       <Route path="/admin/login" element={<AdminLogin />} />
-      <Route path="/admin/courses" element={<ManageCourses />} />
+      <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+      <Route path="/admin/courses" element={<AdminRoute><ManageCourses /></AdminRoute>} />
     </Routes>
   )
 }

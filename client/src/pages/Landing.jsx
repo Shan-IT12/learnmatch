@@ -342,7 +342,10 @@ function Landing() {
             Learn<span className="text-orange-500">Match</span>
           </span>
           <p className="text-xs text-gray-400">
-            STI College San Jose del Monte · Capstone 2 · 2026
+            © 2026 LearnMatch ·{' '}
+            <Link to="/admin/login" className="hover:text-orange-600 transition underline-offset-4 hover:underline">
+              Admin Portal
+            </Link>
           </p>
         </div>
       </footer>

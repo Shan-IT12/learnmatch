@@ -1,6 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import pool from '../config/db.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const dataPath = path.join(__dirname, '../data/learnmatch_courses_final_342_with_ids.json')
@@ -57,7 +58,7 @@ function fieldScore(field, phrase, tokens, weight) {
   return score
 }
 
-export function searchPublicCourses(query, { limit = 342 } = {}) {
+export function searchPublicCourses(query, { limit = 342, courseCodes = null } = {}) {
   const phrase = normalize(query)
   if (!phrase) return []
 
@@ -67,6 +68,7 @@ export function searchPublicCourses(query, { limit = 342 } = {}) {
   if (tokens.length === 0) return []
 
   return indexedCourses
+    .filter(({ course }) => !courseCodes || courseCodes.has(course.course_id))
     .map((item) => {
       const score =
         fieldScore(item.code, phrase, tokens, 16) +
@@ -96,4 +98,24 @@ export function getPublicCourse(courseCode) {
 
 export function getPublicCourseCount() {
   return indexedCourses.length
+}
+
+export async function getActivePublicCourseCodes(database = pool) {
+  const [rows] = await database.query(
+    'SELECT course_code FROM COURSE WHERE is_active = 1'
+  )
+  return new Set(rows.map(({ course_code }) => course_code))
+}
+
+export async function searchAvailablePublicCourses(query, options = {}, database = pool) {
+  const activeCourseCodes = await getActivePublicCourseCodes(database)
+  return searchPublicCourses(query, { ...options, courseCodes: activeCourseCodes })
+}
+
+export async function getAvailablePublicCourse(courseCode, database = pool) {
+  const course = getPublicCourse(courseCode)
+  if (!course) return null
+
+  const activeCourseCodes = await getActivePublicCourseCodes(database)
+  return activeCourseCodes.has(course.course_code) ? course : null
 }
