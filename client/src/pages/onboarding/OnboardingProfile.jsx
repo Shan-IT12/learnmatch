@@ -5,7 +5,6 @@ import OnboardingLayout from '../../components/OnboardingLayout'
 function OnboardingProfile() {
   const navigate = useNavigate()
   const token = localStorage.getItem('token')
-  const userId = localStorage.getItem('userId')
   const [checking, setChecking] = useState(true)
 
   useEffect(() => {
@@ -16,7 +15,13 @@ function OnboardingProfile() {
 
     const checkProfile = async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/profile?userId=${userId}`)
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/profile`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        if (res.status === 401 || res.status === 403) {
+          navigate('/login', { replace: true })
+          return
+        }
         const data = await res.json()
 
         if (data.profile && data.profile.full_name) {
@@ -30,7 +35,7 @@ function OnboardingProfile() {
     }
 
     checkProfile()
-  }, [token, userId, navigate])
+  }, [token, navigate])
 
   if (checking) {
     return (
@@ -51,7 +56,7 @@ function OnboardingProfile() {
         </p>
         <button
           type="button"
-          onClick={() => navigate('/profile', { state: { fromOnboarding: true } })}
+          onClick={() => navigate('/profile', { state: { entryContext: 'assessment' } })}
           className="bg-orange-500 text-white px-6 py-3 rounded-xl font-medium hover:bg-orange-600 transition text-sm"
         >
           Set Up Profile →

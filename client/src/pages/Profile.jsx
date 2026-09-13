@@ -40,7 +40,7 @@ function Profile() {
   const token = localStorage.getItem('token')
   const location = useLocation()
   const assessmentComplete = location.state?.assessmentComplete
-  const fromOnboarding = location.state?.fromOnboarding
+  const entryContext = location.state?.entryContext === 'assessment' ? 'assessment' : 'dashboard'
   const [showRetakePrompt, setShowRetakePrompt] = useState(false)
 
   const [formData, setFormData] = useState({
@@ -163,7 +163,7 @@ function Profile() {
       if (assessmentComplete) {
         setMessage(data.message)
         setShowRetakePrompt(true)
-      } else if (fromOnboarding) {
+      } else if (entryContext === 'assessment') {
         setMessage(data.message)
         setTimeout(() => {
           navigate('/onboarding/interests')

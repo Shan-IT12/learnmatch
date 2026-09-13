@@ -129,7 +129,7 @@ function Landing() {
             Get personalized course recommendations that actually fit who you are.
           </p>
 
-          <div className="flex items-center gap-3 mb-10">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-5 mb-10">
             <Link
               to="/register"
               className="inline-flex items-center gap-2 bg-orange-500 text-white px-6 py-3 rounded-xl font-medium hover:bg-orange-600 transition text-sm"
@@ -141,9 +141,10 @@ function Landing() {
             </Link>
             <Link
               to="/login"
-              className="inline-flex items-center gap-2 text-gray-600 text-sm hover:text-gray-900 transition px-4 py-3"
+              className="inline-flex items-center text-[15px] text-gray-700 transition py-2 sm:py-3"
             >
-              Already have an account? Log in
+              Already have an account?&nbsp;
+              <span className="font-semibold text-orange-600 hover:text-orange-700 hover:underline underline-offset-4">Log in</span>
             </Link>
           </div>
 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useLocation, useParams } from 'react-router-dom'
 import PublicHeader from '../components/PublicHeader'
 
 const apiUrl = import.meta.env.VITE_API_URL || ''
@@ -16,6 +16,8 @@ function setMetaDescription(content) {
 
 function PublicCourseDetails() {
   const { courseCode } = useParams()
+  const location = useLocation()
+  const fromDashboard = location.state?.entryContext === 'dashboard'
   const [course, setCourse] = useState(null)
   const [status, setStatus] = useState('loading')
   const [resolvedCourseCode, setResolvedCourseCode] = useState(null)
@@ -63,12 +65,12 @@ function PublicCourseDetails() {
           <div className="bg-white border border-gray-100 rounded-2xl p-8 text-center">
             <h1 className="text-2xl font-bold text-gray-900">Course not found</h1>
             <p className="text-gray-500 mt-2 mb-5">The course code may be invalid or unavailable.</p>
-            <Link to="/courses/search" className="text-orange-600 font-medium hover:text-orange-700">Explore courses</Link>
+            <Link to="/courses/search" state={fromDashboard ? { entryContext: 'dashboard' } : undefined} className="text-orange-600 font-medium hover:text-orange-700">Explore courses</Link>
           </div>
         )}
         {displayStatus === 'success' && course && (
           <article>
-            <Link to="/courses/search" className="text-sm text-orange-600 hover:text-orange-700">← Back to course search</Link>
+            <Link to="/courses/search" state={fromDashboard ? { entryContext: 'dashboard' } : undefined} className="text-sm text-orange-600 hover:text-orange-700">← Back to course search</Link>
             <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-6 sm:p-9 mt-5">
               <div className="flex flex-wrap items-center gap-2 mb-4">
                 {course.course_abbreviation && <span className="text-xs font-bold text-orange-600 bg-orange-50 px-3 py-1.5 rounded-full">{course.course_abbreviation}</span>}
