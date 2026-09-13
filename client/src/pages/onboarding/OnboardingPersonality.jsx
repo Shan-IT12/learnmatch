@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import OnboardingLayout from '../../components/OnboardingLayout'
-import { mbtiQuestions, likertScale } from '../../data/mbtiQuestions'
+import { getResponseChoices, mbtiQuestions } from '../../data/mbtiQuestions'
 
 function OnboardingPersonality() {
   const navigate = useNavigate()
@@ -16,6 +16,7 @@ function OnboardingPersonality() {
   const selectedRating = answers[currentQuestion.id]
   const isLastQuestion = currentIndex === mbtiQuestions.length - 1
   const answeredCount = Object.keys(answers).length
+  const responseChoices = getResponseChoices(currentQuestion)
 
   const handleSelect = (rating) => {
     setAnswers((prev) => ({ ...prev, [currentQuestion.id]: rating }))
@@ -157,18 +158,17 @@ function OnboardingPersonality() {
 
         {/* Likert scale choices */}
         <div className="space-y-3 mb-8">
-          {likertScale.map((choice) => (
+          {responseChoices.map((choice) => (
             <button
               key={choice.value}
               type="button"
               onClick={() => handleSelect(choice.value)}
-              className={`w-full text-left px-4 py-3 rounded-xl border text-sm transition ${
+              className={`w-full text-left px-4 py-3 rounded-xl border text-sm leading-snug break-words transition ${
                 selectedRating === choice.value
                   ? 'bg-orange-500 text-white border-orange-500'
                   : 'bg-white text-gray-700 border-gray-200 hover:border-orange-300'
               }`}
             >
-              <span className="font-medium mr-2">{choice.value}.</span>
               {choice.label}
             </button>
           ))}
