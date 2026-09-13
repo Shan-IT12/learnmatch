@@ -11,6 +11,7 @@ import jwt from 'jsonwebtoken'
 import authenticateAdmin from './middleware/authenticateAdmin.js'
 import publicCourseRoutes from './routes/publicCourseRoutes.js'
 import { validateInterestSubmission } from './services/interestSubmissionService.js'
+import { validatePersonalitySubmission } from './services/personalitySubmissionService.js'
 import {
   RecommendationDataError,
   RecommendationInputError,
@@ -622,9 +623,10 @@ app.get('/api/courses/:id', async (req, res) => {
 app.post('/api/mbti', authenticateToken, async (req, res) => {
   const { answers } = req.body
   const userId = req.user.userId
- 
-  if (!Array.isArray(answers) || answers.length === 0) {
-    return res.status(400).json({ message: 'Missing answers' })
+
+  const validation = validatePersonalitySubmission(answers)
+  if (!validation.valid) {
+    return res.status(400).json({ message: validation.message })
   }
  
   try {
@@ -636,7 +638,7 @@ app.post('/api/mbti', authenticateToken, async (req, res) => {
       JP: { J: 0, P: 0 },
     }
  
-    for (const a of answers) {
+    for (const a of validation.answers) {
       if (totals[a.dimension] && totals[a.dimension][a.pole] !== undefined) {
         totals[a.dimension][a.pole] += Number(a.rating)
       }
