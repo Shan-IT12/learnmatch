@@ -341,12 +341,7 @@ function Landing() {
           <span className="text-sm font-bold text-gray-900">
             Learn<span className="text-orange-500">Match</span>
           </span>
-          <p className="text-xs text-gray-400">
-            © 2026 LearnMatch ·{' '}
-            <Link to="/admin/login" className="hover:text-orange-600 transition underline-offset-4 hover:underline">
-              Admin Portal
-            </Link>
-          </p>
+          <p className="text-xs text-gray-400">© 2026 LearnMatch</p>
         </div>
       </footer>
 
