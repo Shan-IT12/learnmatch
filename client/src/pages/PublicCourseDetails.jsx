@@ -17,6 +17,7 @@ function setMetaDescription(content) {
 function PublicCourseDetails() {
   const { courseCode } = useParams()
   const location = useLocation()
+  const isAuthenticated = Boolean(localStorage.getItem('token'))
   const fromDashboard = location.state?.entryContext === 'dashboard'
   const [course, setCourse] = useState(null)
   const [status, setStatus] = useState('loading')
@@ -93,7 +94,7 @@ function PublicCourseDetails() {
             </div>
             <div className="bg-gray-900 rounded-2xl p-7 sm:p-9 mt-6 flex flex-col sm:flex-row sm:items-center justify-between gap-5">
               <div><h2 className="text-xl font-semibold text-white">Is this course right for you?</h2><p className="text-sm text-gray-400 mt-1">Get recommendations based on your skills, interests, and personality.</p></div>
-              <Link to="/register" className="shrink-0 text-center bg-orange-500 text-white px-5 py-3 rounded-xl font-medium hover:bg-orange-600">Take the LearnMatch Assessment</Link>
+              <Link to={isAuthenticated ? '/dashboard' : '/register'} className="shrink-0 text-center bg-orange-500 text-white px-5 py-3 rounded-xl font-medium hover:bg-orange-600">Take the LearnMatch Assessment</Link>
             </div>
           </article>
         )}
