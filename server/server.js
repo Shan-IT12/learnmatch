@@ -17,8 +17,11 @@ import { normalizeCourseSearchQuery, searchActiveCollegeCourses } from './servic
 import {
   RecommendationDataError,
   RecommendationInputError,
-  getTopCourseRecommendations,
 } from './services/recommendationService.js'
+import {
+  getLatestSavedRecommendations,
+  getOrCreateSavedRecommendations,
+} from './services/recommendationPersistenceService.js'
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -201,7 +204,7 @@ app.get('/api/results', authenticateToken, async (req, res) => {
   const userId = req.user.userId
 
   try {
-    const recommendations = await getTopCourseRecommendations(pool, userId)
+    const recommendations = await getOrCreateSavedRecommendations(pool, userId)
     res.json({ recommendations })
   } catch (error) {
     console.error('Results fetch error:', error)
@@ -214,6 +217,16 @@ app.get('/api/results', authenticateToken, async (req, res) => {
     }
 
     res.status(500).json({ message: 'Server error fetching results' })
+  }
+})
+
+app.get('/api/recommendations/latest', authenticateToken, async (req, res) => {
+  try {
+    const result = await getLatestSavedRecommendations(pool, req.user.userId)
+    res.json(result)
+  } catch (error) {
+    console.error('Latest recommendation fetch error:', error)
+    res.status(500).json({ message: 'Server error fetching saved recommendations' })
   }
 })
 

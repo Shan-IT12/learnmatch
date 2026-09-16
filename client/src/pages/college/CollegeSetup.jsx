@@ -13,6 +13,7 @@ function CollegeSetup() {
   const token = localStorage.getItem('token')
 
   const [courses, setCourses] = useState([])
+  const [savedRecommendations, setSavedRecommendations] = useState([])
   const [search, setSearch] = useState('')
   const [searchStatus, setSearchStatus] = useState('idle')
   const [selectedCourse, setSelectedCourse] = useState(null)
@@ -24,6 +25,33 @@ function CollegeSetup() {
 
   useEffect(() => {
     if (!token) navigate('/login')
+  }, [token, navigate])
+
+  useEffect(() => {
+    if (!token) return undefined
+
+    const controller = new AbortController()
+    const loadSavedRecommendations = async () => {
+      try {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/recommendations/latest`, {
+          headers: { Authorization: `Bearer ${token}` },
+          signal: controller.signal,
+        })
+        if (response.status === 401 || response.status === 403) {
+          navigate('/login', { replace: true })
+          return
+        }
+        if (!response.ok) return
+
+        const data = await response.json()
+        setSavedRecommendations(Array.isArray(data.recommendations) ? data.recommendations : [])
+      } catch (requestError) {
+        if (requestError.name !== 'AbortError') setSavedRecommendations([])
+      }
+    }
+
+    loadSavedRecommendations()
+    return () => controller.abort()
   }, [token, navigate])
 
   useEffect(() => {
@@ -158,6 +186,36 @@ function CollegeSetup() {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
+
+          {savedRecommendations.length > 0 && (
+            <section className="bg-white border border-orange-100 rounded-2xl p-5 shadow-sm">
+              <h2 className="text-sm font-semibold text-gray-900">Based on your LearnMatch recommendations</h2>
+              <p className="text-xs text-gray-500 mt-1 mb-4">Choose one of your recommended courses or search for another course.</p>
+              <div className="space-y-3">
+                {savedRecommendations.map((recommendation) => (
+                  <div key={recommendation.course_id} className="border border-gray-100 rounded-xl p-4 sm:flex sm:items-center sm:justify-between gap-4">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-xs font-bold text-orange-600">#{recommendation.rank_position}</span>
+                        {recommendation.course_abbreviation && (
+                          <span className="text-xs text-gray-400">{recommendation.course_abbreviation}</span>
+                        )}
+                      </div>
+                      <p className="text-sm font-medium text-gray-800">{recommendation.course_name}</p>
+                      <p className="text-xs text-gray-400 mt-1">{recommendation.match_score}% compatibility</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => selectCourse(recommendation)}
+                      className="mt-3 sm:mt-0 shrink-0 text-xs font-medium text-orange-600 border border-orange-200 px-3 py-2 rounded-lg hover:bg-orange-50 focus:outline-none focus:ring-2 focus:ring-orange-400"
+                    >
+                      {selectedCourse?.course_id === recommendation.course_id ? 'Selected' : 'Choose this course'}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
 
           {/* Course search */}
           <div>
