@@ -1,6 +1,6 @@
 export async function getAdminCourses(database) {
   const [courses] = await database.query(
-    `SELECT course_id, course_name, program_type, cluster_category, psced_group, is_active
+    `SELECT course_id, course_code, course_name, course_abbreviation, program_type, cluster_category, psced_group, is_active
      FROM COURSE
      ORDER BY course_name ASC`
   )

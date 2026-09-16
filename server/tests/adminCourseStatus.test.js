@@ -7,13 +7,15 @@ import { getAdminCourses, setCourseActiveStatus } from '../services/adminCourseS
 
 test('admin listing retains active and inactive courses', async () => {
   const expected = [
-    { course_id: 1, course_name: 'Active course', is_active: 1 },
-    { course_id: 2, course_name: 'Inactive course', is_active: 0 },
+    { course_id: 1, course_code: 'CRS001', course_name: 'Active course', course_abbreviation: 'AC', is_active: 1 },
+    { course_id: 2, course_code: 'CRS002', course_name: 'Inactive course', course_abbreviation: 'IC', is_active: 0 },
   ]
   const database = {
     query: async (sql) => {
       assert.match(sql, /FROM COURSE/)
       assert.doesNotMatch(sql, /WHERE\s+is_active/i)
+      assert.match(sql, /course_code/)
+      assert.match(sql, /course_abbreviation/)
       return [expected]
     },
   }
