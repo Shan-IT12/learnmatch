@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { IconSearch, IconX } from '@tabler/icons-react'
 
 const semesterProgressOptions = [
   { label: "Just starting / early in the semester", phase: 'Early' },
@@ -13,6 +14,7 @@ function CollegeSetup() {
 
   const [courses, setCourses] = useState([])
   const [search, setSearch] = useState('')
+  const [searchStatus, setSearchStatus] = useState('idle')
   const [selectedCourse, setSelectedCourse] = useState(null)
   const [yearLevel, setYearLevel] = useState('')
   const [semester, setSemester] = useState('')
@@ -24,26 +26,54 @@ function CollegeSetup() {
     if (!token) navigate('/login')
   }, [token, navigate])
 
-  // Search courses from your database
-  const handleSearch = async (e) => {
-    const query = e.target.value
-    setSearch(query)
+  useEffect(() => {
+    const query = search.trim().replace(/\s+/g, ' ')
+    if (selectedCourse || query.length < 2) return undefined
+
+    const controller = new AbortController()
+    const timer = setTimeout(async () => {
+      setSearchStatus('loading')
+      try {
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/search?q=${encodeURIComponent(query)}`,
+          { signal: controller.signal }
+        )
+        if (!response.ok) throw new Error('Course search failed')
+        const data = await response.json()
+        setCourses(data.courses || [])
+        setSearchStatus('success')
+      } catch (requestError) {
+        if (requestError.name !== 'AbortError') {
+          setCourses([])
+          setSearchStatus('error')
+        }
+      }
+    }, 200)
+
+    return () => {
+      clearTimeout(timer)
+      controller.abort()
+    }
+  }, [search, selectedCourse])
+
+  const selectCourse = (course) => {
+    setSelectedCourse(course)
+    setSearch(course.course_name)
+    setCourses([])
+    setSearchStatus('idle')
+  }
+
+  const handleSearchChange = (event) => {
+    setSearch(event.target.value)
     setSelectedCourse(null)
+    setCourses([])
+    setSearchStatus('idle')
+  }
 
-    if (query.length < 2) {
-      setCourses([])
-      return
-    }
-
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/search?q=${encodeURIComponent(query)}`
-      )
-      const data = await response.json()
-      setCourses(data.courses || [])
-    } catch {
-      setCourses([])
-    }
+  const clearSearch = () => {
+    setSearch('')
+    setCourses([])
+    setSearchStatus('idle')
   }
 
   const handleSubmit = async (e) => {
@@ -134,36 +164,57 @@ function CollegeSetup() {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               What course are you enrolled in?
             </label>
-            <input
-              type="text"
-              value={search}
-              onChange={handleSearch}
-              placeholder="Search course name..."
-              className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
-            />
+            <div className="relative">
+              <IconSearch size={18} stroke={1.75} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+              <input
+                type="search"
+                value={search}
+                onChange={handleSearchChange}
+                placeholder="Search by course name, abbreviation, or code..."
+                aria-label="Search active courses by name, abbreviation, or code"
+                className="w-full border border-gray-200 rounded-xl pl-10 pr-10 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+              />
+              {search && !selectedCourse && (
+                <button
+                  type="button"
+                  onClick={clearSearch}
+                  aria-label="Clear course search"
+                  className="absolute right-1 top-1/2 -translate-y-1/2 w-10 h-10 inline-flex items-center justify-center rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-400"
+                >
+                  <IconX size={17} stroke={1.75} />
+                </button>
+              )}
+            </div>
 
             {/* Search results dropdown */}
-            {courses.length > 0 && !selectedCourse && (
+            {searchStatus === 'loading' && !selectedCourse && (
+              <p className="mt-2 text-xs text-gray-400">Finding courses...</p>
+            )}
+            {searchStatus === 'success' && courses.length > 0 && !selectedCourse && (
               <div className="border border-gray-100 rounded-xl shadow-sm mt-2 overflow-hidden">
-                {courses.map((course, i) => (
-                  <div
-                    key={i}
-                    onClick={() => {
-                      setSelectedCourse(course)
-                      setSearch(course.course_name)
-                      setCourses([])
-                    }}
-                    className="px-4 py-3 hover:bg-orange-50 cursor-pointer border-t border-gray-50 first:border-t-0"
+                {courses.map((course) => (
+                  <button
+                    key={course.course_id}
+                    type="button"
+                    onClick={() => selectCourse(course)}
+                    className="block w-full text-left px-4 py-3 hover:bg-orange-50 border-t border-gray-50 first:border-t-0 focus:outline-none focus:bg-orange-50"
                   >
                     <p className="text-sm font-medium text-gray-800">
                       {course.course_name}
+                      {course.course_abbreviation && ` (${course.course_abbreviation})`}
                     </p>
                     <p className="text-xs text-orange-500 mt-0.5">
-                      {course.cluster_category}
+                      {[course.course_code, course.cluster_category].filter(Boolean).join(' · ')}
                     </p>
-                  </div>
+                  </button>
                 ))}
               </div>
+            )}
+            {searchStatus === 'success' && courses.length === 0 && !selectedCourse && (
+              <p className="mt-2 text-xs text-gray-400">No active courses found.</p>
+            )}
+            {searchStatus === 'error' && !selectedCourse && (
+              <p className="mt-2 text-xs text-red-500">Course search is unavailable. Please try again.</p>
             )}
 
             {selectedCourse && (
@@ -171,16 +222,17 @@ function CollegeSetup() {
                 <div>
                   <p className="text-sm font-medium text-gray-800">
                     {selectedCourse.course_name}
+                    {selectedCourse.course_abbreviation && ` (${selectedCourse.course_abbreviation})`}
                   </p>
                   <p className="text-xs text-orange-500 mt-0.5">
-                    {selectedCourse.cluster_category}
+                    {[selectedCourse.course_code, selectedCourse.cluster_category].filter(Boolean).join(' · ')}
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => {
                     setSelectedCourse(null)
-                    setSearch('')
+                    clearSearch()
                   }}
                   className="text-xs text-gray-400 hover:text-gray-600"
                 >

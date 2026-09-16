@@ -13,6 +13,7 @@ import publicCourseRoutes from './routes/publicCourseRoutes.js'
 import { validateInterestSubmission } from './services/interestSubmissionService.js'
 import { validatePersonalitySubmission } from './services/personalitySubmissionService.js'
 import { getAdminCourses, setCourseActiveStatus } from './services/adminCourseService.js'
+import { normalizeCourseSearchQuery, searchActiveCollegeCourses } from './services/collegeCourseSearchService.js'
 import {
   RecommendationDataError,
   RecommendationInputError,
@@ -56,19 +57,12 @@ app.listen(PORT, () => {
 })
 
 app.get('/api/search', async (req, res) => {
-  const { q } = req.query
-  if (!q) return res.json({ courses: [], schools: [] })
+  const query = normalizeCourseSearchQuery(req.query.q)
+  if (!query) return res.json({ courses: [], schools: [] })
 
   try {
-    const searchTerm = `%${q}%`
-
-    const [courses] = await pool.query(
-      `SELECT course_id, course_name, cluster_category 
-       FROM COURSE 
-       WHERE course_name LIKE ? AND is_active = 1
-       LIMIT 5`,
-      [searchTerm]
-    )
+    const searchTerm = `%${query}%`
+    const courses = await searchActiveCollegeCourses(pool, query)
 
     const [schools] = await pool.query(
       `SELECT school_name, hei_type, address 
