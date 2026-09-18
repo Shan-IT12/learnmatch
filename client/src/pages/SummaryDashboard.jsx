@@ -11,17 +11,7 @@ const personalFactorLabels = {
   factor_working_student: 'Working Student',
 }
 
-// Same placeholder data used in CareerPath.jsx — replace once
-// CAREER_ROADMAP / CAREER_OPPORTUNITY tables are populated.
-const placeholderSkills = [
-  'Problem Solving', 'Technical Communication', 'Analytical Thinking',
-  'Project Management', 'Research Methods',
-]
- 
-const placeholderOpportunities = [
-  { title: 'Entry-Level Role in the Field', salary: '₱18,000 - ₱28,000/month' },
-  { title: 'Mid-Level Specialist', salary: '₱30,000 - ₱50,000/month' },
-]
+const apiUrl = import.meta.env.VITE_API_URL || ''
 
 function SummaryDashboard() {
   const navigate = useNavigate()
@@ -64,7 +54,7 @@ function SummaryDashboard() {
         if (top) {
           setTopRecommendation(top)
           // Fetch course description for the top recommendation's career path preview
-          const courseRes = await fetch(`${import.meta.env.VITE_API_URL}/api/courses/${top.course_id}`)
+          const courseRes = await fetch(`${apiUrl}/api/public/courses/${encodeURIComponent(top.course_id)}`)
           const courseData = await courseRes.json()
           setTopCourseDetail(courseData.course || null)
         }
@@ -328,7 +318,7 @@ function SummaryDashboard() {
                 Career Path — {topRecommendation.course_name}
               </p>
               <button
-                onClick={() => navigate(`/results/career-path/${topRecommendation.course_id}`)}
+                onClick={() => navigate('/results/career-path')}
                 className="text-xs font-medium text-orange-500 hover:text-orange-600 transition inline-flex items-center gap-1 shrink-0"
               >
                 View Full Career Path →
@@ -339,9 +329,8 @@ function SummaryDashboard() {
             </p>
  
             <p className="text-xs font-semibold text-gray-700 mb-2">Obtainable Skills</p>
-            <p className="text-xs text-orange-400 mb-3">Placeholder — actual skills coming soon</p>
             <div className="flex flex-wrap gap-2 mb-5">
-              {placeholderSkills.map((skill) => (
+              {(topCourseDetail?.obtainable_skills || []).slice(0, 8).map((skill) => (
                 <span
                   key={skill}
                   className="text-xs px-3 py-1.5 rounded-full bg-orange-50 text-orange-700 font-medium"
@@ -352,12 +341,12 @@ function SummaryDashboard() {
             </div>
  
             <p className="text-xs font-semibold text-gray-700 mb-2">Career Opportunities</p>
-            <p className="text-xs text-orange-400 mb-3">Placeholder — actual opportunities coming soon</p>
+            <p className="text-xs text-gray-400 mb-3">Salary figures are estimates and may vary by employer, experience, location, and industry.</p>
             <div className="space-y-2">
-              {placeholderOpportunities.map((job) => (
-                <div key={job.title} className="flex justify-between items-center text-sm">
-                  <span className="text-gray-700">{job.title}</span>
-                  <span className="text-xs text-gray-400">{job.salary}</span>
+              {(topCourseDetail?.career_opportunities || []).map((job) => (
+                <div key={job.career_id} className="flex justify-between items-center gap-4 text-sm">
+                  <span className="text-gray-700">{job.career_title}</span>
+                  <span className="text-xs text-gray-400 text-right">{job.estimated_monthly_salary_php?.display}</span>
                 </div>
               ))}
             </div>

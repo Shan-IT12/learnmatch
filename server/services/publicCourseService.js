@@ -5,7 +5,20 @@ import pool from '../config/db.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const dataPath = path.join(__dirname, '../data/learnmatch_courses_final_342_with_ids.json')
+const enrichmentDataPath = path.join(__dirname, '../data/learnmatch_342_year_levels_and_careers_final.json')
 const { courses } = JSON.parse(fs.readFileSync(dataPath, 'utf8'))
+const { courses: enrichedCourses } = JSON.parse(fs.readFileSync(enrichmentDataPath, 'utf8'))
+const enrichmentByCourseId = new Map(enrichedCourses.map((course) => [course.course_id, course]))
+
+if (enrichmentByCourseId.size !== courses.length) {
+  throw new Error('Course enrichment dataset must contain the same 342 unique course IDs as the canonical catalog')
+}
+
+for (const course of courses) {
+  if (!enrichmentByCourseId.has(course.course_id)) {
+    throw new Error(`Course enrichment is missing canonical course ${course.course_id}`)
+  }
+}
 
 const normalize = (value = '') =>
   String(value)
@@ -29,9 +42,15 @@ const publicCourse = (course, includeDetails = false) => {
   }
 
   if (includeDetails) {
+    const enrichment = enrichmentByCourseId.get(course.course_id)
     result.obtainable_skills = course.obtainable_skills || []
     result.career_paths = course.career_paths || []
     result.sources = course.sources || []
+    result.program_duration_years = enrichment.program_duration_years
+    result.duration_basis = enrichment.duration_basis || null
+    result.year_levels = enrichment.year_levels || []
+    result.year_level_source_note = enrichment.year_level_source_note || null
+    result.career_opportunities = enrichment.career_opportunities || []
   }
 
   return result

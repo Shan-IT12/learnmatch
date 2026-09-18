@@ -43,7 +43,8 @@ function App() {
       <Route path="/college/checkin" element={<SemesterCheckin />} />
       <Route path="/results" element={<Results />} />
       <Route path="/dashboard/summary" element={<SummaryDashboard />} />
-      <Route path="/results/career-path/:courseId" element={<CareerPath />} />
+      <Route path="/results/career-path" element={<CareerPath />} />
+      <Route path="/results/career-path/:courseCode" element={<CareerPath />} />
       <Route path="/feedback" element={<Feedback />} />
       <Route path="/admin/login" element={<AdminLogin />} />
       <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />

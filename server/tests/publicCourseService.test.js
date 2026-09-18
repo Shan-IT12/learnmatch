@@ -41,7 +41,30 @@ test('returns public details by stable course code', () => {
   assert.equal(course.course_code, 'CRS001')
   assert.ok(course.obtainable_skills.length > 1)
   assert.ok(course.career_paths.length > 1)
+  assert.equal(course.year_levels.length, course.program_duration_years)
+  assert.equal(course.career_opportunities.length, 4)
+  assert.ok(course.career_opportunities.every((career) => (
+    career.career_title &&
+    career.estimated_monthly_salary_php?.is_estimate === true &&
+    career.philippines_description &&
+    career.salary_basis?.source_name &&
+    career.reference_year &&
+    career.confidence?.level
+  )))
   assert.equal(getPublicCourse('CRS999'), null)
+})
+
+test('keeps enrichment coverage intact across all 342 courses and 13 clusters', () => {
+  const clusters = new Set()
+  for (let index = 1; index <= 342; index += 1) {
+    const courseCode = `CRS${String(index).padStart(3, '0')}`
+    const course = getPublicCourse(courseCode)
+    assert.ok(course, `${courseCode} should exist`)
+    assert.ok(course.year_levels.length >= 2, `${courseCode} should have a roadmap`)
+    assert.equal(course.career_opportunities.length, 4, `${courseCode} should have four careers`)
+    clusters.add(course.cluster_category)
+  }
+  assert.equal(clusters.size, 13)
 })
 
 test('includes active courses and excludes inactive or unmapped courses from public search', async () => {

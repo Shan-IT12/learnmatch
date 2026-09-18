@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useParams } from 'react-router-dom'
 import PublicHeader from '../components/PublicHeader'
+import CourseEnrichmentSections from '../components/CourseEnrichmentSections'
 
 const apiUrl = import.meta.env.VITE_API_URL || ''
 
@@ -91,6 +92,9 @@ function PublicCourseDetails() {
                 </section>
               </div>
 
+            </div>
+            <div className="mt-6">
+              <CourseEnrichmentSections course={course} />
             </div>
             <div className="bg-gray-900 rounded-2xl p-7 sm:p-9 mt-6 flex flex-col sm:flex-row sm:items-center justify-between gap-5">
               <div><h2 className="text-xl font-semibold text-white">Is this course right for you?</h2><p className="text-sm text-gray-400 mt-1">Get recommendations based on your skills, interests, and personality.</p></div>
