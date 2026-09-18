@@ -166,7 +166,11 @@ function Results() {
                 )}
 
                 {rec.ai_narrative && (
-                  <p className="text-sm text-gray-600 leading-relaxed">{rec.ai_narrative}</p>
+                  <div className="bg-orange-50/60 rounded-xl px-4 py-3">
+                    <p className="text-xs font-semibold text-orange-700 mb-1">Why this matches</p>
+                    <p className="text-sm text-gray-600 leading-relaxed">{rec.ai_narrative}</p>
+                    <p className="text-[11px] text-gray-400 mt-2">LearnMatch’s weighted scoring model determines the ranking. This explanation only interprets those results.</p>
+                  </div>
                 )}
                 <button
                 onClick={() => navigate('/results/career-path', { state: { recommendations } })}

@@ -4,6 +4,10 @@ import {
   getTopCourseRecommendations,
   toDisplayPercent,
 } from './recommendationService.js'
+import {
+  buildDeterministicExplanation,
+  generateRecommendationExplanations,
+} from './recommendationExplanationService.js'
 
 function toNormalizedScore(displayPercent, label) {
   const score = Number(displayPercent) / 100
@@ -14,7 +18,7 @@ function toNormalizedScore(displayPercent, label) {
 }
 
 function shapeSavedRecommendation(row) {
-  return {
+  const recommendation = {
     rank_position: row.rank_position,
     course_id: row.course_id,
     course_code: row.course_code,
@@ -30,6 +34,8 @@ function shapeSavedRecommendation(row) {
     },
     ai_narrative: row.ai_narrative ?? null,
   }
+  recommendation.ai_narrative ||= buildDeterministicExplanation(recommendation)
+  return recommendation
 }
 
 export function validateTopThreeRecommendations(recommendations) {
@@ -162,7 +168,7 @@ export async function saveRecommendationSnapshot(pool, userId, assessmentId, rec
         `INSERT INTO RECOMMENDATION_ITEM
           (recommendation_id, course_id, match_score, skill_match, interest_match,
            personality_match, personal_factor_match, ai_narrative, rank_position)
-         VALUES (?, ?, ?, ?, ?, ?, ?, NULL, ?)`,
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           result.insertId,
           courseIdsByCode.get(recommendation.course_code),
@@ -171,6 +177,7 @@ export async function saveRecommendationSnapshot(pool, userId, assessmentId, rec
           toNormalizedScore(recommendation.score_breakdown.interest_match, 'Interest match'),
           toNormalizedScore(recommendation.score_breakdown.personality_match, 'Personality match'),
           toNormalizedScore(recommendation.score_breakdown.personal_factor_match, 'Personal factor match'),
+          recommendation.ai_narrative,
           recommendation.rank_position,
         ]
       )
@@ -189,7 +196,8 @@ export async function saveRecommendationSnapshot(pool, userId, assessmentId, rec
 export async function getOrCreateSavedRecommendations(
   pool,
   userId,
-  generateRecommendations = getTopCourseRecommendations
+  generateRecommendations = getTopCourseRecommendations,
+  explainRecommendations = generateRecommendationExplanations
 ) {
   const assessmentId = await getPersonalityAssessmentId(pool, userId)
   if (!assessmentId) {
@@ -202,10 +210,24 @@ export async function getOrCreateSavedRecommendations(
   if (saved) return saved.recommendations
 
   const generated = await generateRecommendations(pool, userId)
+  const explained = await explainRecommendations(generated)
+  const narrativesByRank = new Map(
+    explained.map(({ rank_position, ai_narrative }) => [rank_position, ai_narrative])
+  )
+  const recommendationsWithExplanations = generated.map((recommendation) => ({
+    ...recommendation,
+    ai_narrative: narrativesByRank.get(recommendation.rank_position) ||
+      buildDeterministicExplanation(recommendation),
+  }))
 
   try {
-    const persistence = await saveRecommendationSnapshot(pool, userId, assessmentId, generated)
-    if (persistence.created) return generated
+    const persistence = await saveRecommendationSnapshot(
+      pool,
+      userId,
+      assessmentId,
+      recommendationsWithExplanations
+    )
+    if (persistence.created) return recommendationsWithExplanations
   } catch (error) {
     if (error.code !== 'ER_DUP_ENTRY') throw error
   }

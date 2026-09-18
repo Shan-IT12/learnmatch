@@ -114,10 +114,14 @@ function createPersistencePool({ failItemInsert = false } = {}) {
 
 test('Top 3 persist in rank order and map stable course codes to canonical course IDs', async () => {
   const { pool, state } = createPersistencePool()
+  const explainedRecommendations = generatedRecommendations.map((recommendation) => ({
+    ...recommendation,
+    ai_narrative: `Explanation for rank ${recommendation.rank_position}`,
+  }))
   const result = await saveRecommendationSnapshot(pool, 7, 11, [
-    generatedRecommendations[2],
-    generatedRecommendations[0],
-    generatedRecommendations[1],
+    explainedRecommendations[2],
+    explainedRecommendations[0],
+    explainedRecommendations[1],
   ])
 
   assert.deepEqual(result, { created: true, recommendationId: 99 })
@@ -128,11 +132,12 @@ test('Top 3 persist in rank order and map stable course codes to canonical cours
   assert.deepEqual(state.itemValues.map((values) => ({
     courseId: values[1],
     matchScore: values[2],
-    rank: values[7],
+    narrative: values[7],
+    rank: values[8],
   })), [
-    { courseId: 10, matchScore: 0.9125, rank: 1 },
-    { courseId: 20, matchScore: 0.825, rank: 2 },
-    { courseId: 30, matchScore: 0.78, rank: 3 },
+    { courseId: 10, matchScore: 0.9125, narrative: 'Explanation for rank 1', rank: 1 },
+    { courseId: 20, matchScore: 0.825, narrative: 'Explanation for rank 2', rank: 2 },
+    { courseId: 30, matchScore: 0.78, narrative: 'Explanation for rank 3', rank: 3 },
   ])
 })
 
@@ -213,6 +218,7 @@ test('College retrieval is ordered, active-only, and does not invoke WSM', async
 
 test('Results refresh reuses the saved snapshot without rerunning WSM or writing', async () => {
   let generatorCalls = 0
+  let explanationCalls = 0
   let connectionRequests = 0
   const pool = {
     query: async (sql) => {
@@ -231,10 +237,14 @@ test('Results refresh reuses the saved snapshot without rerunning WSM or writing
   const result = await getOrCreateSavedRecommendations(pool, 7, async () => {
     generatorCalls += 1
     return generatedRecommendations
+  }, async (recommendations) => {
+    explanationCalls += 1
+    return recommendations
   })
 
   assert.equal(result.length, 3)
   assert.equal(generatorCalls, 0)
+  assert.equal(explanationCalls, 0)
   assert.equal(connectionRequests, 0)
 })
 
@@ -276,8 +286,42 @@ test('a duplicate concurrent insert reloads the snapshot instead of returning an
   const result = await getOrCreateSavedRecommendations(
     pool,
     7,
-    async () => generatedRecommendations
+    async () => generatedRecommendations,
+    async (recommendations) => recommendations
   )
   assert.equal(result.length, 3)
   assert.equal(headerReads, 2)
+})
+
+test('explanations are attached without changing generated rank or scores', async () => {
+  const { pool } = createPersistencePool()
+  pool.query = async (sql) => {
+    if (sql.includes('FROM PERSONALITY_ASSESSMENT')) return [[{ assessment_id: 11 }]]
+    if (sql.includes('FROM RECOMMENDATION') && !sql.includes('RECOMMENDATION_ITEM')) return [[]]
+    throw new Error(`Unexpected SQL: ${sql}`)
+  }
+
+  const result = await getOrCreateSavedRecommendations(
+    pool,
+    7,
+    async () => generatedRecommendations,
+    async (recommendations) => [...recommendations].reverse().map((recommendation) => ({
+      ...recommendation,
+      match_score: 1,
+      ai_narrative: `Narrative ${recommendation.rank_position}`,
+    }))
+  )
+
+  assert.deepEqual(
+    result.map(({ rank_position, match_score, ai_narrative }) => ({
+      rank_position,
+      match_score,
+      ai_narrative,
+    })),
+    [
+      { rank_position: 1, match_score: 91.25, ai_narrative: 'Narrative 1' },
+      { rank_position: 2, match_score: 82.5, ai_narrative: 'Narrative 2' },
+      { rank_position: 3, match_score: 78, ai_narrative: 'Narrative 3' },
+    ]
+  )
 })

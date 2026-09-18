@@ -55,6 +55,7 @@ function CollegeDashboard() {
   const [loading, setLoading] = useState(true)
   const [collegeInfo, setCollegeInfo] = useState(null)
   const [checkinStatus, setCheckinStatus] = useState(null)
+  const [history, setHistory] = useState([])
   const [startingCheckin, setStartingCheckin] = useState(false)
 
   useEffect(() => {
@@ -65,11 +66,14 @@ function CollegeDashboard() {
 
     const fetchData = async () => {
       try {
-        const [collegeRes, statusRes] = await Promise.all([
+        const [collegeRes, statusRes, historyRes] = await Promise.all([
           fetch(`${import.meta.env.VITE_API_URL}/api/college/status`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
           fetch(`${import.meta.env.VITE_API_URL}/api/college/checkin/status`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          fetch(`${import.meta.env.VITE_API_URL}/api/college/checkin/history?limit=5`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ])
@@ -81,9 +85,11 @@ function CollegeDashboard() {
 
         const collegeData = await collegeRes.json()
         const statusData = await statusRes.json()
+        const historyData = historyRes.ok ? await historyRes.json() : { history: [] }
 
         setCollegeInfo(collegeData)
         setCheckinStatus(statusData)
+        setHistory(Array.isArray(historyData.history) ? historyData.history : [])
         setLoading(false)
       } catch (error) {
         console.error('College dashboard fetch error:', error)
@@ -130,7 +136,9 @@ function CollegeDashboard() {
     collegeInfo?.semester,
     currentPhase
   )
-  const isMismatch = checkinStatus?.latestResult && checkinStatus.latestResult.status !== 'Good Alignment'
+  const latestStatus = checkinStatus?.latestResult?.status
+  const needsAttention = latestStatus === 'Needs Attention'
+  const shouldMonitor = latestStatus === 'Monitor'
 
   return (
     <div className="min-h-screen bg-white">
@@ -165,19 +173,21 @@ function CollegeDashboard() {
         {checkinStatus?.latestResult && (
           <div
             className={`rounded-2xl px-6 py-4 mb-5 flex items-start gap-3 ${
-              isMismatch ? 'bg-orange-50 border border-orange-100' : 'bg-green-50 border border-green-100'
+              needsAttention
+                ? 'bg-red-50 border border-red-100'
+                : shouldMonitor
+                  ? 'bg-orange-50 border border-orange-100'
+                  : 'bg-green-50 border border-green-100'
             }`}
           >
-            {isMismatch ? (
-              <IconAlertTriangle size={20} stroke={1.75} className="text-orange-500 shrink-0 mt-0.5" />
+            {needsAttention || shouldMonitor ? (
+              <IconAlertTriangle size={20} stroke={1.75} className={`${needsAttention ? 'text-red-500' : 'text-orange-500'} shrink-0 mt-0.5`} />
             ) : (
               <IconCircleCheck size={20} stroke={1.75} className="text-green-600 shrink-0 mt-0.5" />
             )}
             <div>
               <p className="text-sm font-semibold text-gray-900">
-                {isMismatch
-                  ? `We noticed a possible mismatch — ${checkinStatus.latestResult.status}`
-                  : "You're a good match with this course"}
+                Alignment status: {latestStatus}
               </p>
               <p className="text-xs text-gray-600 mt-1 leading-relaxed max-w-2xl">
                 {checkinStatus.latestResult.recommendation}
@@ -202,7 +212,10 @@ function CollegeDashboard() {
             {collegeInfo?.courseName}
           </p>
           <p className="text-sm relative" style={{ color: '#7c3f0e' }}>
-            {collegeInfo?.yearLevel} · {collegeInfo?.semester}
+            {[collegeInfo?.courseCode, collegeInfo?.yearLevel, collegeInfo?.semester].filter(Boolean).join(' · ')}
+          </p>
+          <p className="text-xs relative mt-3" style={{ color: '#7c3f0e' }}>
+            Latest recorded GWA: {collegeInfo?.latestGwa ?? 'Not recorded yet'}
           </p>
         </div>
 
@@ -304,6 +317,33 @@ function CollegeDashboard() {
             )}
           </div>
         </div>
+
+        <section className="rounded-[20px] px-7 py-6 border border-gray-100 shadow-sm mt-5">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-gray-400">Check-in History</p>
+              <p className="text-sm text-gray-500 mt-1">Your recent alignment records are kept for progress tracking.</p>
+            </div>
+          </div>
+          {history.length === 0 ? (
+            <p className="text-sm text-gray-400">No completed check-ins yet.</p>
+          ) : (
+            <div className="space-y-3">
+              {history.map((record) => (
+                <div key={record.checkinId} className="border border-gray-100 rounded-xl px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                  <div>
+                    <p className="text-sm font-medium text-gray-800">{record.phase} Check-in · {record.status}</p>
+                    <p className="text-xs text-gray-400 mt-1">{record.courseCode} · {record.yearLevel} · {record.semester}</p>
+                  </div>
+                  <div className="text-left sm:text-right">
+                    <p className="text-sm font-semibold text-orange-500">{record.alignmentPercent}% aligned</p>
+                    {record.gwa !== null && <p className="text-xs text-gray-400 mt-1">GWA: {record.gwa}</p>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
 
       </div>
     </div>

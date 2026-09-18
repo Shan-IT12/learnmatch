@@ -54,7 +54,7 @@ function SummaryDashboard() {
         if (top) {
           setTopRecommendation(top)
           // Fetch course description for the top recommendation's career path preview
-          const courseRes = await fetch(`${apiUrl}/api/public/courses/${encodeURIComponent(top.course_id)}`)
+          const courseRes = await fetch(`${apiUrl}/api/public/courses/${encodeURIComponent(top.course_code)}`)
           const courseData = await courseRes.json()
           setTopCourseDetail(courseData.course || null)
         }
