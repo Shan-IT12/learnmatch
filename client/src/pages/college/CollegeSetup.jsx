@@ -2,10 +2,20 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { IconSearch, IconX } from '@tabler/icons-react'
 
-const semesterProgressOptions = [
-  { label: "Just starting / early in the semester", phase: 'Early' },
-  { label: "I'm around the middle of the semester", phase: 'Mid' },
-  { label: "The semester is almost over", phase: 'End' },
+const MONTHS = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
+]
+const MONTH_PARTS = [
+  { value: 'early', label: 'Early in the month' },
+  { value: 'middle', label: 'Middle of the month' },
+  { value: 'late', label: 'Late in the month' },
+]
+const POSITION_OPTIONS = [
+  { value: 'Early', label: 'Classes recently started' },
+  { value: 'Mid', label: "We're around the middle of the semester" },
+  { value: 'End', label: "We're approaching final exams / the end of the semester" },
+  { value: '', label: "I'm not sure" },
 ]
 
 function CollegeSetup() {
@@ -17,9 +27,15 @@ function CollegeSetup() {
   const [search, setSearch] = useState('')
   const [searchStatus, setSearchStatus] = useState('idle')
   const [selectedCourse, setSelectedCourse] = useState(null)
+  const [academicYear, setAcademicYear] = useState('')
   const [yearLevel, setYearLevel] = useState('')
   const [semester, setSemester] = useState('')
-  const [startingPhase, setStartingPhase] = useState('')
+  const [semesterStartDate, setSemesterStartDate] = useState('')
+  const [semesterEndDate, setSemesterEndDate] = useState('')
+  const [timingChoice, setTimingChoice] = useState('exact')
+  const [approximateStart, setApproximateStart] = useState({ month: '', year: '', part: '' })
+  const [approximateEnd, setApproximateEnd] = useState({ month: '', year: '', part: '' })
+  const [semesterPosition, setSemesterPosition] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -84,6 +100,34 @@ function CollegeSetup() {
     }
   }, [search, selectedCourse])
 
+  const academicYearMatch = academicYear.trim().match(/^(\d{4})\s*[-â€“]\s*(\d{4})$/)
+  const academicYears = academicYearMatch ? [academicYearMatch[1], academicYearMatch[2]] : []
+
+  const handleAcademicYearChange = (event) => {
+    const value = event.target.value
+    setAcademicYear(value)
+    const match = value.trim().match(/^(\d{4})\s*[-â€“]\s*(\d{4})$/)
+    if (!match) return
+    const suggestedYears = [match[1], match[2]]
+    const semesterYear = semester === '1st Semester' ? suggestedYears[0] : suggestedYears[1]
+    setApproximateStart((current) => ({
+      ...current,
+      year: suggestedYears.includes(current.year) ? current.year : semesterYear,
+    }))
+    setApproximateEnd((current) => ({
+      ...current,
+      year: suggestedYears.includes(current.year) ? current.year : semesterYear,
+    }))
+  }
+
+  const handleSemesterChoice = (value) => {
+    setSemester(value)
+    if (academicYears.length !== 2) return
+    const suggestedYear = value === '1st Semester' ? academicYears[0] : academicYears[1]
+    setApproximateStart((current) => ({ ...current, year: suggestedYear }))
+    setApproximateEnd((current) => ({ ...current, year: suggestedYear }))
+  }
+
   const selectCourse = (course) => {
     setSelectedCourse(course)
     setSearch(course.course_name)
@@ -112,6 +156,10 @@ function CollegeSetup() {
       setError('Please select a course from the list.')
       return
     }
+    if (!/^\d{4}\s*[-–]\s*\d{4}$/.test(academicYear)) {
+      setError('Enter an academic year such as 2026-2027.')
+      return
+    }
     if (!yearLevel) {
       setError('Please select your year level.')
       return
@@ -120,8 +168,15 @@ function CollegeSetup() {
       setError('Please select your current semester.')
       return
     }
-    if (!startingPhase) {
-      setError('Please tell us where you are in the semester.')
+    if (timingChoice === 'exact' && (!semesterStartDate || !semesterEndDate || semesterEndDate <= semesterStartDate)) {
+      setError('Enter valid semester dates with the end date after the start date.')
+      return
+    }
+    if (timingChoice === 'approximate' && (
+      !approximateStart.month || !approximateStart.year || !approximateStart.part ||
+      !approximateEnd.month || !approximateEnd.year || !approximateEnd.part
+    )) {
+      setError('Complete the approximate start and end schedule.')
       return
     }
 
@@ -136,9 +191,15 @@ function CollegeSetup() {
         body: JSON.stringify({
           courseId: selectedCourse.course_id,
           courseName: selectedCourse.course_name,
+          academicYear,
           yearLevel,
           semester,
-          startingPhase,
+          timingMode: timingChoice === 'unknown' ? (semesterPosition ? 'phase_only' : 'manual') : timingChoice,
+          semesterStartDate: timingChoice === 'exact' ? semesterStartDate : undefined,
+          semesterEndDate: timingChoice === 'exact' ? semesterEndDate : undefined,
+          approximateStart: timingChoice === 'approximate' ? approximateStart : undefined,
+          approximateEnd: timingChoice === 'approximate' ? approximateEnd : undefined,
+          initialTrackingPhase: timingChoice === 'unknown' && semesterPosition ? semesterPosition : undefined,
         }),
       })
 
@@ -302,6 +363,21 @@ function CollegeSetup() {
 
           {/* Year level */}
           <div>
+            <label htmlFor="academic-year" className="block text-sm font-medium text-gray-700 mb-2">
+              Academic year
+            </label>
+            <input
+              id="academic-year"
+              type="text"
+              value={academicYear}
+              onChange={handleAcademicYearChange}
+              placeholder="2026-2027"
+              className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+            />
+          </div>
+
+          {/* Year level */}
+          <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               What year level are you in?
             </label>
@@ -333,7 +409,7 @@ function CollegeSetup() {
                 <button
                   key={sem}
                   type="button"
-                  onClick={() => setSemester(sem)}
+                  onClick={() => handleSemesterChoice(sem)}
                   className={`py-3 rounded-xl text-sm font-medium border transition ${
                     semester === sem
                       ? 'bg-orange-500 text-white border-orange-500'
@@ -346,31 +422,79 @@ function CollegeSetup() {
             </div>
           </div>
 
-          {/* Where are you in the semester right now */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Where are you in the semester right now?
-            </label>
-            <p className="text-xs text-gray-400 mb-3">
-              This helps us time your alignment check-ins correctly.
-            </p>
+          <section className="border-t border-gray-200 pt-6 space-y-4">
+            <div>
+              <h2 className="text-base font-semibold text-gray-900">Semester Tracking</h2>
+              <p className="text-sm text-gray-500 mt-1">Help LearnMatch determine when your Early, Mid, and End check-ins should happen.</p>
+            </div>
+
             <div className="space-y-2">
-              {semesterProgressOptions.map((option) => (
-                <button
-                  key={option.phase}
-                  type="button"
-                  onClick={() => setStartingPhase(option.phase)}
-                  className={`w-full text-left py-3 px-4 rounded-xl text-sm font-medium border transition ${
-                    startingPhase === option.phase
-                      ? 'bg-orange-500 text-white border-orange-500'
-                      : 'bg-white text-gray-600 border-gray-200 hover:border-orange-300'
-                  }`}
-                >
-                  {option.label}
-                </button>
+              {[
+                ['exact', 'I know my exact semester dates'],
+                ['approximate', 'I only know the approximate schedule'],
+                ['unknown', "I don't know my semester schedule"],
+              ].map(([value, label]) => (
+                <label key={value} className={`flex items-center gap-3 rounded-xl border px-4 py-3 cursor-pointer ${timingChoice === value ? 'border-orange-400 bg-orange-50' : 'border-gray-200 bg-white'}`}>
+                  <input type="radio" name="timing-choice" value={value} checked={timingChoice === value} onChange={() => setTimingChoice(value)} className="accent-orange-500" />
+                  <span className="text-sm font-medium text-gray-700">{label}</span>
+                </label>
               ))}
             </div>
-          </div>
+
+            {timingChoice === 'exact' && (
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="semester-start" className="block text-sm font-medium text-gray-700 mb-2">Semester start</label>
+                  <input id="semester-start" type="date" value={semesterStartDate} onChange={(event) => setSemesterStartDate(event.target.value)} className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400" />
+                </div>
+                <div>
+                  <label htmlFor="semester-end" className="block text-sm font-medium text-gray-700 mb-2">Semester end</label>
+                  <input id="semester-end" type="date" min={semesterStartDate || undefined} value={semesterEndDate} onChange={(event) => setSemesterEndDate(event.target.value)} className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400" />
+                </div>
+              </div>
+            )}
+
+            {timingChoice === 'approximate' && (
+              <div className="space-y-5">
+                {[
+                  ['Around when did your semester start?', approximateStart, setApproximateStart],
+                  ['Around when will your semester end?', approximateEnd, setApproximateEnd],
+                ].map(([label, value, setter]) => (
+                  <fieldset key={label}>
+                    <legend className="text-sm font-medium text-gray-700 mb-2">{label}</legend>
+                    <div className="grid sm:grid-cols-3 gap-2">
+                      <select aria-label={`${label} month`} value={value.month} onChange={(event) => setter({ ...value, month: event.target.value })} className="border border-gray-200 rounded-xl px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400">
+                        <option value="">Month</option>
+                        {MONTHS.map((month, index) => <option key={month} value={String(index + 1)}>{month}</option>)}
+                      </select>
+                      <select aria-label={`${label} year`} value={value.year} onChange={(event) => setter({ ...value, year: event.target.value })} className="border border-gray-200 rounded-xl px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400">
+                        <option value="">Year</option>
+                        {academicYears.map((year) => <option key={year} value={year}>{year}</option>)}
+                      </select>
+                      <select aria-label={`${label} part of month`} value={value.part} onChange={(event) => setter({ ...value, part: event.target.value })} className="border border-gray-200 rounded-xl px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400">
+                        <option value="">Part of month</option>
+                        {MONTH_PARTS.map((part) => <option key={part.value} value={part.value}>{part.label}</option>)}
+                      </select>
+                    </div>
+                  </fieldset>
+                ))}
+              </div>
+            )}
+
+            {timingChoice === 'unknown' && (
+              <fieldset>
+                <legend className="text-sm font-medium text-gray-700 mb-3">How far along are you in your current semester?</legend>
+                <div className="space-y-2">
+                  {POSITION_OPTIONS.map((option) => (
+                    <label key={option.label} className={`flex items-center gap-3 rounded-xl border px-4 py-3 cursor-pointer ${semesterPosition === option.value ? 'border-orange-400 bg-orange-50' : 'border-gray-200 bg-white'}`}>
+                      <input type="radio" name="semester-position" value={option.value || 'unsure'} checked={semesterPosition === option.value} onChange={() => setSemesterPosition(option.value)} className="accent-orange-500" />
+                      <span className="text-sm text-gray-700">{option.label}</span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+            )}
+          </section>
 
           <button
             type="submit"

@@ -30,6 +30,7 @@ import {
   getCollegeStatus,
   getPendingCheckin,
   startNextCheckin,
+  startNextSemester,
   submitCollegeCheckin,
 } from './services/collegeTrackingService.js'
 
@@ -244,8 +245,12 @@ app.post('/api/college/setup', authenticateToken, async (req, res) => {
   try {
     const result = await createCollegeSetup(pool, req.user.userId, req.body)
     res.status(result.created ? 201 : 200).json({
-      message: result.created ? 'College phase setup successful' : 'College phase already set up',
-      checkinId: result.checkinId,
+      message: result.created
+        ? 'College phase setup successful'
+        : result.timingUpdated
+          ? 'Semester schedule updated'
+          : 'College phase already set up',
+      termId: result.termId,
       course: result.course,
     })
   } catch (error) {
@@ -362,7 +367,7 @@ app.get('/api/college/checkin/status', authenticateToken, async (req, res) => {
 
 app.post('/api/college/checkin/start', authenticateToken, async (req, res) => {
   try {
-    res.json(await startNextCheckin(pool, req.user.userId))
+    res.json(await startNextCheckin(pool, req.user.userId, { phase: req.body?.phase }))
   } catch (error) {
     if (error instanceof CollegeTrackingError) {
       return res.status(error.status).json({ message: error.message })
@@ -672,6 +677,18 @@ app.patch('/api/admin/courses/:id/status', authenticateAdmin, async (req, res) =
     }
     console.error('Admin course status update error:', error)
     res.status(500).json({ message: 'Server error updating course status' })
+  }
+})
+
+app.post('/api/college/semester/advance', authenticateToken, async (req, res) => {
+  try {
+    res.json(await startNextSemester(pool, req.user.userId, req.body))
+  } catch (error) {
+    if (error instanceof CollegeTrackingError) {
+      return res.status(error.status).json({ message: error.message })
+    }
+    console.error('Semester progression error:', error)
+    res.status(500).json({ message: 'Server error starting the next semester' })
   }
 })
 
