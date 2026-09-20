@@ -1,0 +1,186 @@
+{
+  "generated_for": "read-only catalog audit",
+  "alias_groups": [
+    {
+      "terms": [
+        "vet",
+        "veterinary",
+        "veterinarian"
+      ],
+      "target": "Proposed Doctor of Veterinary Medicine",
+      "action": "Alias after program approval; until then show an explicit not-in-catalog state."
+    },
+    {
+      "terms": [
+        "dentistry",
+        "dentist",
+        "dental",
+        "dental medicine"
+      ],
+      "target": "Proposed Doctor of Dental Medicine",
+      "action": "Alias after program approval."
+    },
+    {
+      "terms": [
+        "optometry",
+        "optometrist",
+        "eye doctor"
+      ],
+      "target": "Proposed Doctor of Optometry",
+      "action": "Alias after program approval; “eye doctor” may also mean ophthalmologist, so explain ambiguity."
+    },
+    {
+      "terms": [
+        "medicine",
+        "doctor",
+        "physician"
+      ],
+      "target": "Doctor of Medicine pathway",
+      "action": "Scope-aware informational result; do not silently map generic “doctor” to one course."
+    },
+    {
+      "terms": [
+        "dermatology",
+        "dermatologist",
+        "skin doctor"
+      ],
+      "target": "Medicine pathway",
+      "action": "Specialization/career guidance only; no Dermatology course."
+    },
+    {
+      "terms": [
+        "surgeon",
+        "pediatrician"
+      ],
+      "target": "Medicine pathway",
+      "action": "Career/specialization guidance only."
+    },
+    {
+      "terms": [
+        "IT"
+      ],
+      "target": "CRS062 BS Information Technology",
+      "action": "Exact abbreviation alias; never unrestricted substring matching."
+    },
+    {
+      "terms": [
+        "computer",
+        "computing"
+      ],
+      "target": "Computing family",
+      "action": "Facet across Computer Science, IT, Information Systems, and Computer Engineering."
+    },
+    {
+      "terms": [
+        "programming",
+        "software developer",
+        "coder"
+      ],
+      "target": "Computer Science / IT / Software Engineering family",
+      "action": "Career/skill alias with ranked alternatives."
+    },
+    {
+      "terms": [
+        "psych",
+        "psychology"
+      ],
+      "target": "CRS094/CRS095 Psychology",
+      "action": "Discipline alias; keep BA and BS visible."
+    },
+    {
+      "terms": [
+        "psychologist"
+      ],
+      "target": "Psychology family",
+      "action": "Career alias with qualification caveat."
+    },
+    {
+      "terms": [
+        "accounting",
+        "accountant",
+        "CPA"
+      ],
+      "target": "Proposed BS Accountancy; existing BS Management Accounting as alternative",
+      "action": "Do not treat Management Accounting as identical to Accountancy."
+    },
+    {
+      "terms": [
+        "accountancy",
+        "BSA"
+      ],
+      "target": "Proposed BS Accountancy",
+      "action": "Alias after addition."
+    },
+    {
+      "terms": [
+        "lawyer",
+        "law",
+        "attorney"
+      ],
+      "target": "Law/Juris Doctor pathway",
+      "action": "Do not map directly to Political Science or Legal Management."
+    },
+    {
+      "terms": [
+        "architect"
+      ],
+      "target": "CRS125 BS Architecture",
+      "action": "Occupation alias."
+    },
+    {
+      "terms": [
+        "teacher",
+        "teaching"
+      ],
+      "target": "Education cluster",
+      "action": "Facet rather than one-course alias."
+    },
+    {
+      "terms": [
+        "nurse"
+      ],
+      "target": "CRS083 BS Nursing",
+      "action": "Occupation alias after duplicate adjudication."
+    },
+    {
+      "terms": [
+        "marine engineer",
+        "seafarer"
+      ],
+      "target": "Marine Engineering/Transportation family",
+      "action": "Career alias with multiple results."
+    },
+    {
+      "terms": [
+        "hotel management",
+        "HRM"
+      ],
+      "target": "CRS053 and CRS217 hospitality family",
+      "action": "Naming alias; duplicate/legacy title review remains separate."
+    },
+    {
+      "terms": [
+        "tourism"
+      ],
+      "target": "CRS113 Tourism Management",
+      "action": "Direct discipline alias."
+    },
+    {
+      "terms": [
+        "data science",
+        "data analyst"
+      ],
+      "target": "Proposed BS Data Science and Analytics",
+      "action": "Alias after addition; also show Statistics/CS alternatives."
+    },
+    {
+      "terms": [
+        "aviation maintenance",
+        "aircraft mechanic"
+      ],
+      "target": "Proposed BS Aircraft Maintenance Technology",
+      "action": "Alias after addition; distinguish degree from certificates/licensure paths."
+    }
+  ],
+  "term_count": 48
+}

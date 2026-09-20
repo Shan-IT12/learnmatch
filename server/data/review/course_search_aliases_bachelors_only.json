@@ -1,0 +1,300 @@
+{
+  "scope_rule": "Alias targets must remain bachelor's-only; excluded professional programs may be mentioned only in qualification notes.",
+  "summary": {
+    "alias_groups": 22,
+    "search_terms": 50,
+    "by_target_type": {
+      "DIRECT_COURSE": 4,
+      "COURSE_FAMILY": 6,
+      "CAREER_PATHWAY": 8,
+      "NOT_IN_CATALOG": 0,
+      "PROPOSED_BACHELOR": 4
+    }
+  },
+  "aliases": [
+    {
+      "terms": [
+        "vet",
+        "veterinary",
+        "veterinarian"
+      ],
+      "target_type": "CAREER_PATHWAY",
+      "targets": [
+        "CRS008",
+        "CRS013"
+      ],
+      "note": "Explain that veterinarian qualification requires the excluded professional DVM; Agriculture/Biology are related exploration options, not equivalents or universal prerequisites."
+    },
+    {
+      "terms": [
+        "dentistry",
+        "dentist",
+        "dental",
+        "dental medicine"
+      ],
+      "target_type": "CAREER_PATHWAY",
+      "targets": [
+        "CRS013",
+        "CRS097",
+        "CRS218"
+      ],
+      "note": "Explain that professional DMD is outside the bachelor's-only catalog."
+    },
+    {
+      "terms": [
+        "optometry",
+        "optometrist",
+        "eye doctor"
+      ],
+      "target_type": "CAREER_PATHWAY",
+      "targets": [
+        "CRS013",
+        "CRS218"
+      ],
+      "note": "Explain that Doctor of Optometry is excluded; “eye doctor” is ambiguous with ophthalmology."
+    },
+    {
+      "terms": [
+        "medicine",
+        "doctor",
+        "physician"
+      ],
+      "target_type": "CAREER_PATHWAY",
+      "targets": [
+        "CRS013",
+        "CRS076",
+        "CRS077",
+        "CRS097",
+        "CRS218"
+      ],
+      "note": "Show possible pre-med bachelor's options without implying one required major; MD is outside scope."
+    },
+    {
+      "terms": [
+        "dermatology",
+        "dermatologist",
+        "skin doctor"
+      ],
+      "target_type": "CAREER_PATHWAY",
+      "targets": [
+        "CRS013",
+        "CRS076",
+        "CRS077",
+        "CRS097",
+        "CRS218"
+      ],
+      "note": "Medical specialization pathway only; do not create Dermatology or MD."
+    },
+    {
+      "terms": [
+        "surgeon",
+        "pediatrician"
+      ],
+      "target_type": "CAREER_PATHWAY",
+      "targets": [
+        "CRS013",
+        "CRS076",
+        "CRS077",
+        "CRS097",
+        "CRS218"
+      ],
+      "note": "Medical-career guidance with professional-education requirement."
+    },
+    {
+      "terms": [
+        "lawyer",
+        "law",
+        "attorney"
+      ],
+      "target_type": "CAREER_PATHWAY",
+      "targets": [
+        "CRS089",
+        "CRS093",
+        "CRS096",
+        "PROPOSED:BS Legal Management"
+      ],
+      "note": "These are possible pre-law options, not law degrees; JD remains outside scope and any suitable bachelor's may precede law."
+    },
+    {
+      "terms": [
+        "architect"
+      ],
+      "target_type": "DIRECT_COURSE",
+      "targets": [
+        "CRS125"
+      ],
+      "note": "Occupation alias to existing BS Architecture."
+    },
+    {
+      "terms": [
+        "teacher",
+        "teaching"
+      ],
+      "target_type": "COURSE_FAMILY",
+      "targets": [
+        "CLUSTER:EDUCATION"
+      ],
+      "note": "Return relevant Education bachelor's programs, not one generic course."
+    },
+    {
+      "terms": [
+        "nurse"
+      ],
+      "target_type": "DIRECT_COURSE",
+      "targets": [
+        "CRS083"
+      ],
+      "note": "Use the proposed Nursing survivor after duplicate adjudication."
+    },
+    {
+      "terms": [
+        "IT"
+      ],
+      "target_type": "DIRECT_COURSE",
+      "targets": [
+        "CRS062"
+      ],
+      "note": "Exact abbreviation alias only; never unrestricted substring matching."
+    },
+    {
+      "terms": [
+        "computer",
+        "computing"
+      ],
+      "target_type": "COURSE_FAMILY",
+      "targets": [
+        "CRS026",
+        "CRS062",
+        "CRS228",
+        "CRS229",
+        "CRS024",
+        "CRS025"
+      ],
+      "note": "Return ranked CS, IT, IS, and Computer Engineering bachelor's programs after duplicate adjudication."
+    },
+    {
+      "terms": [
+        "programming",
+        "software developer",
+        "coder"
+      ],
+      "target_type": "COURSE_FAMILY",
+      "targets": [
+        "CRS026",
+        "CRS062",
+        "CRS299"
+      ],
+      "note": "Skill/career terms, not new canonical degrees."
+    },
+    {
+      "terms": [
+        "psych",
+        "psychology"
+      ],
+      "target_type": "COURSE_FAMILY",
+      "targets": [
+        "CRS094",
+        "CRS095"
+      ],
+      "note": "Keep BA and BS Psychology visible."
+    },
+    {
+      "terms": [
+        "psychologist"
+      ],
+      "target_type": "CAREER_PATHWAY",
+      "targets": [
+        "CRS094",
+        "CRS095"
+      ],
+      "note": "Explain that professional practice can require further qualifications."
+    },
+    {
+      "terms": [
+        "accounting",
+        "accountant",
+        "CPA",
+        "accountancy",
+        "BSA"
+      ],
+      "target_type": "PROPOSED_BACHELOR",
+      "targets": [
+        "PROPOSED:BS Accountancy",
+        "CRS001",
+        "CRS064"
+      ],
+      "note": "Prefer approved BS Accountancy while showing Management Accounting/Internal Auditing only as distinct alternatives."
+    },
+    {
+      "terms": [
+        "data science",
+        "data analyst"
+      ],
+      "target_type": "PROPOSED_BACHELOR",
+      "targets": [
+        "PROPOSED:BS Data Science and Analytics",
+        "CRS110",
+        "CRS026"
+      ],
+      "note": "Proposed degree plus existing Statistics/CS alternatives."
+    },
+    {
+      "terms": [
+        "aircraft maintenance",
+        "aircraft mechanic"
+      ],
+      "target_type": "PROPOSED_BACHELOR",
+      "targets": [
+        "PROPOSED:BS Aircraft Maintenance Technology"
+      ],
+      "note": "Distinguish bachelor's degree from certificate/TVET/licensure routes."
+    },
+    {
+      "terms": [
+        "marine engineer",
+        "seafarer"
+      ],
+      "target_type": "COURSE_FAMILY",
+      "targets": [
+        "CRS244",
+        "CRS072"
+      ],
+      "note": "Return bachelor's maritime family after duplicate review."
+    },
+    {
+      "terms": [
+        "hotel management",
+        "HRM"
+      ],
+      "target_type": "COURSE_FAMILY",
+      "targets": [
+        "CRS053",
+        "CRS217"
+      ],
+      "note": "Hospitality family; resolve title overlap separately."
+    },
+    {
+      "terms": [
+        "tourism"
+      ],
+      "target_type": "DIRECT_COURSE",
+      "targets": [
+        "CRS113"
+      ],
+      "note": "Direct subject alias."
+    },
+    {
+      "terms": [
+        "actuary",
+        "actuarial science"
+      ],
+      "target_type": "PROPOSED_BACHELOR",
+      "targets": [
+        "PROPOSED:BS Actuarial Science",
+        "CRS074",
+        "CRS110"
+      ],
+      "note": "Proposed bachelor plus related Mathematics/Statistics alternatives."
+    }
+  ]
+}

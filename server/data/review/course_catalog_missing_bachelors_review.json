@@ -1,0 +1,395 @@
+{
+  "scope_rule": "Undergraduate bachelor's degrees only",
+  "summary": {
+    "candidates_reviewed": 20,
+    "OUT_OF_SCOPE_PROGRAM_LEVEL": 4,
+    "VALID_MISSING_BACHELOR": 14,
+    "ALREADY_REPRESENTED": 2
+  },
+  "valid_missing_bachelor_entries": [
+    {
+      "proposed_program": "Bachelor of Science in Accountancy (BSA)",
+      "classification": "VALID_MISSING_BACHELOR",
+      "program_type": "undergraduate bachelor",
+      "suggested_cluster": "Business",
+      "reason": "No standalone BSA exists. CRS232 is a malformed concatenated double-degree record and is not an adequate canonical BSA.",
+      "recommended_audit_action": "Candidate for approval as a new stable CRS343+ course after duplicate/title adjudication.",
+      "confidence": "HIGH",
+      "evidence_url": "https://ched.gov.ph/wp-content/uploads/2017/10/CMO-27-s-2017.pdf"
+    },
+    {
+      "proposed_program": "Bachelor of Science in Data Science and Analytics",
+      "classification": "VALID_MISSING_BACHELOR",
+      "program_type": "undergraduate bachelor",
+      "suggested_cluster": "Engineering/STEM",
+      "reason": "No Data Science degree exists; IT, CS, Statistics, and Mathematics are related but not equivalent.",
+      "recommended_audit_action": "Candidate for approval as CRS343+ after current-title verification.",
+      "confidence": "HIGH",
+      "evidence_url": "https://ched.gov.ph/wp-content/uploads/CMO-No.-14-S.-2025-Revised-Estatistikolar-guidelines.pdf"
+    },
+    {
+      "proposed_program": "Bachelor of Science in Actuarial Science",
+      "classification": "VALID_MISSING_BACHELOR",
+      "program_type": "undergraduate bachelor",
+      "suggested_cluster": "Science & Mathematics",
+      "reason": "No Actuarial Science degree exists; Mathematics and Statistics are related but not equivalent.",
+      "recommended_audit_action": "Candidate for approval as CRS343+.",
+      "confidence": "HIGH",
+      "evidence_url": "https://ched.gov.ph/wp-content/uploads/CMO-No.-14-S.-2025-Revised-Estatistikolar-guidelines.pdf"
+    },
+    {
+      "proposed_program": "Bachelor of Science in Biochemistry",
+      "classification": "VALID_MISSING_BACHELOR",
+      "program_type": "undergraduate bachelor",
+      "suggested_cluster": "Science & Mathematics",
+      "reason": "No Biochemistry degree exists; Biology and Chemistry do not duplicate it.",
+      "recommended_audit_action": "Candidate for approval as CRS343+.",
+      "confidence": "HIGH",
+      "evidence_url": "https://ched.gov.ph/wp-content/uploads/20230913-JMC-No-01-S-2023-Implementing-Guidelines-of-the-Scholarship-Program-for-Coconut-Farmers-and-their-Families-CoScho.pdf"
+    },
+    {
+      "proposed_program": "Bachelor of Science in Legal Management",
+      "classification": "VALID_MISSING_BACHELOR",
+      "program_type": "undergraduate bachelor",
+      "suggested_cluster": "Legal & Public Service",
+      "reason": "No Legal Management bachelor exists. Political Science/Public Administration are not equivalents.",
+      "recommended_audit_action": "Candidate for approval as CRS343+; do not imply it is a law degree.",
+      "confidence": "HIGH",
+      "evidence_url": "https://ro11.ched.gov.ph/programs-per-hei/"
+    },
+    {
+      "proposed_program": "Bachelor of Science in Aircraft Maintenance Technology",
+      "classification": "VALID_MISSING_BACHELOR",
+      "program_type": "undergraduate bachelor",
+      "suggested_cluster": "Aviation & Maritime",
+      "reason": "No exact program exists. Aviation Engineering Technology and Avionics Maintenance majors are related but not equivalent.",
+      "recommended_audit_action": "Candidate for approval as CRS343+ after national/current title confirmation.",
+      "confidence": "HIGH",
+      "evidence_url": "https://ro11.ched.gov.ph/programs-inventory/"
+    },
+    {
+      "proposed_program": "Bachelor of Science in Aviation Electronics Technology",
+      "classification": "VALID_MISSING_BACHELOR",
+      "program_type": "undergraduate bachelor",
+      "suggested_cluster": "Aviation & Maritime",
+      "reason": "No exact bachelor exists; Electronics Engineering and Avionics Maintenance are related alternatives.",
+      "recommended_audit_action": "Candidate for approval as CRS343+ after national/current title confirmation.",
+      "confidence": "HIGH",
+      "evidence_url": "https://ro11.ched.gov.ph/programs-inventory/"
+    },
+    {
+      "proposed_program": "Bachelor of Science in Business Administration major in Marketing Management",
+      "classification": "VALID_MISSING_BACHELOR",
+      "program_type": "undergraduate bachelor",
+      "suggested_cluster": "Business",
+      "reason": "Catalog models BSBA Financial Management and HRDM but not this common recognized major.",
+      "recommended_audit_action": "Candidate for approval only if LearnMatch continues major-level catalog granularity.",
+      "confidence": "HIGH",
+      "evidence_url": "https://ro11.ched.gov.ph/heis-with-accredited-programs/"
+    },
+    {
+      "proposed_program": "Bachelor of Science in Business Administration major in Operations Management",
+      "classification": "VALID_MISSING_BACHELOR",
+      "program_type": "undergraduate bachelor",
+      "suggested_cluster": "Business",
+      "reason": "Catalog models other BSBA majors but no Operations Management major.",
+      "recommended_audit_action": "Candidate for approval only if LearnMatch continues major-level catalog granularity.",
+      "confidence": "HIGH",
+      "evidence_url": "https://region2.ched.gov.ph/index.php/recognized-programs-of-private-higher-education-institutions-pheis-in-region-ii/"
+    },
+    {
+      "proposed_program": "Bachelor of Science in Microbiology",
+      "classification": "VALID_MISSING_BACHELOR",
+      "program_type": "undergraduate bachelor",
+      "suggested_cluster": "Science & Mathematics",
+      "reason": "No standalone Microbiology bachelor exists; Biology/Medical Laboratory Science are related but not equivalent.",
+      "recommended_audit_action": "Candidate for approval after confirming desired coverage threshold and current title.",
+      "confidence": "MEDIUM-HIGH",
+      "evidence_url": "https://mimaropa.ched.gov.ph/wp-content/uploads/2023/03/CMO-No.-10-s.-2021.pdf"
+    },
+    {
+      "proposed_program": "Bachelor of Science in Agricultural Biotechnology",
+      "classification": "VALID_MISSING_BACHELOR",
+      "program_type": "undergraduate bachelor",
+      "suggested_cluster": "Agriculture & Environmental",
+      "reason": "No exact bachelor exists; Agriculture, Biology, and Biological Engineering are related but distinct.",
+      "recommended_audit_action": "Candidate for approval if nationally meaningful rather than institution-specific coverage is desired.",
+      "confidence": "MEDIUM-HIGH",
+      "evidence_url": "https://ched.gov.ph/wp-content/uploads/20230913-JMC-No-01-S-2023-Implementing-Guidelines-of-the-Scholarship-Program-for-Coconut-Farmers-and-their-Families-CoScho.pdf"
+    },
+    {
+      "proposed_program": "Bachelor of Science in Demography",
+      "classification": "VALID_MISSING_BACHELOR",
+      "program_type": "undergraduate bachelor",
+      "suggested_cluster": "Science & Mathematics",
+      "reason": "No Demography degree exists; Statistics and Social Science are related but not equivalent.",
+      "recommended_audit_action": "Candidate for approval subject to prevalence review.",
+      "confidence": "MEDIUM",
+      "evidence_url": "https://ched.gov.ph/wp-content/uploads/CMO-No.-14-S.-2025-Revised-Estatistikolar-guidelines.pdf"
+    },
+    {
+      "proposed_program": "Bachelor of Arts in International Studies",
+      "classification": "VALID_MISSING_BACHELOR",
+      "program_type": "undergraduate bachelor",
+      "suggested_cluster": "Humanities & Social Science",
+      "reason": "No International Studies bachelor exists; Political Science/Interdisciplinary Studies are not equivalents.",
+      "recommended_audit_action": "Candidate for approval subject to stronger national prevalence evidence.",
+      "confidence": "MEDIUM",
+      "evidence_url": "https://ro11.ched.gov.ph/programs-per-hei/"
+    },
+    {
+      "proposed_program": "Bachelor of Science in Aviation Management",
+      "classification": "VALID_MISSING_BACHELOR",
+      "program_type": "undergraduate bachelor",
+      "suggested_cluster": "Aviation & Maritime",
+      "reason": "No Aviation Management degree exists; engineering and maintenance programs are not management equivalents.",
+      "recommended_audit_action": "Candidate for approval subject to national/current title verification.",
+      "confidence": "MEDIUM",
+      "evidence_url": "https://ro11.ched.gov.ph/programs-per-hei/"
+    }
+  ],
+  "rejected_previous_program_level_entries": [
+    {
+      "proposed_program": "Doctor of Veterinary Medicine (DVM)",
+      "classification": "OUT_OF_SCOPE_PROGRAM_LEVEL",
+      "program_type": "professional/post-baccalaureate or explicitly excluded",
+      "suggested_cluster": "Healthcare Science",
+      "reason": "Professional doctoral degree explicitly excluded by the bachelor's-only rule.",
+      "recommended_audit_action": "Do not add. Treat veterinary searches as career/pathway or not-in-catalog behavior.",
+      "confidence": "HIGH",
+      "evidence_url": "https://ched.gov.ph/wp-content/uploads/2017/10/CMO-No.15-s2007.pdf"
+    },
+    {
+      "proposed_program": "Doctor of Dental Medicine (DMD)",
+      "classification": "OUT_OF_SCOPE_PROGRAM_LEVEL",
+      "program_type": "professional/post-baccalaureate or explicitly excluded",
+      "suggested_cluster": "Healthcare Science",
+      "reason": "Professional doctoral degree explicitly excluded by the bachelor's-only rule.",
+      "recommended_audit_action": "Do not add. Treat dentist/dentistry searches as career/pathway behavior.",
+      "confidence": "HIGH",
+      "evidence_url": "https://ched.gov.ph/wp-content/uploads/2018/05/CMO-No.-3-Series-of-2018-Policies-and-Standards-and-Guidelines-for-the-Doctor-of-Dental-Medicine-DMD-Program.pdf"
+    },
+    {
+      "proposed_program": "Doctor of Optometry",
+      "classification": "OUT_OF_SCOPE_PROGRAM_LEVEL",
+      "program_type": "professional/post-baccalaureate or explicitly excluded",
+      "suggested_cluster": "Healthcare Science",
+      "reason": "Explicitly excluded by the scope rule despite CHED describing it as a six-year baccalaureate program.",
+      "recommended_audit_action": "Do not add; provide optometry career/pathway guidance.",
+      "confidence": "HIGH",
+      "evidence_url": "https://ched.gov.ph/wp-content/uploads/2017/10/CMO-No.38-s2007.pdf"
+    },
+    {
+      "proposed_program": "Doctor of Medicine (MD)",
+      "classification": "OUT_OF_SCOPE_PROGRAM_LEVEL",
+      "program_type": "professional/post-baccalaureate or explicitly excluded",
+      "suggested_cluster": "Healthcare Science",
+      "reason": "Post-baccalaureate professional program and explicitly excluded.",
+      "recommended_audit_action": "Do not add; surface relevant pre-med bachelor options with a qualification note.",
+      "confidence": "HIGH",
+      "evidence_url": "https://legacy.ched.gov.ph/wp-content/uploads/2017/10/CMO-18-s.-2016.pdf"
+    }
+  ],
+  "all_candidates": [
+    {
+      "proposed_program": "Doctor of Veterinary Medicine (DVM)",
+      "classification": "OUT_OF_SCOPE_PROGRAM_LEVEL",
+      "program_type": "professional/post-baccalaureate or explicitly excluded",
+      "suggested_cluster": "Healthcare Science",
+      "reason": "Professional doctoral degree explicitly excluded by the bachelor's-only rule.",
+      "recommended_audit_action": "Do not add. Treat veterinary searches as career/pathway or not-in-catalog behavior.",
+      "confidence": "HIGH",
+      "evidence_url": "https://ched.gov.ph/wp-content/uploads/2017/10/CMO-No.15-s2007.pdf"
+    },
+    {
+      "proposed_program": "Doctor of Dental Medicine (DMD)",
+      "classification": "OUT_OF_SCOPE_PROGRAM_LEVEL",
+      "program_type": "professional/post-baccalaureate or explicitly excluded",
+      "suggested_cluster": "Healthcare Science",
+      "reason": "Professional doctoral degree explicitly excluded by the bachelor's-only rule.",
+      "recommended_audit_action": "Do not add. Treat dentist/dentistry searches as career/pathway behavior.",
+      "confidence": "HIGH",
+      "evidence_url": "https://ched.gov.ph/wp-content/uploads/2018/05/CMO-No.-3-Series-of-2018-Policies-and-Standards-and-Guidelines-for-the-Doctor-of-Dental-Medicine-DMD-Program.pdf"
+    },
+    {
+      "proposed_program": "Doctor of Optometry",
+      "classification": "OUT_OF_SCOPE_PROGRAM_LEVEL",
+      "program_type": "professional/post-baccalaureate or explicitly excluded",
+      "suggested_cluster": "Healthcare Science",
+      "reason": "Explicitly excluded by the scope rule despite CHED describing it as a six-year baccalaureate program.",
+      "recommended_audit_action": "Do not add; provide optometry career/pathway guidance.",
+      "confidence": "HIGH",
+      "evidence_url": "https://ched.gov.ph/wp-content/uploads/2017/10/CMO-No.38-s2007.pdf"
+    },
+    {
+      "proposed_program": "Doctor of Medicine (MD)",
+      "classification": "OUT_OF_SCOPE_PROGRAM_LEVEL",
+      "program_type": "professional/post-baccalaureate or explicitly excluded",
+      "suggested_cluster": "Healthcare Science",
+      "reason": "Post-baccalaureate professional program and explicitly excluded.",
+      "recommended_audit_action": "Do not add; surface relevant pre-med bachelor options with a qualification note.",
+      "confidence": "HIGH",
+      "evidence_url": "https://legacy.ched.gov.ph/wp-content/uploads/2017/10/CMO-18-s.-2016.pdf"
+    },
+    {
+      "proposed_program": "Bachelor of Science in Accountancy (BSA)",
+      "classification": "VALID_MISSING_BACHELOR",
+      "program_type": "undergraduate bachelor",
+      "suggested_cluster": "Business",
+      "reason": "No standalone BSA exists. CRS232 is a malformed concatenated double-degree record and is not an adequate canonical BSA.",
+      "recommended_audit_action": "Candidate for approval as a new stable CRS343+ course after duplicate/title adjudication.",
+      "confidence": "HIGH",
+      "evidence_url": "https://ched.gov.ph/wp-content/uploads/2017/10/CMO-27-s-2017.pdf"
+    },
+    {
+      "proposed_program": "Bachelor of Science in Data Science and Analytics",
+      "classification": "VALID_MISSING_BACHELOR",
+      "program_type": "undergraduate bachelor",
+      "suggested_cluster": "Engineering/STEM",
+      "reason": "No Data Science degree exists; IT, CS, Statistics, and Mathematics are related but not equivalent.",
+      "recommended_audit_action": "Candidate for approval as CRS343+ after current-title verification.",
+      "confidence": "HIGH",
+      "evidence_url": "https://ched.gov.ph/wp-content/uploads/CMO-No.-14-S.-2025-Revised-Estatistikolar-guidelines.pdf"
+    },
+    {
+      "proposed_program": "Bachelor of Science in Actuarial Science",
+      "classification": "VALID_MISSING_BACHELOR",
+      "program_type": "undergraduate bachelor",
+      "suggested_cluster": "Science & Mathematics",
+      "reason": "No Actuarial Science degree exists; Mathematics and Statistics are related but not equivalent.",
+      "recommended_audit_action": "Candidate for approval as CRS343+.",
+      "confidence": "HIGH",
+      "evidence_url": "https://ched.gov.ph/wp-content/uploads/CMO-No.-14-S.-2025-Revised-Estatistikolar-guidelines.pdf"
+    },
+    {
+      "proposed_program": "Bachelor of Science in Biochemistry",
+      "classification": "VALID_MISSING_BACHELOR",
+      "program_type": "undergraduate bachelor",
+      "suggested_cluster": "Science & Mathematics",
+      "reason": "No Biochemistry degree exists; Biology and Chemistry do not duplicate it.",
+      "recommended_audit_action": "Candidate for approval as CRS343+.",
+      "confidence": "HIGH",
+      "evidence_url": "https://ched.gov.ph/wp-content/uploads/20230913-JMC-No-01-S-2023-Implementing-Guidelines-of-the-Scholarship-Program-for-Coconut-Farmers-and-their-Families-CoScho.pdf"
+    },
+    {
+      "proposed_program": "Bachelor of Science in Legal Management",
+      "classification": "VALID_MISSING_BACHELOR",
+      "program_type": "undergraduate bachelor",
+      "suggested_cluster": "Legal & Public Service",
+      "reason": "No Legal Management bachelor exists. Political Science/Public Administration are not equivalents.",
+      "recommended_audit_action": "Candidate for approval as CRS343+; do not imply it is a law degree.",
+      "confidence": "HIGH",
+      "evidence_url": "https://ro11.ched.gov.ph/programs-per-hei/"
+    },
+    {
+      "proposed_program": "Bachelor of Science in Aircraft Maintenance Technology",
+      "classification": "VALID_MISSING_BACHELOR",
+      "program_type": "undergraduate bachelor",
+      "suggested_cluster": "Aviation & Maritime",
+      "reason": "No exact program exists. Aviation Engineering Technology and Avionics Maintenance majors are related but not equivalent.",
+      "recommended_audit_action": "Candidate for approval as CRS343+ after national/current title confirmation.",
+      "confidence": "HIGH",
+      "evidence_url": "https://ro11.ched.gov.ph/programs-inventory/"
+    },
+    {
+      "proposed_program": "Bachelor of Science in Aviation Electronics Technology",
+      "classification": "VALID_MISSING_BACHELOR",
+      "program_type": "undergraduate bachelor",
+      "suggested_cluster": "Aviation & Maritime",
+      "reason": "No exact bachelor exists; Electronics Engineering and Avionics Maintenance are related alternatives.",
+      "recommended_audit_action": "Candidate for approval as CRS343+ after national/current title confirmation.",
+      "confidence": "HIGH",
+      "evidence_url": "https://ro11.ched.gov.ph/programs-inventory/"
+    },
+    {
+      "proposed_program": "Bachelor of Science in Business Administration major in Marketing Management",
+      "classification": "VALID_MISSING_BACHELOR",
+      "program_type": "undergraduate bachelor",
+      "suggested_cluster": "Business",
+      "reason": "Catalog models BSBA Financial Management and HRDM but not this common recognized major.",
+      "recommended_audit_action": "Candidate for approval only if LearnMatch continues major-level catalog granularity.",
+      "confidence": "HIGH",
+      "evidence_url": "https://ro11.ched.gov.ph/heis-with-accredited-programs/"
+    },
+    {
+      "proposed_program": "Bachelor of Science in Business Administration major in Operations Management",
+      "classification": "VALID_MISSING_BACHELOR",
+      "program_type": "undergraduate bachelor",
+      "suggested_cluster": "Business",
+      "reason": "Catalog models other BSBA majors but no Operations Management major.",
+      "recommended_audit_action": "Candidate for approval only if LearnMatch continues major-level catalog granularity.",
+      "confidence": "HIGH",
+      "evidence_url": "https://region2.ched.gov.ph/index.php/recognized-programs-of-private-higher-education-institutions-pheis-in-region-ii/"
+    },
+    {
+      "proposed_program": "Bachelor of Science in Microbiology",
+      "classification": "VALID_MISSING_BACHELOR",
+      "program_type": "undergraduate bachelor",
+      "suggested_cluster": "Science & Mathematics",
+      "reason": "No standalone Microbiology bachelor exists; Biology/Medical Laboratory Science are related but not equivalent.",
+      "recommended_audit_action": "Candidate for approval after confirming desired coverage threshold and current title.",
+      "confidence": "MEDIUM-HIGH",
+      "evidence_url": "https://mimaropa.ched.gov.ph/wp-content/uploads/2023/03/CMO-No.-10-s.-2021.pdf"
+    },
+    {
+      "proposed_program": "Bachelor of Science in Agricultural Biotechnology",
+      "classification": "VALID_MISSING_BACHELOR",
+      "program_type": "undergraduate bachelor",
+      "suggested_cluster": "Agriculture & Environmental",
+      "reason": "No exact bachelor exists; Agriculture, Biology, and Biological Engineering are related but distinct.",
+      "recommended_audit_action": "Candidate for approval if nationally meaningful rather than institution-specific coverage is desired.",
+      "confidence": "MEDIUM-HIGH",
+      "evidence_url": "https://ched.gov.ph/wp-content/uploads/20230913-JMC-No-01-S-2023-Implementing-Guidelines-of-the-Scholarship-Program-for-Coconut-Farmers-and-their-Families-CoScho.pdf"
+    },
+    {
+      "proposed_program": "Bachelor of Science in Demography",
+      "classification": "VALID_MISSING_BACHELOR",
+      "program_type": "undergraduate bachelor",
+      "suggested_cluster": "Science & Mathematics",
+      "reason": "No Demography degree exists; Statistics and Social Science are related but not equivalent.",
+      "recommended_audit_action": "Candidate for approval subject to prevalence review.",
+      "confidence": "MEDIUM",
+      "evidence_url": "https://ched.gov.ph/wp-content/uploads/CMO-No.-14-S.-2025-Revised-Estatistikolar-guidelines.pdf"
+    },
+    {
+      "proposed_program": "Bachelor of Arts in International Studies",
+      "classification": "VALID_MISSING_BACHELOR",
+      "program_type": "undergraduate bachelor",
+      "suggested_cluster": "Humanities & Social Science",
+      "reason": "No International Studies bachelor exists; Political Science/Interdisciplinary Studies are not equivalents.",
+      "recommended_audit_action": "Candidate for approval subject to stronger national prevalence evidence.",
+      "confidence": "MEDIUM",
+      "evidence_url": "https://ro11.ched.gov.ph/programs-per-hei/"
+    },
+    {
+      "proposed_program": "Bachelor of Science in Aviation Management",
+      "classification": "VALID_MISSING_BACHELOR",
+      "program_type": "undergraduate bachelor",
+      "suggested_cluster": "Aviation & Maritime",
+      "reason": "No Aviation Management degree exists; engineering and maintenance programs are not management equivalents.",
+      "recommended_audit_action": "Candidate for approval subject to national/current title verification.",
+      "confidence": "MEDIUM",
+      "evidence_url": "https://ro11.ched.gov.ph/programs-per-hei/"
+    },
+    {
+      "proposed_program": "Bachelor of Science in Computer Science (BSCS)",
+      "classification": "ALREADY_REPRESENTED",
+      "program_type": "undergraduate bachelor",
+      "suggested_cluster": "Engineering/STEM",
+      "reason": "CRS026 Bachelor of Computer Science represents the same program family; CHED's standard title suggests title normalization review, not an addition.",
+      "recommended_audit_action": "Do not add. Review CRS026 naming while preserving its stable ID.",
+      "confidence": "HIGH",
+      "evidence_url": "https://legacy.ched.gov.ph/wp-content/uploads/2017/10/CMO-no.-25-s.-2015.pdf"
+    },
+    {
+      "proposed_program": "Bachelor of Science in Hotel and Restaurant Management",
+      "classification": "ALREADY_REPRESENTED",
+      "program_type": "undergraduate bachelor",
+      "suggested_cluster": "Hospitality & Tourism",
+      "reason": "CRS217 Bachelor of Science in Hotel, Restaurant and Tourism Management and CRS053 BSHM already cover this family.",
+      "recommended_audit_action": "Do not add before hospitality naming/duplicate review.",
+      "confidence": "MEDIUM-HIGH",
+      "evidence_url": "https://ro11.ched.gov.ph/programs-per-hei/"
+    }
+  ]
+}

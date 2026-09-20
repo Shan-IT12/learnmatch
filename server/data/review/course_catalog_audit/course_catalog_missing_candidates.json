@@ -1,0 +1,283 @@
+{
+  "generated_for": "read-only catalog coverage audit",
+  "identifier_policy": "Any approved addition must use new stable identifiers beginning at CRS343; never renumber CRS001–CRS342.",
+  "high_confidence_candidates": [
+    {
+      "name": "Doctor of Veterinary Medicine (DVM)",
+      "type": "direct-entry professional/undergraduate veterinary degree",
+      "cluster": "Healthcare Science",
+      "reason": "A common regulated Philippine professional program wholly absent from the catalog; CHED explicitly describes DVM as undergraduate veterinary medicine education.",
+      "evidence": [
+        {
+          "authority": "CHED CMO No. 15, s. 2007",
+          "url": "https://ched.gov.ph/wp-content/uploads/2017/10/CMO-No.15-s2007.pdf"
+        },
+        {
+          "authority": "PRC Veterinary Medicine",
+          "url": "https://www.prc.gov.ph/veterinary-medicine"
+        }
+      ],
+      "confidence": "HIGH"
+    },
+    {
+      "name": "Doctor of Dental Medicine (DMD)",
+      "type": "direct-entry professional degree",
+      "cluster": "Healthcare Science",
+      "reason": "A common regulated Philippine professional program wholly absent from the catalog.",
+      "evidence": [
+        {
+          "authority": "CHED CMO No. 3, s. 2018",
+          "url": "https://ched.gov.ph/wp-content/uploads/2018/05/CMO-No.-3-Series-of-2018-Policies-and-Standards-and-Guidelines-for-the-Doctor-of-Dental-Medicine-DMD-Program.pdf"
+        },
+        {
+          "authority": "PRC Dentistry",
+          "url": "https://www.prc.gov.ph/dentistry"
+        }
+      ],
+      "confidence": "HIGH"
+    },
+    {
+      "name": "Doctor of Optometry",
+      "type": "six-year baccalaureate-level professional degree",
+      "cluster": "Healthcare Science",
+      "reason": "CHED expressly calls it a baccalaureate program of at least six years; absent despite broad allied-health coverage.",
+      "evidence": [
+        {
+          "authority": "CHED CMO No. 38, s. 2007",
+          "url": "https://ched.gov.ph/wp-content/uploads/2017/10/CMO-No.38-s2007.pdf"
+        }
+      ],
+      "confidence": "HIGH"
+    },
+    {
+      "name": "Bachelor of Science in Accountancy (BSA)",
+      "type": "bachelor / undergraduate",
+      "cluster": "Business",
+      "reason": "Major regulated business degree absent as a standalone record; the combined CRS232 record is not an adequate substitute.",
+      "evidence": [
+        {
+          "authority": "CHED CMO No. 27, s. 2017",
+          "url": "https://ched.gov.ph/wp-content/uploads/2017/10/CMO-27-s-2017.pdf"
+        }
+      ],
+      "confidence": "HIGH"
+    },
+    {
+      "name": "Bachelor of Science in Data Science and Analytics",
+      "type": "bachelor / undergraduate",
+      "cluster": "Engineering/STEM",
+      "reason": "Current CHED priority-program title and recognized Philippine offering; meaningfully different from IT/CS.",
+      "evidence": [
+        {
+          "authority": "CHED 2025 priority program codes",
+          "url": "https://ched.gov.ph/wp-content/uploads/CMO-No.-14-S.-2025-Revised-Estatistikolar-guidelines.pdf"
+        }
+      ],
+      "confidence": "HIGH"
+    },
+    {
+      "name": "Bachelor of Science in Actuarial Science",
+      "type": "bachelor / undergraduate",
+      "cluster": "Science & Mathematics",
+      "reason": "Current CHED priority-program title; a substantial mathematics/professional family absent from the catalog.",
+      "evidence": [
+        {
+          "authority": "CHED 2025 priority program codes",
+          "url": "https://ched.gov.ph/wp-content/uploads/CMO-No.-14-S.-2025-Revised-Estatistikolar-guidelines.pdf"
+        }
+      ],
+      "confidence": "HIGH"
+    },
+    {
+      "name": "Bachelor of Science in Biochemistry",
+      "type": "bachelor / undergraduate",
+      "cluster": "Science & Mathematics",
+      "reason": "A recognized science degree and CHED priority program, not equivalent to a course within Chemistry or Biology.",
+      "evidence": [
+        {
+          "authority": "CHED CoScho priority programs",
+          "url": "https://ched.gov.ph/wp-content/uploads/20230913-JMC-No-01-S-2023-Implementing-Guidelines-of-the-Scholarship-Program-for-Coconut-Farmers-and-their-Families-CoScho.pdf"
+        }
+      ],
+      "confidence": "HIGH"
+    },
+    {
+      "name": "Bachelor of Science in Legal Management",
+      "type": "bachelor / undergraduate",
+      "cluster": "Legal & Public Service",
+      "reason": "Recognized Philippine undergraduate program frequently used as a law/public-service pathway; absent from the catalog.",
+      "evidence": [
+        {
+          "authority": "CHEDRO XI recognized programs",
+          "url": "https://ro11.ched.gov.ph/programs-per-hei/"
+        }
+      ],
+      "confidence": "HIGH"
+    },
+    {
+      "name": "Bachelor of Science in Aircraft Maintenance Technology",
+      "type": "bachelor / undergraduate",
+      "cluster": "Aviation & Maritime",
+      "reason": "Recognized Philippine aviation program and a common student search distinct from engineering degrees.",
+      "evidence": [
+        {
+          "authority": "CHEDRO XI program inventory",
+          "url": "https://ro11.ched.gov.ph/programs-inventory/"
+        }
+      ],
+      "confidence": "HIGH"
+    },
+    {
+      "name": "Bachelor of Science in Aviation Electronics Technology",
+      "type": "bachelor / undergraduate",
+      "cluster": "Aviation & Maritime",
+      "reason": "Recognized aviation-technology degree absent from the catalog; distinct from ECE and avionics-maintenance majors.",
+      "evidence": [
+        {
+          "authority": "CHEDRO XI program inventory",
+          "url": "https://ro11.ched.gov.ph/programs-inventory/"
+        }
+      ],
+      "confidence": "HIGH"
+    },
+    {
+      "name": "Bachelor of Science in Business Administration major in Marketing Management",
+      "type": "bachelor / undergraduate major",
+      "cluster": "Business",
+      "reason": "One of the common BSBA majors recognized in Philippine HEI inventories; catalog already models other BSBA majors separately.",
+      "evidence": [
+        {
+          "authority": "CHEDRO XI accredited programs",
+          "url": "https://ro11.ched.gov.ph/heis-with-accredited-programs/"
+        }
+      ],
+      "confidence": "HIGH"
+    },
+    {
+      "name": "Bachelor of Science in Business Administration major in Operations Management",
+      "type": "bachelor / undergraduate major",
+      "cluster": "Business",
+      "reason": "Common BSBA major absent while Financial and HRDM majors are present.",
+      "evidence": [
+        {
+          "authority": "CHEDRO II recognized private HEI programs",
+          "url": "https://region2.ched.gov.ph/index.php/recognized-programs-of-private-higher-education-institutions-pheis-in-region-ii/"
+        }
+      ],
+      "confidence": "HIGH"
+    }
+  ],
+  "lower_confidence_candidates": [
+    {
+      "name": "Doctor of Medicine (MD)",
+      "type": "post-baccalaureate professional degree (with limited integrated-entry exceptions)",
+      "cluster": "Healthcare Science",
+      "reason": "Legitimate and common, but standard admission requires a prior baccalaureate degree and NMAT. Add only if LearnMatch intentionally expands beyond undergraduate-first recommendations.",
+      "evidence": [
+        {
+          "authority": "CHED CMO No. 18, s. 2016",
+          "url": "https://legacy.ched.gov.ph/wp-content/uploads/2017/10/CMO-18-s.-2016.pdf"
+        }
+      ],
+      "confidence": "MEDIUM / SCOPE DECISION"
+    },
+    {
+      "name": "Bachelor of Science in Microbiology",
+      "type": "bachelor / undergraduate",
+      "cluster": "Science & Mathematics",
+      "reason": "Recognized in official CHED materials, but some institutions offer Microbiology as a Biology major; national standalone prevalence needs confirmation.",
+      "evidence": [
+        {
+          "authority": "CHED CMO No. 10, s. 2021 annex",
+          "url": "https://mimaropa.ched.gov.ph/wp-content/uploads/2023/03/CMO-No.-10-s.-2021.pdf"
+        }
+      ],
+      "confidence": "MEDIUM"
+    },
+    {
+      "name": "Bachelor of Science in Agricultural Biotechnology",
+      "type": "bachelor / undergraduate",
+      "cluster": "Agriculture & Environmental",
+      "reason": "CHED priority program, but narrower and less common than existing Agriculture/Biology coverage.",
+      "evidence": [
+        {
+          "authority": "CHED CoScho priority programs",
+          "url": "https://ched.gov.ph/wp-content/uploads/20230913-JMC-No-01-S-2023-Implementing-Guidelines-of-the-Scholarship-Program-for-Coconut-Farmers-and-their-Families-CoScho.pdf"
+        }
+      ],
+      "confidence": "MEDIUM"
+    },
+    {
+      "name": "Bachelor of Science in Demography",
+      "type": "bachelor / undergraduate",
+      "cluster": "Science & Mathematics",
+      "reason": "Listed by CHED as a priority statistics-related program; likely limited offering footprint.",
+      "evidence": [
+        {
+          "authority": "CHED 2025 priority program codes",
+          "url": "https://ched.gov.ph/wp-content/uploads/CMO-No.-14-S.-2025-Revised-Estatistikolar-guidelines.pdf"
+        }
+      ],
+      "confidence": "MEDIUM"
+    },
+    {
+      "name": "Bachelor of Arts in International Studies",
+      "type": "bachelor / undergraduate",
+      "cluster": "Humanities & Social Science",
+      "reason": "Recognized in official regional inventories and a common search family, but national PSG/current prevalence needs stronger verification.",
+      "evidence": [
+        {
+          "authority": "CHEDRO XI recognized programs",
+          "url": "https://ro11.ched.gov.ph/programs-per-hei/"
+        }
+      ],
+      "confidence": "MEDIUM"
+    },
+    {
+      "name": "Bachelor of Science in Aviation Management",
+      "type": "bachelor / undergraduate",
+      "cluster": "Aviation & Maritime",
+      "reason": "Recognized regional offering; may overlap institution-specific Airline Management/airport management titles.",
+      "evidence": [
+        {
+          "authority": "CHEDRO XI recognized programs",
+          "url": "https://ro11.ched.gov.ph/programs-per-hei/"
+        }
+      ],
+      "confidence": "MEDIUM"
+    }
+  ],
+  "not_undergraduate_additions": [
+    {
+      "term": "Dermatology / dermatologist",
+      "classification": "medical specialization / occupation",
+      "recommendation": "Search guidance toward Medicine and medical-specialty information only; do not create a bachelor's course."
+    },
+    {
+      "term": "Surgeon / pediatrician / physician",
+      "classification": "medical occupations/specialties",
+      "recommendation": "Do not create canonical undergraduate courses; explain the MD pathway."
+    },
+    {
+      "term": "Lawyer",
+      "classification": "occupation",
+      "recommendation": "Do not equate with Political Science; surface a law-pathway explanation and Juris Doctor scope decision."
+    },
+    {
+      "term": "Teacher",
+      "classification": "occupation",
+      "recommendation": "Alias/facet across relevant Education programs, not a course."
+    },
+    {
+      "term": "Architect",
+      "classification": "occupation",
+      "recommendation": "Alias to existing CRS125 Architecture."
+    },
+    {
+      "term": "Psychologist",
+      "classification": "occupation with regulated postgraduate/professional considerations",
+      "recommendation": "Alias to BA/BS Psychology for undergraduate exploration, with careful career wording."
+    }
+  ],
+  "common_downstream_impact": "Additions require new CRS343+ IDs, matching-profile and recommendation coverage, enrichment data, database insertion/migration, Course Explorer indexing, and optional School Locator mappings. No current ID should shift."
+}

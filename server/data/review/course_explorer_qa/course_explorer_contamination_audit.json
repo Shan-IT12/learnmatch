@@ -1,0 +1,2234 @@
+{
+  "audit_scope": "Read-only lexical contamination findings for the canonical 342-course JSON",
+  "classification_note": "Entries were flagged when they contain source/provenance/regulatory markers or explicit research caveats; no source data was modified.",
+  "obtainable_skills": {
+    "total_entries": 3675,
+    "suspicious_entries": [
+      {
+        "course_code": "CRS059",
+        "course_name": "Bachelor of Science in Industrial Management Engineering Minor in Information Technology",
+        "value": "No reliable course-specific skill set could be verified for the exact submitted program."
+      },
+      {
+        "course_code": "CRS060",
+        "course_name": "Bachelor of Science in Industrial Management Engineering Minor in Service Management",
+        "value": "No reliable course-specific skills could be established for the exact submitted program."
+      },
+      {
+        "course_code": "CRS125",
+        "course_name": "Bachelor of Science in Architecture",
+        "value": "No reliable information was found in the provided sources for this specific course."
+      },
+      {
+        "course_code": "CRS130",
+        "course_name": "Bachelor of Arts in Chemistry",
+        "value": "No reliable information was found in the provided sources for this specific course."
+      },
+      {
+        "course_code": "CRS180",
+        "course_name": "Bachelor of Science in Aviation Engineering Technology major in Aviation Engineering Technology",
+        "value": "No reliable information was found in the provided sources for this specific course."
+      },
+      {
+        "course_code": "CRS196",
+        "course_name": "Bachelor of Science in Environmental Engineering Technology major in Envet",
+        "value": "(General Engineering Technology competencies only; no verified course-specific PSG found.)"
+      },
+      {
+        "course_code": "CRS202",
+        "course_name": "Bachelor of Food Technology Major in Food Trades",
+        "value": "No reliable information was found in the provided sources for this specific course title."
+      },
+      {
+        "course_code": "CRS203",
+        "course_name": "Bachelor of Science in Forestry major in Forest Products Innovation Design",
+        "value": "No reliable program-specific skills were found for this exact course title in the provided official source."
+      },
+      {
+        "course_code": "CRS210",
+        "course_name": "Bachelor of Science in Geological Science and Engineering",
+        "value": "No course-specific skills could be reliably established from the provided CHED source for this exact degree title."
+      },
+      {
+        "course_code": "CRS212",
+        "course_name": "Bachelor of Science in Geothermal Engineering",
+        "value": "No course-specific skills could be reliably established from the provided CHED source for this exact degree."
+      },
+      {
+        "course_code": "CRS220",
+        "course_name": "Bachelor of Arts major in Humanities",
+        "value": "No course-specific skills can be reliably extracted from the submitted CMO for the exact program title."
+      },
+      {
+        "course_code": "CRS224",
+        "course_name": "Bachelor of Science in Information and Communications Technology",
+        "value": "No course-specific skills can be reliably extracted from the supplied CMO."
+      },
+      {
+        "course_code": "CRS225",
+        "course_name": "Bachelor of Science in Information and Communication Technology",
+        "value": "No course-specific skills can be reliably established from the supplied source."
+      },
+      {
+        "course_code": "CRS227",
+        "course_name": "Bachelor of Arts in Information Management",
+        "value": "No course-specific skills can be reliably extracted from the supplied CHED source."
+      },
+      {
+        "course_code": "CRS232",
+        "course_name": "Bachelor of Science in Applied Economics major in Industrial Economics and Bachelor of Science in Accountancy",
+        "value": "(PSG is CMO No. 27, s. 2017)"
+      },
+      {
+        "course_code": "CRS236",
+        "course_name": "Bachelor of Science in Land Use Design Management",
+        "value": "No reliable course-specific skill set verified."
+      },
+      {
+        "course_code": "CRS237",
+        "course_name": "Bachelor of Arts major in Language Arts",
+        "value": "No reliable course-specific skills verified for the exact submitted title."
+      },
+      {
+        "course_code": "CRS243",
+        "course_name": "Bachelor of Engineering Technology major in Manufacturing Engineering Technology",
+        "value": "Communication and teamwork skills as required by the engineering technology PSG"
+      },
+      {
+        "course_code": "CRS243",
+        "course_name": "Bachelor of Engineering Technology major in Manufacturing Engineering Technology",
+        "value": "Ability to function effectively in multidisciplinary teams as prescribed by CMO No. 86"
+      },
+      {
+        "course_code": "CRS243",
+        "course_name": "Bachelor of Engineering Technology major in Manufacturing Engineering Technology",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS244",
+        "course_name": "Bachelor of Science in Marine Engineering",
+        "value": "Marine engineering knowledge and competencies as prescribed by the BSMarE PSG"
+      },
+      {
+        "course_code": "CRS244",
+        "course_name": "Bachelor of Science in Marine Engineering",
+        "value": "Application of outcomes-based education principles as prescribed by CHED"
+      },
+      {
+        "course_code": "CRS244",
+        "course_name": "Bachelor of Science in Marine Engineering",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS244",
+        "course_name": "Bachelor of Science in Marine Engineering",
+        "value": "CMO No. 67, Series of 2017; CMO No. 14, Series of 2018; Philippine Qualifications Register"
+      },
+      {
+        "course_code": "CRS245",
+        "course_name": "Bachelor of Science in Marine Engineering and Electro Technology",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS245",
+        "course_name": "Bachelor of Science in Marine Engineering and Electro Technology",
+        "value": "CMO No. 86, Series of 2017; CMO No. 13, Series of 2005; CMO No. 51, Series of 1997"
+      },
+      {
+        "course_code": "CRS246",
+        "course_name": "Bachelor of Science in Marine Engineering major in Marine Engineering and Machine Shop",
+        "value": "Marine engineering knowledge and competencies as prescribed by the BSMarE PSG"
+      },
+      {
+        "course_code": "CRS246",
+        "course_name": "Bachelor of Science in Marine Engineering major in Marine Engineering and Machine Shop",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS246",
+        "course_name": "Bachelor of Science in Marine Engineering major in Marine Engineering and Machine Shop",
+        "value": "CMO No. 67, Series of 2017; Philippine Qualifications Register"
+      },
+      {
+        "course_code": "CRS247",
+        "course_name": "Bachelor of Science in Marine Science",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS247",
+        "course_name": "Bachelor of Science in Marine Science",
+        "value": "CMO No. 46, Series of 2017"
+      },
+      {
+        "course_code": "CRS248",
+        "course_name": "Bachelor of Science in Marine Transportation",
+        "value": "Marine transportation knowledge and competencies as prescribed by the BSMT PSG"
+      },
+      {
+        "course_code": "CRS248",
+        "course_name": "Bachelor of Science in Marine Transportation",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS248",
+        "course_name": "Bachelor of Science in Marine Transportation",
+        "value": "CMO No. 67, Series of 2017; CMO No. 13, Series of 2013"
+      },
+      {
+        "course_code": "CRS249",
+        "course_name": "Bachelor of Science in Marine Transportation and Engineering",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS249",
+        "course_name": "Bachelor of Science in Marine Transportation and Engineering",
+        "value": "CMO No. 67, Series of 2017; CMO No. 86, Series of 2017"
+      },
+      {
+        "course_code": "CRS250",
+        "course_name": "Bachelor of Science in Materials Science and Engineering",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS250",
+        "course_name": "Bachelor of Science in Materials Science and Engineering",
+        "value": "CMO No. 95, Series of 2017; CMO No. 86, Series of 2017"
+      },
+      {
+        "course_code": "CRS251",
+        "course_name": "Bachelor of Arts in Mathematics",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS251",
+        "course_name": "Bachelor of Arts in Mathematics",
+        "value": "CMO No. 48, Series of 2017; CMO No. 19, Series of 2007"
+      },
+      {
+        "course_code": "CRS252",
+        "course_name": "Bachelor in Mathematics and Science Elementary Education",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS252",
+        "course_name": "Bachelor in Mathematics and Science Elementary Education",
+        "value": "CMO No. 74, Series of 2017; CMO No. 30, Series of 2004"
+      },
+      {
+        "course_code": "CRS253",
+        "course_name": "Bachelor of Science in Education major in Mathematics",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS253",
+        "course_name": "Bachelor of Science in Education major in Mathematics",
+        "value": "CMO No. 75, Series of 2017; CMO No. 48, Series of 2017"
+      },
+      {
+        "course_code": "CRS254",
+        "course_name": "Bachelor in Mathematics Education major in Mathematics",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS254",
+        "course_name": "Bachelor in Mathematics Education major in Mathematics",
+        "value": "CMO No. 75, Series of 2017; CMO No. 48, Series of 2017"
+      },
+      {
+        "course_code": "CRS255",
+        "course_name": "Bachelor of Science in Industrial Technology major in Mechanical",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS255",
+        "course_name": "Bachelor of Science in Industrial Technology major in Mechanical",
+        "value": "CMO No. 97, Series of 2017; CMO No. 86, Series of 2017"
+      },
+      {
+        "course_code": "CRS256",
+        "course_name": "Bachelor of Mechanical Engineering",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS256",
+        "course_name": "Bachelor of Mechanical Engineering",
+        "value": "CMO No. 97, Series of 2017; CMO No. 86, Series of 2017"
+      },
+      {
+        "course_code": "CRS257",
+        "course_name": "Bachelor of Engineering Technology Major in Mechanical Engineering Technology",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS257",
+        "course_name": "Bachelor of Engineering Technology Major in Mechanical Engineering Technology",
+        "value": "CMO No. 86, Series of 2017"
+      },
+      {
+        "course_code": "CRS258",
+        "course_name": "Bachelor of Engineering Technology Major in Mechanical Engineering Technology Specialized in Automotive Engineering Technology",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS258",
+        "course_name": "Bachelor of Engineering Technology Major in Mechanical Engineering Technology Specialized in Automotive Engineering Technology",
+        "value": "CMO No. 86, Series of 2017"
+      },
+      {
+        "course_code": "CRS259",
+        "course_name": "Bachelor of Engineering Technology Major in Mechanical Engineering Technology With Specialization in Automotive Technology",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS259",
+        "course_name": "Bachelor of Engineering Technology Major in Mechanical Engineering Technology With Specialization in Automotive Technology",
+        "value": "CMO No. 86, Series of 2017"
+      },
+      {
+        "course_code": "CRS260",
+        "course_name": "Bachelor of Engineering Technology Major in Mechanical Technology-Automotive Technology",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS260",
+        "course_name": "Bachelor of Engineering Technology Major in Mechanical Technology-Automotive Technology",
+        "value": "CMO No. 86, Series of 2017"
+      },
+      {
+        "course_code": "CRS261",
+        "course_name": "Bachelor of Science in Mechatronics Engineering",
+        "value": "Communication and teamwork skills as required by the engineering PSG"
+      },
+      {
+        "course_code": "CRS261",
+        "course_name": "Bachelor of Science in Mechatronics Engineering",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS261",
+        "course_name": "Bachelor of Science in Mechatronics Engineering",
+        "value": "CMO No. 86, Series of 2017"
+      },
+      {
+        "course_code": "CRS262",
+        "course_name": "Bachelor of Engineering Technology major in Mechatronics Engineering Technology",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS262",
+        "course_name": "Bachelor of Engineering Technology major in Mechatronics Engineering Technology",
+        "value": "CMO No. 86, Series of 2017"
+      },
+      {
+        "course_code": "CRS263",
+        "course_name": "Bachelor of Engineering Technology major in Metallurgy and Materials Engineering Technology",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS263",
+        "course_name": "Bachelor of Engineering Technology major in Metallurgy and Materials Engineering Technology",
+        "value": "CMO No. 86, Series of 2017"
+      },
+      {
+        "course_code": "CRS264",
+        "course_name": "Bachelor of Music major in Music Education",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS264",
+        "course_name": "Bachelor of Music major in Music Education",
+        "value": "CMO No. 52, Series of 2007; CMO No. 30, Series of 2004"
+      },
+      {
+        "course_code": "CRS265",
+        "course_name": "Bachelor of Music in Music Education",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS265",
+        "course_name": "Bachelor of Music in Music Education",
+        "value": "CMO No. 52, Series of 2007; CMO No. 30, Series of 2004"
+      },
+      {
+        "course_code": "CRS266",
+        "course_name": "Bachelor of Science in Environmental Science major in Natural Resource Management",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS266",
+        "course_name": "Bachelor of Science in Environmental Science major in Natural Resource Management",
+        "value": "CMO No. 35, Series of 2005"
+      },
+      {
+        "course_code": "CRS267",
+        "course_name": "Bachelor of Nursing",
+        "value": "Nursing knowledge and competencies as prescribed by the BSN PSG"
+      },
+      {
+        "course_code": "CRS267",
+        "course_name": "Bachelor of Nursing",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS267",
+        "course_name": "Bachelor of Nursing",
+        "value": "CMO No. 15, Series of 2017"
+      },
+      {
+        "course_code": "CRS268",
+        "course_name": "Bachelor of Arts in Office Administration",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS268",
+        "course_name": "Bachelor of Arts in Office Administration",
+        "value": "CMO No. 19, Series of 2017"
+      },
+      {
+        "course_code": "CRS269",
+        "course_name": "Bachelor of Science in Industrial Engineering major in Organization and Decision System",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS269",
+        "course_name": "Bachelor of Science in Industrial Engineering major in Organization and Decision System",
+        "value": "CMO No. 96, Series of 2017"
+      },
+      {
+        "course_code": "CRS270",
+        "course_name": "Bachelor of Science in Packaging Engineering",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS270",
+        "course_name": "Bachelor of Science in Packaging Engineering",
+        "value": "CMO No. 86, Series of 2017"
+      },
+      {
+        "course_code": "CRS271",
+        "course_name": "Bachelor of Arts in Theater Arts",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS271",
+        "course_name": "Bachelor of Arts in Theater Arts",
+        "value": "CMO No. 25, Series of 2017"
+      },
+      {
+        "course_code": "CRS272",
+        "course_name": "Bachelor of Science in Petroleum Engineering",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS272",
+        "course_name": "Bachelor of Science in Petroleum Engineering",
+        "value": "CMO No. 86, Series of 2017"
+      },
+      {
+        "course_code": "CRS273",
+        "course_name": "Bachelor of Arts in Philippine Studies - Language Culture Media",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS273",
+        "course_name": "Bachelor of Arts in Philippine Studies - Language Culture Media",
+        "value": "CMO No. 44, Series of 1997"
+      },
+      {
+        "course_code": "CRS274",
+        "course_name": "Bachelor of Science in Philosophy",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS274",
+        "course_name": "Bachelor of Science in Philosophy",
+        "value": "CMO No. 44, Series of 1997"
+      },
+      {
+        "course_code": "CRS275",
+        "course_name": "Bachelor of Science in Physical Education",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS275",
+        "course_name": "Bachelor of Science in Physical Education",
+        "value": "CMO No. 80, Series of 2017; CMO No. 23, Series of 2011"
+      },
+      {
+        "course_code": "CRS276",
+        "course_name": "Bachelor in Physical Therapy (Foreign Student) 1St Year",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS276",
+        "course_name": "Bachelor in Physical Therapy (Foreign Student) 1St Year",
+        "value": "CMO No. 55, Series of 2017"
+      },
+      {
+        "course_code": "CRS277",
+        "course_name": "Bachelor of Science in Political Science",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS277",
+        "course_name": "Bachelor of Science in Political Science",
+        "value": "CMO No. 51, Series of 2017; CMO No. 31, Series of 2011"
+      },
+      {
+        "course_code": "CRS278",
+        "course_name": "Bachelor of Na major in Political Science",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS278",
+        "course_name": "Bachelor of Na major in Political Science",
+        "value": "CMO No. 51, Series of 2017"
+      },
+      {
+        "course_code": "CRS279",
+        "course_name": "Bachelor of Science in Industrial Technology major in Power Plant Engineering Technology",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS279",
+        "course_name": "Bachelor of Science in Industrial Technology major in Power Plant Engineering Technology",
+        "value": "CMO No. 86, Series of 2017"
+      },
+      {
+        "course_code": "CRS280",
+        "course_name": "Bachelor of Arts in Production Design",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS280",
+        "course_name": "Bachelor of Arts in Production Design",
+        "value": "CMO No. 43, Series of 2017"
+      },
+      {
+        "course_code": "CRS281",
+        "course_name": "Bachelor of Psychology",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS281",
+        "course_name": "Bachelor of Psychology",
+        "value": "CMO No. 34, Series of 2017"
+      },
+      {
+        "course_code": "CRS282",
+        "course_name": "Bachelor of Science in Public Administration",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS282",
+        "course_name": "Bachelor of Science in Public Administration",
+        "value": "CMO No. 06, Series of 2010"
+      },
+      {
+        "course_code": "CRS283",
+        "course_name": "Bachelor of Arts in Public Administration",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS283",
+        "course_name": "Bachelor of Arts in Public Administration",
+        "value": "CMO No. 06, Series of 2010"
+      },
+      {
+        "course_code": "CRS284",
+        "course_name": "Bachelor of Radiologic Technology",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS284",
+        "course_name": "Bachelor of Radiologic Technology",
+        "value": "CMO No. 7, Series of 2018"
+      },
+      {
+        "course_code": "CRS285",
+        "course_name": "Bachelor of Science in Railway Engineering",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS285",
+        "course_name": "Bachelor of Science in Railway Engineering",
+        "value": "CMO No. 86, Series of 2017"
+      },
+      {
+        "course_code": "CRS286",
+        "course_name": "Bachelor of Science in Environmental Science major in Resource Management",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS286",
+        "course_name": "Bachelor of Science in Environmental Science major in Resource Management",
+        "value": "CMO No. 35, Series of 2005"
+      },
+      {
+        "course_code": "CRS287",
+        "course_name": "Bachelor of Science in Mechatronics Engineering major in Robotics",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS287",
+        "course_name": "Bachelor of Science in Mechatronics Engineering major in Robotics",
+        "value": "CMO No. 86, Series of 2017"
+      },
+      {
+        "course_code": "CRS288",
+        "course_name": "Bachelor of Science in Robotics Engineering",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS288",
+        "course_name": "Bachelor of Science in Robotics Engineering",
+        "value": "CMO No. 86, Series of 2017"
+      },
+      {
+        "course_code": "CRS289",
+        "course_name": "Bachelor in Science Education With Specialization in Physics",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS289",
+        "course_name": "Bachelor in Science Education With Specialization in Physics",
+        "value": "CMO No. 75, Series of 2017; CMO No. 13, Series of 2024"
+      },
+      {
+        "course_code": "CRS290",
+        "course_name": "Bachelor of Science in Secondary Education major in English",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS290",
+        "course_name": "Bachelor of Science in Secondary Education major in English",
+        "value": "CMO No. 75, Series of 2017; CMO No. 24, Series of 2017"
+      },
+      {
+        "course_code": "CRS291",
+        "course_name": "Bachelor of Arts - Bachelor of Secondary Education Major in English",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS291",
+        "course_name": "Bachelor of Arts - Bachelor of Secondary Education Major in English",
+        "value": "CMO No. 75, Series of 2017; CMO No. 24, Series of 2017"
+      },
+      {
+        "course_code": "CRS292",
+        "course_name": "Bachelor in Secondary Education major in English",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS292",
+        "course_name": "Bachelor in Secondary Education major in English",
+        "value": "CMO No. 75, Series of 2017; CMO No. 24, Series of 2017"
+      },
+      {
+        "course_code": "CRS293",
+        "course_name": "Bachelor of Industrial Security Management",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS293",
+        "course_name": "Bachelor of Industrial Security Management",
+        "value": "CMO No. 6, Series of 2018"
+      },
+      {
+        "course_code": "CRS294",
+        "course_name": "Bachelor in Sign Language Interpretation",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS294",
+        "course_name": "Bachelor in Sign Language Interpretation",
+        "value": "CMO No. 44, Series of 1997"
+      },
+      {
+        "course_code": "CRS295",
+        "course_name": "Bachelor of Arts major in Sign Language Interpreting",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS295",
+        "course_name": "Bachelor of Arts major in Sign Language Interpreting",
+        "value": "CMO No. 44, Series of 1997"
+      },
+      {
+        "course_code": "CRS296",
+        "course_name": "Bachelor of Education major in Social Studies",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS296",
+        "course_name": "Bachelor of Education major in Social Studies",
+        "value": "CMO No. 75, Series of 2017; CMO No. 44, Series of 1997"
+      },
+      {
+        "course_code": "CRS297",
+        "course_name": "Bachelor of Arts in Social Work",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS297",
+        "course_name": "Bachelor of Arts in Social Work",
+        "value": "CMO No. 39, Series of 2017"
+      },
+      {
+        "course_code": "CRS298",
+        "course_name": "Bachelor of Science in Sociology",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS298",
+        "course_name": "Bachelor of Science in Sociology",
+        "value": "CMO No. 40, Series of 2017"
+      },
+      {
+        "course_code": "CRS299",
+        "course_name": "Bachelor of Science in Software Engineering",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS299",
+        "course_name": "Bachelor of Science in Software Engineering",
+        "value": "CMO No. 86, Series of 2017"
+      },
+      {
+        "course_code": "CRS300",
+        "course_name": "Bachelor of Science in Special Needs Education",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS300",
+        "course_name": "Bachelor of Science in Special Needs Education",
+        "value": "CMO No. 77, Series of 2017"
+      },
+      {
+        "course_code": "CRS301",
+        "course_name": "Bachelor of Secondary Education Major in Special Prog. Sped",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS301",
+        "course_name": "Bachelor of Secondary Education Major in Special Prog. Sped",
+        "value": "CMO No. 77, Series of 2017; CMO No. 75, Series of 2017"
+      },
+      {
+        "course_code": "CRS302",
+        "course_name": "Bachelor of Sports Science",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS302",
+        "course_name": "Bachelor of Sports Science",
+        "value": "CMO No. 81, Series of 2017; Bulacan State University CSER"
+      },
+      {
+        "course_code": "CRS303",
+        "course_name": "Bachelor of Science in Exercise and Sports Sciences major in Fitness and Sports Coaching",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS303",
+        "course_name": "Bachelor of Science in Exercise and Sports Sciences major in Fitness and Sports Coaching",
+        "value": "CMO No. 81, Series of 2017; Bulacan State University CSER"
+      },
+      {
+        "course_code": "CRS304",
+        "course_name": "Bachelor in Sports Science",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS304",
+        "course_name": "Bachelor in Sports Science",
+        "value": "CMO No. 81, Series of 2017; Bulacan State University CSER"
+      },
+      {
+        "course_code": "CRS305",
+        "course_name": "Bachelor of Science in Civil Engineering major in Structural Engineering",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS305",
+        "course_name": "Bachelor of Science in Civil Engineering major in Structural Engineering",
+        "value": "CMO No. 92, Series of 2017"
+      },
+      {
+        "course_code": "CRS306",
+        "course_name": "Bachelor of Teaching in Home and Economics and Livelihood Education",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS306",
+        "course_name": "Bachelor of Teaching in Home and Economics and Livelihood Education",
+        "value": "CMO No. 78, Series of 2017; CMO No. 52, Series of 2007"
+      },
+      {
+        "course_code": "CRS307",
+        "course_name": "Bachelor of Science in Technical Teacher Education major in Automotive",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS307",
+        "course_name": "Bachelor of Science in Technical Teacher Education major in Automotive",
+        "value": "CMO No. 79, Series of 2017"
+      },
+      {
+        "course_code": "CRS308",
+        "course_name": "Bachelor of Science in Technology and Livelihood Education",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS308",
+        "course_name": "Bachelor of Science in Technology and Livelihood Education",
+        "value": "CMO No. 78, Series of 2017"
+      },
+      {
+        "course_code": "CRS309",
+        "course_name": "Bachelor of Technology & Livelihood Technology major in Home Economics",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS309",
+        "course_name": "Bachelor of Technology & Livelihood Technology major in Home Economics",
+        "value": "CMO No. 78, Series of 2017"
+      },
+      {
+        "course_code": "CRS310",
+        "course_name": "Bachelor of Science in Technology Communication Management",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS310",
+        "course_name": "Bachelor of Science in Technology Communication Management",
+        "value": "CMO No. 44, Series of 1997"
+      },
+      {
+        "course_code": "CRS311",
+        "course_name": "Bachelor of Science in Technology Management major in Marketing",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS311",
+        "course_name": "Bachelor of Science in Technology Management major in Marketing",
+        "value": "CMO No. 17, Series of 2017"
+      },
+      {
+        "course_code": "CRS312",
+        "course_name": "Bachelor of Science in Theology",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS312",
+        "course_name": "Bachelor of Science in Theology",
+        "value": "CMO No. 13, Series of 2007; CMO No. 12, Series of 2007"
+      },
+      {
+        "course_code": "CRS313",
+        "course_name": "Bachelor of Arts in Theology",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS313",
+        "course_name": "Bachelor of Arts in Theology",
+        "value": "CMO No. 13, Series of 2007; CMO No. 12, Series of 2007"
+      },
+      {
+        "course_code": "CRS314",
+        "course_name": "Bachelor of Theology",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS314",
+        "course_name": "Bachelor of Theology",
+        "value": "CMO No. 13, Series of 2007; CMO No. 12, Series of 2007"
+      },
+      {
+        "course_code": "CRS315",
+        "course_name": "Bachelor of Science in Civil Engineering major in Transportation",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS315",
+        "course_name": "Bachelor of Science in Civil Engineering major in Transportation",
+        "value": "CMO No. 92, Series of 2017"
+      },
+      {
+        "course_code": "CRS316",
+        "course_name": "Bachelor of Science in Civil Engineering major in Transportation Engineering",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS316",
+        "course_name": "Bachelor of Science in Civil Engineering major in Transportation Engineering",
+        "value": "CMO No. 92, Series of 2017"
+      },
+      {
+        "course_code": "CRS317",
+        "course_name": "Bachelor of Science in Civil Engineering major in Water Resource Engineering",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS317",
+        "course_name": "Bachelor of Science in Civil Engineering major in Water Resource Engineering",
+        "value": "CMO No. 92, Series of 2017"
+      },
+      {
+        "course_code": "CRS318",
+        "course_name": "Bachelor of Science in Civil Engineering major in Water Resources Engineering",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS318",
+        "course_name": "Bachelor of Science in Civil Engineering major in Water Resources Engineering",
+        "value": "CMO No. 92, Series of 2017"
+      },
+      {
+        "course_code": "CRS319",
+        "course_name": "Bachelor in Architectural Engineering Technology",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS319",
+        "course_name": "Bachelor in Architectural Engineering Technology",
+        "value": "CMO No. 86, Series of 2017"
+      },
+      {
+        "course_code": "CRS320",
+        "course_name": "Bachelor in Aviation Engineering Technology",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS320",
+        "course_name": "Bachelor in Aviation Engineering Technology",
+        "value": "CMO No. 86, Series of 2017"
+      },
+      {
+        "course_code": "CRS321",
+        "course_name": "Bachelor of Engineering Technology major in Avionics Maintenance Technology",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS321",
+        "course_name": "Bachelor of Engineering Technology major in Avionics Maintenance Technology",
+        "value": "CMO No. 86, Series of 2017"
+      },
+      {
+        "course_code": "CRS322",
+        "course_name": "Bachelor of Arts in Behavioral Sciences major in Organizational and Social Systems Development and Bachelor of Science in Advertising Management Bachelor of Science in Advertising Management",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS322",
+        "course_name": "Bachelor of Arts in Behavioral Sciences major in Organizational and Social Systems Development and Bachelor of Science in Advertising Management Bachelor of Science in Advertising Management",
+        "value": "CMO No. 44, Series of 1997"
+      },
+      {
+        "course_code": "CRS323",
+        "course_name": "Bachelor of Arts in Business Administration major in Public Administration",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS323",
+        "course_name": "Bachelor of Arts in Business Administration major in Public Administration",
+        "value": "CMO No. 17, Series of 2017"
+      },
+      {
+        "course_code": "CRS324",
+        "course_name": "Bachelor of Science in Business Management",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS324",
+        "course_name": "Bachelor of Science in Business Management",
+        "value": "CMO No. 17, Series of 2017"
+      },
+      {
+        "course_code": "CRS325",
+        "course_name": "Bachelor of Arts in Christian Education",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS325",
+        "course_name": "Bachelor of Arts in Christian Education",
+        "value": "CMO No. 52, Series of 2007; CMO No. 30, Series of 2004"
+      },
+      {
+        "course_code": "CRS326",
+        "course_name": "Bachelor of Technology major in Civil Engineering Technology",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS326",
+        "course_name": "Bachelor of Technology major in Civil Engineering Technology",
+        "value": "CMO No. 86, Series of 2017"
+      },
+      {
+        "course_code": "CRS327",
+        "course_name": "Bachelor of Technology major in Civil Engineering Technology/Construction Technology",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS327",
+        "course_name": "Bachelor of Technology major in Civil Engineering Technology/Construction Technology",
+        "value": "CMO No. 86, Series of 2017"
+      },
+      {
+        "course_code": "CRS328",
+        "course_name": "Bachelor of Industrial Technology major in Computer",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS328",
+        "course_name": "Bachelor of Industrial Technology major in Computer",
+        "value": "CMO No. 87, Series of 2017; CMO No. 25, Series of 2015"
+      },
+      {
+        "course_code": "CRS329",
+        "course_name": "Bachelor of Science in Industrial Technology major in Computer Technology",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS329",
+        "course_name": "Bachelor of Science in Industrial Technology major in Computer Technology",
+        "value": "CMO No. 25, Series of 2015"
+      },
+      {
+        "course_code": "CRS330",
+        "course_name": "Bachelor in Construction Engineering Technology and Management",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS330",
+        "course_name": "Bachelor in Construction Engineering Technology and Management",
+        "value": "CMO No. 86, Series of 2017"
+      },
+      {
+        "course_code": "CRS331",
+        "course_name": "Bachelor of Arts major in Criminology",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS331",
+        "course_name": "Bachelor of Arts major in Criminology",
+        "value": "CMO No. 5, Series of 2018"
+      },
+      {
+        "course_code": "CRS332",
+        "course_name": "Bachelor of Science in Esports major in Esports Management",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS332",
+        "course_name": "Bachelor of Science in Esports major in Esports Management",
+        "value": "CMO No. 23, Series of 2011"
+      },
+      {
+        "course_code": "CRS333",
+        "course_name": "Bachelor of Science in Industrial Education major in Automotive Technology",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS333",
+        "course_name": "Bachelor of Science in Industrial Education major in Automotive Technology",
+        "value": "CMO No. 52, Series of 2007; CMO No. 30, Series of 2004"
+      },
+      {
+        "course_code": "CRS334",
+        "course_name": "Bachelor of Arts in Religious Education",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS334",
+        "course_name": "Bachelor of Arts in Religious Education",
+        "value": "CMO No. 12, Series of 2007; CMO No. 13, Series of 2007"
+      },
+      {
+        "course_code": "CRS335",
+        "course_name": "Bachelor of Education Studies",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS335",
+        "course_name": "Bachelor of Education Studies",
+        "value": "CMO No. 52, Series of 2007; CMO No. 30, Series of 2004"
+      },
+      {
+        "course_code": "CRS336",
+        "course_name": "Bachelor of Science in Industrial Technology major in Electrical",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS336",
+        "course_name": "Bachelor of Science in Industrial Technology major in Electrical",
+        "value": "CMO No. 88, Series of 2017"
+      },
+      {
+        "course_code": "CRS337",
+        "course_name": "Bachelor of Science in Industrial Technology major in Electronics",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS337",
+        "course_name": "Bachelor of Science in Industrial Technology major in Electronics",
+        "value": "CMO No. 101, Series of 2017"
+      },
+      {
+        "course_code": "CRS338",
+        "course_name": "Bachelor in Industrial Technology major in Electronics",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS338",
+        "course_name": "Bachelor in Industrial Technology major in Electronics",
+        "value": "CMO No. 101, Series of 2017"
+      },
+      {
+        "course_code": "CRS339",
+        "course_name": "Bachelor of Science in Industrial Technology major in Electronics and Communication Technology",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS339",
+        "course_name": "Bachelor of Science in Industrial Technology major in Electronics and Communication Technology",
+        "value": "CMO No. 44, Series of 1997; CMO No. 101, Series of 2017"
+      },
+      {
+        "course_code": "CRS340",
+        "course_name": "Bachelor of Science in Industrial Technology major in Electronics & Communications Technology",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS340",
+        "course_name": "Bachelor of Science in Industrial Technology major in Electronics & Communications Technology",
+        "value": "CMO No. 44, Series of 1997; CMO No. 101, Series of 2017"
+      },
+      {
+        "course_code": "CRS341",
+        "course_name": "Bachelor in Industrial Technology major in Electronics and Communications Technology",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS341",
+        "course_name": "Bachelor in Industrial Technology major in Electronics and Communications Technology",
+        "value": "CMO No. 44, Series of 1997; CMO No. 101, Series of 2017"
+      },
+      {
+        "course_code": "CRS342",
+        "course_name": "Bachelor of Science in Electronics and Computer Technology major in Communications Systems",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS342",
+        "course_name": "Bachelor of Science in Electronics and Computer Technology major in Communications Systems",
+        "value": "CMO No. 44, Series of 1997; CMO No. 101, Series of 2017; CMO No. 25, Series of 2015"
+      }
+    ]
+  },
+  "career_paths": {
+    "total_entries": 3615,
+    "suspicious_entries": [
+      {
+        "course_code": "CRS125",
+        "course_name": "Bachelor of Science in Architecture",
+        "value": "No reliable information was found in the provided sources for this specific course."
+      },
+      {
+        "course_code": "CRS130",
+        "course_name": "Bachelor of Arts in Chemistry",
+        "value": "No reliable information was found in the provided sources for this specific course."
+      },
+      {
+        "course_code": "CRS180",
+        "course_name": "Bachelor of Science in Aviation Engineering Technology major in Aviation Engineering Technology",
+        "value": "No reliable information was found in the provided sources for this specific course."
+      },
+      {
+        "course_code": "CRS202",
+        "course_name": "Bachelor of Food Technology Major in Food Trades",
+        "value": "No reliable information was found in the provided sources for this specific course title."
+      },
+      {
+        "course_code": "CRS203",
+        "course_name": "Bachelor of Science in Forestry major in Forest Products Innovation Design",
+        "value": "No reliable official career opportunities were found for this exact course title in the provided official source."
+      },
+      {
+        "course_code": "CRS207",
+        "course_name": "Bachelor of Elementary Education major in General",
+        "value": "Based on CMO No. 74, s. 2017:"
+      },
+      {
+        "course_code": "CRS208",
+        "course_name": "Bachelor of Science in Geodetic Engineering major in Land Surveying",
+        "value": "Based on CMO No. 89, s. 2017:"
+      },
+      {
+        "course_code": "CRS211",
+        "course_name": "Bachelor of Science in Civil Engineering major in Geotechnical",
+        "value": "Based on CMO No. 92, s. 2017 and the scope of Civil Engineering practice:"
+      },
+      {
+        "course_code": "CRS212",
+        "course_name": "Bachelor of Science in Geothermal Engineering",
+        "value": "No course-specific career opportunities can be reliably assigned to this exact CHED degree title."
+      },
+      {
+        "course_code": "CRS213",
+        "course_name": "Bachelor of Science in Graphics and Design (BSGD)",
+        "value": "Based on the Fine Arts and Design PSG (CMO No. 43, s. 2017):"
+      },
+      {
+        "course_code": "CRS219",
+        "course_name": "Bachelor of Science in Human Services",
+        "value": "Based on CMO No. 33, s. 2017 :"
+      },
+      {
+        "course_code": "CRS222",
+        "course_name": "Bachelor in Industrial Design",
+        "value": "Based on the Fine Arts and Design PSG (CMO No. 43, s. 2017):"
+      },
+      {
+        "course_code": "CRS224",
+        "course_name": "Bachelor of Science in Information and Communications Technology",
+        "value": "No course-specific career list can be reliably attributed to the supplied CMO."
+      },
+      {
+        "course_code": "CRS225",
+        "course_name": "Bachelor of Science in Information and Communication Technology",
+        "value": "No course-specific career opportunities can be reliably established from the supplied source."
+      },
+      {
+        "course_code": "CRS227",
+        "course_name": "Bachelor of Arts in Information Management",
+        "value": "No course-specific career opportunities can be reliably established from the supplied CMO."
+      },
+      {
+        "course_code": "CRS229",
+        "course_name": "Bachelor of Information Systems",
+        "value": "Based on CMO No. 25, s. 2015 and the BSIS program goals:"
+      },
+      {
+        "course_code": "CRS232",
+        "course_name": "Bachelor of Science in Applied Economics major in Industrial Economics and Bachelor of Science in Accountancy",
+        "value": "Based on CMO No. 32, s. 2017:"
+      },
+      {
+        "course_code": "CRS232",
+        "course_name": "Bachelor of Science in Applied Economics major in Industrial Economics and Bachelor of Science in Accountancy",
+        "value": "(PSG is CMO No. 27, s. 2017)"
+      },
+      {
+        "course_code": "CRS236",
+        "course_name": "Bachelor of Science in Land Use Design Management",
+        "value": "No course-specific career outcomes could be reliably established."
+      },
+      {
+        "course_code": "CRS237",
+        "course_name": "Bachelor of Arts major in Language Arts",
+        "value": "No course-specific career opportunities could be reliably established from the supplied source."
+      },
+      {
+        "course_code": "CRS243",
+        "course_name": "Bachelor of Engineering Technology major in Manufacturing Engineering Technology",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS243",
+        "course_name": "Bachelor of Engineering Technology major in Manufacturing Engineering Technology",
+        "value": "CMO No. 86, Series of 2017 (program outcomes and career/occupation provisions)"
+      },
+      {
+        "course_code": "CRS244",
+        "course_name": "Bachelor of Science in Marine Engineering",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS244",
+        "course_name": "Bachelor of Science in Marine Engineering",
+        "value": "CMO No. 67, Series of 2017; MARINA"
+      },
+      {
+        "course_code": "CRS245",
+        "course_name": "Bachelor of Science in Marine Engineering and Electro Technology",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS245",
+        "course_name": "Bachelor of Science in Marine Engineering and Electro Technology",
+        "value": "CMO No. 86, Series of 2017; CMO No. 13, Series of 2005"
+      },
+      {
+        "course_code": "CRS246",
+        "course_name": "Bachelor of Science in Marine Engineering major in Marine Engineering and Machine Shop",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS246",
+        "course_name": "Bachelor of Science in Marine Engineering major in Marine Engineering and Machine Shop",
+        "value": "CMO No. 67, Series of 2017; MARINA"
+      },
+      {
+        "course_code": "CRS247",
+        "course_name": "Bachelor of Science in Marine Science",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS247",
+        "course_name": "Bachelor of Science in Marine Science",
+        "value": "CMO No. 46, Series of 2017"
+      },
+      {
+        "course_code": "CRS248",
+        "course_name": "Bachelor of Science in Marine Transportation",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS248",
+        "course_name": "Bachelor of Science in Marine Transportation",
+        "value": "CMO No. 67, Series of 2017; MARINA"
+      },
+      {
+        "course_code": "CRS249",
+        "course_name": "Bachelor of Science in Marine Transportation and Engineering",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS249",
+        "course_name": "Bachelor of Science in Marine Transportation and Engineering",
+        "value": "CMO No. 67, Series of 2017; CMO No. 86, Series of 2017"
+      },
+      {
+        "course_code": "CRS250",
+        "course_name": "Bachelor of Science in Materials Science and Engineering",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS250",
+        "course_name": "Bachelor of Science in Materials Science and Engineering",
+        "value": "CMO No. 95, Series of 2017"
+      },
+      {
+        "course_code": "CRS251",
+        "course_name": "Bachelor of Arts in Mathematics",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS251",
+        "course_name": "Bachelor of Arts in Mathematics",
+        "value": "CMO No. 48, Series of 2017"
+      },
+      {
+        "course_code": "CRS252",
+        "course_name": "Bachelor in Mathematics and Science Elementary Education",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS252",
+        "course_name": "Bachelor in Mathematics and Science Elementary Education",
+        "value": "CMO No. 74, Series of 2017"
+      },
+      {
+        "course_code": "CRS253",
+        "course_name": "Bachelor of Science in Education major in Mathematics",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS253",
+        "course_name": "Bachelor of Science in Education major in Mathematics",
+        "value": "CMO No. 75, Series of 2017"
+      },
+      {
+        "course_code": "CRS254",
+        "course_name": "Bachelor in Mathematics Education major in Mathematics",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS254",
+        "course_name": "Bachelor in Mathematics Education major in Mathematics",
+        "value": "CMO No. 75, Series of 2017"
+      },
+      {
+        "course_code": "CRS255",
+        "course_name": "Bachelor of Science in Industrial Technology major in Mechanical",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS255",
+        "course_name": "Bachelor of Science in Industrial Technology major in Mechanical",
+        "value": "CMO No. 97, Series of 2017"
+      },
+      {
+        "course_code": "CRS256",
+        "course_name": "Bachelor of Mechanical Engineering",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS256",
+        "course_name": "Bachelor of Mechanical Engineering",
+        "value": "CMO No. 97, Series of 2017"
+      },
+      {
+        "course_code": "CRS257",
+        "course_name": "Bachelor of Engineering Technology Major in Mechanical Engineering Technology",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS257",
+        "course_name": "Bachelor of Engineering Technology Major in Mechanical Engineering Technology",
+        "value": "CMO No. 86, Series of 2017"
+      },
+      {
+        "course_code": "CRS258",
+        "course_name": "Bachelor of Engineering Technology Major in Mechanical Engineering Technology Specialized in Automotive Engineering Technology",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS258",
+        "course_name": "Bachelor of Engineering Technology Major in Mechanical Engineering Technology Specialized in Automotive Engineering Technology",
+        "value": "CMO No. 86, Series of 2017"
+      },
+      {
+        "course_code": "CRS259",
+        "course_name": "Bachelor of Engineering Technology Major in Mechanical Engineering Technology With Specialization in Automotive Technology",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS259",
+        "course_name": "Bachelor of Engineering Technology Major in Mechanical Engineering Technology With Specialization in Automotive Technology",
+        "value": "CMO No. 86, Series of 2017"
+      },
+      {
+        "course_code": "CRS260",
+        "course_name": "Bachelor of Engineering Technology Major in Mechanical Technology-Automotive Technology",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS260",
+        "course_name": "Bachelor of Engineering Technology Major in Mechanical Technology-Automotive Technology",
+        "value": "CMO No. 86, Series of 2017"
+      },
+      {
+        "course_code": "CRS261",
+        "course_name": "Bachelor of Science in Mechatronics Engineering",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS261",
+        "course_name": "Bachelor of Science in Mechatronics Engineering",
+        "value": "CMO No. 86, Series of 2017"
+      },
+      {
+        "course_code": "CRS262",
+        "course_name": "Bachelor of Engineering Technology major in Mechatronics Engineering Technology",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS262",
+        "course_name": "Bachelor of Engineering Technology major in Mechatronics Engineering Technology",
+        "value": "CMO No. 86, Series of 2017"
+      },
+      {
+        "course_code": "CRS263",
+        "course_name": "Bachelor of Engineering Technology major in Metallurgy and Materials Engineering Technology",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS263",
+        "course_name": "Bachelor of Engineering Technology major in Metallurgy and Materials Engineering Technology",
+        "value": "CMO No. 86, Series of 2017"
+      },
+      {
+        "course_code": "CRS264",
+        "course_name": "Bachelor of Music major in Music Education",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS264",
+        "course_name": "Bachelor of Music major in Music Education",
+        "value": "CMO No. 52, Series of 2007; CMO No. 30, Series of 2004"
+      },
+      {
+        "course_code": "CRS265",
+        "course_name": "Bachelor of Music in Music Education",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS265",
+        "course_name": "Bachelor of Music in Music Education",
+        "value": "CMO No. 52, Series of 2007; CMO No. 30, Series of 2004"
+      },
+      {
+        "course_code": "CRS266",
+        "course_name": "Bachelor of Science in Environmental Science major in Natural Resource Management",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS266",
+        "course_name": "Bachelor of Science in Environmental Science major in Natural Resource Management",
+        "value": "CMO No. 35, Series of 2005"
+      },
+      {
+        "course_code": "CRS267",
+        "course_name": "Bachelor of Nursing",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS267",
+        "course_name": "Bachelor of Nursing",
+        "value": "CMO No. 15, Series of 2017"
+      },
+      {
+        "course_code": "CRS268",
+        "course_name": "Bachelor of Arts in Office Administration",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS268",
+        "course_name": "Bachelor of Arts in Office Administration",
+        "value": "CMO No. 19, Series of 2017"
+      },
+      {
+        "course_code": "CRS269",
+        "course_name": "Bachelor of Science in Industrial Engineering major in Organization and Decision System",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS269",
+        "course_name": "Bachelor of Science in Industrial Engineering major in Organization and Decision System",
+        "value": "CMO No. 96, Series of 2017"
+      },
+      {
+        "course_code": "CRS270",
+        "course_name": "Bachelor of Science in Packaging Engineering",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS270",
+        "course_name": "Bachelor of Science in Packaging Engineering",
+        "value": "CMO No. 86, Series of 2017"
+      },
+      {
+        "course_code": "CRS271",
+        "course_name": "Bachelor of Arts in Theater Arts",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS271",
+        "course_name": "Bachelor of Arts in Theater Arts",
+        "value": "CMO No. 25, Series of 2017"
+      },
+      {
+        "course_code": "CRS272",
+        "course_name": "Bachelor of Science in Petroleum Engineering",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS272",
+        "course_name": "Bachelor of Science in Petroleum Engineering",
+        "value": "CMO No. 86, Series of 2017"
+      },
+      {
+        "course_code": "CRS273",
+        "course_name": "Bachelor of Arts in Philippine Studies - Language Culture Media",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS273",
+        "course_name": "Bachelor of Arts in Philippine Studies - Language Culture Media",
+        "value": "CMO No. 44, Series of 1997"
+      },
+      {
+        "course_code": "CRS274",
+        "course_name": "Bachelor of Science in Philosophy",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS274",
+        "course_name": "Bachelor of Science in Philosophy",
+        "value": "CMO No. 44, Series of 1997"
+      },
+      {
+        "course_code": "CRS275",
+        "course_name": "Bachelor of Science in Physical Education",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS275",
+        "course_name": "Bachelor of Science in Physical Education",
+        "value": "CMO No. 80, Series of 2017"
+      },
+      {
+        "course_code": "CRS276",
+        "course_name": "Bachelor in Physical Therapy (Foreign Student) 1St Year",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS276",
+        "course_name": "Bachelor in Physical Therapy (Foreign Student) 1St Year",
+        "value": "CMO No. 55, Series of 2017"
+      },
+      {
+        "course_code": "CRS277",
+        "course_name": "Bachelor of Science in Political Science",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS277",
+        "course_name": "Bachelor of Science in Political Science",
+        "value": "CMO No. 51, Series of 2017"
+      },
+      {
+        "course_code": "CRS278",
+        "course_name": "Bachelor of Na major in Political Science",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS278",
+        "course_name": "Bachelor of Na major in Political Science",
+        "value": "CMO No. 51, Series of 2017"
+      },
+      {
+        "course_code": "CRS279",
+        "course_name": "Bachelor of Science in Industrial Technology major in Power Plant Engineering Technology",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS279",
+        "course_name": "Bachelor of Science in Industrial Technology major in Power Plant Engineering Technology",
+        "value": "CMO No. 86, Series of 2017"
+      },
+      {
+        "course_code": "CRS280",
+        "course_name": "Bachelor of Arts in Production Design",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS280",
+        "course_name": "Bachelor of Arts in Production Design",
+        "value": "CMO No. 43, Series of 2017"
+      },
+      {
+        "course_code": "CRS281",
+        "course_name": "Bachelor of Psychology",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS281",
+        "course_name": "Bachelor of Psychology",
+        "value": "CMO No. 34, Series of 2017"
+      },
+      {
+        "course_code": "CRS282",
+        "course_name": "Bachelor of Science in Public Administration",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS282",
+        "course_name": "Bachelor of Science in Public Administration",
+        "value": "CMO No. 06, Series of 2010"
+      },
+      {
+        "course_code": "CRS283",
+        "course_name": "Bachelor of Arts in Public Administration",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS283",
+        "course_name": "Bachelor of Arts in Public Administration",
+        "value": "CMO No. 06, Series of 2010"
+      },
+      {
+        "course_code": "CRS284",
+        "course_name": "Bachelor of Radiologic Technology",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS284",
+        "course_name": "Bachelor of Radiologic Technology",
+        "value": "CMO No. 7, Series of 2018"
+      },
+      {
+        "course_code": "CRS285",
+        "course_name": "Bachelor of Science in Railway Engineering",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS285",
+        "course_name": "Bachelor of Science in Railway Engineering",
+        "value": "CMO No. 86, Series of 2017"
+      },
+      {
+        "course_code": "CRS286",
+        "course_name": "Bachelor of Science in Environmental Science major in Resource Management",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS286",
+        "course_name": "Bachelor of Science in Environmental Science major in Resource Management",
+        "value": "CMO No. 35, Series of 2005"
+      },
+      {
+        "course_code": "CRS287",
+        "course_name": "Bachelor of Science in Mechatronics Engineering major in Robotics",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS287",
+        "course_name": "Bachelor of Science in Mechatronics Engineering major in Robotics",
+        "value": "CMO No. 86, Series of 2017"
+      },
+      {
+        "course_code": "CRS288",
+        "course_name": "Bachelor of Science in Robotics Engineering",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS288",
+        "course_name": "Bachelor of Science in Robotics Engineering",
+        "value": "CMO No. 86, Series of 2017"
+      },
+      {
+        "course_code": "CRS289",
+        "course_name": "Bachelor in Science Education With Specialization in Physics",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS289",
+        "course_name": "Bachelor in Science Education With Specialization in Physics",
+        "value": "CMO No. 75, Series of 2017"
+      },
+      {
+        "course_code": "CRS290",
+        "course_name": "Bachelor of Science in Secondary Education major in English",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS290",
+        "course_name": "Bachelor of Science in Secondary Education major in English",
+        "value": "CMO No. 75, Series of 2017"
+      },
+      {
+        "course_code": "CRS291",
+        "course_name": "Bachelor of Arts - Bachelor of Secondary Education Major in English",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS291",
+        "course_name": "Bachelor of Arts - Bachelor of Secondary Education Major in English",
+        "value": "CMO No. 75, Series of 2017"
+      },
+      {
+        "course_code": "CRS292",
+        "course_name": "Bachelor in Secondary Education major in English",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS292",
+        "course_name": "Bachelor in Secondary Education major in English",
+        "value": "CMO No. 75, Series of 2017"
+      },
+      {
+        "course_code": "CRS293",
+        "course_name": "Bachelor of Industrial Security Management",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS293",
+        "course_name": "Bachelor of Industrial Security Management",
+        "value": "CMO No. 6, Series of 2018"
+      },
+      {
+        "course_code": "CRS294",
+        "course_name": "Bachelor in Sign Language Interpretation",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS294",
+        "course_name": "Bachelor in Sign Language Interpretation",
+        "value": "CMO No. 44, Series of 1997"
+      },
+      {
+        "course_code": "CRS295",
+        "course_name": "Bachelor of Arts major in Sign Language Interpreting",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS295",
+        "course_name": "Bachelor of Arts major in Sign Language Interpreting",
+        "value": "CMO No. 44, Series of 1997"
+      },
+      {
+        "course_code": "CRS296",
+        "course_name": "Bachelor of Education major in Social Studies",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS296",
+        "course_name": "Bachelor of Education major in Social Studies",
+        "value": "CMO No. 75, Series of 2017"
+      },
+      {
+        "course_code": "CRS297",
+        "course_name": "Bachelor of Arts in Social Work",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS297",
+        "course_name": "Bachelor of Arts in Social Work",
+        "value": "CMO No. 39, Series of 2017"
+      },
+      {
+        "course_code": "CRS298",
+        "course_name": "Bachelor of Science in Sociology",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS298",
+        "course_name": "Bachelor of Science in Sociology",
+        "value": "CMO No. 40, Series of 2017"
+      },
+      {
+        "course_code": "CRS299",
+        "course_name": "Bachelor of Science in Software Engineering",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS299",
+        "course_name": "Bachelor of Science in Software Engineering",
+        "value": "CMO No. 86, Series of 2017"
+      },
+      {
+        "course_code": "CRS300",
+        "course_name": "Bachelor of Science in Special Needs Education",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS300",
+        "course_name": "Bachelor of Science in Special Needs Education",
+        "value": "CMO No. 77, Series of 2017"
+      },
+      {
+        "course_code": "CRS301",
+        "course_name": "Bachelor of Secondary Education Major in Special Prog. Sped",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS301",
+        "course_name": "Bachelor of Secondary Education Major in Special Prog. Sped",
+        "value": "CMO No. 77, Series of 2017"
+      },
+      {
+        "course_code": "CRS302",
+        "course_name": "Bachelor of Sports Science",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS302",
+        "course_name": "Bachelor of Sports Science",
+        "value": "CMO No. 81, Series of 2017; Current Issues in BSESS"
+      },
+      {
+        "course_code": "CRS303",
+        "course_name": "Bachelor of Science in Exercise and Sports Sciences major in Fitness and Sports Coaching",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS303",
+        "course_name": "Bachelor of Science in Exercise and Sports Sciences major in Fitness and Sports Coaching",
+        "value": "CMO No. 81, Series of 2017; Current Issues in BSESS"
+      },
+      {
+        "course_code": "CRS304",
+        "course_name": "Bachelor in Sports Science",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS304",
+        "course_name": "Bachelor in Sports Science",
+        "value": "CMO No. 81, Series of 2017; Current Issues in BSESS"
+      },
+      {
+        "course_code": "CRS305",
+        "course_name": "Bachelor of Science in Civil Engineering major in Structural Engineering",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS305",
+        "course_name": "Bachelor of Science in Civil Engineering major in Structural Engineering",
+        "value": "CMO No. 92, Series of 2017"
+      },
+      {
+        "course_code": "CRS306",
+        "course_name": "Bachelor of Teaching in Home and Economics and Livelihood Education",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS306",
+        "course_name": "Bachelor of Teaching in Home and Economics and Livelihood Education",
+        "value": "CMO No. 78, Series of 2017"
+      },
+      {
+        "course_code": "CRS307",
+        "course_name": "Bachelor of Science in Technical Teacher Education major in Automotive",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS307",
+        "course_name": "Bachelor of Science in Technical Teacher Education major in Automotive",
+        "value": "CMO No. 79, Series of 2017"
+      },
+      {
+        "course_code": "CRS308",
+        "course_name": "Bachelor of Science in Technology and Livelihood Education",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS308",
+        "course_name": "Bachelor of Science in Technology and Livelihood Education",
+        "value": "CMO No. 78, Series of 2017"
+      },
+      {
+        "course_code": "CRS309",
+        "course_name": "Bachelor of Technology & Livelihood Technology major in Home Economics",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS309",
+        "course_name": "Bachelor of Technology & Livelihood Technology major in Home Economics",
+        "value": "CMO No. 78, Series of 2017"
+      },
+      {
+        "course_code": "CRS310",
+        "course_name": "Bachelor of Science in Technology Communication Management",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS310",
+        "course_name": "Bachelor of Science in Technology Communication Management",
+        "value": "CMO No. 44, Series of 1997"
+      },
+      {
+        "course_code": "CRS311",
+        "course_name": "Bachelor of Science in Technology Management major in Marketing",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS311",
+        "course_name": "Bachelor of Science in Technology Management major in Marketing",
+        "value": "CMO No. 17, Series of 2017"
+      },
+      {
+        "course_code": "CRS312",
+        "course_name": "Bachelor of Science in Theology",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS312",
+        "course_name": "Bachelor of Science in Theology",
+        "value": "CMO No. 13, Series of 2007"
+      },
+      {
+        "course_code": "CRS313",
+        "course_name": "Bachelor of Arts in Theology",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS313",
+        "course_name": "Bachelor of Arts in Theology",
+        "value": "CMO No. 13, Series of 2007"
+      },
+      {
+        "course_code": "CRS314",
+        "course_name": "Bachelor of Theology",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS314",
+        "course_name": "Bachelor of Theology",
+        "value": "CMO No. 13, Series of 2007"
+      },
+      {
+        "course_code": "CRS315",
+        "course_name": "Bachelor of Science in Civil Engineering major in Transportation",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS315",
+        "course_name": "Bachelor of Science in Civil Engineering major in Transportation",
+        "value": "CMO No. 92, Series of 2017"
+      },
+      {
+        "course_code": "CRS316",
+        "course_name": "Bachelor of Science in Civil Engineering major in Transportation Engineering",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS316",
+        "course_name": "Bachelor of Science in Civil Engineering major in Transportation Engineering",
+        "value": "CMO No. 92, Series of 2017"
+      },
+      {
+        "course_code": "CRS317",
+        "course_name": "Bachelor of Science in Civil Engineering major in Water Resource Engineering",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS317",
+        "course_name": "Bachelor of Science in Civil Engineering major in Water Resource Engineering",
+        "value": "CMO No. 92, Series of 2017"
+      },
+      {
+        "course_code": "CRS318",
+        "course_name": "Bachelor of Science in Civil Engineering major in Water Resources Engineering",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS318",
+        "course_name": "Bachelor of Science in Civil Engineering major in Water Resources Engineering",
+        "value": "CMO No. 92, Series of 2017"
+      },
+      {
+        "course_code": "CRS319",
+        "course_name": "Bachelor in Architectural Engineering Technology",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS319",
+        "course_name": "Bachelor in Architectural Engineering Technology",
+        "value": "CMO No. 86, Series of 2017"
+      },
+      {
+        "course_code": "CRS320",
+        "course_name": "Bachelor in Aviation Engineering Technology",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS320",
+        "course_name": "Bachelor in Aviation Engineering Technology",
+        "value": "CMO No. 86, Series of 2017"
+      },
+      {
+        "course_code": "CRS321",
+        "course_name": "Bachelor of Engineering Technology major in Avionics Maintenance Technology",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS321",
+        "course_name": "Bachelor of Engineering Technology major in Avionics Maintenance Technology",
+        "value": "CMO No. 86, Series of 2017"
+      },
+      {
+        "course_code": "CRS322",
+        "course_name": "Bachelor of Arts in Behavioral Sciences major in Organizational and Social Systems Development and Bachelor of Science in Advertising Management Bachelor of Science in Advertising Management",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS322",
+        "course_name": "Bachelor of Arts in Behavioral Sciences major in Organizational and Social Systems Development and Bachelor of Science in Advertising Management Bachelor of Science in Advertising Management",
+        "value": "CMO No. 44, Series of 1997"
+      },
+      {
+        "course_code": "CRS323",
+        "course_name": "Bachelor of Arts in Business Administration major in Public Administration",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS323",
+        "course_name": "Bachelor of Arts in Business Administration major in Public Administration",
+        "value": "CMO No. 17, Series of 2017"
+      },
+      {
+        "course_code": "CRS324",
+        "course_name": "Bachelor of Science in Business Management",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS324",
+        "course_name": "Bachelor of Science in Business Management",
+        "value": "CMO No. 17, Series of 2017"
+      },
+      {
+        "course_code": "CRS325",
+        "course_name": "Bachelor of Arts in Christian Education",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS325",
+        "course_name": "Bachelor of Arts in Christian Education",
+        "value": "CMO No. 52, Series of 2007; CMO No. 30, Series of 2004"
+      },
+      {
+        "course_code": "CRS326",
+        "course_name": "Bachelor of Technology major in Civil Engineering Technology",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS326",
+        "course_name": "Bachelor of Technology major in Civil Engineering Technology",
+        "value": "CMO No. 86, Series of 2017"
+      },
+      {
+        "course_code": "CRS327",
+        "course_name": "Bachelor of Technology major in Civil Engineering Technology/Construction Technology",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS327",
+        "course_name": "Bachelor of Technology major in Civil Engineering Technology/Construction Technology",
+        "value": "CMO No. 86, Series of 2017"
+      },
+      {
+        "course_code": "CRS328",
+        "course_name": "Bachelor of Industrial Technology major in Computer",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS328",
+        "course_name": "Bachelor of Industrial Technology major in Computer",
+        "value": "CMO No. 87, Series of 2017; CMO No. 25, Series of 2015"
+      },
+      {
+        "course_code": "CRS329",
+        "course_name": "Bachelor of Science in Industrial Technology major in Computer Technology",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS329",
+        "course_name": "Bachelor of Science in Industrial Technology major in Computer Technology",
+        "value": "CMO No. 25, Series of 2015"
+      },
+      {
+        "course_code": "CRS330",
+        "course_name": "Bachelor in Construction Engineering Technology and Management",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS330",
+        "course_name": "Bachelor in Construction Engineering Technology and Management",
+        "value": "CMO No. 86, Series of 2017"
+      },
+      {
+        "course_code": "CRS331",
+        "course_name": "Bachelor of Arts major in Criminology",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS331",
+        "course_name": "Bachelor of Arts major in Criminology",
+        "value": "CMO No. 5, Series of 2018"
+      },
+      {
+        "course_code": "CRS332",
+        "course_name": "Bachelor of Science in Esports major in Esports Management",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS332",
+        "course_name": "Bachelor of Science in Esports major in Esports Management",
+        "value": "CMO No. 23, Series of 2011"
+      },
+      {
+        "course_code": "CRS333",
+        "course_name": "Bachelor of Science in Industrial Education major in Automotive Technology",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS333",
+        "course_name": "Bachelor of Science in Industrial Education major in Automotive Technology",
+        "value": "CMO No. 52, Series of 2007; CMO No. 30, Series of 2004"
+      },
+      {
+        "course_code": "CRS334",
+        "course_name": "Bachelor of Arts in Religious Education",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS334",
+        "course_name": "Bachelor of Arts in Religious Education",
+        "value": "CMO No. 12, Series of 2007"
+      },
+      {
+        "course_code": "CRS335",
+        "course_name": "Bachelor of Education Studies",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS335",
+        "course_name": "Bachelor of Education Studies",
+        "value": "CMO No. 52, Series of 2007; CMO No. 30, Series of 2004"
+      },
+      {
+        "course_code": "CRS336",
+        "course_name": "Bachelor of Science in Industrial Technology major in Electrical",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS336",
+        "course_name": "Bachelor of Science in Industrial Technology major in Electrical",
+        "value": "CMO No. 88, Series of 2017"
+      },
+      {
+        "course_code": "CRS337",
+        "course_name": "Bachelor of Science in Industrial Technology major in Electronics",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS337",
+        "course_name": "Bachelor of Science in Industrial Technology major in Electronics",
+        "value": "CMO No. 101, Series of 2017"
+      },
+      {
+        "course_code": "CRS338",
+        "course_name": "Bachelor in Industrial Technology major in Electronics",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS338",
+        "course_name": "Bachelor in Industrial Technology major in Electronics",
+        "value": "CMO No. 101, Series of 2017"
+      },
+      {
+        "course_code": "CRS339",
+        "course_name": "Bachelor of Science in Industrial Technology major in Electronics and Communication Technology",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS339",
+        "course_name": "Bachelor of Science in Industrial Technology major in Electronics and Communication Technology",
+        "value": "CMO No. 44, Series of 1997; CMO No. 101, Series of 2017"
+      },
+      {
+        "course_code": "CRS340",
+        "course_name": "Bachelor of Science in Industrial Technology major in Electronics & Communications Technology",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS340",
+        "course_name": "Bachelor of Science in Industrial Technology major in Electronics & Communications Technology",
+        "value": "CMO No. 44, Series of 1997; CMO No. 101, Series of 2017"
+      },
+      {
+        "course_code": "CRS341",
+        "course_name": "Bachelor in Industrial Technology major in Electronics and Communications Technology",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS341",
+        "course_name": "Bachelor in Industrial Technology major in Electronics and Communications Technology",
+        "value": "CMO No. 44, Series of 1997; CMO No. 101, Series of 2017"
+      },
+      {
+        "course_code": "CRS342",
+        "course_name": "Bachelor of Science in Electronics and Computer Technology major in Communications Systems",
+        "value": "SOURCE BASIS:"
+      },
+      {
+        "course_code": "CRS342",
+        "course_name": "Bachelor of Science in Electronics and Computer Technology major in Communications Systems",
+        "value": "CMO No. 44, Series of 1997; CMO No. 101, Series of 2017; CMO No. 25, Series of 2015"
+      }
+    ]
+  }
+}

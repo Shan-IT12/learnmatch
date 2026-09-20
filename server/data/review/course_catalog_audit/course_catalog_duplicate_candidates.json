@@ -1,0 +1,3650 @@
+{
+  "generated_for": "read-only catalog audit",
+  "inventory": [
+    {
+      "course_code": "CRS001",
+      "canonical_course_name": "Bachelor of Management Accounting",
+      "abbreviation": "BSMA",
+      "cluster": "BUSINESS CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor management accounting"
+    },
+    {
+      "course_code": "CRS002",
+      "canonical_course_name": "Bachelor of Science in Accounting Technology",
+      "abbreviation": null,
+      "cluster": "BUSINESS CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor accounting technology"
+    },
+    {
+      "course_code": "CRS003",
+      "canonical_course_name": "Bachelor of Science in Aeronautical Engineering",
+      "abbreviation": null,
+      "cluster": "AVIATION & MARITIME CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor aeronautical engineering"
+    },
+    {
+      "course_code": "CRS004",
+      "canonical_course_name": "Bachelor of Science in Agri-Biosystems Engineering",
+      "abbreviation": null,
+      "cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor agri biosystems engineering"
+    },
+    {
+      "course_code": "CRS005",
+      "canonical_course_name": "Bachelor of Science in Agribusiness",
+      "abbreviation": null,
+      "cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor agribusiness"
+    },
+    {
+      "course_code": "CRS006",
+      "canonical_course_name": "Bachelor of Science in Agricultural and Biosystem Engineering",
+      "abbreviation": null,
+      "cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor agricultural and biosystem engineering"
+    },
+    {
+      "course_code": "CRS007",
+      "canonical_course_name": "Bachelor of Science in Agricultural Biosystem Engineering",
+      "abbreviation": null,
+      "cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor agricultural biosystem engineering"
+    },
+    {
+      "course_code": "CRS008",
+      "canonical_course_name": "Bachelor of Science in Agriculture",
+      "abbreviation": null,
+      "cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor agriculture"
+    },
+    {
+      "course_code": "CRS009",
+      "canonical_course_name": "Bachelor of Science in Agroforestry",
+      "abbreviation": null,
+      "cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor agroforestry"
+    },
+    {
+      "course_code": "CRS010",
+      "canonical_course_name": "Bachelor of Arts in Anthropology",
+      "abbreviation": null,
+      "cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor arts in anthropology"
+    },
+    {
+      "course_code": "CRS011",
+      "canonical_course_name": "Bachelor of Science in Applied Mathematics",
+      "abbreviation": null,
+      "cluster": "SCIENCE & MATHEMATICS CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor applied mathematics"
+    },
+    {
+      "course_code": "CRS012",
+      "canonical_course_name": "Bachelor of Science in Applied Physics",
+      "abbreviation": null,
+      "cluster": "SCIENCE & MATHEMATICS CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor applied physics"
+    },
+    {
+      "course_code": "CRS013",
+      "canonical_course_name": "Bachelor of Science in Biology",
+      "abbreviation": null,
+      "cluster": "SCIENCE & MATHEMATICS CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor biology"
+    },
+    {
+      "course_code": "CRS014",
+      "canonical_course_name": "Bachelor of Arts in Broadcasting",
+      "abbreviation": null,
+      "cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor arts in broadcasting"
+    },
+    {
+      "course_code": "CRS015",
+      "canonical_course_name": "Bachelor of Science in Business Administration major in Financial Management",
+      "abbreviation": null,
+      "cluster": "BUSINESS CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor business administration major financial management"
+    },
+    {
+      "course_code": "CRS016",
+      "canonical_course_name": "Bachelor of Science in Business Administration major in HRDM",
+      "abbreviation": "HRDM",
+      "cluster": "BUSINESS CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor business administration major hrdm"
+    },
+    {
+      "course_code": "CRS017",
+      "canonical_course_name": "Bachelor of Science in Ceramics Engineering",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor ceramics engineering"
+    },
+    {
+      "course_code": "CRS018",
+      "canonical_course_name": "Bachelor of Science in Chemical Engineering",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor chemical engineering"
+    },
+    {
+      "course_code": "CRS019",
+      "canonical_course_name": "Bachelor of Science in Chemistry",
+      "abbreviation": null,
+      "cluster": "SCIENCE & MATHEMATICS CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor chemistry"
+    },
+    {
+      "course_code": "CRS020",
+      "canonical_course_name": "Bachelor of Science in Civil Engineering Major in Civil",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor civil engineering major civil"
+    },
+    {
+      "course_code": "CRS021",
+      "canonical_course_name": "Bachelor of Science in Civil Engineering",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor civil engineering"
+    },
+    {
+      "course_code": "CRS022",
+      "canonical_course_name": "Bachelor of Science in Development Communication",
+      "abbreviation": null,
+      "cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor development communication"
+    },
+    {
+      "course_code": "CRS023",
+      "canonical_course_name": "Bachelor of Arts in Communication",
+      "abbreviation": null,
+      "cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor arts in communication"
+    },
+    {
+      "course_code": "CRS024",
+      "canonical_course_name": "Bachelor of Science in Computer Engineering",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor computer engineering"
+    },
+    {
+      "course_code": "CRS025",
+      "canonical_course_name": "Bachelor in Computer Engineering",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor computer engineering"
+    },
+    {
+      "course_code": "CRS026",
+      "canonical_course_name": "Bachelor of Computer Science",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor computer science"
+    },
+    {
+      "course_code": "CRS027",
+      "canonical_course_name": "Bachelor of Science in Criminology",
+      "abbreviation": null,
+      "cluster": "CRIMINOLOGY CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor criminology"
+    },
+    {
+      "course_code": "CRS028",
+      "canonical_course_name": "Bachelor of Customs Administration",
+      "abbreviation": null,
+      "cluster": "LEGAL & PUBLIC SERVICE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor customs administration"
+    },
+    {
+      "course_code": "CRS029",
+      "canonical_course_name": "Bachelor of Early Childhood Education",
+      "abbreviation": null,
+      "cluster": "EDUCATION CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor early childhood education"
+    },
+    {
+      "course_code": "CRS030",
+      "canonical_course_name": "Bachelor of Science in Economics",
+      "abbreviation": null,
+      "cluster": "BUSINESS CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor economics"
+    },
+    {
+      "course_code": "CRS031",
+      "canonical_course_name": "Bachelor of Arts in Economics",
+      "abbreviation": null,
+      "cluster": "BUSINESS CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor arts in economics"
+    },
+    {
+      "course_code": "CRS032",
+      "canonical_course_name": "Bachelor of Science in Electrical Engineering",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor electrical engineering"
+    },
+    {
+      "course_code": "CRS033",
+      "canonical_course_name": "Bachelor of Science in Electronic Engineering major in Electronic Engineering",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor electronic engineering major electronic engineering"
+    },
+    {
+      "course_code": "CRS034",
+      "canonical_course_name": "Bachelor of Science in Electronics Engineering",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor electronics engineering"
+    },
+    {
+      "course_code": "CRS035",
+      "canonical_course_name": "Bachelor of Science in Elementary Education",
+      "abbreviation": null,
+      "cluster": "EDUCATION CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor elementary education"
+    },
+    {
+      "course_code": "CRS036",
+      "canonical_course_name": "Bachelor in Elementary Education",
+      "abbreviation": null,
+      "cluster": "EDUCATION CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor elementary education"
+    },
+    {
+      "course_code": "CRS037",
+      "canonical_course_name": "Bachelor of Arts in English Language",
+      "abbreviation": "BAEL",
+      "cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor arts in english language"
+    },
+    {
+      "course_code": "CRS038",
+      "canonical_course_name": "Bachelor of Science in Entertainment and Multimedia Computing",
+      "abbreviation": null,
+      "cluster": "ARTS & MULTIMEDIA CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor entertainment and multimedia computing"
+    },
+    {
+      "course_code": "CRS039",
+      "canonical_course_name": "Bachelor of Multimedia Arts",
+      "abbreviation": "BMMA",
+      "cluster": "ARTS & MULTIMEDIA CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor multimedia arts"
+    },
+    {
+      "course_code": "CRS040",
+      "canonical_course_name": "Bachelor of Science in Entrepreneurship",
+      "abbreviation": null,
+      "cluster": "BUSINESS CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor entrepreneurship"
+    },
+    {
+      "course_code": "CRS041",
+      "canonical_course_name": "Bachelor of Science in Environmental Planning",
+      "abbreviation": "BSEP",
+      "cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor environmental planning"
+    },
+    {
+      "course_code": "CRS042",
+      "canonical_course_name": "Bachelor of Science in Environmental Science",
+      "abbreviation": null,
+      "cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor environmental science"
+    },
+    {
+      "course_code": "CRS043",
+      "canonical_course_name": "Bachelor of Science in Family Economics major in Foods and Food Management",
+      "abbreviation": null,
+      "cluster": "BUSINESS CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor family economics major foods and food management"
+    },
+    {
+      "course_code": "CRS044",
+      "canonical_course_name": "Bachelor of Science in Agricultural Economics major in Farm Management and Production Economics",
+      "abbreviation": null,
+      "cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor agricultural economics major farm management and production economics"
+    },
+    {
+      "course_code": "CRS045",
+      "canonical_course_name": "Bachelor of Arts major in Fashion Design and Merchandising",
+      "abbreviation": null,
+      "cluster": "ARTS & MULTIMEDIA CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor arts major fashion design and merchandising"
+    },
+    {
+      "course_code": "CRS046",
+      "canonical_course_name": "Bachelor of Fine Arts",
+      "abbreviation": "BFA",
+      "cluster": "ARTS & MULTIMEDIA CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor fine arts"
+    },
+    {
+      "course_code": "CRS047",
+      "canonical_course_name": "Bachelor of Science in Fisheries",
+      "abbreviation": "BSF",
+      "cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor fisheries"
+    },
+    {
+      "course_code": "CRS048",
+      "canonical_course_name": "Bachelor of Science in Food Technology",
+      "abbreviation": "BSFT",
+      "cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor food technology"
+    },
+    {
+      "course_code": "CRS049",
+      "canonical_course_name": "Bachelor of Science in Forensic Science",
+      "abbreviation": null,
+      "cluster": "CRIMINOLOGY CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor forensic science"
+    },
+    {
+      "course_code": "CRS050",
+      "canonical_course_name": "Bachelor of Science in Forestry",
+      "abbreviation": null,
+      "cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor forestry"
+    },
+    {
+      "course_code": "CRS051",
+      "canonical_course_name": "Bachelor of Science in Geology",
+      "abbreviation": null,
+      "cluster": "SCIENCE & MATHEMATICS CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor geology"
+    },
+    {
+      "course_code": "CRS052",
+      "canonical_course_name": "Bachelor of Arts in History",
+      "abbreviation": null,
+      "cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor arts in history"
+    },
+    {
+      "course_code": "CRS053",
+      "canonical_course_name": "Bachelor of Science in Hospitality Management",
+      "abbreviation": "BSHM",
+      "cluster": "HOSPITALITY & TOURISM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor hospitality management"
+    },
+    {
+      "course_code": "CRS054",
+      "canonical_course_name": "Bachelor in Human Services (BHumServ)",
+      "abbreviation": null,
+      "cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor human services"
+    },
+    {
+      "course_code": "CRS055",
+      "canonical_course_name": "Bachelor of Science in Industrial Design (BSID)",
+      "abbreviation": "BSID",
+      "cluster": "ARTS & MULTIMEDIA CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor industrial design"
+    },
+    {
+      "course_code": "CRS056",
+      "canonical_course_name": "Bachelor of Industrial Engineering major in Industrial Engineering",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor industrial engineering major industrial engineering"
+    },
+    {
+      "course_code": "CRS057",
+      "canonical_course_name": "Bachelor of Science in Industrial Engineering Minor in Service Management",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor industrial engineering minor in service management"
+    },
+    {
+      "course_code": "CRS058",
+      "canonical_course_name": "Bachelor of Science in Industrial Engineering with Specialization in Service Management",
+      "abbreviation": "BSIE",
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor industrial engineering major service management"
+    },
+    {
+      "course_code": "CRS059",
+      "canonical_course_name": "Bachelor of Science in Industrial Management Engineering Minor in Information Technology",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor industrial management engineering minor in information technology"
+    },
+    {
+      "course_code": "CRS060",
+      "canonical_course_name": "Bachelor of Science in Industrial Management Engineering Minor in Service Management",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor industrial management engineering minor in service management"
+    },
+    {
+      "course_code": "CRS061",
+      "canonical_course_name": "Bachelor of Industrial Technology",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor industrial technology"
+    },
+    {
+      "course_code": "CRS062",
+      "canonical_course_name": "Bachelor of Science in Information Technology",
+      "abbreviation": "BSIT",
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor information technology"
+    },
+    {
+      "course_code": "CRS063",
+      "canonical_course_name": "Bachelor of Science in Interior Design",
+      "abbreviation": null,
+      "cluster": "ARTS & MULTIMEDIA CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor interior design"
+    },
+    {
+      "course_code": "CRS064",
+      "canonical_course_name": "Bachelor of Science in Internal Auditing",
+      "abbreviation": "BSIA",
+      "cluster": "BUSINESS CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor internal auditing"
+    },
+    {
+      "course_code": "CRS065",
+      "canonical_course_name": "Bachelor of Arts in Islamic Studies major in Political Economy",
+      "abbreviation": null,
+      "cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor arts in islamic studies major political economy"
+    },
+    {
+      "course_code": "CRS066",
+      "canonical_course_name": "Bachelor of Arts in Journalism",
+      "abbreviation": null,
+      "cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor arts in journalism"
+    },
+    {
+      "course_code": "CRS067",
+      "canonical_course_name": "Bachelor of Landscape Architecture",
+      "abbreviation": "BLA",
+      "cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor landscape architecture"
+    },
+    {
+      "course_code": "CRS068",
+      "canonical_course_name": "Bachelor of Library and Information Science",
+      "abbreviation": "BLIS",
+      "cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor library and information science"
+    },
+    {
+      "course_code": "CRS069",
+      "canonical_course_name": "Bachelor of Arts in Literature",
+      "abbreviation": null,
+      "cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor arts in literature"
+    },
+    {
+      "course_code": "CRS070",
+      "canonical_course_name": "Bachelor of Science in Manufacturing Engineering",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor manufacturing engineering"
+    },
+    {
+      "course_code": "CRS071",
+      "canonical_course_name": "Bachelor of Science in Marine Biology",
+      "abbreviation": null,
+      "cluster": "SCIENCE & MATHEMATICS CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor marine biology"
+    },
+    {
+      "course_code": "CRS072",
+      "canonical_course_name": "Bachelor of Science in Marine Transportation (BSMT)",
+      "abbreviation": "BSMT",
+      "cluster": "AVIATION & MARITIME CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor marine transportation"
+    },
+    {
+      "course_code": "CRS073",
+      "canonical_course_name": "Bachelor of Science in Materials Engineering (BS MatE)",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor materials engineering"
+    },
+    {
+      "course_code": "CRS074",
+      "canonical_course_name": "Bachelor of Science in Mathematics (BS Math)",
+      "abbreviation": null,
+      "cluster": "SCIENCE & MATHEMATICS CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor mathematics"
+    },
+    {
+      "course_code": "CRS075",
+      "canonical_course_name": "Bachelor of Science in Mechanical Engineering (BSME)",
+      "abbreviation": "BSME",
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor mechanical engineering"
+    },
+    {
+      "course_code": "CRS076",
+      "canonical_course_name": "Bachelor of Science in Medical Technology (BSMT) / Bachelor of Science in Medical Laboratory Science (BSMLS)",
+      "abbreviation": "BSMT",
+      "cluster": "HEALTHCARE SCIENCE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor medical technology bachelor medical laboratory science"
+    },
+    {
+      "course_code": "CRS077",
+      "canonical_course_name": "Bachelor of Science in Medical Laboratory Science (BSMLS) / Bachelor of Science in Medical Technology (BSMT)",
+      "abbreviation": "BSMLS",
+      "cluster": "HEALTHCARE SCIENCE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor medical laboratory science bachelor medical technology"
+    },
+    {
+      "course_code": "CRS078",
+      "canonical_course_name": "Bachelor of Science in Metallurgical Engineering (BSMetE)",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor metallurgical engineering"
+    },
+    {
+      "course_code": "CRS079",
+      "canonical_course_name": "Bachelor of Science in Meteorology (BS Met)",
+      "abbreviation": null,
+      "cluster": "SCIENCE & MATHEMATICS CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor meteorology"
+    },
+    {
+      "course_code": "CRS080",
+      "canonical_course_name": "Bachelor of Science in Midwifery (BSM)",
+      "abbreviation": "BSM",
+      "cluster": "HEALTHCARE SCIENCE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor midwifery"
+    },
+    {
+      "course_code": "CRS081",
+      "canonical_course_name": "Bachelor of Science in Mining Engineering (BSEM)",
+      "abbreviation": "BSEM",
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor mining engineering"
+    },
+    {
+      "course_code": "CRS082",
+      "canonical_course_name": "Bachelor of Science in Naval Architecture and Marine Engineering (BSNAME)",
+      "abbreviation": "BSNAME",
+      "cluster": "AVIATION & MARITIME CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor naval architecture and marine engineering"
+    },
+    {
+      "course_code": "CRS083",
+      "canonical_course_name": "Bachelor of Science in Nursing (BSN)",
+      "abbreviation": "BSN",
+      "cluster": "HEALTHCARE SCIENCE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor nursing"
+    },
+    {
+      "course_code": "CRS084",
+      "canonical_course_name": "Bachelor of Science in Nutrition and Dietetics (BSND)",
+      "abbreviation": "BSND",
+      "cluster": "HEALTHCARE SCIENCE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor nutrition and dietetics"
+    },
+    {
+      "course_code": "CRS085",
+      "canonical_course_name": "Bachelor of Science in Occupational Therapy (BSOT)",
+      "abbreviation": "BSOT",
+      "cluster": "HEALTHCARE SCIENCE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor occupational therapy"
+    },
+    {
+      "course_code": "CRS086",
+      "canonical_course_name": "Bachelor of Science in Office Administration (BSOA)",
+      "abbreviation": "BSOA",
+      "cluster": "BUSINESS CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor office administration"
+    },
+    {
+      "course_code": "CRS087",
+      "canonical_course_name": "Bachelor of Performing Arts (BPeA)",
+      "abbreviation": null,
+      "cluster": "ARTS & MULTIMEDIA CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor performing arts"
+    },
+    {
+      "course_code": "CRS088",
+      "canonical_course_name": "Bachelor of Science in Pharmacy (BS Pharmacy)",
+      "abbreviation": null,
+      "cluster": "HEALTHCARE SCIENCE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor pharmacy"
+    },
+    {
+      "course_code": "CRS089",
+      "canonical_course_name": "Bachelor of Arts in Philosophy (AB Philosophy)",
+      "abbreviation": null,
+      "cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor arts in philosophy"
+    },
+    {
+      "course_code": "CRS090",
+      "canonical_course_name": "Bachelor of Physical Education (BPEd)",
+      "abbreviation": null,
+      "cluster": "SPORTS & PHYSICAL EDUCATION CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor physical education"
+    },
+    {
+      "course_code": "CRS091",
+      "canonical_course_name": "Bachelor of Science in Physical Therapy (BSPT)",
+      "abbreviation": "BSPT",
+      "cluster": "HEALTHCARE SCIENCE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor physical therapy"
+    },
+    {
+      "course_code": "CRS092",
+      "canonical_course_name": "Bachelor of Science in Physics (BS Physics)",
+      "abbreviation": null,
+      "cluster": "SCIENCE & MATHEMATICS CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor physics"
+    },
+    {
+      "course_code": "CRS093",
+      "canonical_course_name": "Bachelor of Arts in Political Science (BA Political Science)",
+      "abbreviation": null,
+      "cluster": "LEGAL & PUBLIC SERVICE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor arts in political science"
+    },
+    {
+      "course_code": "CRS094",
+      "canonical_course_name": "Bachelor of Science in Psychology (BS Psychology)",
+      "abbreviation": null,
+      "cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor psychology"
+    },
+    {
+      "course_code": "CRS095",
+      "canonical_course_name": "Bachelor of Arts in Psychology (BA Psychology)",
+      "abbreviation": null,
+      "cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor arts in psychology"
+    },
+    {
+      "course_code": "CRS096",
+      "canonical_course_name": "Bachelor of Public Administration (BPA)",
+      "abbreviation": "BPA",
+      "cluster": "LEGAL & PUBLIC SERVICE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor public administration"
+    },
+    {
+      "course_code": "CRS097",
+      "canonical_course_name": "Bachelor of Science in Public Health (BS Public Health)",
+      "abbreviation": null,
+      "cluster": "HEALTHCARE SCIENCE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor public health"
+    },
+    {
+      "course_code": "CRS098",
+      "canonical_course_name": "Bachelor of Science in Radiologic Technology (BSRT)",
+      "abbreviation": "BSRT",
+      "cluster": "HEALTHCARE SCIENCE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor radiologic technology"
+    },
+    {
+      "course_code": "CRS099",
+      "canonical_course_name": "Bachelor of Science in Real Estate Management (BS REM)",
+      "abbreviation": null,
+      "cluster": "BUSINESS CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor real estate management"
+    },
+    {
+      "course_code": "CRS100",
+      "canonical_course_name": "Bachelor of Science in Respiratory Therapy (BSRT)",
+      "abbreviation": "BSRT",
+      "cluster": "HEALTHCARE SCIENCE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor respiratory therapy"
+    },
+    {
+      "course_code": "CRS101",
+      "canonical_course_name": "Bachelor of Science in Sanitary Engineering (BSSE)",
+      "abbreviation": "BSSE",
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor sanitary engineering"
+    },
+    {
+      "course_code": "CRS102",
+      "canonical_course_name": "Bachelor of Secondary Education major in English (BSEd English)",
+      "abbreviation": "NCBTS",
+      "cluster": "EDUCATION CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor secondary education major english"
+    },
+    {
+      "course_code": "CRS103",
+      "canonical_course_name": "Bachelor of Science in Industrial Security Management (BSISM)",
+      "abbreviation": "BSISM",
+      "cluster": "CRIMINOLOGY CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor industrial security management"
+    },
+    {
+      "course_code": "CRS104",
+      "canonical_course_name": "Bachelor of Arts in Social Science (AB Social Science)",
+      "abbreviation": null,
+      "cluster": "LEGAL & PUBLIC SERVICE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor arts in social science"
+    },
+    {
+      "course_code": "CRS105",
+      "canonical_course_name": "Bachelor of Science in Social Work (BSSW)",
+      "abbreviation": "BSSW",
+      "cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor social work"
+    },
+    {
+      "course_code": "CRS106",
+      "canonical_course_name": "Bachelor of Arts in Sociology (BA Sociology)",
+      "abbreviation": null,
+      "cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor arts in sociology"
+    },
+    {
+      "course_code": "CRS107",
+      "canonical_course_name": "Bachelor of Special Needs Education (BSNEd)",
+      "abbreviation": "NCBTS",
+      "cluster": "EDUCATION CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor special needs education"
+    },
+    {
+      "course_code": "CRS108",
+      "canonical_course_name": "Bachelor of Science in Speech-Language Pathology (BSSLP)",
+      "abbreviation": "BSSLP",
+      "cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor speech language pathology"
+    },
+    {
+      "course_code": "CRS109",
+      "canonical_course_name": "Bachelor of Science in Exercise and Sports Sciences (BSESS)",
+      "abbreviation": "BSESS",
+      "cluster": "SPORTS & PHYSICAL EDUCATION CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor exercise and sports sciences"
+    },
+    {
+      "course_code": "CRS110",
+      "canonical_course_name": "Bachelor of Science in Statistics (BS Stat)",
+      "abbreviation": null,
+      "cluster": "SCIENCE & MATHEMATICS CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor statistics"
+    },
+    {
+      "course_code": "CRS111",
+      "canonical_course_name": "Bachelor of Technical-Vocational Teacher Education major in Food and Service Management (BTVTEd - Food and Service Management)",
+      "abbreviation": "NCBTS",
+      "cluster": "EDUCATION CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor technical vocational teacher education major food and service management"
+    },
+    {
+      "course_code": "CRS112",
+      "canonical_course_name": "Bachelor of Technology and Livelihood Education major in Home Economics (BTLEd - Home Economics)",
+      "abbreviation": "NCBTS",
+      "cluster": "EDUCATION CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor technology and livelihood education major home economics"
+    },
+    {
+      "course_code": "CRS113",
+      "canonical_course_name": "Bachelor of Science in Tourism Management",
+      "abbreviation": null,
+      "cluster": "HOSPITALITY & TOURISM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor tourism management"
+    },
+    {
+      "course_code": "CRS114",
+      "canonical_course_name": "Bs in Accounting Information System (Information Technology Related)",
+      "abbreviation": "BSAIS",
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bs in accounting information system"
+    },
+    {
+      "course_code": "CRS115",
+      "canonical_course_name": "Bachelor of Science in Aerospace Engineering",
+      "abbreviation": null,
+      "cluster": "AVIATION & MARITIME CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor aerospace engineering"
+    },
+    {
+      "course_code": "CRS116",
+      "canonical_course_name": "Bachelor of Science in Agriculture major in Agri-Business",
+      "abbreviation": "BSAB",
+      "cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor agriculture major agri business"
+    },
+    {
+      "course_code": "CRS117",
+      "canonical_course_name": "Bachelor of Science in Agribusiness Economics",
+      "abbreviation": null,
+      "cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor agribusiness economics"
+    },
+    {
+      "course_code": "CRS118",
+      "canonical_course_name": "Bachelor of Science in Agriculture major in Agricultural Economics",
+      "abbreviation": null,
+      "cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor agriculture major agricultural economics"
+    },
+    {
+      "course_code": "CRS119",
+      "canonical_course_name": "Bachelor of Science in Agriculture major in Agricultural Economics and Marketing",
+      "abbreviation": null,
+      "cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor agriculture major agricultural economics and marketing"
+    },
+    {
+      "course_code": "CRS120",
+      "canonical_course_name": "Bachelor of Science in Agriculture major in Agricultural Extension and Communication",
+      "abbreviation": null,
+      "cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor agriculture major agricultural extension and communication"
+    },
+    {
+      "course_code": "CRS121",
+      "canonical_course_name": "Bachelor of Agricultural Technology",
+      "abbreviation": "BAT",
+      "cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor agricultural technology"
+    },
+    {
+      "course_code": "CRS122",
+      "canonical_course_name": "Bachelor of Science in Agricultural Engineering",
+      "abbreviation": "BSABE",
+      "cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor agricultural engineering"
+    },
+    {
+      "course_code": "CRS123",
+      "canonical_course_name": "Bachelor of Industrial Technology major in Apparel and Fashion Design",
+      "abbreviation": null,
+      "cluster": "ARTS & MULTIMEDIA CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor industrial technology major apparel and fashion design"
+    },
+    {
+      "course_code": "CRS124",
+      "canonical_course_name": "Bachelor of Applied Arts major in Visual Design",
+      "abbreviation": null,
+      "cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor applied arts major visual design"
+    },
+    {
+      "course_code": "CRS125",
+      "canonical_course_name": "Bachelor of Science in Architecture",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor architecture"
+    },
+    {
+      "course_code": "CRS126",
+      "canonical_course_name": "Bachelor of Science in Biological Engineering",
+      "abbreviation": "BSABE",
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor biological engineering"
+    },
+    {
+      "course_code": "CRS127",
+      "canonical_course_name": "Bachelor of Arts major in Biology",
+      "abbreviation": null,
+      "cluster": "SCIENCE & MATHEMATICS CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor arts major biology"
+    },
+    {
+      "course_code": "CRS128",
+      "canonical_course_name": "Bachelor of Science in Business Computer Applications",
+      "abbreviation": null,
+      "cluster": "BUSINESS CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor business computer applications"
+    },
+    {
+      "course_code": "CRS129",
+      "canonical_course_name": "Bachelor of Engineering Technology major in Chemical Engineering Technology",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor engineering technology major chemical engineering technology"
+    },
+    {
+      "course_code": "CRS130",
+      "canonical_course_name": "Bachelor of Arts in Chemistry",
+      "abbreviation": null,
+      "cluster": "SCIENCE & MATHEMATICS CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor arts in chemistry"
+    },
+    {
+      "course_code": "CRS131",
+      "canonical_course_name": "Bachelor of Science in Christian Education major in Values Education",
+      "abbreviation": null,
+      "cluster": "EDUCATION CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor christian education major values education"
+    },
+    {
+      "course_code": "CRS132",
+      "canonical_course_name": "Bachelor of Secondary Education major in Values Education With Emphasis in Christian Education",
+      "abbreviation": null,
+      "cluster": "EDUCATION CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor secondary education major values education with emphasis in christian education"
+    },
+    {
+      "course_code": "CRS133",
+      "canonical_course_name": "Bachelor of Engineering Technology major in Civil Engineering Technology",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor engineering technology major civil engineering technology"
+    },
+    {
+      "course_code": "CRS134",
+      "canonical_course_name": "Bachelor of Science in Environmental Science major in Coastal Resource Management",
+      "abbreviation": null,
+      "cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor environmental science major coastal resource management"
+    },
+    {
+      "course_code": "CRS135",
+      "canonical_course_name": "Bachelor of Engineering Technology Major in Computer Engineering Technology",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor engineering technology major computer engineering technology"
+    },
+    {
+      "course_code": "CRS136",
+      "canonical_course_name": "Bachelor of Science in Construction Engineering",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor construction engineering"
+    },
+    {
+      "course_code": "CRS137",
+      "canonical_course_name": "Bachelor of Science in Construction Engineering and Management",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor construction engineering and management"
+    },
+    {
+      "course_code": "CRS138",
+      "canonical_course_name": "Bachelor of Engineering Technology Major in Construction Engineering Technology",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor engineering technology major construction engineering technology"
+    },
+    {
+      "course_code": "CRS139",
+      "canonical_course_name": "Bachelor of Culture and Arts Education",
+      "abbreviation": null,
+      "cluster": "EDUCATION CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor culture and arts education"
+    },
+    {
+      "course_code": "CRS140",
+      "canonical_course_name": "Bachelor of Design",
+      "abbreviation": null,
+      "cluster": "ARTS & MULTIMEDIA CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor design"
+    },
+    {
+      "course_code": "CRS141",
+      "canonical_course_name": "Bachelor of Elementary Education major in Pre-School",
+      "abbreviation": null,
+      "cluster": "EDUCATION CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor elementary education major pre school"
+    },
+    {
+      "course_code": "CRS142",
+      "canonical_course_name": "Bachelor of Science in Environmental Science major in Ecosystem Management",
+      "abbreviation": null,
+      "cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor environmental science major ecosystem management"
+    },
+    {
+      "course_code": "CRS143",
+      "canonical_course_name": "Bachelor of Science in Electronics and Communications Engineering",
+      "abbreviation": "BSECE",
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor electronics and communications engineering"
+    },
+    {
+      "course_code": "CRS144",
+      "canonical_course_name": "Bachelor of Electronics and Communication Engineering major in Electronics and Communication Engineering",
+      "abbreviation": "BSECE",
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor electronics and communication engineering major electronics and communication engineering"
+    },
+    {
+      "course_code": "CRS145",
+      "canonical_course_name": "Bachelor of Engineering Technology major in Electronics Engineering Technology",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor engineering technology major electronics engineering technology"
+    },
+    {
+      "course_code": "CRS146",
+      "canonical_course_name": "Bachelor of Science in Engineering Management",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor engineering management"
+    },
+    {
+      "course_code": "CRS147",
+      "canonical_course_name": "Bachelor of Science in Engineering Technology Management major in Engineering Technology Management",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor engineering technology management major engineering technology management"
+    },
+    {
+      "course_code": "CRS148",
+      "canonical_course_name": "Bachelor of Science in English Language Arts",
+      "abbreviation": "BAEL",
+      "cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor english language arts"
+    },
+    {
+      "course_code": "CRS149",
+      "canonical_course_name": "Bachelor in Arts in English",
+      "abbreviation": "BAEL",
+      "cluster": "EDUCATION CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor arts in english"
+    },
+    {
+      "course_code": "CRS150",
+      "canonical_course_name": "Bachelor of Science in Education major in English",
+      "abbreviation": null,
+      "cluster": "EDUCATION CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor education major english"
+    },
+    {
+      "course_code": "CRS151",
+      "canonical_course_name": "Bachelor in English Education major in English",
+      "abbreviation": null,
+      "cluster": "EDUCATION CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor english education major english"
+    },
+    {
+      "course_code": "CRS152",
+      "canonical_course_name": "Bachelor of Entrepreneurship major in Apparel and Fashion Enterprise",
+      "abbreviation": null,
+      "cluster": "ARTS & MULTIMEDIA CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor entrepreneurship major apparel and fashion enterprise"
+    },
+    {
+      "course_code": "CRS153",
+      "canonical_course_name": "Bachelor of Science in Environmental and Sanitary Engineering",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor environmental and sanitary engineering"
+    },
+    {
+      "course_code": "CRS154",
+      "canonical_course_name": "Bachelor of Engineering Technology major in Environmental and Sanitary Engineering",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor engineering technology major environmental and sanitary engineering"
+    },
+    {
+      "course_code": "CRS155",
+      "canonical_course_name": "Bachelor of Science in Environmental Science major in Environmental Heritage Studies",
+      "abbreviation": null,
+      "cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor environmental science major environmental heritage studies"
+    },
+    {
+      "course_code": "CRS156",
+      "canonical_course_name": "Bachelor of Science in Environmental Science major in Environmental Planning Management",
+      "abbreviation": null,
+      "cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor environmental science major environmental planning management"
+    },
+    {
+      "course_code": "CRS157",
+      "canonical_course_name": "Bachelor of Science in Sanitary & Environmental Engineering",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor sanitary and environmental engineering"
+    },
+    {
+      "course_code": "CRS158",
+      "canonical_course_name": "Bachelor of Arts major in Environmental Science",
+      "abbreviation": null,
+      "cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor arts major environmental science"
+    },
+    {
+      "course_code": "CRS159",
+      "canonical_course_name": "Bachelor of Science in Exercise and Sports Science",
+      "abbreviation": "BSESS",
+      "cluster": "SPORTS & PHYSICAL EDUCATION CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor exercise and sports science"
+    },
+    {
+      "course_code": "CRS160",
+      "canonical_course_name": "Bachelor of Science in Agriculture major in Extension",
+      "abbreviation": null,
+      "cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor agriculture major extension"
+    },
+    {
+      "course_code": "CRS161",
+      "canonical_course_name": "Bachelor of Science in Agriculture major in Extension Education",
+      "abbreviation": null,
+      "cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor agriculture major extension education"
+    },
+    {
+      "course_code": "CRS162",
+      "canonical_course_name": "Bachelor in Fashion Design and Technology",
+      "abbreviation": null,
+      "cluster": "ARTS & MULTIMEDIA CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor fashion design and technology"
+    },
+    {
+      "course_code": "CRS163",
+      "canonical_course_name": "Bachelor of Science in Education major in Filipino",
+      "abbreviation": null,
+      "cluster": "EDUCATION CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor education major filipino"
+    },
+    {
+      "course_code": "CRS164",
+      "canonical_course_name": "Bachelor in Filipino Education major in Filipino",
+      "abbreviation": null,
+      "cluster": "EDUCATION CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor filipino education major filipino"
+    },
+    {
+      "course_code": "CRS165",
+      "canonical_course_name": "Bachelor of Science in Fine Arts",
+      "abbreviation": "BFA",
+      "cluster": "ARTS & MULTIMEDIA CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor fine arts"
+    },
+    {
+      "course_code": "CRS166",
+      "canonical_course_name": "Bachelor of Arts in Fine Arts major in Fine Arts",
+      "abbreviation": "BFA",
+      "cluster": "ARTS & MULTIMEDIA CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor arts in fine arts major fine arts"
+    },
+    {
+      "course_code": "CRS167",
+      "canonical_course_name": "Bachelor of Fisheries and Aquatic Sciences major in General Fisheries",
+      "abbreviation": "BSF",
+      "cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor fisheries and aquatic sciences major general fisheries"
+    },
+    {
+      "course_code": "CRS168",
+      "canonical_course_name": "Bachelor of Science in Food Science",
+      "abbreviation": "BSFT",
+      "cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor food science"
+    },
+    {
+      "course_code": "CRS169",
+      "canonical_course_name": "Bachelor of Science in Food Science and Technology",
+      "abbreviation": "BSFT",
+      "cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor food science and technology"
+    },
+    {
+      "course_code": "CRS170",
+      "canonical_course_name": "Bachelor of Science in Industrial Technology major in Garments Fashion and Design",
+      "abbreviation": null,
+      "cluster": "ARTS & MULTIMEDIA CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor industrial technology major garments fashion and design"
+    },
+    {
+      "course_code": "CRS171",
+      "canonical_course_name": "Bachelor of Science in Industrial Technology major in Garments, Fashion and Design Technology",
+      "abbreviation": null,
+      "cluster": "ARTS & MULTIMEDIA CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor industrial technology major garments fashion and design technology"
+    },
+    {
+      "course_code": "CRS172",
+      "canonical_course_name": "Bachelor of Industrial Technology major in Garments, Fashions and Designs",
+      "abbreviation": null,
+      "cluster": "ARTS & MULTIMEDIA CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor industrial technology major garments fashions and designs"
+    },
+    {
+      "course_code": "CRS173",
+      "canonical_course_name": "Bachelor of Science in Geiodetic Engineering",
+      "abbreviation": "GNSS",
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor geiodetic engineering"
+    },
+    {
+      "course_code": "CRS174",
+      "canonical_course_name": "Bachelor of Science in Geodetic Engineering",
+      "abbreviation": "BSGE",
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor geodetic engineering"
+    },
+    {
+      "course_code": "CRS175",
+      "canonical_course_name": "Bachelor of Science in Civil Engineering major in Geotechnical Engineering",
+      "abbreviation": "BSCE",
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor civil engineering major geotechnical engineering"
+    },
+    {
+      "course_code": "CRS176",
+      "canonical_course_name": "Bachelor of Science in Industrial Engineering",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor industrial engineering"
+    },
+    {
+      "course_code": "CRS177",
+      "canonical_course_name": "Bachelor of Arts in Literary and Cultural Studies",
+      "abbreviation": null,
+      "cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor arts in literary and cultural studies"
+    },
+    {
+      "course_code": "CRS178",
+      "canonical_course_name": "Bachelor of Science in Automotive Engineering",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor automotive engineering"
+    },
+    {
+      "course_code": "CRS179",
+      "canonical_course_name": "Bachelor in Industrial Technology major in Automotive Engineering Technology",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor industrial technology major automotive engineering technology"
+    },
+    {
+      "course_code": "CRS180",
+      "canonical_course_name": "Bachelor of Science in Aviation Engineering Technology major in Aviation Engineering Technology",
+      "abbreviation": null,
+      "cluster": "AVIATION & MARITIME CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor aviation engineering technology major aviation engineering technology"
+    },
+    {
+      "course_code": "CRS181",
+      "canonical_course_name": "Bachelor of Science in Biomedical Engineering",
+      "abbreviation": null,
+      "cluster": "HEALTHCARE SCIENCE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor biomedical engineering"
+    },
+    {
+      "course_code": "CRS182",
+      "canonical_course_name": "Bachelor of Business Administration major in Business Economics",
+      "abbreviation": null,
+      "cluster": "BUSINESS CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor business administration major business economics"
+    },
+    {
+      "course_code": "CRS183",
+      "canonical_course_name": "Bachelor of Science in Civil Engineering With Specialization in Hydraulics and Water Resources Engineering",
+      "abbreviation": "BSCE",
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor civil engineering major hydraulics and water resources engineering"
+    },
+    {
+      "course_code": "CRS184",
+      "canonical_course_name": "Bachelor of Science in Civil Engineering-Water Resources",
+      "abbreviation": "BSCE",
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor civil engineering water resources"
+    },
+    {
+      "course_code": "CRS185",
+      "canonical_course_name": "Bachelor of Communication Arts major in New Media",
+      "abbreviation": null,
+      "cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor communication arts major new media"
+    },
+    {
+      "course_code": "CRS186",
+      "canonical_course_name": "Bachelor of Science in Mathematics major in Computer Information Technology",
+      "abbreviation": null,
+      "cluster": "SCIENCE & MATHEMATICS CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor mathematics major computer information technology"
+    },
+    {
+      "course_code": "CRS187",
+      "canonical_course_name": "Bachelor of Instrumentation and Control Engineering Technology",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor instrumentation and control engineering technology"
+    },
+    {
+      "course_code": "CRS188",
+      "canonical_course_name": "Bachelor of Cultural and Arts Education",
+      "abbreviation": null,
+      "cluster": "EDUCATION CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor cultural and arts education"
+    },
+    {
+      "course_code": "CRS189",
+      "canonical_course_name": "Bachelor of Technical-Vocational Teacher Education major in Automotive Technology",
+      "abbreviation": null,
+      "cluster": "EDUCATION CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor technical vocational teacher education major automotive technology"
+    },
+    {
+      "course_code": "CRS190",
+      "canonical_course_name": "Bachelor of Engineering Technology Major in Electrical Engineering Technology",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor engineering technology major electrical engineering technology"
+    },
+    {
+      "course_code": "CRS191",
+      "canonical_course_name": "Bachelor of Science in Electronics and Communications Engineering major in Electronics Communication Engineering",
+      "abbreviation": "BSECE",
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor electronics and communications engineering major electronics communication engineering"
+    },
+    {
+      "course_code": "CRS192",
+      "canonical_course_name": "Bachelor of Science in Energy Engineering",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor energy engineering"
+    },
+    {
+      "course_code": "CRS193",
+      "canonical_course_name": "Bachelor of Science in Electrical Technology major in Electrical",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor electrical technology major electrical"
+    },
+    {
+      "course_code": "CRS194",
+      "canonical_course_name": "Bachelor of Engineering Technology major in Construction Technology and Management",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor engineering technology major construction technology and management"
+    },
+    {
+      "course_code": "CRS195",
+      "canonical_course_name": "Bachelor of Science in Environmental Engineering",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor environmental engineering"
+    },
+    {
+      "course_code": "CRS196",
+      "canonical_course_name": "Bachelor of Science in Environmental Engineering Technology major in Envet",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor environmental engineering technology major envet"
+    },
+    {
+      "course_code": "CRS197",
+      "canonical_course_name": "Bachelor of Industrial Technology major in Fashion Design and Apparel Technology",
+      "abbreviation": null,
+      "cluster": "ARTS & MULTIMEDIA CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor industrial technology major fashion design and apparel technology"
+    },
+    {
+      "course_code": "CRS198",
+      "canonical_course_name": "Bachelor of Science in Food Engineering",
+      "abbreviation": null,
+      "cluster": "SCIENCE & MATHEMATICS CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor food engineering"
+    },
+    {
+      "course_code": "CRS199",
+      "canonical_course_name": "Bachelor of Industrial Technology major in Food Technology",
+      "abbreviation": null,
+      "cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor industrial technology major food technology"
+    },
+    {
+      "course_code": "CRS200",
+      "canonical_course_name": "Bachelor of Science in Industrial Technology major in Foods",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor industrial technology major foods"
+    },
+    {
+      "course_code": "CRS201",
+      "canonical_course_name": "Bachelor of Science in Industrial Technology major in Foods Technology",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor industrial technology major foods technology"
+    },
+    {
+      "course_code": "CRS202",
+      "canonical_course_name": "Bachelor of Food Technology Major in Food Trades",
+      "abbreviation": null,
+      "cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor food technology major food trades"
+    },
+    {
+      "course_code": "CRS203",
+      "canonical_course_name": "Bachelor of Science in Forestry major in Forest Products Innovation Design",
+      "abbreviation": null,
+      "cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor forestry major forest products innovation design"
+    },
+    {
+      "course_code": "CRS204",
+      "canonical_course_name": "Bachelor of Science in Entertainment and Multimedia Computing (BSEMC) major in Game Design and Development",
+      "abbreviation": "BSEMC",
+      "cluster": "ARTS & MULTIMEDIA CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor entertainment and multimedia computing major game design and development"
+    },
+    {
+      "course_code": "CRS205",
+      "canonical_course_name": "Bachelor of Industrial Technology major in Garment, Fashion and Design",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor industrial technology major garment fashion and design"
+    },
+    {
+      "course_code": "CRS206",
+      "canonical_course_name": "Bachelor of Industrial Technology (E-TEEAP) major in Garments, Fashion and Design Technology",
+      "abbreviation": null,
+      "cluster": "ARTS & MULTIMEDIA CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor industrial technology major garments fashion and design technology"
+    },
+    {
+      "course_code": "CRS207",
+      "canonical_course_name": "Bachelor of Elementary Education major in General",
+      "abbreviation": null,
+      "cluster": "EDUCATION CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor elementary education major general"
+    },
+    {
+      "course_code": "CRS208",
+      "canonical_course_name": "Bachelor of Science in Geodetic Engineering major in Land Surveying",
+      "abbreviation": "BSGE",
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor geodetic engineering major land surveying"
+    },
+    {
+      "course_code": "CRS209",
+      "canonical_course_name": "Bachelor of Science in Geological Engineering",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor geological engineering"
+    },
+    {
+      "course_code": "CRS210",
+      "canonical_course_name": "Bachelor of Science in Geological Science and Engineering",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor geological science and engineering"
+    },
+    {
+      "course_code": "CRS211",
+      "canonical_course_name": "Bachelor of Science in Civil Engineering major in Geotechnical",
+      "abbreviation": "BSCE",
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor civil engineering major geotechnical"
+    },
+    {
+      "course_code": "CRS212",
+      "canonical_course_name": "Bachelor of Science in Geothermal Engineering",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor geothermal engineering"
+    },
+    {
+      "course_code": "CRS213",
+      "canonical_course_name": "Bachelor of Science in Graphics and Design (BSGD)",
+      "abbreviation": "BSGD",
+      "cluster": "ARTS & MULTIMEDIA CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor graphics and design"
+    },
+    {
+      "course_code": "CRS214",
+      "canonical_course_name": "Bachelor of Engineering Technology major in Heating, Ventilating and Airconditioning-Refrigeration Engineering Technology",
+      "abbreviation": "BET",
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor engineering technology major heating ventilating and airconditioning refrigeration engineering technology"
+    },
+    {
+      "course_code": "CRS215",
+      "canonical_course_name": "Bachelor of Science in Home Economics",
+      "abbreviation": null,
+      "cluster": "BUSINESS CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor home economics"
+    },
+    {
+      "course_code": "CRS216",
+      "canonical_course_name": "Bachelor of Technical and Livelihood Education major in Home Economics (BTLed - Home Economics)",
+      "abbreviation": null,
+      "cluster": "EDUCATION CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor technical and livelihood education major home economics"
+    },
+    {
+      "course_code": "CRS217",
+      "canonical_course_name": "Bachelor of Science in Hotel, Restaurant and Tourism Management",
+      "abbreviation": "BSHM",
+      "cluster": "HOSPITALITY & TOURISM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor hotel restaurant and tourism management"
+    },
+    {
+      "course_code": "CRS218",
+      "canonical_course_name": "Bachelor of Science in Health Sciences",
+      "abbreviation": null,
+      "cluster": "HEALTHCARE SCIENCE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor health sciences"
+    },
+    {
+      "course_code": "CRS219",
+      "canonical_course_name": "Bachelor of Science in Human Services",
+      "abbreviation": null,
+      "cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor human services"
+    },
+    {
+      "course_code": "CRS220",
+      "canonical_course_name": "Bachelor of Arts major in Humanities",
+      "abbreviation": null,
+      "cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor arts major humanities"
+    },
+    {
+      "course_code": "CRS221",
+      "canonical_course_name": "Bachelor of Science in Industrial and Commercial Communication",
+      "abbreviation": null,
+      "cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor industrial and commercial communication"
+    },
+    {
+      "course_code": "CRS222",
+      "canonical_course_name": "Bachelor in Industrial Design",
+      "abbreviation": null,
+      "cluster": "ARTS & MULTIMEDIA CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor industrial design"
+    },
+    {
+      "course_code": "CRS223",
+      "canonical_course_name": "Bachelor of Science in Industrial Technology major in Industrial Design Technology",
+      "abbreviation": null,
+      "cluster": "ARTS & MULTIMEDIA CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor industrial technology major industrial design technology"
+    },
+    {
+      "course_code": "CRS224",
+      "canonical_course_name": "Bachelor of Science in Information and Communications Technology",
+      "abbreviation": null,
+      "cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor information and communications technology"
+    },
+    {
+      "course_code": "CRS225",
+      "canonical_course_name": "Bachelor of Science in Information and Communication Technology",
+      "abbreviation": null,
+      "cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor information and communication technology"
+    },
+    {
+      "course_code": "CRS226",
+      "canonical_course_name": "Bachelor of Science in Information Management",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor information management"
+    },
+    {
+      "course_code": "CRS227",
+      "canonical_course_name": "Bachelor of Arts in Information Management",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor arts in information management"
+    },
+    {
+      "course_code": "CRS228",
+      "canonical_course_name": "Bachelor of Science in Information System major in Information System",
+      "abbreviation": "BSIS",
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor information system major information system"
+    },
+    {
+      "course_code": "CRS229",
+      "canonical_course_name": "Bachelor of Information Systems",
+      "abbreviation": "BSIS",
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor information systems"
+    },
+    {
+      "course_code": "CRS230",
+      "canonical_course_name": "Bachelor of Information Technology major in Database System Management",
+      "abbreviation": "BSIT",
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor information technology major database system management"
+    },
+    {
+      "course_code": "CRS231",
+      "canonical_course_name": "Bachelor of Science in Instrumentation and Control Engineering",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor instrumentation and control engineering"
+    },
+    {
+      "course_code": "CRS232",
+      "canonical_course_name": "Bachelor of Science in Applied Economics major in Industrial Economics and Bachelor of Science in Accountancy",
+      "abbreviation": null,
+      "cluster": "BUSINESS CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor applied economics major industrial economics and bachelor accountancy"
+    },
+    {
+      "course_code": "CRS233",
+      "canonical_course_name": "Bachelor of Arts in Interdisciplinary Studies major in Language and Literature",
+      "abbreviation": null,
+      "cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor arts in interdisciplinary studies major language and literature"
+    },
+    {
+      "course_code": "CRS234",
+      "canonical_course_name": "Bachelor of Industrial Technology major in Interior Design Technology",
+      "abbreviation": null,
+      "cluster": "ARTS & MULTIMEDIA CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor industrial technology major interior design technology"
+    },
+    {
+      "course_code": "CRS235",
+      "canonical_course_name": "Bachelor of Science in Agricultural and Biosystems Engineering major in Land and Water Resources Engineering",
+      "abbreviation": "BSABE",
+      "cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor agricultural and biosystems engineering major land and water resources engineering"
+    },
+    {
+      "course_code": "CRS236",
+      "canonical_course_name": "Bachelor of Science in Land Use Design Management",
+      "abbreviation": null,
+      "cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor land use design management"
+    },
+    {
+      "course_code": "CRS237",
+      "canonical_course_name": "Bachelor of Arts major in Language Arts",
+      "abbreviation": null,
+      "cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor arts major language arts"
+    },
+    {
+      "course_code": "CRS238",
+      "canonical_course_name": "Bachelor of Arts in Language and Literature Studies major in English Studies",
+      "abbreviation": null,
+      "cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor arts in language and literature studies major english studies"
+    },
+    {
+      "course_code": "CRS239",
+      "canonical_course_name": "Bachelor of Arts in Library Science",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor arts in library science"
+    },
+    {
+      "course_code": "CRS240",
+      "canonical_course_name": "Bachelor of Science in Management Engineering",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor management engineering"
+    },
+    {
+      "course_code": "CRS241",
+      "canonical_course_name": "Bachelor of Science in Management Science and Engineering",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor management science and engineering"
+    },
+    {
+      "course_code": "CRS242",
+      "canonical_course_name": "Bachelor of Science in Manufacturing Engineering Technology",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor manufacturing engineering technology"
+    },
+    {
+      "course_code": "CRS243",
+      "canonical_course_name": "Bachelor of Engineering Technology major in Manufacturing Engineering Technology",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor engineering technology major manufacturing engineering technology"
+    },
+    {
+      "course_code": "CRS244",
+      "canonical_course_name": "Bachelor of Science in Marine Engineering",
+      "abbreviation": "BSMT",
+      "cluster": "AVIATION & MARITIME CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor marine engineering"
+    },
+    {
+      "course_code": "CRS245",
+      "canonical_course_name": "Bachelor of Science in Marine Engineering and Electro Technology",
+      "abbreviation": null,
+      "cluster": "AVIATION & MARITIME CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor marine engineering and electro technology"
+    },
+    {
+      "course_code": "CRS246",
+      "canonical_course_name": "Bachelor of Science in Marine Engineering major in Marine Engineering and Machine Shop",
+      "abbreviation": null,
+      "cluster": "AVIATION & MARITIME CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor marine engineering major marine engineering and machine shop"
+    },
+    {
+      "course_code": "CRS247",
+      "canonical_course_name": "Bachelor of Science in Marine Science",
+      "abbreviation": null,
+      "cluster": "AVIATION & MARITIME CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor marine science"
+    },
+    {
+      "course_code": "CRS248",
+      "canonical_course_name": "Bachelor of Science in Marine Transportation",
+      "abbreviation": "BSMT",
+      "cluster": "AVIATION & MARITIME CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor marine transportation"
+    },
+    {
+      "course_code": "CRS249",
+      "canonical_course_name": "Bachelor of Science in Marine Transportation and Engineering",
+      "abbreviation": "BSMT",
+      "cluster": "AVIATION & MARITIME CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor marine transportation and engineering"
+    },
+    {
+      "course_code": "CRS250",
+      "canonical_course_name": "Bachelor of Science in Materials Science and Engineering",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor materials science and engineering"
+    },
+    {
+      "course_code": "CRS251",
+      "canonical_course_name": "Bachelor of Arts in Mathematics",
+      "abbreviation": null,
+      "cluster": "SCIENCE & MATHEMATICS CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor arts in mathematics"
+    },
+    {
+      "course_code": "CRS252",
+      "canonical_course_name": "Bachelor in Mathematics and Science Elementary Education",
+      "abbreviation": null,
+      "cluster": "EDUCATION CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor mathematics and science elementary education"
+    },
+    {
+      "course_code": "CRS253",
+      "canonical_course_name": "Bachelor of Science in Education major in Mathematics",
+      "abbreviation": null,
+      "cluster": "EDUCATION CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor education major mathematics"
+    },
+    {
+      "course_code": "CRS254",
+      "canonical_course_name": "Bachelor in Mathematics Education major in Mathematics",
+      "abbreviation": null,
+      "cluster": "EDUCATION CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor mathematics education major mathematics"
+    },
+    {
+      "course_code": "CRS255",
+      "canonical_course_name": "Bachelor of Science in Industrial Technology major in Mechanical",
+      "abbreviation": "BSME",
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor industrial technology major mechanical"
+    },
+    {
+      "course_code": "CRS256",
+      "canonical_course_name": "Bachelor of Mechanical Engineering",
+      "abbreviation": "BSME",
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor mechanical engineering"
+    },
+    {
+      "course_code": "CRS257",
+      "canonical_course_name": "Bachelor of Engineering Technology Major in Mechanical Engineering Technology",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor engineering technology major mechanical engineering technology"
+    },
+    {
+      "course_code": "CRS258",
+      "canonical_course_name": "Bachelor of Engineering Technology Major in Mechanical Engineering Technology Specialized in Automotive Engineering Technology",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor engineering technology major mechanical engineering technology major automotive engineering technology"
+    },
+    {
+      "course_code": "CRS259",
+      "canonical_course_name": "Bachelor of Engineering Technology Major in Mechanical Engineering Technology With Specialization in Automotive Technology",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor engineering technology major mechanical engineering technology major automotive technology"
+    },
+    {
+      "course_code": "CRS260",
+      "canonical_course_name": "Bachelor of Engineering Technology Major in Mechanical Technology-Automotive Technology",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor engineering technology major mechanical technology automotive technology"
+    },
+    {
+      "course_code": "CRS261",
+      "canonical_course_name": "Bachelor of Science in Mechatronics Engineering",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor mechatronics engineering"
+    },
+    {
+      "course_code": "CRS262",
+      "canonical_course_name": "Bachelor of Engineering Technology major in Mechatronics Engineering Technology",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor engineering technology major mechatronics engineering technology"
+    },
+    {
+      "course_code": "CRS263",
+      "canonical_course_name": "Bachelor of Engineering Technology major in Metallurgy and Materials Engineering Technology",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor engineering technology major metallurgy and materials engineering technology"
+    },
+    {
+      "course_code": "CRS264",
+      "canonical_course_name": "Bachelor of Music major in Music Education",
+      "abbreviation": null,
+      "cluster": "EDUCATION CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor music major music education"
+    },
+    {
+      "course_code": "CRS265",
+      "canonical_course_name": "Bachelor of Music in Music Education",
+      "abbreviation": null,
+      "cluster": "EDUCATION CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor music in music education"
+    },
+    {
+      "course_code": "CRS266",
+      "canonical_course_name": "Bachelor of Science in Environmental Science major in Natural Resource Management",
+      "abbreviation": null,
+      "cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor environmental science major natural resource management"
+    },
+    {
+      "course_code": "CRS267",
+      "canonical_course_name": "Bachelor of Nursing",
+      "abbreviation": "BSN",
+      "cluster": "HEALTHCARE SCIENCE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor nursing"
+    },
+    {
+      "course_code": "CRS268",
+      "canonical_course_name": "Bachelor of Arts in Office Administration",
+      "abbreviation": null,
+      "cluster": "BUSINESS CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor arts in office administration"
+    },
+    {
+      "course_code": "CRS269",
+      "canonical_course_name": "Bachelor of Science in Industrial Engineering major in Organization and Decision System",
+      "abbreviation": "BSIE",
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor industrial engineering major organization and decision system"
+    },
+    {
+      "course_code": "CRS270",
+      "canonical_course_name": "Bachelor of Science in Packaging Engineering",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor packaging engineering"
+    },
+    {
+      "course_code": "CRS271",
+      "canonical_course_name": "Bachelor of Arts in Theater Arts",
+      "abbreviation": null,
+      "cluster": "ARTS & MULTIMEDIA CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor arts in theater arts"
+    },
+    {
+      "course_code": "CRS272",
+      "canonical_course_name": "Bachelor of Science in Petroleum Engineering",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor petroleum engineering"
+    },
+    {
+      "course_code": "CRS273",
+      "canonical_course_name": "Bachelor of Arts in Philippine Studies - Language Culture Media",
+      "abbreviation": "HSC",
+      "cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor arts in philippine studies language culture media"
+    },
+    {
+      "course_code": "CRS274",
+      "canonical_course_name": "Bachelor of Science in Philosophy",
+      "abbreviation": "HSC",
+      "cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor philosophy"
+    },
+    {
+      "course_code": "CRS275",
+      "canonical_course_name": "Bachelor of Science in Physical Education",
+      "abbreviation": null,
+      "cluster": "SPORTS & PHYSICAL EDUCATION CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor physical education"
+    },
+    {
+      "course_code": "CRS276",
+      "canonical_course_name": "Bachelor in Physical Therapy (Foreign Student) 1St Year",
+      "abbreviation": "BSPT",
+      "cluster": "HEALTHCARE SCIENCE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor physical therapy 1st year"
+    },
+    {
+      "course_code": "CRS277",
+      "canonical_course_name": "Bachelor of Science in Political Science",
+      "abbreviation": null,
+      "cluster": "LEGAL & PUBLIC SERVICE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor political science"
+    },
+    {
+      "course_code": "CRS278",
+      "canonical_course_name": "Bachelor of Na major in Political Science",
+      "abbreviation": null,
+      "cluster": "LEGAL & PUBLIC SERVICE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor na major political science"
+    },
+    {
+      "course_code": "CRS279",
+      "canonical_course_name": "Bachelor of Science in Industrial Technology major in Power Plant Engineering Technology",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor industrial technology major power plant engineering technology"
+    },
+    {
+      "course_code": "CRS280",
+      "canonical_course_name": "Bachelor of Arts in Production Design",
+      "abbreviation": null,
+      "cluster": "ARTS & MULTIMEDIA CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor arts in production design"
+    },
+    {
+      "course_code": "CRS281",
+      "canonical_course_name": "Bachelor of Psychology",
+      "abbreviation": null,
+      "cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor psychology"
+    },
+    {
+      "course_code": "CRS282",
+      "canonical_course_name": "Bachelor of Science in Public Administration",
+      "abbreviation": "BPA",
+      "cluster": "LEGAL & PUBLIC SERVICE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor public administration"
+    },
+    {
+      "course_code": "CRS283",
+      "canonical_course_name": "Bachelor of Arts in Public Administration",
+      "abbreviation": "BPA",
+      "cluster": "LEGAL & PUBLIC SERVICE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor arts in public administration"
+    },
+    {
+      "course_code": "CRS284",
+      "canonical_course_name": "Bachelor of Radiologic Technology",
+      "abbreviation": "BSRT",
+      "cluster": "HEALTHCARE SCIENCE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor radiologic technology"
+    },
+    {
+      "course_code": "CRS285",
+      "canonical_course_name": "Bachelor of Science in Railway Engineering",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor railway engineering"
+    },
+    {
+      "course_code": "CRS286",
+      "canonical_course_name": "Bachelor of Science in Environmental Science major in Resource Management",
+      "abbreviation": null,
+      "cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor environmental science major resource management"
+    },
+    {
+      "course_code": "CRS287",
+      "canonical_course_name": "Bachelor of Science in Mechatronics Engineering major in Robotics",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor mechatronics engineering major robotics"
+    },
+    {
+      "course_code": "CRS288",
+      "canonical_course_name": "Bachelor of Science in Robotics Engineering",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor robotics engineering"
+    },
+    {
+      "course_code": "CRS289",
+      "canonical_course_name": "Bachelor in Science Education With Specialization in Physics",
+      "abbreviation": null,
+      "cluster": "EDUCATION CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor education major physics"
+    },
+    {
+      "course_code": "CRS290",
+      "canonical_course_name": "Bachelor of Science in Secondary Education major in English",
+      "abbreviation": null,
+      "cluster": "EDUCATION CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor secondary education major english"
+    },
+    {
+      "course_code": "CRS291",
+      "canonical_course_name": "Bachelor of Arts - Bachelor of Secondary Education Major in English",
+      "abbreviation": null,
+      "cluster": "EDUCATION CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor arts bachelor secondary education major english"
+    },
+    {
+      "course_code": "CRS292",
+      "canonical_course_name": "Bachelor in Secondary Education major in English",
+      "abbreviation": null,
+      "cluster": "EDUCATION CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor secondary education major english"
+    },
+    {
+      "course_code": "CRS293",
+      "canonical_course_name": "Bachelor of Industrial Security Management",
+      "abbreviation": "BSISM",
+      "cluster": "CRIMINOLOGY CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor industrial security management"
+    },
+    {
+      "course_code": "CRS294",
+      "canonical_course_name": "Bachelor in Sign Language Interpretation",
+      "abbreviation": "HSC",
+      "cluster": "EDUCATION CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor sign language interpretation"
+    },
+    {
+      "course_code": "CRS295",
+      "canonical_course_name": "Bachelor of Arts major in Sign Language Interpreting",
+      "abbreviation": "HSC",
+      "cluster": "EDUCATION CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor arts major sign language interpreting"
+    },
+    {
+      "course_code": "CRS296",
+      "canonical_course_name": "Bachelor of Education major in Social Studies",
+      "abbreviation": null,
+      "cluster": "EDUCATION CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor education major social studies"
+    },
+    {
+      "course_code": "CRS297",
+      "canonical_course_name": "Bachelor of Arts in Social Work",
+      "abbreviation": null,
+      "cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor arts in social work"
+    },
+    {
+      "course_code": "CRS298",
+      "canonical_course_name": "Bachelor of Science in Sociology",
+      "abbreviation": null,
+      "cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor sociology"
+    },
+    {
+      "course_code": "CRS299",
+      "canonical_course_name": "Bachelor of Science in Software Engineering",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor software engineering"
+    },
+    {
+      "course_code": "CRS300",
+      "canonical_course_name": "Bachelor of Science in Special Needs Education",
+      "abbreviation": null,
+      "cluster": "EDUCATION CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor special needs education"
+    },
+    {
+      "course_code": "CRS301",
+      "canonical_course_name": "Bachelor of Secondary Education Major in Special Prog. Sped",
+      "abbreviation": null,
+      "cluster": "EDUCATION CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor secondary education major special prog sped"
+    },
+    {
+      "course_code": "CRS302",
+      "canonical_course_name": "Bachelor of Sports Science",
+      "abbreviation": "BSESS",
+      "cluster": "SPORTS & PHYSICAL EDUCATION CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor sports science"
+    },
+    {
+      "course_code": "CRS303",
+      "canonical_course_name": "Bachelor of Science in Exercise and Sports Sciences major in Fitness and Sports Coaching",
+      "abbreviation": "BSESS",
+      "cluster": "SPORTS & PHYSICAL EDUCATION CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor exercise and sports sciences major fitness and sports coaching"
+    },
+    {
+      "course_code": "CRS304",
+      "canonical_course_name": "Bachelor in Sports Science",
+      "abbreviation": "BSESS",
+      "cluster": "SPORTS & PHYSICAL EDUCATION CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor sports science"
+    },
+    {
+      "course_code": "CRS305",
+      "canonical_course_name": "Bachelor of Science in Civil Engineering major in Structural Engineering",
+      "abbreviation": "BSCE",
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor civil engineering major structural engineering"
+    },
+    {
+      "course_code": "CRS306",
+      "canonical_course_name": "Bachelor of Teaching in Home and Economics and Livelihood Education",
+      "abbreviation": null,
+      "cluster": "EDUCATION CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor teaching in home and economics and livelihood education"
+    },
+    {
+      "course_code": "CRS307",
+      "canonical_course_name": "Bachelor of Science in Technical Teacher Education major in Automotive",
+      "abbreviation": null,
+      "cluster": "EDUCATION CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor technical teacher education major automotive"
+    },
+    {
+      "course_code": "CRS308",
+      "canonical_course_name": "Bachelor of Science in Technology and Livelihood Education",
+      "abbreviation": null,
+      "cluster": "EDUCATION CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor technology and livelihood education"
+    },
+    {
+      "course_code": "CRS309",
+      "canonical_course_name": "Bachelor of Technology & Livelihood Technology major in Home Economics",
+      "abbreviation": null,
+      "cluster": "BUSINESS CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor technology and livelihood technology major home economics"
+    },
+    {
+      "course_code": "CRS310",
+      "canonical_course_name": "Bachelor of Science in Technology Communication Management",
+      "abbreviation": "HSC",
+      "cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor technology communication management"
+    },
+    {
+      "course_code": "CRS311",
+      "canonical_course_name": "Bachelor of Science in Technology Management major in Marketing",
+      "abbreviation": null,
+      "cluster": "BUSINESS CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor technology management major marketing"
+    },
+    {
+      "course_code": "CRS312",
+      "canonical_course_name": "Bachelor of Science in Theology",
+      "abbreviation": null,
+      "cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor theology"
+    },
+    {
+      "course_code": "CRS313",
+      "canonical_course_name": "Bachelor of Arts in Theology",
+      "abbreviation": null,
+      "cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor arts in theology"
+    },
+    {
+      "course_code": "CRS314",
+      "canonical_course_name": "Bachelor of Theology",
+      "abbreviation": null,
+      "cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor theology"
+    },
+    {
+      "course_code": "CRS315",
+      "canonical_course_name": "Bachelor of Science in Civil Engineering major in Transportation",
+      "abbreviation": "BSCE",
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor civil engineering major transportation"
+    },
+    {
+      "course_code": "CRS316",
+      "canonical_course_name": "Bachelor of Science in Civil Engineering major in Transportation Engineering",
+      "abbreviation": "BSCE",
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor civil engineering major transportation engineering"
+    },
+    {
+      "course_code": "CRS317",
+      "canonical_course_name": "Bachelor of Science in Civil Engineering major in Water Resource Engineering",
+      "abbreviation": "BSCE",
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor civil engineering major water resource engineering"
+    },
+    {
+      "course_code": "CRS318",
+      "canonical_course_name": "Bachelor of Science in Civil Engineering major in Water Resources Engineering",
+      "abbreviation": "BSCE",
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor civil engineering major water resources engineering"
+    },
+    {
+      "course_code": "CRS319",
+      "canonical_course_name": "Bachelor in Architectural Engineering Technology",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor architectural engineering technology"
+    },
+    {
+      "course_code": "CRS320",
+      "canonical_course_name": "Bachelor in Aviation Engineering Technology",
+      "abbreviation": null,
+      "cluster": "AVIATION & MARITIME CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor aviation engineering technology"
+    },
+    {
+      "course_code": "CRS321",
+      "canonical_course_name": "Bachelor of Engineering Technology major in Avionics Maintenance Technology",
+      "abbreviation": null,
+      "cluster": "AVIATION & MARITIME CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor engineering technology major avionics maintenance technology"
+    },
+    {
+      "course_code": "CRS322",
+      "canonical_course_name": "Bachelor of Arts in Behavioral Sciences major in Organizational and Social Systems Development and Bachelor of Science in Advertising Management Bachelor of Science in Advertising Management",
+      "abbreviation": "HSC",
+      "cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor arts in behavioral sciences major organizational and social systems development and bachelor advertising management bachelor advertising management"
+    },
+    {
+      "course_code": "CRS323",
+      "canonical_course_name": "Bachelor of Arts in Business Administration major in Public Administration",
+      "abbreviation": null,
+      "cluster": "LEGAL & PUBLIC SERVICE CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor arts in business administration major public administration"
+    },
+    {
+      "course_code": "CRS324",
+      "canonical_course_name": "Bachelor of Science in Business Management",
+      "abbreviation": null,
+      "cluster": "BUSINESS CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor business management"
+    },
+    {
+      "course_code": "CRS325",
+      "canonical_course_name": "Bachelor of Arts in Christian Education",
+      "abbreviation": null,
+      "cluster": "EDUCATION CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor arts in christian education"
+    },
+    {
+      "course_code": "CRS326",
+      "canonical_course_name": "Bachelor of Technology major in Civil Engineering Technology",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor technology major civil engineering technology"
+    },
+    {
+      "course_code": "CRS327",
+      "canonical_course_name": "Bachelor of Technology major in Civil Engineering Technology/Construction Technology",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor technology major civil engineering technology construction technology"
+    },
+    {
+      "course_code": "CRS328",
+      "canonical_course_name": "Bachelor of Industrial Technology major in Computer",
+      "abbreviation": "BSCS",
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor industrial technology major computer"
+    },
+    {
+      "course_code": "CRS329",
+      "canonical_course_name": "Bachelor of Science in Industrial Technology major in Computer Technology",
+      "abbreviation": "BSCS",
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor industrial technology major computer technology"
+    },
+    {
+      "course_code": "CRS330",
+      "canonical_course_name": "Bachelor in Construction Engineering Technology and Management",
+      "abbreviation": null,
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor construction engineering technology and management"
+    },
+    {
+      "course_code": "CRS331",
+      "canonical_course_name": "Bachelor of Arts major in Criminology",
+      "abbreviation": null,
+      "cluster": "CRIMINOLOGY CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor arts major criminology"
+    },
+    {
+      "course_code": "CRS332",
+      "canonical_course_name": "Bachelor of Science in Esports major in Esports Management",
+      "abbreviation": null,
+      "cluster": "SPORTS & PHYSICAL EDUCATION CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor esports major esports management"
+    },
+    {
+      "course_code": "CRS333",
+      "canonical_course_name": "Bachelor of Science in Industrial Education major in Automotive Technology",
+      "abbreviation": null,
+      "cluster": "EDUCATION CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor industrial education major automotive technology"
+    },
+    {
+      "course_code": "CRS334",
+      "canonical_course_name": "Bachelor of Arts in Religious Education",
+      "abbreviation": null,
+      "cluster": "EDUCATION CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor arts in religious education"
+    },
+    {
+      "course_code": "CRS335",
+      "canonical_course_name": "Bachelor of Education Studies",
+      "abbreviation": null,
+      "cluster": "EDUCATION CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor education studies"
+    },
+    {
+      "course_code": "CRS336",
+      "canonical_course_name": "Bachelor of Science in Industrial Technology major in Electrical",
+      "abbreviation": "BSEE",
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor industrial technology major electrical"
+    },
+    {
+      "course_code": "CRS337",
+      "canonical_course_name": "Bachelor of Science in Industrial Technology major in Electronics",
+      "abbreviation": "BSECE",
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor industrial technology major electronics"
+    },
+    {
+      "course_code": "CRS338",
+      "canonical_course_name": "Bachelor in Industrial Technology major in Electronics",
+      "abbreviation": "BSECE",
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor industrial technology major electronics"
+    },
+    {
+      "course_code": "CRS339",
+      "canonical_course_name": "Bachelor of Science in Industrial Technology major in Electronics and Communication Technology",
+      "abbreviation": "HSC",
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor industrial technology major electronics and communication technology"
+    },
+    {
+      "course_code": "CRS340",
+      "canonical_course_name": "Bachelor of Science in Industrial Technology major in Electronics & Communications Technology",
+      "abbreviation": "HSC",
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor industrial technology major electronics and communications technology"
+    },
+    {
+      "course_code": "CRS341",
+      "canonical_course_name": "Bachelor in Industrial Technology major in Electronics and Communications Technology",
+      "abbreviation": "HSC",
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor industrial technology major electronics and communications technology"
+    },
+    {
+      "course_code": "CRS342",
+      "canonical_course_name": "Bachelor of Science in Electronics and Computer Technology major in Communications Systems",
+      "abbreviation": "HSC",
+      "cluster": "ENGINEERING / STEM CLUSTER",
+      "program_type": "bachelor / undergraduate",
+      "normalized_course_name": "bachelor electronics and computer technology major communications systems"
+    }
+  ],
+  "summary": {
+    "inventory_count": 342,
+    "high_confidence_duplicate_groups": 31,
+    "likely_duplicate_groups": 11,
+    "related_but_distinct_groups": 10,
+    "distinct_control_groups": 5,
+    "questionable_programs": 18
+  },
+  "duplicate_groups": [
+    {
+      "classification": "HIGH-CONFIDENCE DUPLICATE",
+      "codes": [
+        "CRS024",
+        "CRS025"
+      ],
+      "current_names": [
+        "Bachelor of Science in Computer Engineering",
+        "Bachelor in Computer Engineering"
+      ],
+      "proposed_canonical_survivor": "CRS024",
+      "reasoning": "Same Computer Engineering degree; only Bachelor wording differs."
+    },
+    {
+      "classification": "HIGH-CONFIDENCE DUPLICATE",
+      "codes": [
+        "CRS035",
+        "CRS036"
+      ],
+      "current_names": [
+        "Bachelor of Science in Elementary Education",
+        "Bachelor in Elementary Education"
+      ],
+      "proposed_canonical_survivor": "CRS035",
+      "reasoning": "Same Elementary Education degree; only Bachelor wording differs."
+    },
+    {
+      "classification": "HIGH-CONFIDENCE DUPLICATE",
+      "codes": [
+        "CRS054",
+        "CRS219"
+      ],
+      "current_names": [
+        "Bachelor in Human Services (BHumServ)",
+        "Bachelor of Science in Human Services"
+      ],
+      "proposed_canonical_survivor": "CRS219",
+      "reasoning": "Same Human Services degree with parenthetical abbreviation/style variation."
+    },
+    {
+      "classification": "HIGH-CONFIDENCE DUPLICATE",
+      "codes": [
+        "CRS055",
+        "CRS222"
+      ],
+      "current_names": [
+        "Bachelor of Science in Industrial Design (BSID)",
+        "Bachelor in Industrial Design"
+      ],
+      "proposed_canonical_survivor": "CRS055",
+      "reasoning": "Same Industrial Design degree with Bachelor/BS wording variation."
+    },
+    {
+      "classification": "HIGH-CONFIDENCE DUPLICATE",
+      "codes": [
+        "CRS072",
+        "CRS248"
+      ],
+      "current_names": [
+        "Bachelor of Science in Marine Transportation (BSMT)",
+        "Bachelor of Science in Marine Transportation"
+      ],
+      "proposed_canonical_survivor": "CRS072",
+      "reasoning": "Same BS Marine Transportation title; one adds the abbreviation."
+    },
+    {
+      "classification": "HIGH-CONFIDENCE DUPLICATE",
+      "codes": [
+        "CRS075",
+        "CRS256"
+      ],
+      "current_names": [
+        "Bachelor of Science in Mechanical Engineering (BSME)",
+        "Bachelor of Mechanical Engineering"
+      ],
+      "proposed_canonical_survivor": "CRS075",
+      "reasoning": "Same Mechanical Engineering degree; one adds BS and abbreviation."
+    },
+    {
+      "classification": "HIGH-CONFIDENCE DUPLICATE",
+      "codes": [
+        "CRS076",
+        "CRS077"
+      ],
+      "current_names": [
+        "Bachelor of Science in Medical Technology (BSMT) / Bachelor of Science in Medical Laboratory Science (BSMLS)",
+        "Bachelor of Science in Medical Laboratory Science (BSMLS) / Bachelor of Science in Medical Technology (BSMT)"
+      ],
+      "proposed_canonical_survivor": "CRS077",
+      "reasoning": "The same two official synonymous degree titles are merely reversed."
+    },
+    {
+      "classification": "HIGH-CONFIDENCE DUPLICATE",
+      "codes": [
+        "CRS083",
+        "CRS267"
+      ],
+      "current_names": [
+        "Bachelor of Science in Nursing (BSN)",
+        "Bachelor of Nursing"
+      ],
+      "proposed_canonical_survivor": "CRS083",
+      "reasoning": "Bachelor of Nursing record uses the BSN abbreviation and proxy BSN curriculum; same regulated degree family."
+    },
+    {
+      "classification": "HIGH-CONFIDENCE DUPLICATE",
+      "codes": [
+        "CRS098",
+        "CRS284"
+      ],
+      "current_names": [
+        "Bachelor of Science in Radiologic Technology (BSRT)",
+        "Bachelor of Radiologic Technology"
+      ],
+      "proposed_canonical_survivor": "CRS098",
+      "reasoning": "Same Radiologic Technology degree; Bachelor/BS wording only."
+    },
+    {
+      "classification": "HIGH-CONFIDENCE DUPLICATE",
+      "codes": [
+        "CRS103",
+        "CRS293"
+      ],
+      "current_names": [
+        "Bachelor of Science in Industrial Security Management (BSISM)",
+        "Bachelor of Industrial Security Management"
+      ],
+      "proposed_canonical_survivor": "CRS103",
+      "reasoning": "Same Industrial Security Management degree; Bachelor/BS wording only."
+    },
+    {
+      "classification": "HIGH-CONFIDENCE DUPLICATE",
+      "codes": [
+        "CRS107",
+        "CRS300"
+      ],
+      "current_names": [
+        "Bachelor of Special Needs Education (BSNEd)",
+        "Bachelor of Science in Special Needs Education"
+      ],
+      "proposed_canonical_survivor": "CRS107",
+      "reasoning": "Same Special Needs Education degree; Bachelor/BS wording only."
+    },
+    {
+      "classification": "HIGH-CONFIDENCE DUPLICATE",
+      "codes": [
+        "CRS102",
+        "CRS290",
+        "CRS292"
+      ],
+      "current_names": [
+        "Bachelor of Secondary Education major in English (BSEd English)",
+        "Bachelor of Science in Secondary Education major in English",
+        "Bachelor in Secondary Education major in English"
+      ],
+      "proposed_canonical_survivor": "CRS102",
+      "reasoning": "Same Secondary Education major in English; Bachelor/BS wording differs."
+    },
+    {
+      "classification": "HIGH-CONFIDENCE DUPLICATE",
+      "codes": [
+        "CRS139",
+        "CRS188"
+      ],
+      "current_names": [
+        "Bachelor of Culture and Arts Education",
+        "Bachelor of Cultural and Arts Education"
+      ],
+      "proposed_canonical_survivor": "CRS139",
+      "reasoning": "Culture/Cultural and Arts Education naming variant with no material specialization difference."
+    },
+    {
+      "classification": "HIGH-CONFIDENCE DUPLICATE",
+      "codes": [
+        "CRS143",
+        "CRS144",
+        "CRS191"
+      ],
+      "current_names": [
+        "Bachelor of Science in Electronics and Communications Engineering",
+        "Bachelor of Electronics and Communication Engineering major in Electronics and Communication Engineering",
+        "Bachelor of Science in Electronics and Communications Engineering major in Electronics Communication Engineering"
+      ],
+      "proposed_canonical_survivor": "CRS143",
+      "reasoning": "Same Electronics and Communication(s) Engineering degree; redundant self-major and pluralization vary."
+    },
+    {
+      "classification": "HIGH-CONFIDENCE DUPLICATE",
+      "codes": [
+        "CRS150",
+        "CRS151"
+      ],
+      "current_names": [
+        "Bachelor of Science in Education major in English",
+        "Bachelor in English Education major in English"
+      ],
+      "proposed_canonical_survivor": "CRS150",
+      "reasoning": "Same English Education degree/major with reordered wording."
+    },
+    {
+      "classification": "HIGH-CONFIDENCE DUPLICATE",
+      "codes": [
+        "CRS153",
+        "CRS157"
+      ],
+      "current_names": [
+        "Bachelor of Science in Environmental and Sanitary Engineering",
+        "Bachelor of Science in Sanitary & Environmental Engineering"
+      ],
+      "proposed_canonical_survivor": "CRS153",
+      "reasoning": "Same Environmental and Sanitary Engineering terms in reversed order."
+    },
+    {
+      "classification": "HIGH-CONFIDENCE DUPLICATE",
+      "codes": [
+        "CRS159",
+        "CRS109"
+      ],
+      "current_names": [
+        "Bachelor of Science in Exercise and Sports Science",
+        "Bachelor of Science in Exercise and Sports Sciences (BSESS)"
+      ],
+      "proposed_canonical_survivor": "CRS109",
+      "reasoning": "Same Exercise and Sports Science(s) degree and BSESS abbreviation."
+    },
+    {
+      "classification": "HIGH-CONFIDENCE DUPLICATE",
+      "codes": [
+        "CRS163",
+        "CRS164"
+      ],
+      "current_names": [
+        "Bachelor of Science in Education major in Filipino",
+        "Bachelor in Filipino Education major in Filipino"
+      ],
+      "proposed_canonical_survivor": "CRS163",
+      "reasoning": "Same Filipino Education degree/major with reordered wording."
+    },
+    {
+      "classification": "HIGH-CONFIDENCE DUPLICATE",
+      "codes": [
+        "CRS173",
+        "CRS174"
+      ],
+      "current_names": [
+        "Bachelor of Science in Geiodetic Engineering",
+        "Bachelor of Science in Geodetic Engineering"
+      ],
+      "proposed_canonical_survivor": "CRS174",
+      "reasoning": "CRS173 is an apparent misspelling of Geodetic Engineering."
+    },
+    {
+      "classification": "HIGH-CONFIDENCE DUPLICATE",
+      "codes": [
+        "CRS175",
+        "CRS211"
+      ],
+      "current_names": [
+        "Bachelor of Science in Civil Engineering major in Geotechnical Engineering",
+        "Bachelor of Science in Civil Engineering major in Geotechnical"
+      ],
+      "proposed_canonical_survivor": "CRS175",
+      "reasoning": "Same Civil Engineering geotechnical major; Engineering suffix omitted in one."
+    },
+    {
+      "classification": "HIGH-CONFIDENCE DUPLICATE",
+      "codes": [
+        "CRS200",
+        "CRS201"
+      ],
+      "current_names": [
+        "Bachelor of Science in Industrial Technology major in Foods",
+        "Bachelor of Science in Industrial Technology major in Foods Technology"
+      ],
+      "proposed_canonical_survivor": "CRS201",
+      "reasoning": "Same Industrial Technology Foods/Foods Technology major naming variant."
+    },
+    {
+      "classification": "HIGH-CONFIDENCE DUPLICATE",
+      "codes": [
+        "CRS224",
+        "CRS225"
+      ],
+      "current_names": [
+        "Bachelor of Science in Information and Communications Technology",
+        "Bachelor of Science in Information and Communication Technology"
+      ],
+      "proposed_canonical_survivor": "CRS225",
+      "reasoning": "Same Information and Communication(s) Technology title; pluralization only."
+    },
+    {
+      "classification": "HIGH-CONFIDENCE DUPLICATE",
+      "codes": [
+        "CRS228",
+        "CRS229"
+      ],
+      "current_names": [
+        "Bachelor of Science in Information System major in Information System",
+        "Bachelor of Information Systems"
+      ],
+      "proposed_canonical_survivor": "CRS229",
+      "reasoning": "Same Information Systems degree; one redundantly repeats the major."
+    },
+    {
+      "classification": "HIGH-CONFIDENCE DUPLICATE",
+      "codes": [
+        "CRS253",
+        "CRS254"
+      ],
+      "current_names": [
+        "Bachelor of Science in Education major in Mathematics",
+        "Bachelor in Mathematics Education major in Mathematics"
+      ],
+      "proposed_canonical_survivor": "CRS253",
+      "reasoning": "Same Mathematics Education degree/major with reordered wording."
+    },
+    {
+      "classification": "HIGH-CONFIDENCE DUPLICATE",
+      "codes": [
+        "CRS264",
+        "CRS265"
+      ],
+      "current_names": [
+        "Bachelor of Music major in Music Education",
+        "Bachelor of Music in Music Education"
+      ],
+      "proposed_canonical_survivor": "CRS265",
+      "reasoning": "Same Music Education degree with major/in wording variation."
+    },
+    {
+      "classification": "HIGH-CONFIDENCE DUPLICATE",
+      "codes": [
+        "CRS302",
+        "CRS304"
+      ],
+      "current_names": [
+        "Bachelor of Sports Science",
+        "Bachelor in Sports Science"
+      ],
+      "proposed_canonical_survivor": "CRS302",
+      "reasoning": "Same Sports Science degree and BSESS abbreviation; in/of variation only."
+    },
+    {
+      "classification": "HIGH-CONFIDENCE DUPLICATE",
+      "codes": [
+        "CRS315",
+        "CRS316"
+      ],
+      "current_names": [
+        "Bachelor of Science in Civil Engineering major in Transportation",
+        "Bachelor of Science in Civil Engineering major in Transportation Engineering"
+      ],
+      "proposed_canonical_survivor": "CRS316",
+      "reasoning": "Same Civil Engineering transportation major; Engineering suffix only."
+    },
+    {
+      "classification": "HIGH-CONFIDENCE DUPLICATE",
+      "codes": [
+        "CRS317",
+        "CRS318"
+      ],
+      "current_names": [
+        "Bachelor of Science in Civil Engineering major in Water Resource Engineering",
+        "Bachelor of Science in Civil Engineering major in Water Resources Engineering"
+      ],
+      "proposed_canonical_survivor": "CRS318",
+      "reasoning": "Same Civil Engineering Water Resource(s) Engineering major; singular/plural only."
+    },
+    {
+      "classification": "HIGH-CONFIDENCE DUPLICATE",
+      "codes": [
+        "CRS328",
+        "CRS329"
+      ],
+      "current_names": [
+        "Bachelor of Industrial Technology major in Computer",
+        "Bachelor of Science in Industrial Technology major in Computer Technology"
+      ],
+      "proposed_canonical_survivor": "CRS329",
+      "reasoning": "Same Industrial Technology computer major; BS and Technology suffix vary."
+    },
+    {
+      "classification": "HIGH-CONFIDENCE DUPLICATE",
+      "codes": [
+        "CRS337",
+        "CRS338"
+      ],
+      "current_names": [
+        "Bachelor of Science in Industrial Technology major in Electronics",
+        "Bachelor in Industrial Technology major in Electronics"
+      ],
+      "proposed_canonical_survivor": "CRS337",
+      "reasoning": "Same Industrial Technology Electronics major; Bachelor/BS wording only."
+    },
+    {
+      "classification": "HIGH-CONFIDENCE DUPLICATE",
+      "codes": [
+        "CRS340",
+        "CRS341"
+      ],
+      "current_names": [
+        "Bachelor of Science in Industrial Technology major in Electronics & Communications Technology",
+        "Bachelor in Industrial Technology major in Electronics and Communications Technology"
+      ],
+      "proposed_canonical_survivor": "CRS340",
+      "reasoning": "Same Industrial Technology Electronics and Communications Technology major; Bachelor/BS and ampersand variation."
+    },
+    {
+      "classification": "LIKELY DUPLICATE — REQUIRES REVIEW",
+      "codes": [
+        "CRS046",
+        "CRS165",
+        "CRS166"
+      ],
+      "current_names": [
+        "Bachelor of Fine Arts",
+        "Bachelor of Science in Fine Arts",
+        "Bachelor of Arts in Fine Arts major in Fine Arts"
+      ],
+      "proposed_canonical_survivor": "CRS046",
+      "reasoning": "Fine Arts appears repeated, but BFA, BS, and BA designations may encode institution-specific curricular differences."
+    },
+    {
+      "classification": "LIKELY DUPLICATE — REQUIRES REVIEW",
+      "codes": [
+        "CRS057",
+        "CRS058",
+        "CRS060"
+      ],
+      "current_names": [
+        "Bachelor of Science in Industrial Engineering Minor in Service Management",
+        "Bachelor of Science in Industrial Engineering with Specialization in Service Management",
+        "Bachelor of Science in Industrial Management Engineering Minor in Service Management"
+      ],
+      "proposed_canonical_survivor": "CRS058",
+      "reasoning": "Service Management appears as minor/specialization under Industrial Engineering or Industrial Management Engineering; likely overlapping but degree wording differs."
+    },
+    {
+      "classification": "LIKELY DUPLICATE — REQUIRES REVIEW",
+      "codes": [
+        "CRS090",
+        "CRS275"
+      ],
+      "current_names": [
+        "Bachelor of Physical Education (BPEd)",
+        "Bachelor of Science in Physical Education"
+      ],
+      "proposed_canonical_survivor": "CRS090",
+      "reasoning": "Physical Education titles likely represent the same teacher-education family, but BS versus BPEd requires regulatory-era review."
+    },
+    {
+      "classification": "LIKELY DUPLICATE — REQUIRES REVIEW",
+      "codes": [
+        "CRS094",
+        "CRS281"
+      ],
+      "current_names": [
+        "Bachelor of Science in Psychology (BS Psychology)",
+        "Bachelor of Psychology"
+      ],
+      "proposed_canonical_survivor": "CRS094",
+      "reasoning": "Bachelor of Psychology likely overlaps BS Psychology, but generic naming may conceal BA/BS structure."
+    },
+    {
+      "classification": "LIKELY DUPLICATE — REQUIRES REVIEW",
+      "codes": [
+        "CRS123",
+        "CRS170",
+        "CRS171",
+        "CRS172",
+        "CRS197",
+        "CRS205",
+        "CRS206"
+      ],
+      "current_names": [
+        "Bachelor of Industrial Technology major in Apparel and Fashion Design",
+        "Bachelor of Science in Industrial Technology major in Garments Fashion and Design",
+        "Bachelor of Science in Industrial Technology major in Garments, Fashion and Design Technology",
+        "Bachelor of Industrial Technology major in Garments, Fashions and Designs",
+        "Bachelor of Industrial Technology major in Fashion Design and Apparel Technology",
+        "Bachelor of Industrial Technology major in Garment, Fashion and Design",
+        "Bachelor of Industrial Technology (E-TEEAP) major in Garments, Fashion and Design Technology"
+      ],
+      "proposed_canonical_survivor": "CRS171",
+      "reasoning": "Industrial Technology fashion/apparel/garments majors are heavily overlapping; E-TEEAP is a delivery pathway, not a separate discipline."
+    },
+    {
+      "classification": "LIKELY DUPLICATE — REQUIRES REVIEW",
+      "codes": [
+        "CRS133",
+        "CRS138",
+        "CRS326"
+      ],
+      "current_names": [
+        "Bachelor of Engineering Technology major in Civil Engineering Technology",
+        "Bachelor of Engineering Technology Major in Construction Engineering Technology",
+        "Bachelor of Technology major in Civil Engineering Technology"
+      ],
+      "proposed_canonical_survivor": "CRS133",
+      "reasoning": "Civil Engineering Technology appears as a degree/major under Bachelor of Engineering Technology or Bachelor of Technology."
+    },
+    {
+      "classification": "LIKELY DUPLICATE — REQUIRES REVIEW",
+      "codes": [
+        "CRS146",
+        "CRS240",
+        "CRS241"
+      ],
+      "current_names": [
+        "Bachelor of Science in Engineering Management",
+        "Bachelor of Science in Management Engineering",
+        "Bachelor of Science in Management Science and Engineering"
+      ],
+      "proposed_canonical_survivor": "CRS146",
+      "reasoning": "Engineering Management, Management Engineering, and Management Science and Engineering overlap substantially but may be distinct curricula."
+    },
+    {
+      "classification": "LIKELY DUPLICATE — REQUIRES REVIEW",
+      "codes": [
+        "CRS242",
+        "CRS243"
+      ],
+      "current_names": [
+        "Bachelor of Science in Manufacturing Engineering Technology",
+        "Bachelor of Engineering Technology major in Manufacturing Engineering Technology"
+      ],
+      "proposed_canonical_survivor": "CRS242",
+      "reasoning": "Manufacturing Engineering Technology differs only by Bachelor of Science versus Bachelor of Engineering Technology wording."
+    },
+    {
+      "classification": "LIKELY DUPLICATE — REQUIRES REVIEW",
+      "codes": [
+        "CRS258",
+        "CRS259",
+        "CRS260"
+      ],
+      "current_names": [
+        "Bachelor of Engineering Technology Major in Mechanical Engineering Technology Specialized in Automotive Engineering Technology",
+        "Bachelor of Engineering Technology Major in Mechanical Engineering Technology With Specialization in Automotive Technology",
+        "Bachelor of Engineering Technology Major in Mechanical Technology-Automotive Technology"
+      ],
+      "proposed_canonical_survivor": "CRS259",
+      "reasoning": "Automotive specialization variants under Mechanical Engineering Technology appear semantically equivalent."
+    },
+    {
+      "classification": "LIKELY DUPLICATE — REQUIRES REVIEW",
+      "codes": [
+        "CRS294",
+        "CRS295"
+      ],
+      "current_names": [
+        "Bachelor in Sign Language Interpretation",
+        "Bachelor of Arts major in Sign Language Interpreting"
+      ],
+      "proposed_canonical_survivor": "CRS294",
+      "reasoning": "Sign Language Interpretation/Interpreting likely names the same program, but degree type is unclear."
+    },
+    {
+      "classification": "LIKELY DUPLICATE — REQUIRES REVIEW",
+      "codes": [
+        "CRS312",
+        "CRS314"
+      ],
+      "current_names": [
+        "Bachelor of Science in Theology",
+        "Bachelor of Theology"
+      ],
+      "proposed_canonical_survivor": "CRS314",
+      "reasoning": "BS Theology and Bachelor of Theology may be naming variants, but theological degree structures can differ."
+    },
+    {
+      "classification": "RELATED BUT DISTINCT",
+      "codes": [
+        "CRS030",
+        "CRS031"
+      ],
+      "current_names": [
+        "Bachelor of Science in Economics",
+        "Bachelor of Arts in Economics"
+      ],
+      "proposed_canonical_survivor": null,
+      "reasoning": "BS Economics and BA Economics can have different quantitative/liberal-arts emphasis."
+    },
+    {
+      "classification": "RELATED BUT DISTINCT",
+      "codes": [
+        "CRS094",
+        "CRS095"
+      ],
+      "current_names": [
+        "Bachelor of Science in Psychology (BS Psychology)",
+        "Bachelor of Arts in Psychology (BA Psychology)"
+      ],
+      "proposed_canonical_survivor": null,
+      "reasoning": "BS and BA Psychology are recognized degree variants and should not be automatically merged."
+    },
+    {
+      "classification": "RELATED BUT DISTINCT",
+      "codes": [
+        "CRS096",
+        "CRS282",
+        "CRS283"
+      ],
+      "current_names": [
+        "Bachelor of Public Administration (BPA)",
+        "Bachelor of Science in Public Administration",
+        "Bachelor of Arts in Public Administration"
+      ],
+      "proposed_canonical_survivor": null,
+      "reasoning": "Public Administration degree designations are related; BA and BS variants may be distinct, while BPA is the general professional title."
+    },
+    {
+      "classification": "RELATED BUT DISTINCT",
+      "codes": [
+        "CRS104",
+        "CRS298",
+        "CRS106"
+      ],
+      "current_names": [
+        "Bachelor of Arts in Social Science (AB Social Science)",
+        "Bachelor of Science in Sociology",
+        "Bachelor of Arts in Sociology (BA Sociology)"
+      ],
+      "proposed_canonical_survivor": null,
+      "reasoning": "Social Science and Sociology overlap topically but are not the same program."
+    },
+    {
+      "classification": "RELATED BUT DISTINCT",
+      "codes": [
+        "CRS131",
+        "CRS132",
+        "CRS325",
+        "CRS334"
+      ],
+      "current_names": [
+        "Bachelor of Science in Christian Education major in Values Education",
+        "Bachelor of Secondary Education major in Values Education With Emphasis in Christian Education",
+        "Bachelor of Arts in Christian Education",
+        "Bachelor of Arts in Religious Education"
+      ],
+      "proposed_canonical_survivor": null,
+      "reasoning": "Christian/Religious Education programs differ by teacher-training emphasis and degree structure."
+    },
+    {
+      "classification": "RELATED BUT DISTINCT",
+      "codes": [
+        "CRS312",
+        "CRS313",
+        "CRS314",
+        "CRS334"
+      ],
+      "current_names": [
+        "Bachelor of Science in Theology",
+        "Bachelor of Arts in Theology",
+        "Bachelor of Theology",
+        "Bachelor of Arts in Religious Education"
+      ],
+      "proposed_canonical_survivor": null,
+      "reasoning": "Theology BA/BS/BTh and Religious Education share subject matter but are not safely equivalent."
+    },
+    {
+      "classification": "RELATED BUT DISTINCT",
+      "codes": [
+        "CRS021",
+        "CRS175",
+        "CRS183",
+        "CRS184",
+        "CRS211",
+        "CRS305",
+        "CRS315",
+        "CRS316",
+        "CRS317",
+        "CRS318"
+      ],
+      "current_names": [
+        "Bachelor of Science in Civil Engineering",
+        "Bachelor of Science in Civil Engineering major in Geotechnical Engineering",
+        "Bachelor of Science in Civil Engineering With Specialization in Hydraulics and Water Resources Engineering",
+        "Bachelor of Science in Civil Engineering-Water Resources",
+        "Bachelor of Science in Civil Engineering major in Geotechnical",
+        "Bachelor of Science in Civil Engineering major in Structural Engineering",
+        "Bachelor of Science in Civil Engineering major in Transportation",
+        "Bachelor of Science in Civil Engineering major in Transportation Engineering",
+        "Bachelor of Science in Civil Engineering major in Water Resource Engineering",
+        "Bachelor of Science in Civil Engineering major in Water Resources Engineering"
+      ],
+      "proposed_canonical_survivor": null,
+      "reasoning": "Parent Civil Engineering and named majors/specializations are distinct catalog concepts, though duplicate specializations exist within the set."
+    },
+    {
+      "classification": "RELATED BUT DISTINCT",
+      "codes": [
+        "CRS042",
+        "CRS134",
+        "CRS142",
+        "CRS155",
+        "CRS156",
+        "CRS266",
+        "CRS286"
+      ],
+      "current_names": [
+        "Bachelor of Science in Environmental Science",
+        "Bachelor of Science in Environmental Science major in Coastal Resource Management",
+        "Bachelor of Science in Environmental Science major in Ecosystem Management",
+        "Bachelor of Science in Environmental Science major in Environmental Heritage Studies",
+        "Bachelor of Science in Environmental Science major in Environmental Planning Management",
+        "Bachelor of Science in Environmental Science major in Natural Resource Management",
+        "Bachelor of Science in Environmental Science major in Resource Management"
+      ],
+      "proposed_canonical_survivor": null,
+      "reasoning": "Parent Environmental Science and materially named resource/ecosystem/planning majors should remain distinct."
+    },
+    {
+      "classification": "RELATED BUT DISTINCT",
+      "codes": [
+        "CRS109",
+        "CRS303"
+      ],
+      "current_names": [
+        "Bachelor of Science in Exercise and Sports Sciences (BSESS)",
+        "Bachelor of Science in Exercise and Sports Sciences major in Fitness and Sports Coaching"
+      ],
+      "proposed_canonical_survivor": null,
+      "reasoning": "General Exercise and Sports Sciences versus Fitness and Sports Coaching specialization."
+    },
+    {
+      "classification": "RELATED BUT DISTINCT",
+      "codes": [
+        "CRS187",
+        "CRS231"
+      ],
+      "current_names": [
+        "Bachelor of Instrumentation and Control Engineering Technology",
+        "Bachelor of Science in Instrumentation and Control Engineering"
+      ],
+      "proposed_canonical_survivor": null,
+      "reasoning": "Engineering Technology and Engineering degrees are not automatically equivalent."
+    },
+    {
+      "classification": "DISTINCT",
+      "codes": [
+        "CRS018",
+        "CRS019"
+      ],
+      "current_names": [
+        "Bachelor of Science in Chemical Engineering",
+        "Bachelor of Science in Chemistry"
+      ],
+      "proposed_canonical_survivor": null,
+      "reasoning": "Chemical Engineering and Chemistry are different professional/scientific programs."
+    },
+    {
+      "classification": "DISTINCT",
+      "codes": [
+        "CRS024",
+        "CRS062",
+        "CRS026"
+      ],
+      "current_names": [
+        "Bachelor of Science in Computer Engineering",
+        "Bachelor of Science in Information Technology",
+        "Bachelor of Computer Science"
+      ],
+      "proposed_canonical_survivor": null,
+      "reasoning": "Computer Engineering, IT, and Computer Science are separate computing disciplines."
+    },
+    {
+      "classification": "DISTINCT",
+      "codes": [
+        "CRS071",
+        "CRS247"
+      ],
+      "current_names": [
+        "Bachelor of Science in Marine Biology",
+        "Bachelor of Science in Marine Science"
+      ],
+      "proposed_canonical_survivor": null,
+      "reasoning": "Marine Biology and broader Marine Science are related but distinct."
+    },
+    {
+      "classification": "DISTINCT",
+      "codes": [
+        "CRS081",
+        "CRS209",
+        "CRS212"
+      ],
+      "current_names": [
+        "Bachelor of Science in Mining Engineering (BSEM)",
+        "Bachelor of Science in Geological Engineering",
+        "Bachelor of Science in Geothermal Engineering"
+      ],
+      "proposed_canonical_survivor": null,
+      "reasoning": "Mining, Geological, and Geothermal Engineering are distinct engineering fields."
+    },
+    {
+      "classification": "DISTINCT",
+      "codes": [
+        "CRS084",
+        "CRS048"
+      ],
+      "current_names": [
+        "Bachelor of Science in Nutrition and Dietetics (BSND)",
+        "Bachelor of Science in Food Technology"
+      ],
+      "proposed_canonical_survivor": null,
+      "reasoning": "Nutrition and Dietetics and Food Technology are distinct health and food-science programs."
+    }
+  ],
+  "questionable_programs": [
+    {
+      "code": "CRS020",
+      "name": "Bachelor of Science in Civil Engineering Major in Civil",
+      "reason": "Redundant “Major in Civil” on the parent Civil Engineering title."
+    },
+    {
+      "code": "CRS033",
+      "name": "Bachelor of Science in Electronic Engineering major in Electronic Engineering",
+      "reason": "Redundant self-major and singular “Electronic Engineering” wording."
+    },
+    {
+      "code": "CRS043",
+      "name": "Bachelor of Science in Family Economics major in Foods and Food Management",
+      "reason": "Family Economics/Foods and Food Management naming appears legacy and needs current-program verification."
+    },
+    {
+      "code": "CRS057",
+      "name": "Bachelor of Science in Industrial Engineering Minor in Service Management",
+      "reason": "A minor is encoded as an independent canonical course."
+    },
+    {
+      "code": "CRS059",
+      "name": "Bachelor of Science in Industrial Management Engineering Minor in Information Technology",
+      "reason": "Composite Industrial Management Engineering/IT-minor title lacks course-specific evidence."
+    },
+    {
+      "code": "CRS060",
+      "name": "Bachelor of Science in Industrial Management Engineering Minor in Service Management",
+      "reason": "Composite Industrial Management Engineering/Service Management-minor title lacks course-specific evidence."
+    },
+    {
+      "code": "CRS114",
+      "name": "Bs in Accounting Information System (Information Technology Related)",
+      "reason": "Malformed casing and parenthetical taxonomy note embedded in the name."
+    },
+    {
+      "code": "CRS127",
+      "name": "Bachelor of Arts major in Biology",
+      "reason": "BA major in Biology is unusual and needs recognized-program evidence."
+    },
+    {
+      "code": "CRS149",
+      "name": "Bachelor in Arts in English",
+      "reason": "Malformed “Bachelor in Arts in English” title and likely overlap with English programs."
+    },
+    {
+      "code": "CRS173",
+      "name": "Bachelor of Science in Geiodetic Engineering",
+      "reason": "Misspelled “Geiodetic.”"
+    },
+    {
+      "code": "CRS180",
+      "name": "Bachelor of Science in Aviation Engineering Technology major in Aviation Engineering Technology",
+      "reason": "Degree and major repeat Aviation Engineering Technology."
+    },
+    {
+      "code": "CRS196",
+      "name": "Bachelor of Science in Environmental Engineering Technology major in Envet",
+      "reason": "“Envet” is unexplained/opaque and lacks verified course-specific PSG."
+    },
+    {
+      "code": "CRS206",
+      "name": "Bachelor of Industrial Technology (E-TEEAP) major in Garments, Fashion and Design Technology",
+      "reason": "E-TEEAP delivery pathway is embedded as if it were a separate degree."
+    },
+    {
+      "code": "CRS232",
+      "name": "Bachelor of Science in Applied Economics major in Industrial Economics and Bachelor of Science in Accountancy",
+      "reason": "Two degrees are concatenated into one canonical record."
+    },
+    {
+      "code": "CRS245",
+      "name": "Bachelor of Science in Marine Engineering and Electro Technology",
+      "reason": "Marine Engineering and Electro Technology combined title needs evidence."
+    },
+    {
+      "code": "CRS276",
+      "name": "Bachelor in Physical Therapy (Foreign Student) 1St Year",
+      "reason": "“Foreign Student 1St Year” is a cohort/year label, not a degree."
+    },
+    {
+      "code": "CRS278",
+      "name": "Bachelor of Na major in Political Science",
+      "reason": "Malformed placeholder “Na” in the degree title."
+    },
+    {
+      "code": "CRS322",
+      "name": "Bachelor of Arts in Behavioral Sciences major in Organizational and Social Systems Development and Bachelor of Science in Advertising Management Bachelor of Science in Advertising Management",
+      "reason": "Multiple programs are concatenated and Advertising Management is repeated."
+    }
+  ]
+}

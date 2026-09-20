@@ -1,0 +1,145 @@
+{
+  "generated_on": "2026-09-21",
+  "review_only": true,
+  "source_rows": 223,
+  "classifications": {
+    "EXACT": 50,
+    "NORMALIZED": 50,
+    "MAJOR_OR_SPECIALIZATION": 28,
+    "AMBIGUOUS": 74,
+    "UNMATCHED": 21
+  },
+  "confidence": {
+    "High": 128,
+    "Medium": 0,
+    "Low": 95
+  },
+  "unique_canonical_courses_mapped": 49,
+  "canonical_courses_with_no_proposed_sjdm_school": 293,
+  "schools_covered": 13,
+  "schools_with_at_least_one_high_confidence_mapping": 13,
+  "rows_needing_manual_review": 95,
+  "duplicate_source_offerings": [
+    {
+      "key": "03012b|Associate in Computer Technology|",
+      "source_rows": [
+        24,
+        25
+      ]
+    },
+    {
+      "key": "03135|Bachelor of Science in Business Administration major in Human Resource Management|Human Resource Management",
+      "source_rows": [
+        175,
+        176
+      ]
+    },
+    {
+      "key": "03135|Bachelor of Science in Business Administration major in Marketing Management|Marketing Management",
+      "source_rows": [
+        177,
+        178
+      ]
+    },
+    {
+      "key": "03135|Bachelor of Science in Computer Science|",
+      "source_rows": [
+        179,
+        180
+      ]
+    },
+    {
+      "key": "03135|Bachelor of Science in Elementary Education|",
+      "source_rows": [
+        181,
+        182
+      ]
+    },
+    {
+      "key": "03135|Bachelor of Science in Entrepreneurship|",
+      "source_rows": [
+        183,
+        184
+      ]
+    },
+    {
+      "key": "03135|Bachelor of Science in Hospitality Management|",
+      "source_rows": [
+        185,
+        186
+      ]
+    },
+    {
+      "key": "03135|Bachelor of Science in Secondary Education major in English|English",
+      "source_rows": [
+        187,
+        188
+      ]
+    },
+    {
+      "key": "03135|Bachelor of Science in Secondary Education major in Filipino|Filipino",
+      "source_rows": [
+        189,
+        190
+      ]
+    },
+    {
+      "key": "03135|Bachelor of Science in Secondary Education major in Mathematics|Mathematics",
+      "source_rows": [
+        191,
+        192
+      ]
+    },
+    {
+      "key": "03135|Bachelor of Science in Secondary Education major in Values Education|Values Education",
+      "source_rows": [
+        193,
+        194
+      ]
+    }
+  ],
+  "duplicate_proposed_school_course_major_combinations": [
+    {
+      "key": "03135|CRS026|",
+      "source_rows": [
+        179,
+        180
+      ]
+    },
+    {
+      "key": "03135|CRS035|",
+      "source_rows": [
+        181,
+        182
+      ]
+    },
+    {
+      "key": "03135|CRS040|",
+      "source_rows": [
+        183,
+        184
+      ]
+    },
+    {
+      "key": "03135|CRS053|",
+      "source_rows": [
+        185,
+        186
+      ]
+    },
+    {
+      "key": "03135|CRS290|English",
+      "source_rows": [
+        187,
+        188
+      ]
+    }
+  ],
+  "integrity": {
+    "exactly_223_rows": true,
+    "all_codes_canonical": true,
+    "all_names_exact": true,
+    "all_13_schools_accounted_for": true,
+    "majors_preserved": true
+  }
+}
