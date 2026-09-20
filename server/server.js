@@ -15,6 +15,7 @@ import { validatePersonalitySubmission } from './services/personalitySubmissionS
 import { getAdminCourses, setCourseActiveStatus } from './services/adminCourseService.js'
 import { getAdminDashboard } from './services/adminDashboardService.js'
 import { getAdminAnalytics } from './services/adminAnalyticsService.js'
+import { getAdminFeedback, getAdminFeedbackDetail } from './services/adminFeedbackService.js'
 import { getAdminUserDetail, getAdminUsers } from './services/adminUserMonitoringService.js'
 import { normalizeCourseSearchQuery, searchActiveCollegeCourses } from './services/collegeCourseSearchService.js'
 import {
@@ -605,6 +606,27 @@ app.get('/api/admin/analytics', authenticateAdmin, async (req, res) => {
   } catch (error) {
     console.error('Admin analytics fetch error:', error)
     res.status(500).json({ message: 'Server error fetching analytics' })
+  }
+})
+
+app.get('/api/admin/feedback', authenticateAdmin, async (req, res) => {
+  try {
+    const result = await getAdminFeedback(pool, req.query)
+    res.json(result)
+  } catch (error) {
+    console.error('Admin feedback fetch error:', error)
+    res.status(500).json({ message: 'Server error fetching feedback' })
+  }
+})
+
+app.get('/api/admin/feedback/:feedbackId', authenticateAdmin, async (req, res) => {
+  try {
+    const feedback = await getAdminFeedbackDetail(pool, req.params.feedbackId)
+    if (!feedback) return res.status(404).json({ message: 'Feedback not found' })
+    res.json({ feedback })
+  } catch (error) {
+    console.error('Admin feedback detail fetch error:', error)
+    res.status(500).json({ message: 'Server error fetching feedback details' })
   }
 })
 

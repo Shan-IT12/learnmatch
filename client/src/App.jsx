@@ -21,6 +21,8 @@ import AdminDashboard from './pages/admin/AdminDashboard'
 import AdminUsers from './pages/admin/AdminUsers'
 import AdminUserDetail from './pages/admin/AdminUserDetail'
 import AdminAnalytics from './pages/admin/AdminAnalytics'
+import AdminFeedback from './pages/admin/AdminFeedback'
+import AdminFeedbackDetail from './pages/admin/AdminFeedbackDetail'
 import AdminRoute from './components/AdminRoute'
 import CourseSearch from './pages/CourseSearch'
 import PublicCourseDetails from './pages/PublicCourseDetails'
@@ -55,6 +57,8 @@ function App() {
       <Route path="/admin/users/:userId" element={<AdminRoute><AdminUserDetail /></AdminRoute>} />
       <Route path="/admin/courses" element={<AdminRoute><ManageCourses /></AdminRoute>} />
       <Route path="/admin/analytics" element={<AdminRoute><AdminAnalytics /></AdminRoute>} />
+      <Route path="/admin/feedback" element={<AdminRoute><AdminFeedback /></AdminRoute>} />
+      <Route path="/admin/feedback/:feedbackId" element={<AdminRoute><AdminFeedbackDetail /></AdminRoute>} />
     </Routes>
   )
 }
