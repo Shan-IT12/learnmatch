@@ -13,6 +13,7 @@ import publicCourseRoutes from './routes/publicCourseRoutes.js'
 import { validateInterestSubmission } from './services/interestSubmissionService.js'
 import { validatePersonalitySubmission } from './services/personalitySubmissionService.js'
 import { getAdminCourses, setCourseActiveStatus } from './services/adminCourseService.js'
+import { getAdminDashboard } from './services/adminDashboardService.js'
 import { normalizeCourseSearchQuery, searchActiveCollegeCourses } from './services/collegeCourseSearchService.js'
 import {
   RecommendationDataError,
@@ -584,6 +585,16 @@ app.post('/api/admin/login', async (req, res) => {
 })
 
 // ============ ADMIN: COURSE MANAGEMENT ============
+
+app.get('/api/admin/dashboard', authenticateAdmin, async (req, res) => {
+  try {
+    const dashboard = await getAdminDashboard(pool)
+    res.json(dashboard)
+  } catch (error) {
+    console.error('Admin dashboard fetch error:', error)
+    res.status(500).json({ message: 'Server error fetching dashboard analytics' })
+  }
+})
 
 // Get all courses (for the admin course list table)
 app.get('/api/admin/courses', authenticateAdmin, async (req, res) => {
