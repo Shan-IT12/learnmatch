@@ -6,6 +6,12 @@ export const YEAR_LEVELS = ['1st Year', '2nd Year', '3rd Year', '4th Year', '5th
 export const SEMESTERS = ['1st Semester', '2nd Semester', '3rd Semester', 'Summer']
 export const TIMING_MODES = ['exact', 'approximate', 'phase_only', 'manual']
 export const MONTH_PARTS = ['early', 'middle', 'late']
+export const ALIGNMENT_RULES = Object.freeze({
+  passingGwa: 75,
+  highAlignmentPercent: 70,
+  onTrackMismatchExclusive: 30,
+  monitorMismatchExclusive: 60,
+})
 
 // Internal LearnMatch estimation rule. These representative days are used only
 // to make approximate month selections calculable; they are never presented as
@@ -232,6 +238,21 @@ export function validateCheckinAnswers(answers) {
   return normalized.sort((left, right) => left.question_number - right.question_number)
 }
 
+export function determineAlignmentStatus(alignmentPercent, { phase, gwa = null } = {}) {
+  const mismatchScore = 100 - alignmentPercent
+
+  if (phase === 'End' && gwa !== null) {
+    const passing = gwa >= ALIGNMENT_RULES.passingGwa
+    const highAlignment = alignmentPercent >= ALIGNMENT_RULES.highAlignmentPercent
+    if (passing && highAlignment) return 'On Track'
+    if (passing || highAlignment) return 'Monitor'
+    return 'Needs Attention'
+  }
+  if (mismatchScore < ALIGNMENT_RULES.onTrackMismatchExclusive) return 'On Track'
+  if (mismatchScore < ALIGNMENT_RULES.monitorMismatchExclusive) return 'Monitor'
+  return 'Needs Attention'
+}
+
 export function calculateAlignmentResult(answers, { phase, gwa = null } = {}) {
   const normalizedAnswers = validateCheckinAnswers(answers)
   validateChoice(phase, CHECKIN_PHASES, 'check-in phase')
@@ -247,17 +268,7 @@ export function calculateAlignmentResult(answers, { phase, gwa = null } = {}) {
   const average = normalizedAnswers.reduce((sum, answer) => sum + answer.score, 0) / normalizedAnswers.length
   const alignmentPercent = Math.round(((average - 1) / 4) * 100)
   const mismatchScore = 100 - alignmentPercent
-
-  let status
-  if (phase === 'End' && normalizedGwa !== null) {
-    const passing = normalizedGwa >= 75
-    const highAlignment = alignmentPercent >= 70
-    if (passing && highAlignment) status = 'On Track'
-    else if (passing || highAlignment) status = 'Monitor'
-    else status = 'Needs Attention'
-  } else if (mismatchScore < 30) status = 'On Track'
-  else if (mismatchScore < 60) status = 'Monitor'
-  else status = 'Needs Attention'
+  const status = determineAlignmentStatus(alignmentPercent, { phase, gwa: normalizedGwa })
 
   return {
     answers: normalizedAnswers,

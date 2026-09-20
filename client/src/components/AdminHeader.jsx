@@ -9,7 +9,7 @@ function AdminHeader({ currentPage }) {
     navigate('/')
   }
 
-  const navClass = (page) => `text-sm font-medium px-2.5 sm:px-3 py-2 rounded-md transition focus:outline-none focus:ring-2 focus:ring-orange-500 ${
+  const navClass = (page) => `shrink-0 rounded-md px-2 py-2 text-xs font-medium transition focus:outline-none focus:ring-2 focus:ring-orange-500 sm:px-3 sm:text-sm ${
     currentPage === page
       ? 'bg-orange-50 text-orange-700'
       : 'text-slate-600 hover:text-slate-950 hover:bg-slate-50'
@@ -22,10 +22,12 @@ function AdminHeader({ currentPage }) {
           <span>Learn<span className="text-orange-500">Match</span></span>
           <span className="text-sm font-semibold text-slate-500">Admin Portal</span>
         </Link>
-        <nav className="w-full sm:w-auto flex items-center justify-between sm:justify-end gap-1 sm:gap-2" aria-label="Admin navigation">
+        <nav className="flex w-full min-w-0 items-center justify-between gap-0 overflow-x-auto sm:w-auto sm:justify-end sm:gap-2" aria-label="Admin navigation">
           <Link to="/admin" className={navClass('dashboard')}>Dashboard</Link>
+          <Link to="/admin/users" className={navClass('users')}>Users</Link>
           <Link to="/admin/courses" className={navClass('courses')}>Manage Courses</Link>
-          <button type="button" onClick={handleLogout} className="rounded-md px-2.5 py-2 text-sm font-medium text-slate-600 transition hover:bg-orange-50 hover:text-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 sm:px-3">
+          <Link to="/admin/analytics" className={navClass('analytics')}>Analytics</Link>
+          <button type="button" onClick={handleLogout} className="shrink-0 rounded-md px-2 py-2 text-xs font-medium text-slate-600 transition hover:bg-orange-50 hover:text-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 sm:px-3 sm:text-sm">
             Logout
           </button>
         </nav>

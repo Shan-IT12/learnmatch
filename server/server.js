@@ -14,6 +14,8 @@ import { validateInterestSubmission } from './services/interestSubmissionService
 import { validatePersonalitySubmission } from './services/personalitySubmissionService.js'
 import { getAdminCourses, setCourseActiveStatus } from './services/adminCourseService.js'
 import { getAdminDashboard } from './services/adminDashboardService.js'
+import { getAdminAnalytics } from './services/adminAnalyticsService.js'
+import { getAdminUserDetail, getAdminUsers } from './services/adminUserMonitoringService.js'
 import { normalizeCourseSearchQuery, searchActiveCollegeCourses } from './services/collegeCourseSearchService.js'
 import {
   RecommendationDataError,
@@ -593,6 +595,37 @@ app.get('/api/admin/dashboard', authenticateAdmin, async (req, res) => {
   } catch (error) {
     console.error('Admin dashboard fetch error:', error)
     res.status(500).json({ message: 'Server error fetching dashboard analytics' })
+  }
+})
+
+app.get('/api/admin/analytics', authenticateAdmin, async (req, res) => {
+  try {
+    const analytics = await getAdminAnalytics(pool)
+    res.json(analytics)
+  } catch (error) {
+    console.error('Admin analytics fetch error:', error)
+    res.status(500).json({ message: 'Server error fetching analytics' })
+  }
+})
+
+app.get('/api/admin/users', authenticateAdmin, async (req, res) => {
+  try {
+    const result = await getAdminUsers(pool, req.query)
+    res.json(result)
+  } catch (error) {
+    console.error('Admin users fetch error:', error)
+    res.status(500).json({ message: 'Server error fetching users' })
+  }
+})
+
+app.get('/api/admin/users/:userId', authenticateAdmin, async (req, res) => {
+  try {
+    const user = await getAdminUserDetail(pool, req.params.userId)
+    if (!user) return res.status(404).json({ message: 'User not found' })
+    res.json({ user })
+  } catch (error) {
+    console.error('Admin user detail fetch error:', error)
+    res.status(500).json({ message: 'Server error fetching user details' })
   }
 })
 

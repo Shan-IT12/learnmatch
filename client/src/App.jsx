@@ -18,6 +18,9 @@ import Feedback from './pages/Feedback'
 import AdminLogin from "./pages/AdminLogin";
 import ManageCourses from './pages/admin/ManageCourses'
 import AdminDashboard from './pages/admin/AdminDashboard'
+import AdminUsers from './pages/admin/AdminUsers'
+import AdminUserDetail from './pages/admin/AdminUserDetail'
+import AdminAnalytics from './pages/admin/AdminAnalytics'
 import AdminRoute from './components/AdminRoute'
 import CourseSearch from './pages/CourseSearch'
 import PublicCourseDetails from './pages/PublicCourseDetails'
@@ -48,7 +51,10 @@ function App() {
       <Route path="/feedback" element={<Feedback />} />
       <Route path="/admin/login" element={<AdminLogin />} />
       <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+      <Route path="/admin/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />
+      <Route path="/admin/users/:userId" element={<AdminRoute><AdminUserDetail /></AdminRoute>} />
       <Route path="/admin/courses" element={<AdminRoute><ManageCourses /></AdminRoute>} />
+      <Route path="/admin/analytics" element={<AdminRoute><AdminAnalytics /></AdminRoute>} />
     </Routes>
   )
 }
