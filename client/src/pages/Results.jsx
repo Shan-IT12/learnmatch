@@ -172,12 +172,20 @@ function Results() {
                     <p className="text-[11px] text-gray-400 mt-2">LearnMatch’s weighted scoring model determines the ranking. This explanation only interprets those results.</p>
                   </div>
                 )}
+                <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2">
                 <button
                 onClick={() => navigate('/results/career-path', { state: { recommendations } })}
-                className="mt-4 text-sm font-medium text-orange-500 hover:text-orange-600 transition inline-flex items-center gap-1"
+                className="text-sm font-medium text-orange-500 hover:text-orange-600 transition inline-flex items-center gap-1"
               >
                 View Full Career Path →
               </button>
+                  <button
+                    onClick={() => navigate(`/schools/${encodeURIComponent(rec.course_code)}`)}
+                    className="text-sm font-medium text-gray-600 hover:text-orange-600 transition"
+                  >
+                    Find Schools in SJDM
+                  </button>
+                </div>
               <FeedbackPopup />
               </div>
             ))}

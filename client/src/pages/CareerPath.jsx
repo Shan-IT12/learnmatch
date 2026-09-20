@@ -122,7 +122,6 @@ function CareerPath() {
                       <span className="text-sm font-bold text-orange-500">{recommendation.match_score}% match</span>
                     </div>
                     <h2 className="text-lg font-bold text-gray-900 leading-snug">{recommendation.course_name}</h2>
-                    <p className="text-sm font-medium text-gray-500 mt-2">{recommendation.course_code}</p>
                     {recommendation.cluster_category && <p className="text-xs text-gray-400 uppercase tracking-wide mt-2">{recommendation.cluster_category}</p>}
                     <button type="button" onClick={() => openCourse(recommendation)} className="mt-6 md:mt-auto pt-3 w-full bg-orange-500 text-white px-4 py-3 rounded-xl text-sm font-medium hover:bg-orange-600 transition">
                       View Career Path
@@ -138,7 +137,6 @@ function CareerPath() {
           <>
             <span className="text-xs font-semibold text-orange-500 uppercase tracking-wide">{course.cluster_category}</span>
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mt-1 mb-1">{course.course_name}</h1>
-            <p className="text-sm font-medium text-gray-400 mb-3">{course.course_code}</p>
             <p className="text-sm text-gray-600 leading-7 mb-8 max-w-4xl">{course.description}</p>
 
             <section className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm mb-6">

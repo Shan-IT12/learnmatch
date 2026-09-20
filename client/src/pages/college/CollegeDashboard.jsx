@@ -652,7 +652,7 @@ function CollegeDashboard() {
                       <p className="text-sm font-semibold text-gray-900">{record.yearLevel} · {record.semester} · {record.phase}</p>
                       <span className={`inline-flex border rounded-full px-2 py-0.5 text-[9px] font-bold ${statusStyle(record.status)}`}>{record.status}</span>
                     </div>
-                    <p className="text-xs text-gray-400 mt-1">{record.courseCode} · {formatCheckinDate(record.checkinDate) || 'Date unavailable'}</p>
+                    <p className="text-xs text-gray-400 mt-1">{formatCheckinDate(record.checkinDate) || 'Date unavailable'}</p>
                   </div>
                   <div className="sm:text-right">
                     <p className="text-lg font-bold text-orange-500">{record.alignmentPercent}%</p>

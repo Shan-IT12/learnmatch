@@ -322,9 +322,7 @@ function CollegeSetup() {
                       {course.course_name}
                       {course.course_abbreviation && ` (${course.course_abbreviation})`}
                     </p>
-                    <p className="text-xs text-orange-500 mt-0.5">
-                      {[course.course_code, course.cluster_category].filter(Boolean).join(' · ')}
-                    </p>
+                    {course.cluster_category && <p className="text-xs text-orange-500 mt-0.5">{course.cluster_category}</p>}
                   </button>
                 ))}
               </div>
@@ -343,9 +341,7 @@ function CollegeSetup() {
                     {selectedCourse.course_name}
                     {selectedCourse.course_abbreviation && ` (${selectedCourse.course_abbreviation})`}
                   </p>
-                  <p className="text-xs text-orange-500 mt-0.5">
-                    {[selectedCourse.course_code, selectedCourse.cluster_category].filter(Boolean).join(' · ')}
-                  </p>
+                  {selectedCourse.cluster_category && <p className="text-xs text-orange-500 mt-0.5">{selectedCourse.cluster_category}</p>}
                 </div>
                 <button
                   type="button"

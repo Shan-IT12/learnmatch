@@ -3,6 +3,7 @@ import {
   getAvailablePublicCourse,
   searchAvailablePublicCourses,
 } from '../services/publicCourseService.js'
+import { getSchoolsForCourse } from '../services/schoolLocatorService.js'
 
 const router = express.Router()
 
@@ -18,6 +19,17 @@ router.get('/search', async (req, res) => {
   } catch (error) {
     console.error('Public course search error:', error)
     res.status(500).json({ message: 'Server error searching courses' })
+  }
+})
+
+router.get('/:courseCode/schools', async (req, res) => {
+  try {
+    const result = await getSchoolsForCourse(req.params.courseCode)
+    if (!result) return res.status(404).json({ message: 'Course not found' })
+    res.json(result)
+  } catch (error) {
+    console.error('School locator fetch error:', error)
+    res.status(500).json({ message: 'Server error fetching schools' })
   }
 })
 

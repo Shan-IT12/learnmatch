@@ -26,6 +26,7 @@ import AdminFeedbackDetail from './pages/admin/AdminFeedbackDetail'
 import AdminRoute from './components/AdminRoute'
 import CourseSearch from './pages/CourseSearch'
 import PublicCourseDetails from './pages/PublicCourseDetails'
+import SchoolLocator from './pages/SchoolLocator'
 import './App.css'
 
 
@@ -35,6 +36,7 @@ function App() {
       <Route path="/" element={<Landing />} />
       <Route path="/courses/search" element={<CourseSearch />} />
       <Route path="/courses/:courseCode" element={<PublicCourseDetails />} />
+      <Route path="/schools/:courseCode" element={<SchoolLocator />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/dashboard" element={<Dashboard />} />

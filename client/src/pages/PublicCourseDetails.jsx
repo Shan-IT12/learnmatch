@@ -81,6 +81,10 @@ function PublicCourseDetails() {
               <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 leading-tight">{course.course_name}</h1>
               {course.description && <p className="text-gray-600 leading-7 whitespace-pre-line mt-6">{course.description}</p>}
 
+              <Link to={`/schools/${encodeURIComponent(course.course_code)}`} className="inline-flex mt-6 bg-orange-500 text-white px-5 py-3 rounded-xl text-sm font-semibold hover:bg-orange-600 transition">
+                Find Schools in SJDM
+              </Link>
+
               <div className="grid md:grid-cols-2 gap-8 mt-10 pt-8 border-t border-gray-100">
                 <section>
                   <h2 className="text-lg font-semibold text-gray-900 mb-4">Skills you can develop</h2>
