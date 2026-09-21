@@ -2,10 +2,15 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 
 import { PARENT_CLUSTERS, SKILL_DOMAINS } from '../config/recommendationConfig.js'
-import { calculateCourseScore, rankCourses } from '../services/recommendationEngine.js'
+import {
+  calculateCourseScore,
+  calculatePersonalFactorScore,
+  rankCourses,
+} from '../services/recommendationEngine.js'
 import {
   RecommendationInputError,
   buildClusterRiasecVector,
+  buildEffectivePersonalFactors,
   buildStudentDomainScores,
   buildStudentRiasecVector,
   calculateClusterInterestScore,
@@ -16,6 +21,75 @@ import {
   selectTopClusters,
   toDisplayPercent,
 } from '../services/recommendationService.js'
+
+test('a valid matched classification is merged without mutating manual factors', () => {
+  const profile = {
+    factor_family: false,
+    factor_working_student: true,
+    factor_others: 'I care for my siblings.',
+    factor_others_classification_status: 'MATCHED',
+    factor_others_classification: ['factor_family', 'factor_financial'],
+  }
+  const effective = buildEffectivePersonalFactors(profile)
+  assert.equal(effective.factor_family, true)
+  assert.equal(effective.factor_financial, true)
+  assert.equal(effective.factor_working_student, true)
+  assert.equal(profile.factor_family, false)
+})
+
+test('manual and AI selection of the same category remains one effective boolean', () => {
+  const effective = buildEffectivePersonalFactors({
+    factor_family: true,
+    factor_others_classification_status: 'MATCHED',
+    factor_others_classification: '["factor_family"]',
+  })
+  assert.equal(effective.factor_family, true)
+  assert.equal(calculatePersonalFactorScore(effective, 'HEALTHCARE SCIENCE CLUSTER'), 0)
+})
+
+test('distance classification remains non-scoreable', () => {
+  const baseline = calculatePersonalFactorScore({}, 'AVIATION & MARITIME CLUSTER')
+  const effective = buildEffectivePersonalFactors({
+    factor_others_classification_status: 'MATCHED',
+    factor_others_classification: '["factor_distance","factor_working_student"]',
+  })
+  assert.equal(effective.factor_distance, true)
+  assert.equal(effective.factor_working_student, true)
+  assert.notEqual(calculatePersonalFactorScore(effective, 'AVIATION & MARITIME CLUSTER'), baseline)
+  assert.equal(
+    calculatePersonalFactorScore(effective, 'AVIATION & MARITIME CLUSTER'),
+    calculatePersonalFactorScore({ factor_working_student: true }, 'AVIATION & MARITIME CLUSTER')
+  )
+})
+
+test('non-matched and invalid stored classifications have no effect', () => {
+  const baseline = calculatePersonalFactorScore({}, 'HEALTHCARE SCIENCE CLUSTER')
+  for (const profile of [
+    { factor_others_classification_status: 'AMBIGUOUS', factor_others_classification: [] },
+    { factor_others_classification_status: 'UNMATCHED', factor_others_classification: '[]' },
+    { factor_others_classification_status: 'UNAVAILABLE', factor_others_classification: [] },
+    { factor_others_classification_status: 'MATCHED', factor_others_classification: '["invented"]' },
+    { factor_others_classification_status: 'MATCHED', factor_others_classification: 'not-json' },
+    { factor_others_classification_status: 'MATCHED', factor_others_classification: '["factor_family","factor_family"]' },
+    { factor_others: 'Raw text without a classification' },
+  ]) {
+    assert.equal(
+      calculatePersonalFactorScore(buildEffectivePersonalFactors(profile), 'HEALTHCARE SCIENCE CLUSTER'),
+      baseline
+    )
+  }
+})
+
+test('AI classification never disables an existing manual factor', () => {
+  const effective = buildEffectivePersonalFactors({
+    factor_health: true,
+    factor_others_classification_status: 'MATCHED',
+    factor_others_classification: ['factor_financial', 'factor_family'],
+  })
+  assert.equal(effective.factor_health, true)
+  assert.equal(effective.factor_financial, true)
+  assert.equal(effective.factor_family, true)
+})
 
 test('canonical interest names produce the expected RIASEC totals', () => {
   const vector = buildStudentRiasecVector(['Drawing', 'Science Experiments'])

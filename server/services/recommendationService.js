@@ -20,6 +20,39 @@ import {
   calculateRiasecCosineSimilarity,
   rankCourses,
 } from './recommendationEngine.js'
+import {
+  PERSONAL_FACTOR_CATEGORIES,
+  parseStoredPersonalFactorCategories,
+  validatePersonalFactorClassification,
+} from './personalFactorClassificationService.js'
+
+const personalFactorCategorySet = new Set(PERSONAL_FACTOR_CATEGORIES)
+
+export function buildEffectivePersonalFactors(profile = {}) {
+  const effectiveFactors = {
+    factor_physical: profile.factor_physical,
+    factor_health: profile.factor_health,
+    factor_financial: profile.factor_financial,
+    factor_family: profile.factor_family,
+    factor_distance: profile.factor_distance,
+    factor_working_student: profile.factor_working_student,
+  }
+
+  const categories = parseStoredPersonalFactorCategories(
+    profile.factor_others_classification
+  )
+  const classification = validatePersonalFactorClassification({
+    status: profile.factor_others_classification_status,
+    categories,
+  })
+  if (classification.status === 'MATCHED') {
+    for (const category of classification.categories) {
+      if (personalFactorCategorySet.has(category)) effectiveFactors[category] = true
+    }
+  }
+
+  return effectiveFactors
+}
 
 export class RecommendationInputError extends Error {
   constructor(message) {
@@ -365,7 +398,9 @@ export async function getTopCourseRecommendations(pool, userId) {
     ),
     pool.query(
       `SELECT factor_physical, factor_health, factor_financial,
-              factor_family, factor_working_student
+              factor_family, factor_distance, factor_working_student,
+              factor_others, factor_others_classification_status,
+              factor_others_classification
        FROM PROFILE
        WHERE user_id = ?
        LIMIT 1`,
@@ -407,7 +442,7 @@ export async function getTopCourseRecommendations(pool, userId) {
       'A student profile is required to generate recommendations.'
     )
   }
-  const profileFactors = profileRows[0]
+  const profileFactors = buildEffectivePersonalFactors(profileRows[0])
 
   const knownClusters = new Set(PARENT_CLUSTERS)
   const eligibleCourses = courseRows.filter((course) => knownClusters.has(course.cluster_category))

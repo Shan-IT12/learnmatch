@@ -42,6 +42,7 @@ function Profile() {
   const assessmentComplete = location.state?.assessmentComplete
   const entryContext = location.state?.entryContext === 'assessment' ? 'assessment' : 'dashboard'
   const [showRetakePrompt, setShowRetakePrompt] = useState(false)
+  const [othersSelected, setOthersSelected] = useState(false)
 
   const [formData, setFormData] = useState({
     full_name: '',
@@ -82,6 +83,7 @@ function Profile() {
         const data = await response.json()
 
         if (data.profile) {
+          setOthersSelected(Boolean(data.profile.factor_others))
           setFormData({
             full_name: data.profile.full_name || '',
             height_cm: data.profile.height_cm || '',
@@ -348,8 +350,9 @@ function Profile() {
                 <label className="flex items-center gap-3 cursor-pointer mb-2">
                   <input
                     type="checkbox"
-                    checked={formData.factor_others !== ''}
+                    checked={othersSelected}
                     onChange={(e) => {
+                      setOthersSelected(e.target.checked)
                       if (!e.target.checked) {
                         setFormData({ ...formData, factor_others: '' })
                       }
@@ -358,15 +361,24 @@ function Profile() {
                   />
                   <span className="text-sm text-gray-700">Others, please specify</span>
                 </label>
-                {formData.factor_others !== undefined && (
-                  <input
-                    type="text"
-                    name="factor_others"
-                    value={formData.factor_others}
-                    onChange={handleChange}
-                    placeholder="Please specify..."
-                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
-                  />
+                {othersSelected && (
+                  <>
+                    <input
+                      type="text"
+                      name="factor_others"
+                      value={formData.factor_others}
+                      onChange={handleChange}
+                      placeholder="Please specify..."
+                      maxLength={500}
+                      className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+                    />
+                    <p className="mt-1.5 text-right text-xs text-gray-400">
+                      {formData.factor_others.length}/500 characters
+                    </p>
+                    <p className="mt-1 text-xs text-gray-400">
+                      You may describe more than one situation in the same paragraph.
+                    </p>
+                  </>
                 )}
               </div>
             </div>
