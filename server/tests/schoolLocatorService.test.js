@@ -46,6 +46,37 @@ test('returns mapped active course with public context', async () => {
   assert.equal(result.academic_year, SCHOOL_LOCATOR_ACADEMIC_YEAR)
 })
 
+test('attaches exact reviewed coordinates by UII', async () => {
+  const result = await getSchoolsForCourse('CRS062', database({ offeringRows: [schoolOffering()] }))
+  assert.equal(result.schools[0].latitude, 14.81028)
+  assert.equal(result.schools[0].longitude, 121.06149)
+})
+
+test('returns null coordinates for a reviewed school without retained coordinates', async () => {
+  const result = await getSchoolsForCourse('CRS062', database({
+    offeringRows: [schoolOffering(null, {
+      uii: '13228',
+      school_name: 'STI College - San Jose del Monte',
+    })],
+  }))
+  assert.equal(result.schools[0].latitude, null)
+  assert.equal(result.schools[0].longitude, null)
+})
+
+test('returns null coordinates for an unknown UII without changing the school offering', async () => {
+  const sourceOffering = schoolOffering('Cyber Security', {
+    uii: 'unknown-uii',
+    school_name: 'Unknown reviewed location',
+  })
+  const result = await getSchoolsForCourse('CRS062', database({ offeringRows: [sourceOffering] }))
+
+  assert.equal(result.schools.length, 1)
+  assert.equal(result.schools[0].latitude, null)
+  assert.equal(result.schools[0].longitude, null)
+  assert.deepEqual(result.schools[0].offerings, [{ major: 'Cyber Security' }])
+  assert.equal(sourceOffering.major, 'Cyber Security')
+})
+
 test('returns an empty school list for an unmapped active canonical course', async () => {
   const result = await getSchoolsForCourse('CRS062', database())
   assert.deepEqual(result.schools, [])
@@ -80,6 +111,8 @@ test('groups multiple majors into one school result', async () => {
     { major: 'Cyber Security' },
     { major: 'Software Engineering' },
   ])
+  assert.equal(result.schools[0].latitude, 14.81028)
+  assert.equal(result.schools[0].longitude, 121.06149)
 })
 
 test('deduplicates equivalent majors without merging distinct schools', async () => {

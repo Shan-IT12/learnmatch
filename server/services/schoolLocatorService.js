@@ -1,10 +1,26 @@
 import pool from '../config/db.js'
+import schoolLocatorLocations from '../data/schoolLocatorLocations.js'
 
 export const SCHOOL_LOCATOR_SCOPE = 'San Jose del Monte, Bulacan'
 export const SCHOOL_LOCATOR_ACADEMIC_YEAR = '2024-25'
 
 const normalizeCourseCode = (value) => String(value || '').trim().toUpperCase()
 const normalizeMajor = (value) => String(value || '').trim().toLowerCase()
+
+const getReviewedCoordinates = (uii) => {
+  const location = schoolLocatorLocations[uii]
+  if (!location) return { latitude: null, longitude: null }
+
+  const { latitude, longitude } = location
+  const isValid = Number.isFinite(latitude)
+    && latitude >= -90
+    && latitude <= 90
+    && Number.isFinite(longitude)
+    && longitude >= -180
+    && longitude <= 180
+
+  return isValid ? { latitude, longitude } : { latitude: null, longitude: null }
+}
 
 export async function getSchoolsForCourse(courseCode, database = pool) {
   const normalizedCode = normalizeCourseCode(courseCode)
@@ -33,6 +49,7 @@ export async function getSchoolsForCourse(courseCode, database = pool) {
   const schoolsById = new Map()
   for (const row of offeringRows) {
     if (!schoolsById.has(row.school_id)) {
+      const coordinates = getReviewedCoordinates(row.uii)
       schoolsById.set(row.school_id, {
         school_id: row.school_id,
         school_name: row.school_name,
@@ -40,6 +57,8 @@ export async function getSchoolsForCourse(courseCode, database = pool) {
         hei_type: row.hei_type,
         hei_type2: row.hei_type2,
         address: row.address,
+        latitude: coordinates.latitude,
+        longitude: coordinates.longitude,
         offerings: [],
       })
     }

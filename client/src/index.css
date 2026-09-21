@@ -1,1 +1,13 @@
 @import "tailwindcss";
+
+.school-locator-map {
+  height: min(52vh, 32rem);
+  min-height: 22rem;
+}
+
+@media (max-width: 640px) {
+  .school-locator-map {
+    height: 22rem;
+    min-height: 22rem;
+  }
+}

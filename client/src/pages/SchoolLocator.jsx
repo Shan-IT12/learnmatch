@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { IconAlertCircle, IconArrowLeft, IconBook2, IconMapPin, IconSchool } from '@tabler/icons-react'
 import PublicHeader from '../components/PublicHeader'
+import SchoolLocatorMap from '../components/SchoolLocatorMap'
 
 const apiUrl = import.meta.env.VITE_API_URL || ''
 
@@ -12,6 +13,7 @@ function SchoolLocator() {
   const [status, setStatus] = useState('loading')
   const [retryCount, setRetryCount] = useState(0)
   const [resolvedCourseCode, setResolvedCourseCode] = useState(null)
+  const [selectedSchoolId, setSelectedSchoolId] = useState(null)
   const displayStatus = resolvedCourseCode === courseCode ? status : 'loading'
 
   useEffect(() => {
@@ -30,6 +32,7 @@ function SchoolLocator() {
           return
         }
         setResult(data)
+        setSelectedSchoolId(null)
         setStatus('success')
         setResolvedCourseCode(courseCode)
         document.title = `Schools for ${data.course.course_abbreviation || data.course.course_name} | LearnMatch`
@@ -114,6 +117,7 @@ function SchoolLocator() {
                   <div><p className="text-xs font-semibold uppercase tracking-[0.16em] text-orange-600">Available matches</p><h2 className="text-xl sm:text-2xl font-bold mt-1">{result.schools.length} {result.schools.length === 1 ? 'school' : 'schools'} available</h2></div>
                   <p className="text-xs text-gray-400">Academic year {result.academic_year}</p>
                 </div>
+                <SchoolLocatorMap schools={result.schools} selectedSchoolId={selectedSchoolId} />
                 <div className="grid md:grid-cols-2 gap-5">
                   {result.schools.map((school) => {
                     const majors = school.offerings.map((offering) => offering.major).filter(Boolean)
@@ -125,6 +129,15 @@ function SchoolLocator() {
                           <div className="min-w-0"><h3 className="font-bold text-lg leading-snug text-gray-900">{school.school_name}</h3>{(school.hei_type || school.hei_type2) && <p className="text-xs text-gray-500 mt-1">{[school.hei_type, school.hei_type2].filter(Boolean).join(' · ')}</p>}</div>
                         </div>
                         {school.address && <p className="flex items-start gap-2 text-sm text-gray-600 leading-6 mt-5"><IconMapPin size={18} stroke={1.7} className="text-orange-500 shrink-0 mt-0.5" /><span>{school.address}</span></p>}
+                        {Number.isFinite(school.latitude) && Number.isFinite(school.longitude) && (
+                          <button
+                            type="button"
+                            onClick={() => setSelectedSchoolId(school.school_id)}
+                            className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-orange-700 hover:text-orange-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500"
+                          >
+                            <IconMapPin size={17} stroke={1.8} /> Show on map
+                          </button>
+                        )}
                         {(hasGeneralOffering || majors.length > 0) && (
                           <div className="mt-5 pt-5 border-t border-gray-100">
                             <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-2.5">Offering variants</p>
