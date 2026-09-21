@@ -26,6 +26,9 @@ function authenticateToken(req, res, next) {
     if (err) {
       return res.status(403).json({ message: 'Invalid or expired token. Please log in again.' })
     }
+    if (decoded.purpose === 'password-reset') {
+      return res.status(403).json({ message: 'Invalid or expired token. Please log in again.' })
+    }
     req.user = decoded // { userId: 1, username: '...', iat: ..., exp: ... }
     next()
   })

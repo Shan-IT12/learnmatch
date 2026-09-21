@@ -1,6 +1,7 @@
 import pool from '../config/db.js'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
+import { randomInt } from 'node:crypto'
 
 const sendResendMail = async ({ to, subject, html }) => {
   if (!process.env.RESEND_API_KEY) {
@@ -457,5 +458,191 @@ export const loginUser = async (req, res) => {
     return res.status(500).json({
       message: 'Server error during login',
     })
+  }
+}
+
+const normalizeEmail = (email) => String(email || '').trim().toLowerCase()
+
+export const forgotPassword = async (req, res) => {
+  const email = normalizeEmail(req.body?.email)
+
+  if (!isValidEmail(email)) {
+    return res.status(400).json({ message: 'Please enter a valid email address' })
+  }
+
+  const genericResponse = {
+    message: 'If an account exists for that email, a verification code has been sent.',
+  }
+
+  try {
+    const [users] = await pool.query(
+      `SELECT user_id, email FROM USER_ACCOUNT WHERE LOWER(email) = ? AND is_active = 1 LIMIT 1`,
+      [email]
+    )
+
+    if (users.length === 0) {
+      return res.json(genericResponse)
+    }
+
+    const user = users[0]
+    const otpCode = randomInt(100000, 1000000).toString()
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000)
+
+    await pool.query('DELETE FROM OTP_VERIFICATION WHERE user_id = ?', [user.user_id])
+    const [otpResult] = await pool.query(
+      'INSERT INTO OTP_VERIFICATION (user_id, otp_code, expires_at) VALUES (?, ?, ?)',
+      [user.user_id, otpCode, expiresAt]
+    )
+
+    try {
+      await sendResendMail({
+        to: user.email,
+        subject: 'Reset your LearnMatch password',
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 420px; margin: 0 auto; padding: 24px;">
+            <h2 style="color: #f97316;">Reset your LearnMatch password</h2>
+            <p>Use this verification code to reset your password:</p>
+            <p style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #1f2937;">${otpCode}</p>
+            <p style="color: #6b7280; font-size: 14px;">This code expires in 10 minutes. If you did not request this, you can ignore this email.</p>
+          </div>
+        `,
+      })
+    } catch (emailError) {
+      console.error('Resend password reset email error:', emailError)
+      await pool.query(
+        'DELETE FROM OTP_VERIFICATION WHERE otp_id = ? AND user_id = ?',
+        [otpResult.insertId, user.user_id]
+      )
+    }
+
+    return res.json(genericResponse)
+  } catch (error) {
+    console.error('Forgot password error:', error)
+    return res.status(500).json({ message: 'Unable to process the request. Please try again.' })
+  }
+}
+
+export const verifyPasswordResetOtp = async (req, res) => {
+  const email = normalizeEmail(req.body?.email)
+  const otpCode = String(req.body?.otpCode || '').trim()
+
+  if (!isValidEmail(email) || !/^\d{6}$/.test(otpCode)) {
+    return res.status(400).json({ message: 'Invalid or expired verification code.' })
+  }
+
+  try {
+    const [rows] = await pool.query(
+      `
+      SELECT otp.otp_id, otp.user_id, otp.otp_code, otp.expires_at
+      FROM OTP_VERIFICATION otp
+      INNER JOIN USER_ACCOUNT user ON user.user_id = otp.user_id
+      WHERE LOWER(user.email) = ? AND user.is_active = 1
+      ORDER BY otp.otp_id DESC
+      LIMIT 1
+      `,
+      [email]
+    )
+
+    const otp = rows[0]
+    if (!otp || new Date() > new Date(otp.expires_at) || otp.otp_code !== otpCode) {
+      return res.status(400).json({ message: 'Invalid or expired verification code.' })
+    }
+
+    const resetToken = jwt.sign(
+      { userId: otp.user_id, otpId: otp.otp_id, purpose: 'password-reset' },
+      process.env.JWT_SECRET,
+      { expiresIn: '10m' }
+    )
+
+    return res.json({ message: 'Code verified.', resetToken })
+  } catch (error) {
+    console.error('Password reset OTP verification error:', error)
+    return res.status(500).json({ message: 'Unable to verify the code. Please try again.' })
+  }
+}
+
+export const resetPassword = async (req, res) => {
+  const { resetToken, password, confirmPassword } = req.body || {}
+
+  if (!resetToken || !password || !confirmPassword) {
+    return res.status(400).json({ message: 'Reset token, password, and password confirmation are required.' })
+  }
+
+  if (password !== confirmPassword) {
+    return res.status(400).json({ message: 'Passwords do not match' })
+  }
+
+  const passwordError = isValidPassword(password)
+  if (passwordError) {
+    return res.status(400).json({ message: passwordError })
+  }
+
+  let decoded
+  try {
+    decoded = jwt.verify(resetToken, process.env.JWT_SECRET)
+  } catch {
+    return res.status(401).json({ message: 'Invalid or expired password reset authorization.' })
+  }
+
+  if (
+    decoded.purpose !== 'password-reset'
+    || !Number.isInteger(decoded.userId)
+    || !Number.isInteger(decoded.otpId)
+  ) {
+    return res.status(401).json({ message: 'Invalid or expired password reset authorization.' })
+  }
+
+  let connection
+  try {
+    connection = await pool.getConnection()
+    await connection.beginTransaction()
+
+    const [rows] = await connection.query(
+      `
+      SELECT otp.otp_id, otp.expires_at
+      FROM OTP_VERIFICATION otp
+      INNER JOIN USER_ACCOUNT user ON user.user_id = otp.user_id
+      WHERE otp.otp_id = ? AND otp.user_id = ? AND user.is_active = 1
+      FOR UPDATE
+      `,
+      [decoded.otpId, decoded.userId]
+    )
+
+    const otp = rows[0]
+    if (!otp || new Date() > new Date(otp.expires_at)) {
+      await connection.rollback()
+      return res.status(401).json({ message: 'Invalid or expired password reset authorization.' })
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10)
+    const [updateResult] = await connection.query(
+      'UPDATE USER_ACCOUNT SET password = ? WHERE user_id = ? AND is_active = 1',
+      [hashedPassword, decoded.userId]
+    )
+
+    if (updateResult.affectedRows !== 1) {
+      await connection.rollback()
+      return res.status(401).json({ message: 'Invalid or expired password reset authorization.' })
+    }
+
+    const [deleteResult] = await connection.query(
+      'DELETE FROM OTP_VERIFICATION WHERE otp_id = ? AND user_id = ?',
+      [decoded.otpId, decoded.userId]
+    )
+
+    if (deleteResult.affectedRows !== 1) {
+      await connection.rollback()
+      return res.status(401).json({ message: 'Invalid or expired password reset authorization.' })
+    }
+
+    await connection.commit()
+
+    return res.json({ message: 'Password reset successfully. You can now log in.' })
+  } catch (error) {
+    if (connection) await connection.rollback()
+    console.error('Password reset error:', error)
+    return res.status(500).json({ message: 'Unable to reset the password. Please try again.' })
+  } finally {
+    if (connection) connection.release()
   }
 }

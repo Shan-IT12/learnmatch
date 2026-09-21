@@ -2,6 +2,7 @@ import { Routes, Route } from 'react-router-dom'
 import Landing from './pages/Landing'
 import Login from './pages/Login'
 import Register from './pages/Register'
+import ForgotPassword from './pages/ForgotPassword'
 import Dashboard from './pages/Dashboard'
 import Profile from './pages/Profile'
 import OnboardingProfile from './pages/onboarding/OnboardingProfile'
@@ -39,6 +40,7 @@ function App() {
       <Route path="/schools/:courseCode" element={<SchoolLocator />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/profile" element={<Profile />} />
       <Route path="/onboarding/profile" element={<OnboardingProfile />} />
