@@ -1,90 +1,112 @@
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
-import pool from "../config/db.js";
+import fs from 'fs'
+import path from 'path'
+import { fileURLToPath } from 'url'
+import pool from '../config/db.js'
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const EXPECTED_DATABASE = 'learnmatch_db'
+const EXPECTED_HOSTS = new Set(['localhost', '127.0.0.1', '::1'])
+
+function validateCanonicalCourses(courses) {
+  if (!Array.isArray(courses) || courses.length !== 360) {
+    throw new Error('Canonical dataset must contain exactly 360 courses.')
+  }
+  const expectedCodes = Array.from(
+    { length: 360 },
+    (_, index) => `CRS${String(index + 1).padStart(3, '0')}`
+  )
+  if (courses.some((course, index) => course.course_id !== expectedCodes[index])) {
+    throw new Error('Canonical dataset must contain the exact CRS001-CRS360 sequence.')
+  }
+}
+
+async function assertLocalTarget(connection) {
+  const configuredHost = String(process.env.DB_HOST || '').trim().toLowerCase()
+  const [[identity]] = await connection.query('SELECT DATABASE() AS database_name')
+  if (!EXPECTED_HOSTS.has(configuredHost) || identity.database_name !== EXPECTED_DATABASE) {
+    throw new Error('Refusing course sync: database target is not confirmed local LearnMatch.')
+  }
+}
 
 async function importCourses() {
-  let connection;
+  const filePath = path.join(__dirname, '../data/learnmatch_courses_final_342_with_ids.json')
+  const { courses } = JSON.parse(fs.readFileSync(filePath, 'utf8'))
+  validateCanonicalCourses(courses)
 
+  const connection = await pool.getConnection()
   try {
-    const filePath = path.join(
-      __dirname,
-      "../data/learnmatch_courses_final_342_with_ids.json"
-    );
+    await assertLocalTarget(connection)
+    const [existingCourses] = await connection.query(
+      'SELECT course_id, course_code FROM COURSE ORDER BY course_code'
+    )
+    const existingIdsByCode = new Map(
+      existingCourses.map(({ course_id, course_code }) => [course_code, course_id])
+    )
 
-    const rawData = fs.readFileSync(filePath, "utf8");
-    const jsonData = JSON.parse(rawData);
-
-    if (!Array.isArray(jsonData.courses)) {
-      throw new Error('Invalid JSON: "courses" array not found.');
-    }
-
-    console.log(`Found ${jsonData.courses.length} courses.`);
-
-    connection = await pool.getConnection();
-    await connection.beginTransaction();
-
-    for (const course of jsonData.courses) {
+    await connection.beginTransaction()
+    for (const course of courses) {
       const obtainableSkills = Array.isArray(course.obtainable_skills)
-        ? course.obtainable_skills.join("\n")
-        : null;
-
+        ? course.obtainable_skills.join('\n')
+        : null
       await connection.execute(
-        `
-        INSERT INTO COURSE (
-          course_code,
-          course_name,
-          course_abbreviation,
-          program_type,
-          cluster_category,
-          psced_group,
-          description,
-          obtainable_skills,
-          is_active
-        )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `,
+        `INSERT INTO COURSE (
+           course_code, course_name, course_abbreviation, program_type,
+           cluster_category, psced_group, description, obtainable_skills, is_active
+         ) VALUES (?, ?, ?, NULL, ?, NULL, ?, ?, 1)
+         ON DUPLICATE KEY UPDATE
+           course_name = VALUES(course_name),
+           course_abbreviation = VALUES(course_abbreviation),
+           cluster_category = VALUES(cluster_category),
+           description = VALUES(description),
+           obtainable_skills = VALUES(obtainable_skills)`,
         [
           course.course_id,
           course.course_name,
           course.course_abbreviation || null,
-          null,
           course.parent_cluster,
-          null,
           course.course_description || null,
           obtainableSkills,
-          1,
         ]
-      );
-
-      console.log(`Imported ${course.course_id} - ${course.course_name}`);
+      )
     }
 
-    await connection.commit();
+    const [syncedCourses] = await connection.query(
+      'SELECT course_id, course_code FROM COURSE ORDER BY course_code'
+    )
+    const syncedByCode = new Map(
+      syncedCourses.map(({ course_id, course_code }) => [course_code, course_id])
+    )
+    if (syncedCourses.length !== 360 || syncedByCode.size !== 360) {
+      throw new Error('Course sync verification failed: expected 360 unique rows.')
+    }
+    for (const course of courses) {
+      if (!syncedByCode.has(course.course_id)) {
+        throw new Error(`Course sync verification failed: missing ${course.course_id}.`)
+      }
+    }
+    for (const [courseCode, originalId] of existingIdsByCode) {
+      if (syncedByCode.get(courseCode) !== originalId) {
+        throw new Error(`Course sync changed the internal ID for ${courseCode}.`)
+      }
+    }
 
-    console.log("\n====================================");
-    console.log("Course import completed successfully!");
-    console.log(`Total imported: ${jsonData.courses.length}`);
-    console.log("====================================");
-
+    await connection.commit()
+    console.log(JSON.stringify({
+      status: 'committed',
+      database: EXPECTED_DATABASE,
+      stored_courses: syncedCourses.length,
+      existing_internal_ids_preserved: true,
+    }))
   } catch (error) {
-    if (connection) {
-      await connection.rollback();
-    }
-
-    console.error("\nImport failed:");
-    console.error(error);
-
+    await connection.rollback()
+    throw error
   } finally {
-    if (connection) {
-      connection.release();
-    }
-
-    process.exit();
+    connection.release()
+    await pool.end()
   }
 }
 
-importCourses();
+importCourses().catch((error) => {
+  console.error(error.message)
+  process.exitCode = 1
+})
