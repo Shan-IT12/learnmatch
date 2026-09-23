@@ -2,6 +2,11 @@ import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import pool from '../config/db.js'
+import {
+  COURSE_IDENTITY_METADATA,
+  isCurrentIndependentCourse,
+  resolveCanonicalCourseIds,
+} from './courseIdentityService.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const dataPath = path.join(__dirname, '../data/learnmatch_courses_final_342_with_ids.json')
@@ -11,7 +16,7 @@ const { courses: enrichedCourses } = JSON.parse(fs.readFileSync(enrichmentDataPa
 const enrichmentByCourseId = new Map(enrichedCourses.map((course) => [course.course_id, course]))
 
 if (enrichmentByCourseId.size !== courses.length) {
-  throw new Error('Course enrichment dataset must contain the same 342 unique course IDs as the canonical catalog')
+  throw new Error('Course enrichment dataset must contain the same unique course IDs as the canonical catalog')
 }
 
 for (const course of courses) {
@@ -45,11 +50,8 @@ const publicCourse = (course, includeDetails = false) => {
     const enrichment = enrichmentByCourseId.get(course.course_id)
     result.obtainable_skills = course.obtainable_skills || []
     result.career_paths = course.career_paths || []
-    result.sources = course.sources || []
     result.program_duration_years = enrichment.program_duration_years
-    result.duration_basis = enrichment.duration_basis || null
     result.year_levels = enrichment.year_levels || []
-    result.year_level_source_note = enrichment.year_level_source_note || null
     result.career_opportunities = enrichment.career_opportunities || []
   }
 
@@ -66,6 +68,13 @@ const indexedCourses = courses.map((course) => ({
   skills: normalize((course.obtainable_skills || []).join(' ')),
   careers: normalize((course.career_paths || []).join(' ')),
 }))
+const currentIndexedCourses = indexedCourses.filter(({ course }) => (
+  isCurrentIndependentCourse(course.course_id)
+))
+
+if (currentIndexedCourses.length !== COURSE_IDENTITY_METADATA.active_independent_programs) {
+  throw new Error('Active independent course count does not match the course identity registry')
+}
 
 function fieldScore(field, phrase, tokens, weight) {
   if (!field) return 0
@@ -77,7 +86,7 @@ function fieldScore(field, phrase, tokens, weight) {
   return score
 }
 
-export function searchPublicCourses(query, { limit = 342, courseCodes = null } = {}) {
+export function searchPublicCourses(query, { limit = currentIndexedCourses.length, courseCodes = null } = {}) {
   const phrase = normalize(query)
   if (!phrase) return []
 
@@ -86,7 +95,7 @@ export function searchPublicCourses(query, { limit = 342, courseCodes = null } =
   )]
   if (tokens.length === 0) return []
 
-  return indexedCourses
+  return currentIndexedCourses
     .filter(({ course }) => !courseCodes || courseCodes.has(course.course_id))
     .map((item) => {
       const score =
@@ -105,7 +114,10 @@ export function searchPublicCourses(query, { limit = 342, courseCodes = null } =
       right.score - left.score ||
       left.item.course.course_name.localeCompare(right.item.course.course_name)
     )
-    .slice(0, Math.max(0, Math.min(Number(limit) || 342, 342)))
+    .slice(0, Math.max(0, Math.min(
+      Number(limit) || currentIndexedCourses.length,
+      currentIndexedCourses.length
+    )))
     .map(({ item }) => publicCourse(item.course))
 }
 
@@ -116,7 +128,7 @@ export function getPublicCourse(courseCode) {
 }
 
 export function getPublicCourseCount() {
-  return indexedCourses.length
+  return currentIndexedCourses.length
 }
 
 export async function getActivePublicCourseCodes(database = pool) {
@@ -132,7 +144,10 @@ export async function searchAvailablePublicCourses(query, options = {}, database
 }
 
 export async function getAvailablePublicCourse(courseCode, database = pool) {
-  const course = getPublicCourse(courseCode)
+  const resolvedCourseCodes = resolveCanonicalCourseIds(courseCode)
+  if (resolvedCourseCodes.length !== 1) return null
+
+  const course = getPublicCourse(resolvedCourseCodes[0])
   if (!course) return null
 
   const activeCourseCodes = await getActivePublicCourseCodes(database)

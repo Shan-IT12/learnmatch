@@ -15,6 +15,7 @@ import {
   buildStudentRiasecVector,
   calculateClusterInterestScore,
   calculateClusterSkillScore,
+  filterCurrentIndependentCourses,
   filterCoursesByCandidateClusters,
   rankClusters,
   scoreAndRankClusters,
@@ -244,6 +245,20 @@ test('only courses in the top 3 clusters proceed as candidate courses', () => {
       (course) => course.course_code
     ),
     ['CRS001', 'CRS003']
+  )
+})
+
+test('deprecated and quarantined courses cannot enter recommendation competition', () => {
+  const courses = [
+    { course_code: 'CRS021' },
+    { course_code: 'CRS020' },
+    { course_code: 'CRS166' },
+    { course_code: 'CRS343' },
+  ]
+
+  assert.deepEqual(
+    filterCurrentIndependentCourses(courses).map(({ course_code }) => course_code),
+    ['CRS021', 'CRS343']
   )
 })
 

@@ -27074,6 +27074,1718 @@
           "used_for": "CHED regulatory reference used to validate/support the course title, description, obtainable skills, and career paths."
         }
       ]
+    },
+    {
+      "course_id": "CRS343",
+      "course_name": "Bachelor of Science in Accountancy",
+      "course_abbreviation": "BSA",
+      "parent_cluster": "BUSINESS CLUSTER",
+      "skills_profile": [
+        {
+          "skill": "Verbal",
+          "weight": 2,
+          "evidence": "Accounting work requires clear interpretation and communication of financial findings."
+        },
+        {
+          "skill": "Numerical",
+          "weight": 3,
+          "evidence": "Financial reporting, taxation, auditing, and management accounting require sustained quantitative accuracy."
+        },
+        {
+          "skill": "Abstract/Logical",
+          "weight": 3,
+          "evidence": "Audit analysis and professional judgment require structured reasoning and problem-solving."
+        },
+        {
+          "skill": "Practical/Applied",
+          "weight": 1,
+          "evidence": "Accounting systems and assurance procedures apply principles to organizational records."
+        }
+      ],
+      "riasec_profile": {
+        "R": {
+          "weight": 0,
+          "evidence": "Hands-on, mechanical, field, or equipment-centered activity is not a central program emphasis."
+        },
+        "I": {
+          "weight": 3,
+          "evidence": "Auditing, financial analysis, and evaluation of accounting evidence are strongly investigative."
+        },
+        "A": {
+          "weight": 0,
+          "evidence": "Creative expression and open-ended artistic production are not a central program emphasis."
+        },
+        "S": {
+          "weight": 1,
+          "evidence": "Accountants communicate findings and support organizational decisions."
+        },
+        "E": {
+          "weight": 2,
+          "evidence": "Business judgment and advisory responsibilities provide an enterprising component."
+        },
+        "C": {
+          "weight": 3,
+          "evidence": "Financial records, controls, standards, and compliance require highly systematic detail work."
+        }
+      },
+      "personality": {
+        "source": "PARENT_CLUSTER",
+        "parent_cluster": "BUSINESS CLUSTER"
+      },
+      "personal_factors": {
+        "source": "PARENT_CLUSTER",
+        "parent_cluster": "BUSINESS CLUSTER",
+        "note": "Personal Factors are scored at the Parent Cluster level using the fixed 5-factor effect matrix. Distance/Commute is excluded from WSM scoring and used only by the School Locator."
+      },
+      "data_quality": {
+        "strong_evidence": [
+          "Verbal skill domain",
+          "Numerical skill domain",
+          "Abstract/Logical skill domain",
+          "Practical/Applied skill domain",
+          "RIASEC-I",
+          "RIASEC-S",
+          "RIASEC-E",
+          "RIASEC-C"
+        ],
+        "interpretations_inferences": [],
+        "ambiguous_insufficient_information": [
+          "RIASEC-R is not a central program orientation.",
+          "RIASEC-A is not a central program orientation."
+        ]
+      },
+      "sources": [
+        {
+          "title": "CHED CMO No. 27, Series of 2017 - Revised PSG for the Bachelor of Science in Accountancy",
+          "url": "https://ched.gov.ph/wp-content/uploads/2017/10/CMO-27-s-2017.pdf",
+          "used_for": "Exact degree identity, curriculum focus, competencies, and career alignment"
+        }
+      ]
+    },
+    {
+      "course_id": "CRS344",
+      "course_name": "Bachelor of Science in Business Administration major in Marketing Management",
+      "course_abbreviation": "BSBA",
+      "parent_cluster": "BUSINESS CLUSTER",
+      "skills_profile": [
+        {
+          "skill": "Verbal",
+          "weight": 3,
+          "evidence": "Marketing strategy, promotion, sales, and customer research depend on persuasive communication."
+        },
+        {
+          "skill": "Numerical",
+          "weight": 2,
+          "evidence": "Market research, pricing, and campaign evaluation require quantitative interpretation."
+        },
+        {
+          "skill": "Abstract/Logical",
+          "weight": 2,
+          "evidence": "Consumer analysis and marketing planning require structured reasoning."
+        },
+        {
+          "skill": "Practical/Applied",
+          "weight": 2,
+          "evidence": "Students apply marketing concepts to brands, products, channels, and campaigns."
+        }
+      ],
+      "riasec_profile": {
+        "R": {
+          "weight": 0,
+          "evidence": "Hands-on, mechanical, field, or equipment-centered activity is not a central program emphasis."
+        },
+        "I": {
+          "weight": 2,
+          "evidence": "Market research and consumer analysis require investigative interpretation."
+        },
+        "A": {
+          "weight": 3,
+          "evidence": "Brand development and promotional planning involve creative communication."
+        },
+        "S": {
+          "weight": 2,
+          "evidence": "Marketing requires understanding and communicating with customers and stakeholders."
+        },
+        "E": {
+          "weight": 3,
+          "evidence": "Persuasion, sales planning, and market strategy are strongly enterprising."
+        },
+        "C": {
+          "weight": 2,
+          "evidence": "Campaign planning and market information require organized procedures and records."
+        }
+      },
+      "personality": {
+        "source": "PARENT_CLUSTER",
+        "parent_cluster": "BUSINESS CLUSTER"
+      },
+      "personal_factors": {
+        "source": "PARENT_CLUSTER",
+        "parent_cluster": "BUSINESS CLUSTER",
+        "note": "Personal Factors are scored at the Parent Cluster level using the fixed 5-factor effect matrix. Distance/Commute is excluded from WSM scoring and used only by the School Locator."
+      },
+      "data_quality": {
+        "strong_evidence": [
+          "Verbal skill domain",
+          "Numerical skill domain",
+          "Abstract/Logical skill domain",
+          "Practical/Applied skill domain",
+          "RIASEC-I",
+          "RIASEC-A",
+          "RIASEC-S",
+          "RIASEC-E",
+          "RIASEC-C"
+        ],
+        "interpretations_inferences": [],
+        "ambiguous_insufficient_information": [
+          "RIASEC-R is not a central program orientation."
+        ]
+      },
+      "sources": [
+        {
+          "title": "CHEDRO XI Recognized Programs Inventory",
+          "url": "https://ro11.ched.gov.ph/programs-inventory/",
+          "used_for": "Exact BSBA major identity and recognized undergraduate offering"
+        },
+        {
+          "title": "CHED CMO No. 39, Series of 2006 - Policies and Standards for BSBA",
+          "url": "https://ched.gov.ph/wp-content/uploads/2017/10/CMO-No.39-s2006.pdf",
+          "used_for": "Marketing Management curriculum focus, competencies, and career preparation"
+        }
+      ]
+    },
+    {
+      "course_id": "CRS345",
+      "course_name": "Bachelor of Science in Business Administration major in Operations Management",
+      "course_abbreviation": "BSBA",
+      "parent_cluster": "BUSINESS CLUSTER",
+      "skills_profile": [
+        {
+          "skill": "Verbal",
+          "weight": 2,
+          "evidence": "Operations professionals communicate plans, procedures, and performance findings across teams."
+        },
+        {
+          "skill": "Numerical",
+          "weight": 3,
+          "evidence": "Capacity, inventory, productivity, forecasting, and quality analysis are quantitatively intensive."
+        },
+        {
+          "skill": "Abstract/Logical",
+          "weight": 3,
+          "evidence": "Process design and improvement require systems reasoning and problem-solving."
+        },
+        {
+          "skill": "Practical/Applied",
+          "weight": 3,
+          "evidence": "The degree applies management methods directly to production and service operations."
+        }
+      ],
+      "riasec_profile": {
+        "R": {
+          "weight": 2,
+          "evidence": "Operations work engages practical production, logistics, and service processes."
+        },
+        "I": {
+          "weight": 3,
+          "evidence": "Process analysis, forecasting, and quality improvement require systematic investigation."
+        },
+        "A": {
+          "weight": 1,
+          "evidence": "Designing improved workflows provides a supporting creative component."
+        },
+        "S": {
+          "weight": 2,
+          "evidence": "Coordinating people and operational teams requires interpersonal collaboration."
+        },
+        "E": {
+          "weight": 3,
+          "evidence": "Planning, supervision, and operational decision-making are strongly enterprising."
+        },
+        "C": {
+          "weight": 3,
+          "evidence": "Inventory, schedules, standards, and quality systems demand structured detail work."
+        }
+      },
+      "personality": {
+        "source": "PARENT_CLUSTER",
+        "parent_cluster": "BUSINESS CLUSTER"
+      },
+      "personal_factors": {
+        "source": "PARENT_CLUSTER",
+        "parent_cluster": "BUSINESS CLUSTER",
+        "note": "Personal Factors are scored at the Parent Cluster level using the fixed 5-factor effect matrix. Distance/Commute is excluded from WSM scoring and used only by the School Locator."
+      },
+      "data_quality": {
+        "strong_evidence": [
+          "Verbal skill domain",
+          "Numerical skill domain",
+          "Abstract/Logical skill domain",
+          "Practical/Applied skill domain",
+          "RIASEC-R",
+          "RIASEC-I",
+          "RIASEC-A",
+          "RIASEC-S",
+          "RIASEC-E",
+          "RIASEC-C"
+        ],
+        "interpretations_inferences": [],
+        "ambiguous_insufficient_information": []
+      },
+      "sources": [
+        {
+          "title": "CHEDRO XI Recognized Programs Inventory",
+          "url": "https://ro11.ched.gov.ph/programs-inventory/",
+          "used_for": "Exact BSBA major identity and recognized undergraduate offering"
+        },
+        {
+          "title": "Batangas State University - BSBA major in Operations Management",
+          "url": "https://batstateu.edu.ph/wp-content/uploads/2020/10/Bachelor-of-Science-in-Business-Administration-BSBA-Major-in-Operations-Management.docx.pdf",
+          "used_for": "Operations Management curriculum, competencies, and program focus"
+        }
+      ]
+    },
+    {
+      "course_id": "CRS346",
+      "course_name": "Bachelor in Data Science and Analytics",
+      "course_abbreviation": "",
+      "parent_cluster": "ENGINEERING / STEM CLUSTER",
+      "skills_profile": [
+        {
+          "skill": "Verbal",
+          "weight": 2,
+          "evidence": "Data findings must be explained through reports, presentations, and visualizations."
+        },
+        {
+          "skill": "Numerical",
+          "weight": 3,
+          "evidence": "Statistics, linear algebra, modeling, and quantitative analysis are central."
+        },
+        {
+          "skill": "Abstract/Logical",
+          "weight": 3,
+          "evidence": "Algorithms, programming, machine learning, and data modeling require advanced logical reasoning."
+        },
+        {
+          "skill": "Scientific Reasoning",
+          "weight": 3,
+          "evidence": "Data investigations require model evaluation and evidence-based conclusions."
+        },
+        {
+          "skill": "Practical/Applied",
+          "weight": 2,
+          "evidence": "Programming, database work, visualization, and practicum apply methods to real datasets."
+        }
+      ],
+      "riasec_profile": {
+        "R": {
+          "weight": 1,
+          "evidence": "Computing tools and practical data workflows provide a supporting hands-on component."
+        },
+        "I": {
+          "weight": 3,
+          "evidence": "Exploratory analysis, modeling, and machine learning are strongly investigative."
+        },
+        "A": {
+          "weight": 2,
+          "evidence": "Data visualization and model design involve creative representation and solution design."
+        },
+        "S": {
+          "weight": 1,
+          "evidence": "Communicating findings provides a supporting social component."
+        },
+        "E": {
+          "weight": 1,
+          "evidence": "Analytics supports decisions, though persuasion and leadership are not primary."
+        },
+        "C": {
+          "weight": 3,
+          "evidence": "Data preparation, programming, databases, and reproducible analysis require systematic precision."
+        }
+      },
+      "personality": {
+        "source": "PARENT_CLUSTER",
+        "parent_cluster": "ENGINEERING / STEM CLUSTER"
+      },
+      "personal_factors": {
+        "source": "PARENT_CLUSTER",
+        "parent_cluster": "ENGINEERING / STEM CLUSTER",
+        "note": "Personal Factors are scored at the Parent Cluster level using the fixed 5-factor effect matrix. Distance/Commute is excluded from WSM scoring and used only by the School Locator."
+      },
+      "data_quality": {
+        "strong_evidence": [
+          "Verbal skill domain",
+          "Numerical skill domain",
+          "Abstract/Logical skill domain",
+          "Scientific Reasoning skill domain",
+          "Practical/Applied skill domain",
+          "RIASEC-R",
+          "RIASEC-I",
+          "RIASEC-A",
+          "RIASEC-S",
+          "RIASEC-E",
+          "RIASEC-C"
+        ],
+        "interpretations_inferences": [],
+        "ambiguous_insufficient_information": []
+      },
+      "sources": [
+        {
+          "title": "CHED CMO No. 14, Series of 2025 - Revised Estatistikolar Guidelines",
+          "url": "https://ched.gov.ph/wp-content/uploads/CMO-No.-14-S.-2025-Revised-Estatistikolar-guidelines.pdf",
+          "used_for": "Exact Bachelor in Data Science and Analytics degree identity and national undergraduate-program recognition"
+        },
+        {
+          "title": "University of Santo Tomas - Bachelor of Science in Data Science and Analytics",
+          "url": "https://www.ust.edu.ph/academics/programs/bachelor-of-science-in-data-science-and-analytics/",
+          "used_for": "Related Philippine bachelor's curriculum used only to corroborate common data-science disciplinary content, skills, and career preparation; not evidence that UST offers the exact proposed award title"
+        }
+      ]
+    },
+    {
+      "course_id": "CRS347",
+      "course_name": "Bachelor of Science in Cybersecurity",
+      "course_abbreviation": "",
+      "parent_cluster": "ENGINEERING / STEM CLUSTER",
+      "skills_profile": [
+        {
+          "skill": "Verbal",
+          "weight": 2,
+          "evidence": "Security reports, incident communication, and policy documentation require technical communication."
+        },
+        {
+          "skill": "Numerical",
+          "weight": 2,
+          "evidence": "Risk assessment, cryptographic concepts, and security metrics require quantitative reasoning."
+        },
+        {
+          "skill": "Abstract/Logical",
+          "weight": 3,
+          "evidence": "Threat analysis, secure design, and vulnerability assessment require complex logical reasoning."
+        },
+        {
+          "skill": "Scientific Reasoning",
+          "weight": 2,
+          "evidence": "Security testing and incident investigation require evidence-based technical inquiry."
+        },
+        {
+          "skill": "Practical/Applied",
+          "weight": 3,
+          "evidence": "Defensive operations, systems administration, forensics, and security assessment are strongly applied."
+        }
+      ],
+      "riasec_profile": {
+        "R": {
+          "weight": 3,
+          "evidence": "Configuring, testing, and defending computer systems is strongly hands-on and technical."
+        },
+        "I": {
+          "weight": 3,
+          "evidence": "Threat analysis, digital forensics, and vulnerability investigation are strongly investigative."
+        },
+        "A": {
+          "weight": 1,
+          "evidence": "Designing secure solutions offers a supporting creative component."
+        },
+        "S": {
+          "weight": 1,
+          "evidence": "Incident coordination requires teamwork, though direct helping work is not central."
+        },
+        "E": {
+          "weight": 1,
+          "evidence": "Risk communication and security governance provide a supporting enterprising component."
+        },
+        "C": {
+          "weight": 3,
+          "evidence": "Security controls, logs, procedures, and compliance require disciplined systematic work."
+        }
+      },
+      "personality": {
+        "source": "PARENT_CLUSTER",
+        "parent_cluster": "ENGINEERING / STEM CLUSTER"
+      },
+      "personal_factors": {
+        "source": "PARENT_CLUSTER",
+        "parent_cluster": "ENGINEERING / STEM CLUSTER",
+        "note": "Personal Factors are scored at the Parent Cluster level using the fixed 5-factor effect matrix. Distance/Commute is excluded from WSM scoring and used only by the School Locator."
+      },
+      "data_quality": {
+        "strong_evidence": [
+          "Verbal skill domain",
+          "Numerical skill domain",
+          "Abstract/Logical skill domain",
+          "Scientific Reasoning skill domain",
+          "Practical/Applied skill domain",
+          "RIASEC-R",
+          "RIASEC-I",
+          "RIASEC-A",
+          "RIASEC-S",
+          "RIASEC-E",
+          "RIASEC-C"
+        ],
+        "interpretations_inferences": [],
+        "ambiguous_insufficient_information": []
+      },
+      "sources": [
+        {
+          "title": "University of the Visayas - Bachelor of Science in Cybersecurity",
+          "url": "https://www.uv.edu.ph/colleges/ceta/undergraduate/bscyb.html",
+          "used_for": "Standalone degree identity, undergraduate status, curriculum focus, and careers"
+        },
+        {
+          "title": "USTP Alubijid - BS Cybersecurity",
+          "url": "https://www.ustp.edu.ph/alubijid/bs-cybersecurity/",
+          "used_for": "Independent confirmation of the standalone Philippine degree"
+        }
+      ]
+    },
+    {
+      "course_id": "CRS348",
+      "course_name": "Bachelor of Science in Actuarial Science",
+      "course_abbreviation": "",
+      "parent_cluster": "SCIENCE & MATHEMATICS CLUSTER",
+      "skills_profile": [
+        {
+          "skill": "Verbal",
+          "weight": 2,
+          "evidence": "Actuarial findings and risk implications must be communicated to decision-makers."
+        },
+        {
+          "skill": "Numerical",
+          "weight": 3,
+          "evidence": "Probability, statistics, financial mathematics, and quantitative forecasting are central."
+        },
+        {
+          "skill": "Abstract/Logical",
+          "weight": 3,
+          "evidence": "Actuarial modeling requires advanced reasoning about uncertainty and long-term risk."
+        },
+        {
+          "skill": "Scientific Reasoning",
+          "weight": 2,
+          "evidence": "Model selection, validation, and interpretation require evidence-based quantitative inquiry."
+        },
+        {
+          "skill": "Practical/Applied",
+          "weight": 2,
+          "evidence": "Insurance, pension, pricing, and financial-risk problems apply mathematical models to practice."
+        }
+      ],
+      "riasec_profile": {
+        "R": {
+          "weight": 0,
+          "evidence": "Hands-on, mechanical, field, or equipment-centered activity is not a central program emphasis."
+        },
+        "I": {
+          "weight": 3,
+          "evidence": "Risk modeling and analysis of uncertain financial outcomes are strongly investigative."
+        },
+        "A": {
+          "weight": 0,
+          "evidence": "Creative expression and open-ended artistic production are not a central program emphasis."
+        },
+        "S": {
+          "weight": 1,
+          "evidence": "Explaining risk results provides a supporting social component."
+        },
+        "E": {
+          "weight": 2,
+          "evidence": "Pricing and financial-risk recommendations support business decisions."
+        },
+        "C": {
+          "weight": 3,
+          "evidence": "Actuarial calculations, assumptions, records, and model validation require exceptional precision."
+        }
+      },
+      "personality": {
+        "source": "PARENT_CLUSTER",
+        "parent_cluster": "SCIENCE & MATHEMATICS CLUSTER"
+      },
+      "personal_factors": {
+        "source": "PARENT_CLUSTER",
+        "parent_cluster": "SCIENCE & MATHEMATICS CLUSTER",
+        "note": "Personal Factors are scored at the Parent Cluster level using the fixed 5-factor effect matrix. Distance/Commute is excluded from WSM scoring and used only by the School Locator."
+      },
+      "data_quality": {
+        "strong_evidence": [
+          "Verbal skill domain",
+          "Numerical skill domain",
+          "Abstract/Logical skill domain",
+          "Scientific Reasoning skill domain",
+          "Practical/Applied skill domain",
+          "RIASEC-I",
+          "RIASEC-S",
+          "RIASEC-E",
+          "RIASEC-C"
+        ],
+        "interpretations_inferences": [],
+        "ambiguous_insufficient_information": [
+          "RIASEC-R is not a central program orientation.",
+          "RIASEC-A is not a central program orientation."
+        ]
+      },
+      "sources": [
+        {
+          "title": "CHED CMO No. 14, Series of 2025 - Revised Estatistikolar Guidelines",
+          "url": "https://ched.gov.ph/wp-content/uploads/CMO-No.-14-S.-2025-Revised-Estatistikolar-guidelines.pdf",
+          "used_for": "Exact standalone Bachelor of Science in Actuarial Science degree identity and national undergraduate-program recognition"
+        },
+        {
+          "title": "University of Santo Tomas - BS Applied Mathematics major in Actuarial Science",
+          "url": "https://www.ust.edu.ph/academics/programs/bachelor-of-science-in-applied-mathematics-major-in-actuarial-science/",
+          "used_for": "Related Philippine bachelor's curriculum used only to corroborate common actuarial mathematics, probability, finance, risk, modeling, and career preparation; not evidence that UST offers the standalone proposed award"
+        },
+        {
+          "title": "De La Salle University - BS Statistics major in Actuarial Science",
+          "url": "https://old.dlsu.edu.ph/colleges/cos/undergraduate-degree-programs/bs-stat/",
+          "used_for": "Related Philippine bachelor's curriculum used only to corroborate common actuarial statistics, computing, quantitative analysis, and career preparation; not evidence that DLSU offers the standalone proposed award"
+        }
+      ]
+    },
+    {
+      "course_id": "CRS349",
+      "course_name": "Bachelor of Science in Biochemistry",
+      "course_abbreviation": "",
+      "parent_cluster": "SCIENCE & MATHEMATICS CLUSTER",
+      "skills_profile": [
+        {
+          "skill": "Verbal",
+          "weight": 2,
+          "evidence": "Laboratory reports and scientific findings require precise technical communication."
+        },
+        {
+          "skill": "Numerical",
+          "weight": 2,
+          "evidence": "Analytical chemistry, biostatistics, and quantitative laboratory analysis require numerical competence."
+        },
+        {
+          "skill": "Abstract/Logical",
+          "weight": 3,
+          "evidence": "Understanding molecular processes requires integration of chemical and biological concepts."
+        },
+        {
+          "skill": "Scientific Reasoning",
+          "weight": 3,
+          "evidence": "Experimental design, biochemical analysis, and data interpretation are central."
+        },
+        {
+          "skill": "Practical/Applied",
+          "weight": 3,
+          "evidence": "Laboratory techniques and instrumentation are major program components."
+        }
+      ],
+      "riasec_profile": {
+        "R": {
+          "weight": 3,
+          "evidence": "Biochemical laboratory work requires sustained hands-on use of methods and instruments."
+        },
+        "I": {
+          "weight": 3,
+          "evidence": "Molecular investigation and experimental analysis are strongly investigative."
+        },
+        "A": {
+          "weight": 1,
+          "evidence": "Designing experiments provides a supporting creative element."
+        },
+        "S": {
+          "weight": 1,
+          "evidence": "Scientific collaboration provides a supporting social element."
+        },
+        "E": {
+          "weight": 1,
+          "evidence": "Product development and laboratory coordination provide limited enterprising relevance."
+        },
+        "C": {
+          "weight": 2,
+          "evidence": "Laboratory protocols, quality practices, and accurate records require systematic work."
+        }
+      },
+      "personality": {
+        "source": "PARENT_CLUSTER",
+        "parent_cluster": "SCIENCE & MATHEMATICS CLUSTER"
+      },
+      "personal_factors": {
+        "source": "PARENT_CLUSTER",
+        "parent_cluster": "SCIENCE & MATHEMATICS CLUSTER",
+        "note": "Personal Factors are scored at the Parent Cluster level using the fixed 5-factor effect matrix. Distance/Commute is excluded from WSM scoring and used only by the School Locator."
+      },
+      "data_quality": {
+        "strong_evidence": [
+          "Verbal skill domain",
+          "Numerical skill domain",
+          "Abstract/Logical skill domain",
+          "Scientific Reasoning skill domain",
+          "Practical/Applied skill domain",
+          "RIASEC-R",
+          "RIASEC-I",
+          "RIASEC-A",
+          "RIASEC-S",
+          "RIASEC-E",
+          "RIASEC-C"
+        ],
+        "interpretations_inferences": [],
+        "ambiguous_insufficient_information": []
+      },
+      "sources": [
+        {
+          "title": "CHED - UP Manila and UP Los Banos Quality Assurance Recognition",
+          "url": "https://legacy.ched.gov.ph/ched-commends-up-manila-and-up-los-banos-for-strong-quality-assurance-mechanism/",
+          "used_for": "Official recognition of BS Biochemistry as a Philippine undergraduate program"
+        },
+        {
+          "title": "UP Manila - Bachelor of Science in Biochemistry",
+          "url": "https://dpsm.cas.upm.edu.ph/index.php/bachelor-of-science-in-biochemistry/",
+          "used_for": "Undergraduate program focus, learning outcomes, laboratory competencies, and curriculum"
+        }
+      ]
+    },
+    {
+      "course_id": "CRS350",
+      "course_name": "Bachelor of Science in Microbiology",
+      "course_abbreviation": "",
+      "parent_cluster": "SCIENCE & MATHEMATICS CLUSTER",
+      "skills_profile": [
+        {
+          "skill": "Verbal",
+          "weight": 2,
+          "evidence": "Microbiological findings and laboratory documentation require scientific communication."
+        },
+        {
+          "skill": "Numerical",
+          "weight": 1,
+          "evidence": "Quantitative measurements support microbial analysis."
+        },
+        {
+          "skill": "Abstract/Logical",
+          "weight": 2,
+          "evidence": "Microbial identification and interpretation require analytical reasoning."
+        },
+        {
+          "skill": "Scientific Reasoning",
+          "weight": 3,
+          "evidence": "Cultivation, identification, experimentation, and evaluation of microorganisms are central."
+        },
+        {
+          "skill": "Practical/Applied",
+          "weight": 3,
+          "evidence": "Aseptic technique, culture methods, and quality-control procedures are strongly hands-on."
+        }
+      ],
+      "riasec_profile": {
+        "R": {
+          "weight": 3,
+          "evidence": "Laboratory cultivation and microbial testing are strongly practical and hands-on."
+        },
+        "I": {
+          "weight": 3,
+          "evidence": "Microbial identification and experimental analysis are strongly investigative."
+        },
+        "A": {
+          "weight": 0,
+          "evidence": "Creative expression and open-ended artistic production are not a central program emphasis."
+        },
+        "S": {
+          "weight": 1,
+          "evidence": "Laboratory teamwork provides a supporting social component."
+        },
+        "E": {
+          "weight": 0,
+          "evidence": "Persuasion, entrepreneurship, and organizational leadership are not a central program emphasis."
+        },
+        "C": {
+          "weight": 3,
+          "evidence": "Aseptic procedures, quality controls, and specimen records require disciplined precision."
+        }
+      },
+      "personality": {
+        "source": "PARENT_CLUSTER",
+        "parent_cluster": "SCIENCE & MATHEMATICS CLUSTER"
+      },
+      "personal_factors": {
+        "source": "PARENT_CLUSTER",
+        "parent_cluster": "SCIENCE & MATHEMATICS CLUSTER",
+        "note": "Personal Factors are scored at the Parent Cluster level using the fixed 5-factor effect matrix. Distance/Commute is excluded from WSM scoring and used only by the School Locator."
+      },
+      "data_quality": {
+        "strong_evidence": [
+          "Verbal skill domain",
+          "Numerical skill domain",
+          "Abstract/Logical skill domain",
+          "Scientific Reasoning skill domain",
+          "Practical/Applied skill domain",
+          "RIASEC-R",
+          "RIASEC-I",
+          "RIASEC-S",
+          "RIASEC-C"
+        ],
+        "interpretations_inferences": [],
+        "ambiguous_insufficient_information": [
+          "RIASEC-A is not a central program orientation.",
+          "RIASEC-E is not a central program orientation."
+        ]
+      },
+      "sources": [
+        {
+          "title": "University of Santo Tomas - Bachelor of Science in Microbiology",
+          "url": "https://www.ust.edu.ph/academics/programs/bachelor-of-science-in-microbiology/",
+          "used_for": "Exact degree identity, undergraduate status, focus, and career alignment"
+        }
+      ]
+    },
+    {
+      "course_id": "CRS351",
+      "course_name": "Bachelor of Science in Legal Management",
+      "course_abbreviation": "",
+      "parent_cluster": "LEGAL & PUBLIC SERVICE CLUSTER",
+      "skills_profile": [
+        {
+          "skill": "Verbal",
+          "weight": 3,
+          "evidence": "Legal research, document analysis, writing, and compliance communication are language-intensive."
+        },
+        {
+          "skill": "Numerical",
+          "weight": 1,
+          "evidence": "Business and management contexts provide supporting quantitative demands."
+        },
+        {
+          "skill": "Abstract/Logical",
+          "weight": 3,
+          "evidence": "Interpreting laws, contracts, policies, and organizational problems requires structured reasoning."
+        },
+        {
+          "skill": "Practical/Applied",
+          "weight": 2,
+          "evidence": "Legal writing, compliance work, contracts, and practicum apply legal-management principles."
+        }
+      ],
+      "riasec_profile": {
+        "R": {
+          "weight": 0,
+          "evidence": "Hands-on, mechanical, field, or equipment-centered activity is not a central program emphasis."
+        },
+        "I": {
+          "weight": 3,
+          "evidence": "Legal research and analysis of laws, contracts, and policies are strongly investigative."
+        },
+        "A": {
+          "weight": 1,
+          "evidence": "Constructing arguments and legal strategies provides a supporting creative component."
+        },
+        "S": {
+          "weight": 2,
+          "evidence": "Client and stakeholder communication is meaningfully important."
+        },
+        "E": {
+          "weight": 3,
+          "evidence": "Management, negotiation, compliance leadership, and business decisions are strongly enterprising."
+        },
+        "C": {
+          "weight": 3,
+          "evidence": "Legal documentation, contracts, procedures, and regulatory compliance require systematic detail."
+        }
+      },
+      "personality": {
+        "source": "PARENT_CLUSTER",
+        "parent_cluster": "LEGAL & PUBLIC SERVICE CLUSTER"
+      },
+      "personal_factors": {
+        "source": "PARENT_CLUSTER",
+        "parent_cluster": "LEGAL & PUBLIC SERVICE CLUSTER",
+        "note": "Personal Factors are scored at the Parent Cluster level using the fixed 5-factor effect matrix. Distance/Commute is excluded from WSM scoring and used only by the School Locator."
+      },
+      "data_quality": {
+        "strong_evidence": [
+          "Verbal skill domain",
+          "Numerical skill domain",
+          "Abstract/Logical skill domain",
+          "Practical/Applied skill domain",
+          "RIASEC-I",
+          "RIASEC-A",
+          "RIASEC-S",
+          "RIASEC-E",
+          "RIASEC-C"
+        ],
+        "interpretations_inferences": [],
+        "ambiguous_insufficient_information": [
+          "RIASEC-R is not a central program orientation."
+        ]
+      },
+      "sources": [
+        {
+          "title": "CHEDRO XI Programs per Higher Education Institution",
+          "url": "https://ro11.ched.gov.ph/programs-per-hei/",
+          "used_for": "Exact BS Legal Management identity and recognized undergraduate offering"
+        },
+        {
+          "title": "De La Salle University - Bachelor of Science in Legal Management",
+          "url": "https://old.dlsu.edu.ph/colleges/rvrcob/undergraduate-degree-programs/lgl/",
+          "used_for": "Program focus, legal and management curriculum, legal research, writing, and practicum competencies"
+        }
+      ]
+    },
+    {
+      "course_id": "CRS352",
+      "course_name": "Bachelor of Arts in Legal Management",
+      "course_abbreviation": "",
+      "parent_cluster": "LEGAL & PUBLIC SERVICE CLUSTER",
+      "skills_profile": [
+        {
+          "skill": "Verbal",
+          "weight": 3,
+          "evidence": "Legal reading, argumentation, policy analysis, and writing are central academic demands."
+        },
+        {
+          "skill": "Abstract/Logical",
+          "weight": 3,
+          "evidence": "Legal interpretation and evaluation of governance issues require structured reasoning."
+        },
+        {
+          "skill": "Practical/Applied",
+          "weight": 2,
+          "evidence": "Legal documents, policy work, and administrative applications connect theory with practice."
+        }
+      ],
+      "riasec_profile": {
+        "R": {
+          "weight": 0,
+          "evidence": "Hands-on, mechanical, field, or equipment-centered activity is not a central program emphasis."
+        },
+        "I": {
+          "weight": 3,
+          "evidence": "Legal and policy research are strongly investigative."
+        },
+        "A": {
+          "weight": 2,
+          "evidence": "Argument construction and interpretation of social and legal issues involve creative reasoning."
+        },
+        "S": {
+          "weight": 3,
+          "evidence": "The liberal-arts orientation emphasizes communication, institutions, and public-facing concerns."
+        },
+        "E": {
+          "weight": 2,
+          "evidence": "Governance and organizational analysis provide enterprising relevance."
+        },
+        "C": {
+          "weight": 2,
+          "evidence": "Legal documents and administrative procedures require organized, detail-oriented work."
+        }
+      },
+      "personality": {
+        "source": "PARENT_CLUSTER",
+        "parent_cluster": "LEGAL & PUBLIC SERVICE CLUSTER"
+      },
+      "personal_factors": {
+        "source": "PARENT_CLUSTER",
+        "parent_cluster": "LEGAL & PUBLIC SERVICE CLUSTER",
+        "note": "Personal Factors are scored at the Parent Cluster level using the fixed 5-factor effect matrix. Distance/Commute is excluded from WSM scoring and used only by the School Locator."
+      },
+      "data_quality": {
+        "strong_evidence": [
+          "Verbal skill domain",
+          "Abstract/Logical skill domain",
+          "Practical/Applied skill domain",
+          "RIASEC-I",
+          "RIASEC-A",
+          "RIASEC-S",
+          "RIASEC-E",
+          "RIASEC-C"
+        ],
+        "interpretations_inferences": [],
+        "ambiguous_insufficient_information": [
+          "RIASEC-R is not a central program orientation."
+        ]
+      },
+      "sources": [
+        {
+          "title": "CHEDRO III Enrollment and Graduates per Discipline and Program",
+          "url": "https://www.chedro3.ched.gov.ph/wp-content/uploads/2020/07/Enrollment-Graduates-per-Discipline-per-Program.pdf",
+          "used_for": "Independent government evidence for the BA Legal Management degree identity"
+        },
+        {
+          "title": "University of Santo Tomas - Bachelor of Arts in Legal Management",
+          "url": "https://www.ust.edu.ph/academics/programs/bachelor-of-arts-in-legal-management/",
+          "used_for": "Exact degree identity, curriculum focus, learning outcomes, and career preparation"
+        }
+      ]
+    },
+    {
+      "course_id": "CRS353",
+      "course_name": "Bachelor of Science in Aircraft Maintenance Technology",
+      "course_abbreviation": "BSAMT",
+      "parent_cluster": "AVIATION & MARITIME CLUSTER",
+      "skills_profile": [
+        {
+          "skill": "Verbal",
+          "weight": 1,
+          "evidence": "Maintenance documentation and technical coordination require concise communication."
+        },
+        {
+          "skill": "Numerical",
+          "weight": 2,
+          "evidence": "Measurements, tolerances, and aircraft-system checks require quantitative accuracy."
+        },
+        {
+          "skill": "Abstract/Logical",
+          "weight": 2,
+          "evidence": "Troubleshooting aircraft systems requires logical diagnosis."
+        },
+        {
+          "skill": "Spatial",
+          "weight": 3,
+          "evidence": "Aircraft structures, components, and mechanical assemblies require strong spatial understanding."
+        },
+        {
+          "skill": "Scientific Reasoning",
+          "weight": 2,
+          "evidence": "Inspection and troubleshooting apply physical and technical principles."
+        },
+        {
+          "skill": "Practical/Applied",
+          "weight": 3,
+          "evidence": "Inspection, airframe and powerplant maintenance, repair, and safety procedures are central."
+        }
+      ],
+      "riasec_profile": {
+        "R": {
+          "weight": 3,
+          "evidence": "Aircraft inspection, repair, and maintenance are strongly mechanical and hands-on."
+        },
+        "I": {
+          "weight": 2,
+          "evidence": "Fault diagnosis and inspection findings require technical investigation."
+        },
+        "A": {
+          "weight": 0,
+          "evidence": "Creative expression and open-ended artistic production are not a central program emphasis."
+        },
+        "S": {
+          "weight": 1,
+          "evidence": "Maintenance work requires team coordination and safety communication."
+        },
+        "E": {
+          "weight": 1,
+          "evidence": "Maintenance planning and supervision provide a supporting enterprising component."
+        },
+        "C": {
+          "weight": 3,
+          "evidence": "Airworthiness procedures, technical records, and safety standards demand strict precision."
+        }
+      },
+      "personality": {
+        "source": "PARENT_CLUSTER",
+        "parent_cluster": "AVIATION & MARITIME CLUSTER"
+      },
+      "personal_factors": {
+        "source": "PARENT_CLUSTER",
+        "parent_cluster": "AVIATION & MARITIME CLUSTER",
+        "note": "Personal Factors are scored at the Parent Cluster level using the fixed 5-factor effect matrix. Distance/Commute is excluded from WSM scoring and used only by the School Locator."
+      },
+      "data_quality": {
+        "strong_evidence": [
+          "Verbal skill domain",
+          "Numerical skill domain",
+          "Abstract/Logical skill domain",
+          "Spatial skill domain",
+          "Scientific Reasoning skill domain",
+          "Practical/Applied skill domain",
+          "RIASEC-R",
+          "RIASEC-I",
+          "RIASEC-S",
+          "RIASEC-E",
+          "RIASEC-C"
+        ],
+        "interpretations_inferences": [],
+        "ambiguous_insufficient_information": [
+          "RIASEC-A is not a central program orientation."
+        ]
+      },
+      "sources": [
+        {
+          "title": "CHEDRO XI Recognized Programs Inventory",
+          "url": "https://ro11.ched.gov.ph/programs-inventory/",
+          "used_for": "Exact degree identity and government recognition"
+        },
+        {
+          "title": "National Aviation Academy of the Philippines - Programs Offered",
+          "url": "https://naap.edu.ph/programs-offered/",
+          "used_for": "Program focus and undergraduate offering"
+        }
+      ]
+    },
+    {
+      "course_id": "CRS354",
+      "course_name": "Bachelor of Science in Aviation Electronics Technology",
+      "course_abbreviation": "BSAET",
+      "parent_cluster": "AVIATION & MARITIME CLUSTER",
+      "skills_profile": [
+        {
+          "skill": "Verbal",
+          "weight": 1,
+          "evidence": "Avionics documentation and technical coordination require concise communication."
+        },
+        {
+          "skill": "Numerical",
+          "weight": 2,
+          "evidence": "Electrical measurements and electronic testing require quantitative accuracy."
+        },
+        {
+          "skill": "Abstract/Logical",
+          "weight": 3,
+          "evidence": "Diagnosing avionics, communication, navigation, and control systems requires systems reasoning."
+        },
+        {
+          "skill": "Spatial",
+          "weight": 2,
+          "evidence": "Wiring, components, instruments, and aircraft installations require spatial understanding."
+        },
+        {
+          "skill": "Scientific Reasoning",
+          "weight": 3,
+          "evidence": "Electronics testing and troubleshooting apply scientific principles and evidence."
+        },
+        {
+          "skill": "Practical/Applied",
+          "weight": 3,
+          "evidence": "Installation, maintenance, testing, and repair of aircraft electronics are central."
+        }
+      ],
+      "riasec_profile": {
+        "R": {
+          "weight": 3,
+          "evidence": "Installing, testing, and repairing avionics systems is strongly hands-on."
+        },
+        "I": {
+          "weight": 3,
+          "evidence": "Electronic fault analysis and systems troubleshooting are strongly investigative."
+        },
+        "A": {
+          "weight": 1,
+          "evidence": "Developing technical solutions provides a supporting design component."
+        },
+        "S": {
+          "weight": 1,
+          "evidence": "Aviation maintenance teams require coordination and safety communication."
+        },
+        "E": {
+          "weight": 1,
+          "evidence": "Technical supervision provides a supporting enterprising component."
+        },
+        "C": {
+          "weight": 3,
+          "evidence": "Wiring, testing procedures, records, and aviation standards require systematic precision."
+        }
+      },
+      "personality": {
+        "source": "PARENT_CLUSTER",
+        "parent_cluster": "AVIATION & MARITIME CLUSTER"
+      },
+      "personal_factors": {
+        "source": "PARENT_CLUSTER",
+        "parent_cluster": "AVIATION & MARITIME CLUSTER",
+        "note": "Personal Factors are scored at the Parent Cluster level using the fixed 5-factor effect matrix. Distance/Commute is excluded from WSM scoring and used only by the School Locator."
+      },
+      "data_quality": {
+        "strong_evidence": [
+          "Verbal skill domain",
+          "Numerical skill domain",
+          "Abstract/Logical skill domain",
+          "Spatial skill domain",
+          "Scientific Reasoning skill domain",
+          "Practical/Applied skill domain",
+          "RIASEC-R",
+          "RIASEC-I",
+          "RIASEC-A",
+          "RIASEC-S",
+          "RIASEC-E",
+          "RIASEC-C"
+        ],
+        "interpretations_inferences": [],
+        "ambiguous_insufficient_information": []
+      },
+      "sources": [
+        {
+          "title": "CHEDRO XI Recognized Programs Inventory",
+          "url": "https://ro11.ched.gov.ph/programs-inventory/",
+          "used_for": "Exact degree identity and government recognition"
+        },
+        {
+          "title": "CHEDRO III Bulletin 2018",
+          "url": "https://chedro3.ched.gov.ph/wp-content/uploads/2020/10/CHEDRO3%20Bulletin%202018.pdf",
+          "used_for": "Independent government confirmation of the program identity"
+        },
+        {
+          "title": "National Aviation Academy of the Philippines - Programs Offered",
+          "url": "https://naap.edu.ph/programs-offered/",
+          "used_for": "BSAET undergraduate structure, avionics curriculum focus, technical competencies, and career preparation"
+        }
+      ]
+    },
+    {
+      "course_id": "CRS355",
+      "course_name": "Bachelor of Science in Aviation Management",
+      "course_abbreviation": "BSAM",
+      "parent_cluster": "AVIATION & MARITIME CLUSTER",
+      "skills_profile": [
+        {
+          "skill": "Verbal",
+          "weight": 3,
+          "evidence": "Airline, airport, service, and regulatory operations require stakeholder communication."
+        },
+        {
+          "skill": "Numerical",
+          "weight": 2,
+          "evidence": "Operational planning, logistics, scheduling, and performance analysis use quantitative information."
+        },
+        {
+          "skill": "Abstract/Logical",
+          "weight": 2,
+          "evidence": "Aviation planning and safety decisions require structured analysis."
+        },
+        {
+          "skill": "Practical/Applied",
+          "weight": 2,
+          "evidence": "The program applies business and management principles to aviation operations."
+        }
+      ],
+      "riasec_profile": {
+        "R": {
+          "weight": 1,
+          "evidence": "Airport and ground operations provide a supporting practical environment."
+        },
+        "I": {
+          "weight": 2,
+          "evidence": "Safety, logistics, and operational problems require analytical investigation."
+        },
+        "A": {
+          "weight": 1,
+          "evidence": "Service and operations planning provide a supporting creative element."
+        },
+        "S": {
+          "weight": 3,
+          "evidence": "Aviation services depend on coordination with passengers, staff, and stakeholders."
+        },
+        "E": {
+          "weight": 3,
+          "evidence": "Management, supervision, and operational decision-making are strongly enterprising."
+        },
+        "C": {
+          "weight": 3,
+          "evidence": "Schedules, regulations, safety systems, and operational records require structured detail."
+        }
+      },
+      "personality": {
+        "source": "PARENT_CLUSTER",
+        "parent_cluster": "AVIATION & MARITIME CLUSTER"
+      },
+      "personal_factors": {
+        "source": "PARENT_CLUSTER",
+        "parent_cluster": "AVIATION & MARITIME CLUSTER",
+        "note": "Personal Factors are scored at the Parent Cluster level using the fixed 5-factor effect matrix. Distance/Commute is excluded from WSM scoring and used only by the School Locator."
+      },
+      "data_quality": {
+        "strong_evidence": [
+          "Verbal skill domain",
+          "Numerical skill domain",
+          "Abstract/Logical skill domain",
+          "Practical/Applied skill domain",
+          "RIASEC-R",
+          "RIASEC-I",
+          "RIASEC-A",
+          "RIASEC-S",
+          "RIASEC-E",
+          "RIASEC-C"
+        ],
+        "interpretations_inferences": [],
+        "ambiguous_insufficient_information": []
+      },
+      "sources": [
+        {
+          "title": "Mapua Malayan Colleges Laguna - BS Aviation Management",
+          "url": "https://mcl.edu.ph/bs-aviation-management/",
+          "used_for": "Exact degree identity, curriculum focus, and undergraduate status"
+        },
+        {
+          "title": "Holy Angel University - Aviation Management",
+          "url": "https://www.hau.edu.ph/programs/school-of-business-and-accountancy/88",
+          "used_for": "Independent confirmation of the degree and career focus"
+        }
+      ]
+    },
+    {
+      "course_id": "CRS356",
+      "course_name": "Bachelor of Science in Agricultural Biotechnology",
+      "course_abbreviation": "BSABT",
+      "parent_cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
+      "skills_profile": [
+        {
+          "skill": "Verbal",
+          "weight": 2,
+          "evidence": "Research reports and scientific collaboration require technical communication."
+        },
+        {
+          "skill": "Numerical",
+          "weight": 2,
+          "evidence": "Genetic data and experimental results require quantitative interpretation."
+        },
+        {
+          "skill": "Abstract/Logical",
+          "weight": 3,
+          "evidence": "Molecular, genetic, and biotechnological systems require integrated analytical reasoning."
+        },
+        {
+          "skill": "Scientific Reasoning",
+          "weight": 3,
+          "evidence": "Experimental design and biotechnology research are central."
+        },
+        {
+          "skill": "Practical/Applied",
+          "weight": 3,
+          "evidence": "Molecular techniques, laboratory experimentation, and agricultural applications are strongly hands-on."
+        }
+      ],
+      "riasec_profile": {
+        "R": {
+          "weight": 3,
+          "evidence": "Laboratory, crop, and agricultural biotechnology work is strongly applied."
+        },
+        "I": {
+          "weight": 3,
+          "evidence": "Genetic, molecular, and agricultural experimentation are strongly investigative."
+        },
+        "A": {
+          "weight": 1,
+          "evidence": "Designing biotechnology experiments provides a supporting creative component."
+        },
+        "S": {
+          "weight": 2,
+          "evidence": "Research collaboration and agricultural application provide social relevance."
+        },
+        "E": {
+          "weight": 1,
+          "evidence": "Technology transfer and agricultural innovation provide a supporting enterprising component."
+        },
+        "C": {
+          "weight": 2,
+          "evidence": "Laboratory protocols, biosafety, and research records require systematic precision."
+        }
+      },
+      "personality": {
+        "source": "PARENT_CLUSTER",
+        "parent_cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER"
+      },
+      "personal_factors": {
+        "source": "PARENT_CLUSTER",
+        "parent_cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
+        "note": "Personal Factors are scored at the Parent Cluster level using the fixed 5-factor effect matrix. Distance/Commute is excluded from WSM scoring and used only by the School Locator."
+      },
+      "data_quality": {
+        "strong_evidence": [
+          "Verbal skill domain",
+          "Numerical skill domain",
+          "Abstract/Logical skill domain",
+          "Scientific Reasoning skill domain",
+          "Practical/Applied skill domain",
+          "RIASEC-R",
+          "RIASEC-I",
+          "RIASEC-A",
+          "RIASEC-S",
+          "RIASEC-E",
+          "RIASEC-C"
+        ],
+        "interpretations_inferences": [],
+        "ambiguous_insufficient_information": []
+      },
+      "sources": [
+        {
+          "title": "UPLB Degree Programs Appeals Criteria 2025-2026",
+          "url": "https://our.uplb.edu.ph/wp-content/uploads/2025/06/UPCAT-2025-Sem-1-UPLB-Degree-Programs-Appeals-Criteria-1.pdf",
+          "used_for": "Exact degree identity, abbreviation, and current undergraduate offering"
+        },
+        {
+          "title": "UPLB Institute of Crop Science - BS Agricultural Biotechnology Undergraduate Program",
+          "url": "https://icrops.uplb.edu.ph/wp-content/uploads/2025/02/BS-ABT-Undergraduate-Program.pdf",
+          "used_for": "Curriculum, laboratory competencies, specializations, research, practicum, and agricultural biotechnology focus"
+        }
+      ]
+    },
+    {
+      "course_id": "CRS357",
+      "course_name": "Bachelor of Science in Agricultural Chemistry",
+      "course_abbreviation": "BSAC",
+      "parent_cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
+      "skills_profile": [
+        {
+          "skill": "Verbal",
+          "weight": 2,
+          "evidence": "Scientific reports and laboratory findings require technical communication."
+        },
+        {
+          "skill": "Numerical",
+          "weight": 3,
+          "evidence": "Quantitative chemical analysis of soils, fertilizers, food, and feeds is central."
+        },
+        {
+          "skill": "Abstract/Logical",
+          "weight": 3,
+          "evidence": "Connecting chemical behavior with agricultural systems requires integrated reasoning."
+        },
+        {
+          "skill": "Scientific Reasoning",
+          "weight": 3,
+          "evidence": "Analytical chemistry, experimentation, and scientific research are central."
+        },
+        {
+          "skill": "Practical/Applied",
+          "weight": 3,
+          "evidence": "Laboratory analysis and quality-control methods are strongly hands-on."
+        }
+      ],
+      "riasec_profile": {
+        "R": {
+          "weight": 3,
+          "evidence": "Agricultural chemical testing and laboratory work are strongly practical."
+        },
+        "I": {
+          "weight": 3,
+          "evidence": "Chemical analysis and research into agricultural materials are strongly investigative."
+        },
+        "A": {
+          "weight": 1,
+          "evidence": "Experimental design provides a supporting creative element."
+        },
+        "S": {
+          "weight": 1,
+          "evidence": "Scientific collaboration provides a supporting social component."
+        },
+        "E": {
+          "weight": 1,
+          "evidence": "Quality and product-development work provide limited enterprising relevance."
+        },
+        "C": {
+          "weight": 3,
+          "evidence": "Analytical procedures, measurements, standards, and records demand strict precision."
+        }
+      },
+      "personality": {
+        "source": "PARENT_CLUSTER",
+        "parent_cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER"
+      },
+      "personal_factors": {
+        "source": "PARENT_CLUSTER",
+        "parent_cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
+        "note": "Personal Factors are scored at the Parent Cluster level using the fixed 5-factor effect matrix. Distance/Commute is excluded from WSM scoring and used only by the School Locator."
+      },
+      "data_quality": {
+        "strong_evidence": [
+          "Verbal skill domain",
+          "Numerical skill domain",
+          "Abstract/Logical skill domain",
+          "Scientific Reasoning skill domain",
+          "Practical/Applied skill domain",
+          "RIASEC-R",
+          "RIASEC-I",
+          "RIASEC-A",
+          "RIASEC-S",
+          "RIASEC-E",
+          "RIASEC-C"
+        ],
+        "interpretations_inferences": [],
+        "ambiguous_insufficient_information": []
+      },
+      "sources": [
+        {
+          "title": "UPLB - BS Agricultural Chemistry Curriculum",
+          "url": "https://our.uplb.edu.ph/wp-content/uploads/2023/03/BS-Agricultural-Chemistry.pdf",
+          "used_for": "Exact degree identity, curriculum, competencies, and undergraduate structure"
+        },
+        {
+          "title": "UPLB Degree Programs Appeals Criteria 2025-2026",
+          "url": "https://our.uplb.edu.ph/wp-content/uploads/2025/06/UPCAT-2025-Sem-1-UPLB-Degree-Programs-Appeals-Criteria-1.pdf",
+          "used_for": "Current offering and BSAC abbreviation"
+        }
+      ]
+    },
+    {
+      "course_id": "CRS358",
+      "course_name": "Bachelor of Arts in International Studies",
+      "course_abbreviation": "BAIS",
+      "parent_cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
+      "skills_profile": [
+        {
+          "skill": "Verbal",
+          "weight": 3,
+          "evidence": "International affairs, policy research, diplomacy, and intercultural work require advanced communication."
+        },
+        {
+          "skill": "Numerical",
+          "weight": 1,
+          "evidence": "Quantitative information supports analysis of international economic and social issues."
+        },
+        {
+          "skill": "Abstract/Logical",
+          "weight": 3,
+          "evidence": "Comparing global systems, institutions, and policies requires complex analytical reasoning."
+        },
+        {
+          "skill": "Practical/Applied",
+          "weight": 1,
+          "evidence": "Internship and policy-oriented work apply international-studies knowledge."
+        }
+      ],
+      "riasec_profile": {
+        "R": {
+          "weight": 0,
+          "evidence": "Hands-on, mechanical, field, or equipment-centered activity is not a central program emphasis."
+        },
+        "I": {
+          "weight": 3,
+          "evidence": "Research into international relations, regions, and global issues is strongly investigative."
+        },
+        "A": {
+          "weight": 2,
+          "evidence": "Intercultural interpretation and policy framing involve creative perspective-taking."
+        },
+        "S": {
+          "weight": 3,
+          "evidence": "Diplomacy, intercultural communication, and international programs are strongly people-oriented."
+        },
+        "E": {
+          "weight": 2,
+          "evidence": "Policy advocacy and international organizational work provide enterprising relevance."
+        },
+        "C": {
+          "weight": 1,
+          "evidence": "Formal policy, institutional, and diplomatic processes provide supporting conventional work."
+        }
+      },
+      "personality": {
+        "source": "PARENT_CLUSTER",
+        "parent_cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER"
+      },
+      "personal_factors": {
+        "source": "PARENT_CLUSTER",
+        "parent_cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
+        "note": "Personal Factors are scored at the Parent Cluster level using the fixed 5-factor effect matrix. Distance/Commute is excluded from WSM scoring and used only by the School Locator."
+      },
+      "data_quality": {
+        "strong_evidence": [
+          "Verbal skill domain",
+          "Numerical skill domain",
+          "Abstract/Logical skill domain",
+          "Practical/Applied skill domain",
+          "RIASEC-I",
+          "RIASEC-A",
+          "RIASEC-S",
+          "RIASEC-E",
+          "RIASEC-C"
+        ],
+        "interpretations_inferences": [],
+        "ambiguous_insufficient_information": [
+          "RIASEC-R is not a central program orientation."
+        ]
+      },
+      "sources": [
+        {
+          "title": "CHEDRO XI Programs per Higher Education Institution",
+          "url": "https://ro11.ched.gov.ph/programs-per-hei/",
+          "used_for": "Exact BA International Studies identity and recognized undergraduate offerings"
+        },
+        {
+          "title": "Far Eastern University - Bachelor of Arts in International Studies",
+          "url": "https://www.feu.edu.ph/institute-of-arts-and-sciences/bachelor-of-arts-in-international-studies/",
+          "used_for": "BAIS abbreviation, curriculum, program competencies, internship, and career pathways"
+        }
+      ]
+    },
+    {
+      "course_id": "CRS359",
+      "course_name": "Bachelor of Arts in Development Studies",
+      "course_abbreviation": "",
+      "parent_cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
+      "skills_profile": [
+        {
+          "skill": "Verbal",
+          "weight": 3,
+          "evidence": "Development research, community work, policy analysis, and program reporting require strong communication."
+        },
+        {
+          "skill": "Numerical",
+          "weight": 2,
+          "evidence": "Development indicators, evaluation, and social research require quantitative interpretation."
+        },
+        {
+          "skill": "Abstract/Logical",
+          "weight": 3,
+          "evidence": "Analyzing institutions, inequality, policy, and social change requires interdisciplinary reasoning."
+        },
+        {
+          "skill": "Practical/Applied",
+          "weight": 2,
+          "evidence": "Community assessment, project planning, and program evaluation apply theory to development work."
+        }
+      ],
+      "riasec_profile": {
+        "R": {
+          "weight": 1,
+          "evidence": "Community and field-based development work provides a supporting practical component."
+        },
+        "I": {
+          "weight": 3,
+          "evidence": "Development research, policy analysis, and evaluation are strongly investigative."
+        },
+        "A": {
+          "weight": 2,
+          "evidence": "Designing context-sensitive development responses involves creative problem-solving."
+        },
+        "S": {
+          "weight": 3,
+          "evidence": "Community engagement and social-development work are strongly people-oriented."
+        },
+        "E": {
+          "weight": 3,
+          "evidence": "Program planning, advocacy, and organizational change are strongly enterprising."
+        },
+        "C": {
+          "weight": 2,
+          "evidence": "Monitoring, evaluation, documentation, and project administration require structured work."
+        }
+      },
+      "personality": {
+        "source": "PARENT_CLUSTER",
+        "parent_cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER"
+      },
+      "personal_factors": {
+        "source": "PARENT_CLUSTER",
+        "parent_cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
+        "note": "Personal Factors are scored at the Parent Cluster level using the fixed 5-factor effect matrix. Distance/Commute is excluded from WSM scoring and used only by the School Locator."
+      },
+      "data_quality": {
+        "strong_evidence": [
+          "Verbal skill domain",
+          "Numerical skill domain",
+          "Abstract/Logical skill domain",
+          "Practical/Applied skill domain",
+          "RIASEC-R",
+          "RIASEC-I",
+          "RIASEC-A",
+          "RIASEC-S",
+          "RIASEC-E",
+          "RIASEC-C"
+        ],
+        "interpretations_inferences": [],
+        "ambiguous_insufficient_information": []
+      },
+      "sources": [
+        {
+          "title": "De La Salle University - Bachelor of Arts in Development Studies",
+          "url": "https://old.dlsu.edu.ph/colleges/cla/undergraduate-degree-programs/bachelor-of-arts-ab-in-development-studies/",
+          "used_for": "Exact degree identity, undergraduate status, curriculum focus, and careers"
+        }
+      ]
+    },
+    {
+      "course_id": "CRS360",
+      "course_name": "Bachelor of Secondary Education major in Science",
+      "course_abbreviation": "BSEd",
+      "parent_cluster": "EDUCATION CLUSTER",
+      "skills_profile": [
+        {
+          "skill": "Verbal",
+          "weight": 3,
+          "evidence": "Teaching, explanation, lesson planning, and learner feedback require strong communication."
+        },
+        {
+          "skill": "Numerical",
+          "weight": 2,
+          "evidence": "Science teaching includes quantitative reasoning across scientific subjects."
+        },
+        {
+          "skill": "Abstract/Logical",
+          "weight": 2,
+          "evidence": "Lesson design, assessment, and scientific explanation require structured reasoning."
+        },
+        {
+          "skill": "Scientific Reasoning",
+          "weight": 3,
+          "evidence": "Scientific inquiry and mastery of biology, chemistry, physics, and earth science are central."
+        },
+        {
+          "skill": "Practical/Applied",
+          "weight": 3,
+          "evidence": "Laboratory facilitation, classroom practice, assessment, and instructional design are applied."
+        }
+      ],
+      "riasec_profile": {
+        "R": {
+          "weight": 2,
+          "evidence": "Laboratory activities and classroom demonstrations provide meaningful hands-on work."
+        },
+        "I": {
+          "weight": 3,
+          "evidence": "Scientific inquiry and analysis of teaching and learning are strongly investigative."
+        },
+        "A": {
+          "weight": 1,
+          "evidence": "Designing lessons and learning materials provides a supporting creative component."
+        },
+        "S": {
+          "weight": 3,
+          "evidence": "Teaching, mentoring, and learner development are strongly social."
+        },
+        "E": {
+          "weight": 2,
+          "evidence": "Classroom leadership and instructional coordination provide enterprising relevance."
+        },
+        "C": {
+          "weight": 2,
+          "evidence": "Lesson plans, assessment records, and curriculum requirements require structured organization."
+        }
+      },
+      "personality": {
+        "source": "PARENT_CLUSTER",
+        "parent_cluster": "EDUCATION CLUSTER"
+      },
+      "personal_factors": {
+        "source": "PARENT_CLUSTER",
+        "parent_cluster": "EDUCATION CLUSTER",
+        "note": "Personal Factors are scored at the Parent Cluster level using the fixed 5-factor effect matrix. Distance/Commute is excluded from WSM scoring and used only by the School Locator."
+      },
+      "data_quality": {
+        "strong_evidence": [
+          "Verbal skill domain",
+          "Numerical skill domain",
+          "Abstract/Logical skill domain",
+          "Scientific Reasoning skill domain",
+          "Practical/Applied skill domain",
+          "RIASEC-R",
+          "RIASEC-I",
+          "RIASEC-A",
+          "RIASEC-S",
+          "RIASEC-E",
+          "RIASEC-C"
+        ],
+        "interpretations_inferences": [],
+        "ambiguous_insufficient_information": []
+      },
+      "sources": [
+        {
+          "title": "CHED ETEEAP Deputized HEIs and Degree Programs",
+          "url": "https://legacy.ched.gov.ph/wp-content/uploads/ETEAAP-list-as-of-19March2026-FINAL.pdf",
+          "used_for": "Exact BSEd Science major identity and recognized Philippine offering"
+        },
+        {
+          "title": "De La Salle University Undergraduate Degree Programs",
+          "url": "https://old.dlsu.edu.ph/admissions/undergraduate/degree-programs/",
+          "used_for": "Independent institutional confirmation of the Science major"
+        },
+        {
+          "title": "University of Santo Tomas - Bachelor of Secondary Education major in Science",
+          "url": "https://www.ust.edu.ph/academics/programs/bachelor-of-secondary-education-major-in-science/",
+          "used_for": "Four-year undergraduate status, science pedagogy, curriculum development, assessment, classroom management, and practice teaching"
+        }
+      ]
     }
   ]
 }

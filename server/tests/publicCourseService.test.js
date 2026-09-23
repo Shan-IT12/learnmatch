@@ -15,8 +15,8 @@ const databaseWithActiveCodes = (...courseCodes) => ({
   },
 })
 
-test('loads all validated courses', () => {
-  assert.equal(getPublicCourseCount(), 342)
+test('loads the 304 active independent courses for discovery', () => {
+  assert.equal(getPublicCourseCount(), 304)
 })
 
 test('searches partial names and abbreviations case-insensitively', () => {
@@ -43,6 +43,9 @@ test('returns public details by stable course code', () => {
   assert.ok(course.career_paths.length > 1)
   assert.equal(course.year_levels.length, course.program_duration_years)
   assert.equal(course.career_opportunities.length, 4)
+  assert.equal('sources' in course, false)
+  assert.equal('duration_basis' in course, false)
+  assert.equal('year_level_source_note' in course, false)
   assert.ok(course.career_opportunities.every((career) => (
     career.career_title &&
     career.estimated_monthly_salary_php?.is_estimate === true &&
@@ -54,9 +57,15 @@ test('returns public details by stable course code', () => {
   assert.equal(getPublicCourse('CRS999'), null)
 })
 
-test('keeps enrichment coverage intact across all 342 courses and 13 clusters', () => {
+test('keeps deprecated stable IDs directly resolvable but out of public discovery', () => {
+  assert.equal(getPublicCourse('CRS020').course_code, 'CRS020')
+  assert.deepEqual(searchPublicCourses('CRS020'), [])
+  assert.deepEqual(searchPublicCourses('CRS166'), [])
+})
+
+test('keeps enrichment coverage intact across all 360 courses and 13 clusters', () => {
   const clusters = new Set()
-  for (let index = 1; index <= 342; index += 1) {
+  for (let index = 1; index <= 360; index += 1) {
     const courseCode = `CRS${String(index).padStart(3, '0')}`
     const course = getPublicCourse(courseCode)
     assert.ok(course, `${courseCode} should exist`)
@@ -99,6 +108,12 @@ test('preserves ranking among remaining active public courses', async () => {
 
 test('makes active details available and inactive or unmapped details unavailable', async () => {
   assert.ok(await getAvailablePublicCourse('CRS001', databaseWithActiveCodes('CRS001')))
+  assert.equal(
+    (await getAvailablePublicCourse('CRS020', databaseWithActiveCodes('CRS021'))).course_code,
+    'CRS021'
+  )
+  assert.equal(await getAvailablePublicCourse('CRS249', databaseWithActiveCodes('CRS072', 'CRS244')), null)
+  assert.equal(await getAvailablePublicCourse('CRS166', databaseWithActiveCodes('CRS166')), null)
   assert.equal(await getAvailablePublicCourse('CRS001', databaseWithActiveCodes()), null)
   assert.equal(await getAvailablePublicCourse('CRS999', databaseWithActiveCodes('CRS999')), null)
 })

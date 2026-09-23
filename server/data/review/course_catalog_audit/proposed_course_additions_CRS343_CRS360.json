@@ -1,0 +1,185 @@
+{
+  "scope_note": "Undergraduate bachelor's-degree programs only. DVM, DMD, Doctor of Optometry, master's programs, and all other doctorate/postgraduate programs are excluded by human instruction. The 18 proposed records use the next contiguous IDs, CRS343-CRS360.",
+  "courses": [
+    {
+      "course_id": "CRS343",
+      "course_name": "Bachelor of Science in Accountancy",
+      "course_abbreviation": "BSA",
+      "parent_cluster": "BUSINESS CLUSTER",
+      "course_description": "The Bachelor of Science in Accountancy develops competence in financial reporting, auditing, taxation, management accounting, accounting information systems, and professional ethics. It is distinguished from Management Accounting and Accounting Information Systems by its broader preparation for professional accountancy practice and assurance work.",
+      "obtainable_skills": ["Financial accounting and reporting", "Auditing and assurance", "Taxation", "Management accounting", "Accounting information systems", "Professional judgment and ethical decision-making"],
+      "career_paths": ["Accountant", "Audit Associate", "Tax Associate", "Financial Reporting Analyst", "Internal Auditor", "Management Accountant"],
+      "sources": [{"title": "CHED CMO No. 27, Series of 2017 - Revised PSG for the Bachelor of Science in Accountancy", "url": "https://ched.gov.ph/wp-content/uploads/2017/10/CMO-27-s-2017.pdf", "used_for": "Exact degree identity, curriculum focus, competencies, and career alignment"}]
+    },
+    {
+      "course_id": "CRS344",
+      "course_name": "Bachelor of Science in Business Administration major in Marketing Management",
+      "course_abbreviation": "BSBA",
+      "parent_cluster": "BUSINESS CLUSTER",
+      "course_description": "This BSBA major focuses on understanding markets, customers, brands, products, pricing, promotion, distribution, and digital marketing. It differs from Financial Management and Human Resource Management by concentrating on how organizations create, communicate, and deliver value to customers.",
+      "obtainable_skills": ["Market research", "Marketing strategy", "Brand management", "Digital marketing", "Sales planning", "Consumer behavior analysis"],
+      "career_paths": ["Marketing Associate", "Brand Associate", "Market Research Analyst", "Digital Marketing Specialist", "Sales Analyst", "Product Marketing Associate"],
+      "sources": [{"title": "CHEDRO XI Recognized Programs Inventory", "url": "https://ro11.ched.gov.ph/programs-inventory/", "used_for": "Exact BSBA major identity and recognized undergraduate offering"}, {"title": "CHED CMO No. 39, Series of 2006 - Policies and Standards for BSBA", "url": "https://ched.gov.ph/wp-content/uploads/2017/10/CMO-No.39-s2006.pdf", "used_for": "Marketing Management curriculum focus, competencies, and career preparation"}]
+    },
+    {
+      "course_id": "CRS345",
+      "course_name": "Bachelor of Science in Business Administration major in Operations Management",
+      "course_abbreviation": "BSBA",
+      "parent_cluster": "BUSINESS CLUSTER",
+      "course_description": "This BSBA major studies the planning, coordination, improvement, and control of business operations. It is distinguished from other BSBA majors by its emphasis on process design, quality, productivity, capacity, inventory, logistics, and the efficient delivery of goods and services.",
+      "obtainable_skills": ["Operations planning", "Process improvement", "Quality management", "Inventory management", "Supply chain coordination", "Productivity analysis"],
+      "career_paths": ["Operations Analyst", "Operations Supervisor", "Production Planner", "Inventory Analyst", "Quality Assurance Analyst", "Supply Chain Associate"],
+      "sources": [{"title": "CHEDRO XI Recognized Programs Inventory", "url": "https://ro11.ched.gov.ph/programs-inventory/", "used_for": "Exact BSBA major identity and recognized undergraduate offering"}, {"title": "Batangas State University - BSBA major in Operations Management", "url": "https://batstateu.edu.ph/wp-content/uploads/2020/10/Bachelor-of-Science-in-Business-Administration-BSBA-Major-in-Operations-Management.docx.pdf", "used_for": "Operations Management curriculum, competencies, and program focus"}]
+    },
+    {
+      "course_id": "CRS346",
+      "course_name": "Bachelor in Data Science and Analytics",
+      "course_abbreviation": "",
+      "parent_cluster": "ENGINEERING / STEM CLUSTER",
+      "course_description": "Bachelor in Data Science and Analytics combines computing, mathematics, statistics, data management, and analytical methods for extracting useful insights from data. It differs from Computer Science and Statistics by integrating software, statistical modeling, machine learning, and data communication around applied data problems.",
+      "obtainable_skills": ["Data preparation", "Statistical modeling", "Machine learning", "Data visualization", "Database querying", "Analytical programming"],
+      "career_paths": ["Data Analyst", "Junior Data Scientist", "Business Intelligence Analyst", "Data Visualization Specialist", "Analytics Associate", "Machine Learning Associate"],
+      "sources": [{"title": "CHED CMO No. 14, Series of 2025 - Revised Estatistikolar Guidelines", "url": "https://ched.gov.ph/wp-content/uploads/CMO-No.-14-S.-2025-Revised-Estatistikolar-guidelines.pdf", "used_for": "Exact Bachelor in Data Science and Analytics degree identity and national undergraduate-program recognition"}, {"title": "University of Santo Tomas - Bachelor of Science in Data Science and Analytics", "url": "https://www.ust.edu.ph/academics/programs/bachelor-of-science-in-data-science-and-analytics/", "used_for": "Related Philippine bachelor's curriculum used only to corroborate common data-science disciplinary content, skills, and career preparation; not evidence that UST offers the exact proposed award title"}]
+    },
+    {
+      "course_id": "CRS347",
+      "course_name": "Bachelor of Science in Cybersecurity",
+      "course_abbreviation": "",
+      "parent_cluster": "ENGINEERING / STEM CLUSTER",
+      "course_description": "The Bachelor of Science in Cybersecurity focuses on protecting computer systems, networks, applications, and information from digital threats. Unlike a general Computer Science or Information Technology program, it places sustained emphasis on security engineering, threat analysis, defensive operations, incident response, governance, and ethical security practice.",
+      "obtainable_skills": ["Network security", "Security assessment", "Incident response", "Digital forensics fundamentals", "Secure systems administration", "Cybersecurity risk analysis"],
+      "career_paths": ["Cybersecurity Analyst", "Security Operations Center Analyst", "Information Security Analyst", "Junior Penetration Tester", "Digital Forensics Associate", "Governance Risk and Compliance Analyst"],
+      "sources": [{"title": "University of the Visayas - Bachelor of Science in Cybersecurity", "url": "https://www.uv.edu.ph/colleges/ceta/undergraduate/bscyb.html", "used_for": "Standalone degree identity, undergraduate status, curriculum focus, and careers"}, {"title": "USTP Alubijid - BS Cybersecurity", "url": "https://www.ustp.edu.ph/alubijid/bs-cybersecurity/", "used_for": "Independent confirmation of the standalone Philippine degree"}]
+    },
+    {
+      "course_id": "CRS348",
+      "course_name": "Bachelor of Science in Actuarial Science",
+      "course_abbreviation": "",
+      "parent_cluster": "SCIENCE & MATHEMATICS CLUSTER",
+      "course_description": "The Bachelor of Science in Actuarial Science applies mathematics, probability, statistics, finance, economics, and computing to the measurement and management of financial risk. It differs from general Mathematics and Statistics through its specialized focus on insurance, pensions, investments, and long-term financial uncertainty.",
+      "obtainable_skills": ["Actuarial modeling", "Probability and statistical analysis", "Financial mathematics", "Risk assessment", "Insurance analytics", "Quantitative forecasting"],
+      "career_paths": ["Actuarial Analyst", "Risk Analyst", "Insurance Analyst", "Pension Analyst", "Pricing Analyst", "Financial Modeling Analyst"],
+      "sources": [{"title": "CHED CMO No. 14, Series of 2025 - Revised Estatistikolar Guidelines", "url": "https://ched.gov.ph/wp-content/uploads/CMO-No.-14-S.-2025-Revised-Estatistikolar-guidelines.pdf", "used_for": "Exact standalone Bachelor of Science in Actuarial Science degree identity and national undergraduate-program recognition"}, {"title": "University of Santo Tomas - BS Applied Mathematics major in Actuarial Science", "url": "https://www.ust.edu.ph/academics/programs/bachelor-of-science-in-applied-mathematics-major-in-actuarial-science/", "used_for": "Related Philippine bachelor's curriculum used only to corroborate common actuarial mathematics, probability, finance, risk, modeling, and career preparation; not evidence that UST offers the standalone proposed award"}, {"title": "De La Salle University - BS Statistics major in Actuarial Science", "url": "https://old.dlsu.edu.ph/colleges/cos/undergraduate-degree-programs/bs-stat/", "used_for": "Related Philippine bachelor's curriculum used only to corroborate common actuarial statistics, computing, quantitative analysis, and career preparation; not evidence that DLSU offers the standalone proposed award"}]
+    },
+    {
+      "course_id": "CRS349",
+      "course_name": "Bachelor of Science in Biochemistry",
+      "course_abbreviation": "",
+      "parent_cluster": "SCIENCE & MATHEMATICS CLUSTER",
+      "course_description": "The Bachelor of Science in Biochemistry examines the chemical processes, structures, and interactions underlying living systems. It bridges Chemistry and Biology but remains distinct through its concentration on biomolecules, metabolism, molecular techniques, biochemical analysis, and laboratory investigation of biological processes.",
+      "obtainable_skills": ["Biochemical laboratory techniques", "Biomolecular analysis", "Analytical chemistry", "Experimental design", "Scientific data interpretation", "Laboratory safety and quality practices"],
+      "career_paths": ["Biochemistry Laboratory Analyst", "Research Assistant", "Quality Control Analyst", "Laboratory Technician", "Product Development Associate", "Scientific Research Associate"],
+      "sources": [{"title": "CHED - UP Manila and UP Los Banos Quality Assurance Recognition", "url": "https://legacy.ched.gov.ph/ched-commends-up-manila-and-up-los-banos-for-strong-quality-assurance-mechanism/", "used_for": "Official recognition of BS Biochemistry as a Philippine undergraduate program"}, {"title": "UP Manila - Bachelor of Science in Biochemistry", "url": "https://dpsm.cas.upm.edu.ph/index.php/bachelor-of-science-in-biochemistry/", "used_for": "Undergraduate program focus, learning outcomes, laboratory competencies, and curriculum"}]
+    },
+    {
+      "course_id": "CRS350",
+      "course_name": "Bachelor of Science in Microbiology",
+      "course_abbreviation": "",
+      "parent_cluster": "SCIENCE & MATHEMATICS CLUSTER",
+      "course_description": "The Bachelor of Science in Microbiology studies microorganisms and their roles in health, agriculture, food, industry, and the environment. It differs from a broad Biology degree through its focused laboratory training in microbial identification, cultivation, genetics, physiology, ecology, and control.",
+      "obtainable_skills": ["Microbial culture techniques", "Microorganism identification", "Aseptic technique", "Microbiological analysis", "Laboratory quality control", "Scientific investigation"],
+      "career_paths": ["Microbiology Laboratory Analyst", "Quality Control Microbiologist", "Research Assistant", "Food Microbiology Analyst", "Environmental Microbiology Technician", "Laboratory Technician"],
+      "sources": [{"title": "University of Santo Tomas - Bachelor of Science in Microbiology", "url": "https://www.ust.edu.ph/academics/programs/bachelor-of-science-in-microbiology/", "used_for": "Exact degree identity, undergraduate status, focus, and career alignment"}]
+    },
+    {
+      "course_id": "CRS351",
+      "course_name": "Bachelor of Science in Legal Management",
+      "course_abbreviation": "",
+      "parent_cluster": "LEGAL & PUBLIC SERVICE CLUSTER",
+      "course_description": "The Bachelor of Science in Legal Management combines business, management, and foundational legal studies. Its science-degree construction emphasizes analytical and organizational preparation for legal-support, compliance, governance, and business roles and remains distinct from Political Science, Public Administration, and the separately recognized BA Legal Management program.",
+      "obtainable_skills": ["Legal research", "Legal document analysis", "Business law application", "Compliance analysis", "Policy interpretation", "Management decision-making"],
+      "career_paths": ["Legal Assistant", "Compliance Analyst", "Contracts Associate", "Corporate Governance Assistant", "Regulatory Affairs Associate", "Business Operations Analyst"],
+      "sources": [{"title": "CHEDRO XI Programs per Higher Education Institution", "url": "https://ro11.ched.gov.ph/programs-per-hei/", "used_for": "Exact BS Legal Management identity and recognized undergraduate offering"}, {"title": "De La Salle University - Bachelor of Science in Legal Management", "url": "https://old.dlsu.edu.ph/colleges/rvrcob/undergraduate-degree-programs/lgl/", "used_for": "Program focus, legal and management curriculum, legal research, writing, and practicum competencies"}]
+    },
+    {
+      "course_id": "CRS352",
+      "course_name": "Bachelor of Arts in Legal Management",
+      "course_abbreviation": "",
+      "parent_cluster": "LEGAL & PUBLIC SERVICE CLUSTER",
+      "course_description": "The Bachelor of Arts in Legal Management integrates liberal-arts study with foundational law, governance, organizations, and management. It is preserved separately from BS Legal Management because the BA degree construction carries a distinct humanities and social-science orientation while supporting legal-support, policy, compliance, and administrative work.",
+      "obtainable_skills": ["Legal research", "Critical reading", "Policy analysis", "Legal writing", "Organizational analysis", "Argumentation and communication"],
+      "career_paths": ["Legal Assistant", "Policy Research Assistant", "Compliance Associate", "Administrative Officer", "Contracts Assistant", "Government Program Assistant"],
+      "sources": [{"title": "CHEDRO III Enrollment and Graduates per Discipline and Program", "url": "https://www.chedro3.ched.gov.ph/wp-content/uploads/2020/07/Enrollment-Graduates-per-Discipline-per-Program.pdf", "used_for": "Independent government evidence for the BA Legal Management degree identity"}, {"title": "University of Santo Tomas - Bachelor of Arts in Legal Management", "url": "https://www.ust.edu.ph/academics/programs/bachelor-of-arts-in-legal-management/", "used_for": "Exact degree identity, curriculum focus, learning outcomes, and career preparation"}]
+    },
+    {
+      "course_id": "CRS353",
+      "course_name": "Bachelor of Science in Aircraft Maintenance Technology",
+      "course_abbreviation": "BSAMT",
+      "parent_cluster": "AVIATION & MARITIME CLUSTER",
+      "course_description": "The Bachelor of Science in Aircraft Maintenance Technology develops knowledge and practical competence in aircraft inspection, maintenance, repair, systems, structures, powerplants, documentation, and aviation safety. It differs from Aeronautical Engineering by concentrating on aircraft airworthiness and maintenance operations rather than aircraft engineering design.",
+      "obtainable_skills": ["Aircraft inspection", "Airframe maintenance", "Aircraft powerplant maintenance", "Maintenance documentation", "Aviation safety procedures", "Aircraft systems troubleshooting"],
+      "career_paths": ["Aircraft Maintenance Technician", "Aircraft Mechanic", "Maintenance Planning Assistant", "Aircraft Quality Assurance Assistant", "Technical Records Analyst", "Aviation Maintenance Operations Assistant"],
+      "sources": [{"title": "CHEDRO XI Recognized Programs Inventory", "url": "https://ro11.ched.gov.ph/programs-inventory/", "used_for": "Exact degree identity and government recognition"}, {"title": "National Aviation Academy of the Philippines - Programs Offered", "url": "https://naap.edu.ph/programs-offered/", "used_for": "Program focus and undergraduate offering"}]
+    },
+    {
+      "course_id": "CRS354",
+      "course_name": "Bachelor of Science in Aviation Electronics Technology",
+      "course_abbreviation": "BSAET",
+      "parent_cluster": "AVIATION & MARITIME CLUSTER",
+      "course_description": "The Bachelor of Science in Aviation Electronics Technology focuses on electronic, electrical, communication, navigation, instrumentation, and control systems used in aircraft and aviation operations. It differs from general Electronics programs through its specialized application of electronics to avionics equipment, aircraft systems, and aviation safety requirements.",
+      "obtainable_skills": ["Avionics systems testing", "Aircraft electronics troubleshooting", "Electronic instrumentation", "Communication and navigation systems", "Electrical maintenance procedures", "Technical documentation"],
+      "career_paths": ["Avionics Technician", "Aviation Electronics Technician", "Aircraft Electronics Maintenance Assistant", "Avionics Quality Assurance Assistant", "Aviation Technical Records Analyst", "Avionics Systems Support Associate"],
+      "sources": [{"title": "CHEDRO XI Recognized Programs Inventory", "url": "https://ro11.ched.gov.ph/programs-inventory/", "used_for": "Exact degree identity and government recognition"}, {"title": "CHEDRO III Bulletin 2018", "url": "https://chedro3.ched.gov.ph/wp-content/uploads/2020/10/CHEDRO3%20Bulletin%202018.pdf", "used_for": "Independent government confirmation of the program identity"}, {"title": "National Aviation Academy of the Philippines - Programs Offered", "url": "https://naap.edu.ph/programs-offered/", "used_for": "BSAET undergraduate structure, avionics curriculum focus, technical competencies, and career preparation"}]
+    },
+    {
+      "course_id": "CRS355",
+      "course_name": "Bachelor of Science in Aviation Management",
+      "course_abbreviation": "BSAM",
+      "parent_cluster": "AVIATION & MARITIME CLUSTER",
+      "course_description": "The Bachelor of Science in Aviation Management applies business and management principles to airlines, airports, aviation services, safety, logistics, and regulatory operations. It differs from aircraft engineering and maintenance degrees by focusing on the planning, administration, and coordination of aviation organizations and services.",
+      "obtainable_skills": ["Airline operations planning", "Airport operations", "Aviation safety management", "Aviation logistics coordination", "Service operations management", "Regulatory compliance analysis"],
+      "career_paths": ["Airline Operations Associate", "Airport Operations Assistant", "Aviation Safety Assistant", "Ground Operations Supervisor", "Aviation Logistics Coordinator", "Aviation Management Trainee"],
+      "sources": [{"title": "Mapua Malayan Colleges Laguna - BS Aviation Management", "url": "https://mcl.edu.ph/bs-aviation-management/", "used_for": "Exact degree identity, curriculum focus, and undergraduate status"}, {"title": "Holy Angel University - Aviation Management", "url": "https://www.hau.edu.ph/programs/school-of-business-and-accountancy/88", "used_for": "Independent confirmation of the degree and career focus"}]
+    },
+    {
+      "course_id": "CRS356",
+      "course_name": "Bachelor of Science in Agricultural Biotechnology",
+      "course_abbreviation": "BSABT",
+      "parent_cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
+      "course_description": "The Bachelor of Science in Agricultural Biotechnology applies biology, genetics, molecular methods, and biotechnology to crops, livestock, food systems, and agricultural sustainability. It differs from general Agriculture and Biology through its specialized use of laboratory and biotechnological approaches to agricultural problems.",
+      "obtainable_skills": ["Molecular biology techniques", "Plant and animal biotechnology", "Laboratory experimentation", "Genetic data interpretation", "Agricultural research", "Biosafety practices"],
+      "career_paths": ["Agricultural Biotechnology Research Assistant", "Laboratory Analyst", "Plant Biotechnology Technician", "Quality Control Analyst", "Seed Technology Associate", "Agricultural Research Associate"],
+      "sources": [{"title": "UPLB Degree Programs Appeals Criteria 2025-2026", "url": "https://our.uplb.edu.ph/wp-content/uploads/2025/06/UPCAT-2025-Sem-1-UPLB-Degree-Programs-Appeals-Criteria-1.pdf", "used_for": "Exact degree identity, abbreviation, and current undergraduate offering"}, {"title": "UPLB Institute of Crop Science - BS Agricultural Biotechnology Undergraduate Program", "url": "https://icrops.uplb.edu.ph/wp-content/uploads/2025/02/BS-ABT-Undergraduate-Program.pdf", "used_for": "Curriculum, laboratory competencies, specializations, research, practicum, and agricultural biotechnology focus"}]
+    },
+    {
+      "course_id": "CRS357",
+      "course_name": "Bachelor of Science in Agricultural Chemistry",
+      "course_abbreviation": "BSAC",
+      "parent_cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
+      "course_description": "The Bachelor of Science in Agricultural Chemistry integrates chemistry with agricultural science to study soils, fertilizers, crops, feeds, pesticides, food materials, and other agricultural products. It differs from general Chemistry and Agriculture by emphasizing chemical analysis and research directed toward agricultural systems and materials.",
+      "obtainable_skills": ["Agricultural chemical analysis", "Analytical chemistry", "Soil and fertilizer analysis", "Food and feed analysis", "Laboratory quality control", "Scientific research"],
+      "career_paths": ["Agricultural Chemistry Analyst", "Laboratory Analyst", "Quality Control Analyst", "Soil and Fertilizer Analyst", "Food and Feed Analyst", "Research Assistant"],
+      "sources": [{"title": "UPLB - BS Agricultural Chemistry Curriculum", "url": "https://our.uplb.edu.ph/wp-content/uploads/2023/03/BS-Agricultural-Chemistry.pdf", "used_for": "Exact degree identity, curriculum, competencies, and undergraduate structure"}, {"title": "UPLB Degree Programs Appeals Criteria 2025-2026", "url": "https://our.uplb.edu.ph/wp-content/uploads/2025/06/UPCAT-2025-Sem-1-UPLB-Degree-Programs-Appeals-Criteria-1.pdf", "used_for": "Current offering and BSAC abbreviation"}]
+    },
+    {
+      "course_id": "CRS358",
+      "course_name": "Bachelor of Arts in International Studies",
+      "course_abbreviation": "BAIS",
+      "parent_cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
+      "course_description": "The Bachelor of Arts in International Studies examines relations among states, societies, cultures, institutions, and global systems. It differs from Political Science through its sustained interdisciplinary attention to international affairs, regional studies, diplomacy, global development, intercultural communication, and transnational issues.",
+      "obtainable_skills": ["International affairs analysis", "Policy research", "Cross-cultural communication", "Regional studies research", "Diplomatic communication", "Global issue analysis"],
+      "career_paths": ["Foreign Affairs Research Assistant", "International Programs Assistant", "Policy Research Assistant", "Development Project Assistant", "International Relations Associate", "Government Affairs Assistant"],
+      "sources": [{"title": "CHEDRO XI Programs per Higher Education Institution", "url": "https://ro11.ched.gov.ph/programs-per-hei/", "used_for": "Exact BA International Studies identity and recognized undergraduate offerings"}, {"title": "Far Eastern University - Bachelor of Arts in International Studies", "url": "https://www.feu.edu.ph/institute-of-arts-and-sciences/bachelor-of-arts-in-international-studies/", "used_for": "BAIS abbreviation, curriculum, program competencies, internship, and career pathways"}]
+    },
+    {
+      "course_id": "CRS359",
+      "course_name": "Bachelor of Arts in Development Studies",
+      "course_abbreviation": "",
+      "parent_cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
+      "course_description": "The Bachelor of Arts in Development Studies examines social, economic, political, cultural, and environmental dimensions of development. It differs from Economics, Sociology, and Development Communication by integrating these perspectives to analyze inequality, institutions, public policy, communities, and sustainable social change.",
+      "obtainable_skills": ["Development policy analysis", "Social research", "Community needs assessment", "Project planning", "Program monitoring and evaluation", "Qualitative and quantitative analysis"],
+      "career_paths": ["Development Project Assistant", "Program Officer", "Policy Research Assistant", "Community Development Worker", "Monitoring and Evaluation Assistant", "Social Research Assistant"],
+      "sources": [{"title": "De La Salle University - Bachelor of Arts in Development Studies", "url": "https://old.dlsu.edu.ph/colleges/cla/undergraduate-degree-programs/bachelor-of-arts-ab-in-development-studies/", "used_for": "Exact degree identity, undergraduate status, curriculum focus, and careers"}]
+    },
+    {
+      "course_id": "CRS360",
+      "course_name": "Bachelor of Secondary Education major in Science",
+      "course_abbreviation": "BSEd",
+      "parent_cluster": "EDUCATION CLUSTER",
+      "course_description": "The Bachelor of Secondary Education major in Science prepares future secondary-school teachers to teach integrated science and related subjects using sound scientific and pedagogical practice. Unlike a pure science degree, it combines disciplinary science with curriculum design, teaching methods, assessment, classroom management, and supervised teaching experience.",
+      "obtainable_skills": ["Science lesson planning", "Science teaching methods", "Laboratory activity facilitation", "Learning assessment", "Classroom management", "Curriculum implementation"],
+      "career_paths": ["Secondary School Science Teacher", "Science Learning Materials Developer", "Science Education Program Assistant", "Academic Tutor", "Laboratory Learning Facilitator", "Education Research Assistant"],
+      "sources": [{"title": "CHED ETEEAP Deputized HEIs and Degree Programs", "url": "https://legacy.ched.gov.ph/wp-content/uploads/ETEAAP-list-as-of-19March2026-FINAL.pdf", "used_for": "Exact BSEd Science major identity and recognized Philippine offering"}, {"title": "De La Salle University Undergraduate Degree Programs", "url": "https://old.dlsu.edu.ph/admissions/undergraduate/degree-programs/", "used_for": "Independent institutional confirmation of the Science major"}, {"title": "University of Santo Tomas - Bachelor of Secondary Education major in Science", "url": "https://www.ust.edu.ph/academics/programs/bachelor-of-secondary-education-major-in-science/", "used_for": "Four-year undergraduate status, science pedagogy, curriculum development, assessment, classroom management, and practice teaching"}]
+    }
+  ]
+}

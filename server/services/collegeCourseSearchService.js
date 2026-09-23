@@ -1,3 +1,5 @@
+import { isCurrentIndependentCourse } from './courseIdentityService.js'
+
 export function normalizeCourseSearchQuery(value) {
   return String(value || '').trim().replace(/\s+/g, ' ')
 }
@@ -17,9 +19,11 @@ export async function searchActiveCollegeCourses(database, value) {
        OR LOWER(course_code) LIKE LOWER(?)
        OR LOWER(REPLACE(REPLACE(course_abbreviation, ' ', ''), '.', '')) LIKE LOWER(?)
      ) AND is_active = 1
-     LIMIT 5`,
+     LIMIT 25`,
     [searchTerm, searchTerm, searchTerm, compactSearchTerm]
   )
 
   return courses
+    .filter(({ course_code }) => isCurrentIndependentCourse(course_code))
+    .slice(0, 5)
 }

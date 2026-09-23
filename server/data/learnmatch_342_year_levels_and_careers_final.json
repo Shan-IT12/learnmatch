@@ -57139,6 +57139,3102 @@
           "career_relevance_basis": "work_dataset_mapping_retained_after_structural_review"
         }
       ]
+    },
+    {
+      "course_id": "CRS343",
+      "course_name": "Bachelor of Science in Accountancy",
+      "course_abbreviation": "BSA",
+      "parent_cluster": "BUSINESS CLUSTER",
+      "course_description": "The Bachelor of Science in Accountancy develops competence in financial reporting, auditing, taxation, management accounting, accounting information systems, and professional ethics. It is distinguished from Management Accounting and Accounting Information Systems by its broader preparation for professional accountancy practice and assurance work.",
+      "obtainable_skills": [
+        "Financial accounting and reporting",
+        "Auditing and assurance",
+        "Taxation",
+        "Management accounting",
+        "Accounting information systems",
+        "Professional judgment and ethical decision-making"
+      ],
+      "career_paths": [
+        "Accountant",
+        "Audit Associate",
+        "Tax Associate",
+        "Financial Reporting Analyst",
+        "Internal Auditor",
+        "Management Accountant"
+      ],
+      "sources": [
+        {
+          "title": "CHED CMO No. 27, Series of 2017 - Revised PSG for the Bachelor of Science in Accountancy",
+          "url": "https://ched.gov.ph/wp-content/uploads/2017/10/CMO-27-s-2017.pdf",
+          "used_for": "Exact degree identity, curriculum focus, competencies, and career alignment"
+        }
+      ],
+      "program_duration_years": 4,
+      "duration_basis": "official_philippine_curriculum_or_disclosed_current_equivalent",
+      "year_levels": [
+        {
+          "year": 1,
+          "label": "1ST YEAR",
+          "overview": "General education, business mathematics, economics, and introductory financial accounting establish the foundations of accountancy."
+        },
+        {
+          "year": 2,
+          "label": "2ND YEAR",
+          "overview": "Intermediate financial accounting, cost and management accounting, taxation, business law, and accounting systems develop core professional knowledge."
+        },
+        {
+          "year": 3,
+          "label": "3RD YEAR",
+          "overview": "Advanced financial reporting, auditing and assurance, accounting research, governance, and applied taxation deepen professional analysis."
+        },
+        {
+          "year": 4,
+          "label": "4TH YEAR",
+          "overview": "Integrated accountancy subjects, strategic business analysis, internship or practicum, and review-oriented preparation consolidate professional competencies."
+        }
+      ],
+      "year_level_status": "completed",
+      "year_level_source_note": "Structured from the approved Philippine program and curriculum evidence retained in the canonical course sources.",
+      "year_level_confidence": "high",
+      "year_level_sources": [
+        {
+          "title": "CHED CMO No. 27, Series of 2017 - Revised PSG for the Bachelor of Science in Accountancy",
+          "url": "https://ched.gov.ph/wp-content/uploads/2017/10/CMO-27-s-2017.pdf",
+          "accessed": "2026-09-23"
+        }
+      ],
+      "career_opportunities": [
+        {
+          "career_title": "Accountant",
+          "estimated_monthly_salary_php": {
+            "minimum": 16000,
+            "maximum": 59000,
+            "display": "Estimated ₱16,000–₱59,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Prepares and analyzes financial records for Philippine companies, firms, government offices, or shared-service organizations.",
+          "salary_basis": {
+            "basis_type": "exact_occupation",
+            "source_name": "Indeed Philippines",
+            "source_title": "Indeed Philippines Career Explorer — Accountant",
+            "source_url": "https://ph.indeed.com/career/accountant/salaries",
+            "derivation_and_occupation_mapping": "Direct or closely aligned Philippine salary evidence for Accountant; range remains an estimate and varies by experience and employer."
+          },
+          "reference_year": 2026,
+          "confidence": {
+            "level": "medium",
+            "rationale": "A direct or closely related Philippine occupation benchmark is available, but role and experience affect pay."
+          },
+          "career_id": "CRS343-CAR01",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        },
+        {
+          "career_title": "Audit Associate",
+          "estimated_monthly_salary_php": {
+            "minimum": 16000,
+            "maximum": 59000,
+            "display": "Estimated ₱16,000–₱59,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Examines transactions, controls, and supporting records under the supervision of an audit team.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Indeed Philippines",
+            "source_title": "Indeed Philippines Career Explorer — Accountant",
+            "source_url": "https://ph.indeed.com/career/accountant/salaries",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2026,
+          "confidence": {
+            "level": "medium",
+            "rationale": "A direct or closely related Philippine occupation benchmark is available, but role and experience affect pay."
+          },
+          "career_id": "CRS343-CAR02",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        },
+        {
+          "career_title": "Tax Associate",
+          "estimated_monthly_salary_php": {
+            "minimum": 16000,
+            "maximum": 59000,
+            "display": "Estimated ₱16,000–₱59,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Assists with tax computations, returns, documentation, and compliance work for Philippine clients or organizations.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Indeed Philippines",
+            "source_title": "Indeed Philippines Career Explorer — Accountant",
+            "source_url": "https://ph.indeed.com/career/accountant/salaries",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2026,
+          "confidence": {
+            "level": "medium",
+            "rationale": "A direct or closely related Philippine occupation benchmark is available, but role and experience affect pay."
+          },
+          "career_id": "CRS343-CAR03",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        },
+        {
+          "career_title": "Financial Reporting Analyst",
+          "estimated_monthly_salary_php": {
+            "minimum": 16000,
+            "maximum": 59000,
+            "display": "Estimated ₱16,000–₱59,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Prepares and reviews financial statements, reconciliations, and reporting schedules for management and regulatory use.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Indeed Philippines",
+            "source_title": "Indeed Philippines Career Explorer — Accountant",
+            "source_url": "https://ph.indeed.com/career/accountant/salaries",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2026,
+          "confidence": {
+            "level": "medium",
+            "rationale": "A direct or closely related Philippine occupation benchmark is available, but role and experience affect pay."
+          },
+          "career_id": "CRS343-CAR04",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        }
+      ]
+    },
+    {
+      "course_id": "CRS344",
+      "course_name": "Bachelor of Science in Business Administration major in Marketing Management",
+      "course_abbreviation": "BSBA",
+      "parent_cluster": "BUSINESS CLUSTER",
+      "course_description": "This BSBA major focuses on understanding markets, customers, brands, products, pricing, promotion, distribution, and digital marketing. It differs from Financial Management and Human Resource Management by concentrating on how organizations create, communicate, and deliver value to customers.",
+      "obtainable_skills": [
+        "Market research",
+        "Marketing strategy",
+        "Brand management",
+        "Digital marketing",
+        "Sales planning",
+        "Consumer behavior analysis"
+      ],
+      "career_paths": [
+        "Marketing Associate",
+        "Brand Associate",
+        "Market Research Analyst",
+        "Digital Marketing Specialist",
+        "Sales Analyst",
+        "Product Marketing Associate"
+      ],
+      "sources": [
+        {
+          "title": "CHEDRO XI Recognized Programs Inventory",
+          "url": "https://ro11.ched.gov.ph/programs-inventory/",
+          "used_for": "Exact BSBA major identity and recognized undergraduate offering"
+        },
+        {
+          "title": "CHED CMO No. 39, Series of 2006 - Policies and Standards for BSBA",
+          "url": "https://ched.gov.ph/wp-content/uploads/2017/10/CMO-No.39-s2006.pdf",
+          "used_for": "Marketing Management curriculum focus, competencies, and career preparation"
+        }
+      ],
+      "program_duration_years": 4,
+      "duration_basis": "official_philippine_curriculum_or_disclosed_current_equivalent",
+      "year_levels": [
+        {
+          "year": 1,
+          "label": "1ST YEAR",
+          "overview": "General education and foundations in business, economics, accounting, management, and communication introduce the business environment."
+        },
+        {
+          "year": 2,
+          "label": "2ND YEAR",
+          "overview": "Marketing principles, consumer behavior, market research, sales, and business analytics develop core marketing knowledge."
+        },
+        {
+          "year": 3,
+          "label": "3RD YEAR",
+          "overview": "Brand, product, pricing, distribution, digital marketing, and integrated communications are applied through cases and projects."
+        },
+        {
+          "year": 4,
+          "label": "4TH YEAR",
+          "overview": "Strategic marketing, marketing planning, internship or practicum, and a capstone project integrate research, communication, and business decisions."
+        }
+      ],
+      "year_level_status": "completed",
+      "year_level_source_note": "Structured from the approved Philippine program and curriculum evidence retained in the canonical course sources.",
+      "year_level_confidence": "high",
+      "year_level_sources": [
+        {
+          "title": "CHEDRO XI Recognized Programs Inventory",
+          "url": "https://ro11.ched.gov.ph/programs-inventory/",
+          "accessed": "2026-09-23"
+        },
+        {
+          "title": "CHED CMO No. 39, Series of 2006 - Policies and Standards for BSBA",
+          "url": "https://ched.gov.ph/wp-content/uploads/2017/10/CMO-No.39-s2006.pdf",
+          "accessed": "2026-09-23"
+        }
+      ],
+      "career_opportunities": [
+        {
+          "career_title": "Marketing Officer",
+          "estimated_monthly_salary_php": {
+            "minimum": 18000,
+            "maximum": 55000,
+            "display": "Estimated ₱18,000–₱55,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Coordinates campaigns, promotions, customer communication, and market activities for Philippine organizations.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Philippine Statistics Authority",
+            "source_title": "PSA 2024 Occupational Wages Survey",
+            "source_url": "https://psa.gov.ph/statistics/occupational-wages-survey",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2024,
+          "confidence": {
+            "level": "low",
+            "rationale": "Only a broad Philippine industry proxy is available; treat the range as indicative."
+          },
+          "career_id": "CRS344-CAR01",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        },
+        {
+          "career_title": "Market Research Analyst",
+          "estimated_monthly_salary_php": {
+            "minimum": 18000,
+            "maximum": 55000,
+            "display": "Estimated ₱18,000–₱55,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Collects and interprets customer, competitor, and market information to support business decisions.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Philippine Statistics Authority",
+            "source_title": "PSA 2024 Occupational Wages Survey",
+            "source_url": "https://psa.gov.ph/statistics/occupational-wages-survey",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2024,
+          "confidence": {
+            "level": "low",
+            "rationale": "Only a broad Philippine industry proxy is available; treat the range as indicative."
+          },
+          "career_id": "CRS344-CAR02",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        },
+        {
+          "career_title": "Digital Marketing Specialist",
+          "estimated_monthly_salary_php": {
+            "minimum": 18000,
+            "maximum": 55000,
+            "display": "Estimated ₱18,000–₱55,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Plans and evaluates online content, advertising, audience engagement, and campaign performance.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Philippine Statistics Authority",
+            "source_title": "PSA 2024 Occupational Wages Survey",
+            "source_url": "https://psa.gov.ph/statistics/occupational-wages-survey",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2024,
+          "confidence": {
+            "level": "low",
+            "rationale": "Only a broad Philippine industry proxy is available; treat the range as indicative."
+          },
+          "career_id": "CRS344-CAR03",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        },
+        {
+          "career_title": "Brand Associate",
+          "estimated_monthly_salary_php": {
+            "minimum": 18000,
+            "maximum": 55000,
+            "display": "Estimated ₱18,000–₱55,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Supports brand planning, product positioning, promotions, and coordination with sales and creative teams.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Philippine Statistics Authority",
+            "source_title": "PSA 2024 Occupational Wages Survey",
+            "source_url": "https://psa.gov.ph/statistics/occupational-wages-survey",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2024,
+          "confidence": {
+            "level": "low",
+            "rationale": "Only a broad Philippine industry proxy is available; treat the range as indicative."
+          },
+          "career_id": "CRS344-CAR04",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        }
+      ]
+    },
+    {
+      "course_id": "CRS345",
+      "course_name": "Bachelor of Science in Business Administration major in Operations Management",
+      "course_abbreviation": "BSBA",
+      "parent_cluster": "BUSINESS CLUSTER",
+      "course_description": "This BSBA major studies the planning, coordination, improvement, and control of business operations. It is distinguished from other BSBA majors by its emphasis on process design, quality, productivity, capacity, inventory, logistics, and the efficient delivery of goods and services.",
+      "obtainable_skills": [
+        "Operations planning",
+        "Process improvement",
+        "Quality management",
+        "Inventory management",
+        "Supply chain coordination",
+        "Productivity analysis"
+      ],
+      "career_paths": [
+        "Operations Analyst",
+        "Operations Supervisor",
+        "Production Planner",
+        "Inventory Analyst",
+        "Quality Assurance Analyst",
+        "Supply Chain Associate"
+      ],
+      "sources": [
+        {
+          "title": "CHEDRO XI Recognized Programs Inventory",
+          "url": "https://ro11.ched.gov.ph/programs-inventory/",
+          "used_for": "Exact BSBA major identity and recognized undergraduate offering"
+        },
+        {
+          "title": "Batangas State University - BSBA major in Operations Management",
+          "url": "https://batstateu.edu.ph/wp-content/uploads/2020/10/Bachelor-of-Science-in-Business-Administration-BSBA-Major-in-Operations-Management.docx.pdf",
+          "used_for": "Operations Management curriculum, competencies, and program focus"
+        }
+      ],
+      "program_duration_years": 4,
+      "duration_basis": "official_philippine_curriculum_or_disclosed_current_equivalent",
+      "year_levels": [
+        {
+          "year": 1,
+          "label": "1ST YEAR",
+          "overview": "General education and foundational business, economics, accounting, management, and quantitative subjects establish the business base."
+        },
+        {
+          "year": 2,
+          "label": "2ND YEAR",
+          "overview": "Operations fundamentals, statistics, process analysis, inventory, quality, and management information develop operational competence."
+        },
+        {
+          "year": 3,
+          "label": "3RD YEAR",
+          "overview": "Supply chains, forecasting, capacity, production planning, service operations, and process improvement are applied to organizational problems."
+        },
+        {
+          "year": 4,
+          "label": "4TH YEAR",
+          "overview": "Strategic operations, project management, internship or practicum, and capstone work integrate productivity, quality, and operational decisions."
+        }
+      ],
+      "year_level_status": "completed",
+      "year_level_source_note": "Structured from the approved Philippine program and curriculum evidence retained in the canonical course sources.",
+      "year_level_confidence": "high",
+      "year_level_sources": [
+        {
+          "title": "CHEDRO XI Recognized Programs Inventory",
+          "url": "https://ro11.ched.gov.ph/programs-inventory/",
+          "accessed": "2026-09-23"
+        },
+        {
+          "title": "Batangas State University - BSBA major in Operations Management",
+          "url": "https://batstateu.edu.ph/wp-content/uploads/2020/10/Bachelor-of-Science-in-Business-Administration-BSBA-Major-in-Operations-Management.docx.pdf",
+          "accessed": "2026-09-23"
+        }
+      ],
+      "career_opportunities": [
+        {
+          "career_title": "Operations Analyst",
+          "estimated_monthly_salary_php": {
+            "minimum": 18000,
+            "maximum": 55000,
+            "display": "Estimated ₱18,000–₱55,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Examines workflows, productivity, service levels, and operational data to recommend improvements.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Philippine Statistics Authority",
+            "source_title": "PSA 2024 Occupational Wages Survey",
+            "source_url": "https://psa.gov.ph/statistics/occupational-wages-survey",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2024,
+          "confidence": {
+            "level": "low",
+            "rationale": "Only a broad Philippine industry proxy is available; treat the range as indicative."
+          },
+          "career_id": "CRS345-CAR01",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        },
+        {
+          "career_title": "Production Planner",
+          "estimated_monthly_salary_php": {
+            "minimum": 18000,
+            "maximum": 55000,
+            "display": "Estimated ₱18,000–₱55,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Coordinates materials, capacity, schedules, and production requirements in manufacturing operations.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Philippine Statistics Authority",
+            "source_title": "PSA 2024 Occupational Wages Survey",
+            "source_url": "https://psa.gov.ph/statistics/occupational-wages-survey",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2024,
+          "confidence": {
+            "level": "low",
+            "rationale": "Only a broad Philippine industry proxy is available; treat the range as indicative."
+          },
+          "career_id": "CRS345-CAR02",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        },
+        {
+          "career_title": "Inventory Analyst",
+          "estimated_monthly_salary_php": {
+            "minimum": 18000,
+            "maximum": 55000,
+            "display": "Estimated ₱18,000–₱55,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Monitors stock levels, movement, demand, and replenishment for retail, logistics, or manufacturing organizations.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Philippine Statistics Authority",
+            "source_title": "PSA 2024 Occupational Wages Survey",
+            "source_url": "https://psa.gov.ph/statistics/occupational-wages-survey",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2024,
+          "confidence": {
+            "level": "low",
+            "rationale": "Only a broad Philippine industry proxy is available; treat the range as indicative."
+          },
+          "career_id": "CRS345-CAR03",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        },
+        {
+          "career_title": "Quality Assurance Analyst",
+          "estimated_monthly_salary_php": {
+            "minimum": 18000,
+            "maximum": 55000,
+            "display": "Estimated ₱18,000–₱55,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Reviews processes, standards, records, and performance indicators to support consistent products or services.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Philippine Statistics Authority",
+            "source_title": "PSA 2024 Occupational Wages Survey",
+            "source_url": "https://psa.gov.ph/statistics/occupational-wages-survey",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2024,
+          "confidence": {
+            "level": "low",
+            "rationale": "Only a broad Philippine industry proxy is available; treat the range as indicative."
+          },
+          "career_id": "CRS345-CAR04",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        }
+      ]
+    },
+    {
+      "course_id": "CRS346",
+      "course_name": "Bachelor in Data Science and Analytics",
+      "course_abbreviation": "",
+      "parent_cluster": "ENGINEERING / STEM CLUSTER",
+      "course_description": "Bachelor in Data Science and Analytics combines computing, mathematics, statistics, data management, and analytical methods for extracting useful insights from data. It differs from Computer Science and Statistics by integrating software, statistical modeling, machine learning, and data communication around applied data problems.",
+      "obtainable_skills": [
+        "Data preparation",
+        "Statistical modeling",
+        "Machine learning",
+        "Data visualization",
+        "Database querying",
+        "Analytical programming"
+      ],
+      "career_paths": [
+        "Data Analyst",
+        "Junior Data Scientist",
+        "Business Intelligence Analyst",
+        "Data Visualization Specialist",
+        "Analytics Associate",
+        "Machine Learning Associate"
+      ],
+      "sources": [
+        {
+          "title": "CHED CMO No. 14, Series of 2025 - Revised Estatistikolar Guidelines",
+          "url": "https://ched.gov.ph/wp-content/uploads/CMO-No.-14-S.-2025-Revised-Estatistikolar-guidelines.pdf",
+          "used_for": "Exact Bachelor in Data Science and Analytics degree identity and national undergraduate-program recognition"
+        },
+        {
+          "title": "University of Santo Tomas - Bachelor of Science in Data Science and Analytics",
+          "url": "https://www.ust.edu.ph/academics/programs/bachelor-of-science-in-data-science-and-analytics/",
+          "used_for": "Related Philippine bachelor's curriculum used only to corroborate common data-science disciplinary content, skills, and career preparation; not evidence that UST offers the exact proposed award title"
+        }
+      ],
+      "program_duration_years": 4,
+      "duration_basis": "official_philippine_curriculum_or_disclosed_current_equivalent",
+      "year_levels": [
+        {
+          "year": 1,
+          "label": "1ST YEAR",
+          "overview": "Programming, introductory data science, calculus, discrete structures, and general education establish computational and mathematical foundations."
+        },
+        {
+          "year": 2,
+          "label": "2ND YEAR",
+          "overview": "Data structures, algorithms, information management, linear algebra, probability, exploratory analysis, and data visualization develop core analytical methods."
+        },
+        {
+          "year": 3,
+          "label": "3RD YEAR",
+          "overview": "Machine learning, artificial intelligence, big-data methods, statistical modeling, data engineering, and research projects deepen applied analytics."
+        },
+        {
+          "year": 4,
+          "label": "4TH YEAR",
+          "overview": "Advanced electives, capstone or thesis work, practicum, model evaluation, and communication of analytical results prepare students for data work."
+        }
+      ],
+      "year_level_status": "completed",
+      "year_level_source_note": "Structured from the approved Philippine program and curriculum evidence retained in the canonical course sources.",
+      "year_level_confidence": "high",
+      "year_level_sources": [
+        {
+          "title": "CHED CMO No. 14, Series of 2025 - Revised Estatistikolar Guidelines",
+          "url": "https://ched.gov.ph/wp-content/uploads/CMO-No.-14-S.-2025-Revised-Estatistikolar-guidelines.pdf",
+          "accessed": "2026-09-23"
+        },
+        {
+          "title": "University of Santo Tomas - Bachelor of Science in Data Science and Analytics",
+          "url": "https://www.ust.edu.ph/academics/programs/bachelor-of-science-in-data-science-and-analytics/",
+          "accessed": "2026-09-23"
+        }
+      ],
+      "career_opportunities": [
+        {
+          "career_title": "Data Analyst",
+          "estimated_monthly_salary_php": {
+            "minimum": 17000,
+            "maximum": 64000,
+            "display": "Estimated ₱17,000–₱64,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Cleans, analyzes, visualizes, and communicates data for Philippine companies, government units, or research teams.",
+          "salary_basis": {
+            "basis_type": "exact_occupation",
+            "source_name": "Indeed Philippines",
+            "source_title": "Indeed Philippines Career Explorer — Data Analyst",
+            "source_url": "https://ph.indeed.com/career/data-analyst/salaries",
+            "derivation_and_occupation_mapping": "Direct or closely aligned Philippine salary evidence for Data Analyst; range remains an estimate and varies by experience and employer."
+          },
+          "reference_year": 2026,
+          "confidence": {
+            "level": "medium",
+            "rationale": "A direct or closely related Philippine occupation benchmark is available, but role and experience affect pay."
+          },
+          "career_id": "CRS346-CAR01",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        },
+        {
+          "career_title": "Junior Data Scientist",
+          "estimated_monthly_salary_php": {
+            "minimum": 17000,
+            "maximum": 64000,
+            "display": "Estimated ₱17,000–₱64,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Builds and evaluates statistical or machine-learning models under the guidance of an analytics team.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Indeed Philippines",
+            "source_title": "Indeed Philippines Career Explorer — Data Analyst",
+            "source_url": "https://ph.indeed.com/career/data-analyst/salaries",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2026,
+          "confidence": {
+            "level": "medium",
+            "rationale": "A direct or closely related Philippine occupation benchmark is available, but role and experience affect pay."
+          },
+          "career_id": "CRS346-CAR02",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        },
+        {
+          "career_title": "Business Intelligence Analyst",
+          "estimated_monthly_salary_php": {
+            "minimum": 17000,
+            "maximum": 64000,
+            "display": "Estimated ₱17,000–₱64,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Develops reports, dashboards, and data models that support organizational planning and decisions.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Indeed Philippines",
+            "source_title": "Indeed Philippines Career Explorer — Data Analyst",
+            "source_url": "https://ph.indeed.com/career/data-analyst/salaries",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2026,
+          "confidence": {
+            "level": "medium",
+            "rationale": "A direct or closely related Philippine occupation benchmark is available, but role and experience affect pay."
+          },
+          "career_id": "CRS346-CAR03",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        },
+        {
+          "career_title": "Data Visualization Specialist",
+          "estimated_monthly_salary_php": {
+            "minimum": 17000,
+            "maximum": 64000,
+            "display": "Estimated ₱17,000–₱64,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Transforms analytical results into accessible charts, dashboards, and visual explanations for stakeholders.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Indeed Philippines",
+            "source_title": "Indeed Philippines Career Explorer — Data Analyst",
+            "source_url": "https://ph.indeed.com/career/data-analyst/salaries",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2026,
+          "confidence": {
+            "level": "medium",
+            "rationale": "A direct or closely related Philippine occupation benchmark is available, but role and experience affect pay."
+          },
+          "career_id": "CRS346-CAR04",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        }
+      ]
+    },
+    {
+      "course_id": "CRS347",
+      "course_name": "Bachelor of Science in Cybersecurity",
+      "course_abbreviation": "",
+      "parent_cluster": "ENGINEERING / STEM CLUSTER",
+      "course_description": "The Bachelor of Science in Cybersecurity focuses on protecting computer systems, networks, applications, and information from digital threats. Unlike a general Computer Science or Information Technology program, it places sustained emphasis on security engineering, threat analysis, defensive operations, incident response, governance, and ethical security practice.",
+      "obtainable_skills": [
+        "Network security",
+        "Security assessment",
+        "Incident response",
+        "Digital forensics fundamentals",
+        "Secure systems administration",
+        "Cybersecurity risk analysis"
+      ],
+      "career_paths": [
+        "Cybersecurity Analyst",
+        "Security Operations Center Analyst",
+        "Information Security Analyst",
+        "Junior Penetration Tester",
+        "Digital Forensics Associate",
+        "Governance Risk and Compliance Analyst"
+      ],
+      "sources": [
+        {
+          "title": "University of the Visayas - Bachelor of Science in Cybersecurity",
+          "url": "https://www.uv.edu.ph/colleges/ceta/undergraduate/bscyb.html",
+          "used_for": "Standalone degree identity, undergraduate status, curriculum focus, and careers"
+        },
+        {
+          "title": "USTP Alubijid - BS Cybersecurity",
+          "url": "https://www.ustp.edu.ph/alubijid/bs-cybersecurity/",
+          "used_for": "Independent confirmation of the standalone Philippine degree"
+        }
+      ],
+      "program_duration_years": 4,
+      "duration_basis": "official_philippine_curriculum_or_disclosed_current_equivalent",
+      "year_levels": [
+        {
+          "year": 1,
+          "label": "1ST YEAR",
+          "overview": "Programming, computing fundamentals, mathematics, networking basics, and introductory cybersecurity establish technical foundations."
+        },
+        {
+          "year": 2,
+          "label": "2ND YEAR",
+          "overview": "Operating systems, databases, network administration, secure programming, cryptography, and security principles develop core defensive knowledge."
+        },
+        {
+          "year": 3,
+          "label": "3RD YEAR",
+          "overview": "Threat analysis, vulnerability assessment, incident response, digital forensics, governance, and security operations are applied in laboratories."
+        },
+        {
+          "year": 4,
+          "label": "4TH YEAR",
+          "overview": "Advanced security integration, ethical testing, capstone work, practicum, and risk or compliance projects prepare students for professional security roles."
+        }
+      ],
+      "year_level_status": "completed",
+      "year_level_source_note": "Structured from the approved Philippine program and curriculum evidence retained in the canonical course sources.",
+      "year_level_confidence": "high",
+      "year_level_sources": [
+        {
+          "title": "University of the Visayas - Bachelor of Science in Cybersecurity",
+          "url": "https://www.uv.edu.ph/colleges/ceta/undergraduate/bscyb.html",
+          "accessed": "2026-09-23"
+        },
+        {
+          "title": "USTP Alubijid - BS Cybersecurity",
+          "url": "https://www.ustp.edu.ph/alubijid/bs-cybersecurity/",
+          "accessed": "2026-09-23"
+        }
+      ],
+      "career_opportunities": [
+        {
+          "career_title": "Cybersecurity Analyst",
+          "estimated_monthly_salary_php": {
+            "minimum": 22000,
+            "maximum": 81000,
+            "display": "Estimated ₱22,000–₱81,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Monitors systems, evaluates threats, and helps implement security controls for Philippine organizations.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Indeed Philippines",
+            "source_title": "Indeed Philippines Career Explorer — Software Engineer",
+            "source_url": "https://ph.indeed.com/career/software-engineer/salaries",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2026,
+          "confidence": {
+            "level": "medium",
+            "rationale": "A direct or closely related Philippine occupation benchmark is available, but role and experience affect pay."
+          },
+          "career_id": "CRS347-CAR01",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        },
+        {
+          "career_title": "Security Operations Center Analyst",
+          "estimated_monthly_salary_php": {
+            "minimum": 22000,
+            "maximum": 81000,
+            "display": "Estimated ₱22,000–₱81,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Reviews alerts, investigates suspicious activity, and supports incident response in a security operations team.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Indeed Philippines",
+            "source_title": "Indeed Philippines Career Explorer — Software Engineer",
+            "source_url": "https://ph.indeed.com/career/software-engineer/salaries",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2026,
+          "confidence": {
+            "level": "medium",
+            "rationale": "A direct or closely related Philippine occupation benchmark is available, but role and experience affect pay."
+          },
+          "career_id": "CRS347-CAR02",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        },
+        {
+          "career_title": "Information Security Analyst",
+          "estimated_monthly_salary_php": {
+            "minimum": 22000,
+            "maximum": 81000,
+            "display": "Estimated ₱22,000–₱81,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Assesses information risks, documents safeguards, and supports security policies and compliance activities.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Indeed Philippines",
+            "source_title": "Indeed Philippines Career Explorer — Software Engineer",
+            "source_url": "https://ph.indeed.com/career/software-engineer/salaries",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2026,
+          "confidence": {
+            "level": "medium",
+            "rationale": "A direct or closely related Philippine occupation benchmark is available, but role and experience affect pay."
+          },
+          "career_id": "CRS347-CAR03",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        },
+        {
+          "career_title": "Governance Risk and Compliance Analyst",
+          "estimated_monthly_salary_php": {
+            "minimum": 22000,
+            "maximum": 81000,
+            "display": "Estimated ₱22,000–₱81,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Evaluates security controls, regulatory requirements, risks, and audit evidence for organizational compliance.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Indeed Philippines",
+            "source_title": "Indeed Philippines Career Explorer — Software Engineer",
+            "source_url": "https://ph.indeed.com/career/software-engineer/salaries",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2026,
+          "confidence": {
+            "level": "medium",
+            "rationale": "A direct or closely related Philippine occupation benchmark is available, but role and experience affect pay."
+          },
+          "career_id": "CRS347-CAR04",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        }
+      ]
+    },
+    {
+      "course_id": "CRS348",
+      "course_name": "Bachelor of Science in Actuarial Science",
+      "course_abbreviation": "",
+      "parent_cluster": "SCIENCE & MATHEMATICS CLUSTER",
+      "course_description": "The Bachelor of Science in Actuarial Science applies mathematics, probability, statistics, finance, economics, and computing to the measurement and management of financial risk. It differs from general Mathematics and Statistics through its specialized focus on insurance, pensions, investments, and long-term financial uncertainty.",
+      "obtainable_skills": [
+        "Actuarial modeling",
+        "Probability and statistical analysis",
+        "Financial mathematics",
+        "Risk assessment",
+        "Insurance analytics",
+        "Quantitative forecasting"
+      ],
+      "career_paths": [
+        "Actuarial Analyst",
+        "Risk Analyst",
+        "Insurance Analyst",
+        "Pension Analyst",
+        "Pricing Analyst",
+        "Financial Modeling Analyst"
+      ],
+      "sources": [
+        {
+          "title": "CHED CMO No. 14, Series of 2025 - Revised Estatistikolar Guidelines",
+          "url": "https://ched.gov.ph/wp-content/uploads/CMO-No.-14-S.-2025-Revised-Estatistikolar-guidelines.pdf",
+          "used_for": "Exact standalone Bachelor of Science in Actuarial Science degree identity and national undergraduate-program recognition"
+        },
+        {
+          "title": "University of Santo Tomas - BS Applied Mathematics major in Actuarial Science",
+          "url": "https://www.ust.edu.ph/academics/programs/bachelor-of-science-in-applied-mathematics-major-in-actuarial-science/",
+          "used_for": "Related Philippine bachelor's curriculum used only to corroborate common actuarial mathematics, probability, finance, risk, modeling, and career preparation; not evidence that UST offers the standalone proposed award"
+        },
+        {
+          "title": "De La Salle University - BS Statistics major in Actuarial Science",
+          "url": "https://old.dlsu.edu.ph/colleges/cos/undergraduate-degree-programs/bs-stat/",
+          "used_for": "Related Philippine bachelor's curriculum used only to corroborate common actuarial statistics, computing, quantitative analysis, and career preparation; not evidence that DLSU offers the standalone proposed award"
+        }
+      ],
+      "program_duration_years": 4,
+      "duration_basis": "official_philippine_curriculum_or_disclosed_current_equivalent",
+      "year_levels": [
+        {
+          "year": 1,
+          "label": "1ST YEAR",
+          "overview": "Calculus, probability, statistics, economics, accounting, computing, and general education establish mathematical and business foundations."
+        },
+        {
+          "year": 2,
+          "label": "2ND YEAR",
+          "overview": "Financial mathematics, statistical modeling, insurance principles, data analysis, and risk concepts develop actuarial fundamentals."
+        },
+        {
+          "year": 3,
+          "label": "3RD YEAR",
+          "overview": "Life contingencies, loss models, pensions, investments, forecasting, and computational modeling deepen actuarial analysis."
+        },
+        {
+          "year": 4,
+          "label": "4TH YEAR",
+          "overview": "Advanced risk applications, research or capstone work, practicum, and professional-examination preparation integrate actuarial problem-solving."
+        }
+      ],
+      "year_level_status": "completed",
+      "year_level_source_note": "Structured from the approved Philippine program and curriculum evidence retained in the canonical course sources.",
+      "year_level_confidence": "high",
+      "year_level_sources": [
+        {
+          "title": "CHED CMO No. 14, Series of 2025 - Revised Estatistikolar Guidelines",
+          "url": "https://ched.gov.ph/wp-content/uploads/CMO-No.-14-S.-2025-Revised-Estatistikolar-guidelines.pdf",
+          "accessed": "2026-09-23"
+        },
+        {
+          "title": "University of Santo Tomas - BS Applied Mathematics major in Actuarial Science",
+          "url": "https://www.ust.edu.ph/academics/programs/bachelor-of-science-in-applied-mathematics-major-in-actuarial-science/",
+          "accessed": "2026-09-23"
+        },
+        {
+          "title": "De La Salle University - BS Statistics major in Actuarial Science",
+          "url": "https://old.dlsu.edu.ph/colleges/cos/undergraduate-degree-programs/bs-stat/",
+          "accessed": "2026-09-23"
+        }
+      ],
+      "career_opportunities": [
+        {
+          "career_title": "Actuarial Analyst",
+          "estimated_monthly_salary_php": {
+            "minimum": 40000,
+            "maximum": 120000,
+            "display": "Estimated ₱40,000–₱120,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Supports insurance, pension, pricing, and risk calculations while progressing through applicable professional examinations.",
+          "salary_basis": {
+            "basis_type": "exact_occupation",
+            "source_name": "Philippine Statistics Authority",
+            "source_title": "PSA 2024 Occupational Wages Survey — mathematicians and actuaries",
+            "source_url": "https://psa.gov.ph/statistics/occupational-wages-survey",
+            "derivation_and_occupation_mapping": "Direct or closely aligned Philippine salary evidence for Actuarial Analyst; range remains an estimate and varies by experience and employer."
+          },
+          "reference_year": 2024,
+          "confidence": {
+            "level": "medium",
+            "rationale": "A direct or closely related Philippine occupation benchmark is available, but role and experience affect pay."
+          },
+          "career_id": "CRS348-CAR01",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        },
+        {
+          "career_title": "Risk Analyst",
+          "estimated_monthly_salary_php": {
+            "minimum": 40000,
+            "maximum": 120000,
+            "display": "Estimated ₱40,000–₱120,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Uses quantitative methods to evaluate financial or operational uncertainty for insurers, banks, or consulting teams.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Philippine Statistics Authority",
+            "source_title": "PSA 2024 Occupational Wages Survey — mathematicians and actuaries",
+            "source_url": "https://psa.gov.ph/statistics/occupational-wages-survey",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2024,
+          "confidence": {
+            "level": "medium",
+            "rationale": "A direct or closely related Philippine occupation benchmark is available, but role and experience affect pay."
+          },
+          "career_id": "CRS348-CAR02",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        },
+        {
+          "career_title": "Insurance Analyst",
+          "estimated_monthly_salary_php": {
+            "minimum": 40000,
+            "maximum": 120000,
+            "display": "Estimated ₱40,000–₱120,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Analyzes policy, claims, pricing, and portfolio information to support insurance decisions.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Philippine Statistics Authority",
+            "source_title": "PSA 2024 Occupational Wages Survey — mathematicians and actuaries",
+            "source_url": "https://psa.gov.ph/statistics/occupational-wages-survey",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2024,
+          "confidence": {
+            "level": "medium",
+            "rationale": "A direct or closely related Philippine occupation benchmark is available, but role and experience affect pay."
+          },
+          "career_id": "CRS348-CAR03",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        },
+        {
+          "career_title": "Actuarial Modeling Associate",
+          "estimated_monthly_salary_php": {
+            "minimum": 40000,
+            "maximum": 120000,
+            "display": "Estimated ₱40,000–₱120,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Builds, tests, and documents quantitative models under professional actuarial supervision.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Philippine Statistics Authority",
+            "source_title": "PSA 2024 Occupational Wages Survey — mathematicians and actuaries",
+            "source_url": "https://psa.gov.ph/statistics/occupational-wages-survey",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2024,
+          "confidence": {
+            "level": "medium",
+            "rationale": "A direct or closely related Philippine occupation benchmark is available, but role and experience affect pay."
+          },
+          "career_id": "CRS348-CAR04",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        }
+      ]
+    },
+    {
+      "course_id": "CRS349",
+      "course_name": "Bachelor of Science in Biochemistry",
+      "course_abbreviation": "",
+      "parent_cluster": "SCIENCE & MATHEMATICS CLUSTER",
+      "course_description": "The Bachelor of Science in Biochemistry examines the chemical processes, structures, and interactions underlying living systems. It bridges Chemistry and Biology but remains distinct through its concentration on biomolecules, metabolism, molecular techniques, biochemical analysis, and laboratory investigation of biological processes.",
+      "obtainable_skills": [
+        "Biochemical laboratory techniques",
+        "Biomolecular analysis",
+        "Analytical chemistry",
+        "Experimental design",
+        "Scientific data interpretation",
+        "Laboratory safety and quality practices"
+      ],
+      "career_paths": [
+        "Biochemistry Laboratory Analyst",
+        "Research Assistant",
+        "Quality Control Analyst",
+        "Laboratory Technician",
+        "Product Development Associate",
+        "Scientific Research Associate"
+      ],
+      "sources": [
+        {
+          "title": "CHED - UP Manila and UP Los Banos Quality Assurance Recognition",
+          "url": "https://legacy.ched.gov.ph/ched-commends-up-manila-and-up-los-banos-for-strong-quality-assurance-mechanism/",
+          "used_for": "Official recognition of BS Biochemistry as a Philippine undergraduate program"
+        },
+        {
+          "title": "UP Manila - Bachelor of Science in Biochemistry",
+          "url": "https://dpsm.cas.upm.edu.ph/index.php/bachelor-of-science-in-biochemistry/",
+          "used_for": "Undergraduate program focus, learning outcomes, laboratory competencies, and curriculum"
+        }
+      ],
+      "program_duration_years": 4,
+      "duration_basis": "official_philippine_curriculum_or_disclosed_current_equivalent",
+      "year_levels": [
+        {
+          "year": 1,
+          "label": "1ST YEAR",
+          "overview": "General chemistry, biology, physics, mathematics, and introductory laboratory work establish the scientific foundations of biochemistry."
+        },
+        {
+          "year": 2,
+          "label": "2ND YEAR",
+          "overview": "Organic, analytical, and physical chemistry alongside cell biology, genetics, and laboratory techniques develop molecular understanding."
+        },
+        {
+          "year": 3,
+          "label": "3RD YEAR",
+          "overview": "Protein, enzyme, metabolism, molecular biology, biochemical analysis, and instrumentation support advanced experimental work."
+        },
+        {
+          "year": 4,
+          "label": "4TH YEAR",
+          "overview": "Specialized biochemistry, research or thesis, practicum, bioethics, and advanced laboratory integration prepare students for scientific practice."
+        }
+      ],
+      "year_level_status": "completed",
+      "year_level_source_note": "Structured from the approved Philippine program and curriculum evidence retained in the canonical course sources.",
+      "year_level_confidence": "high",
+      "year_level_sources": [
+        {
+          "title": "CHED - UP Manila and UP Los Banos Quality Assurance Recognition",
+          "url": "https://legacy.ched.gov.ph/ched-commends-up-manila-and-up-los-banos-for-strong-quality-assurance-mechanism/",
+          "accessed": "2026-09-23"
+        },
+        {
+          "title": "UP Manila - Bachelor of Science in Biochemistry",
+          "url": "https://dpsm.cas.upm.edu.ph/index.php/bachelor-of-science-in-biochemistry/",
+          "accessed": "2026-09-23"
+        }
+      ],
+      "career_opportunities": [
+        {
+          "career_title": "Biochemistry Laboratory Analyst",
+          "estimated_monthly_salary_php": {
+            "minimum": 20000,
+            "maximum": 65000,
+            "display": "Estimated ₱20,000–₱65,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Performs biochemical testing and documents results in research, health-related, food, or industrial laboratories.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Philippine Statistics Authority",
+            "source_title": "PSA 2024 Occupational Wages Survey",
+            "source_url": "https://psa.gov.ph/statistics/occupational-wages-survey",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2024,
+          "confidence": {
+            "level": "low",
+            "rationale": "Only a broad Philippine industry proxy is available; treat the range as indicative."
+          },
+          "career_id": "CRS349-CAR01",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        },
+        {
+          "career_title": "Research Assistant",
+          "estimated_monthly_salary_php": {
+            "minimum": 20000,
+            "maximum": 65000,
+            "display": "Estimated ₱20,000–₱65,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Supports experiments, sample preparation, data analysis, and scientific documentation in laboratory research.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Philippine Statistics Authority",
+            "source_title": "PSA 2024 Occupational Wages Survey",
+            "source_url": "https://psa.gov.ph/statistics/occupational-wages-survey",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2024,
+          "confidence": {
+            "level": "low",
+            "rationale": "Only a broad Philippine industry proxy is available; treat the range as indicative."
+          },
+          "career_id": "CRS349-CAR02",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        },
+        {
+          "career_title": "Quality Control Analyst",
+          "estimated_monthly_salary_php": {
+            "minimum": 20000,
+            "maximum": 65000,
+            "display": "Estimated ₱20,000–₱65,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Tests materials or products against laboratory specifications in pharmaceutical, food, or manufacturing settings.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Philippine Statistics Authority",
+            "source_title": "PSA 2024 Occupational Wages Survey",
+            "source_url": "https://psa.gov.ph/statistics/occupational-wages-survey",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2024,
+          "confidence": {
+            "level": "low",
+            "rationale": "Only a broad Philippine industry proxy is available; treat the range as indicative."
+          },
+          "career_id": "CRS349-CAR03",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        },
+        {
+          "career_title": "Product Development Associate",
+          "estimated_monthly_salary_php": {
+            "minimum": 20000,
+            "maximum": 65000,
+            "display": "Estimated ₱20,000–₱65,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Assists laboratory-based formulation, testing, documentation, and improvement of scientific products or processes.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Philippine Statistics Authority",
+            "source_title": "PSA 2024 Occupational Wages Survey",
+            "source_url": "https://psa.gov.ph/statistics/occupational-wages-survey",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2024,
+          "confidence": {
+            "level": "low",
+            "rationale": "Only a broad Philippine industry proxy is available; treat the range as indicative."
+          },
+          "career_id": "CRS349-CAR04",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        }
+      ]
+    },
+    {
+      "course_id": "CRS350",
+      "course_name": "Bachelor of Science in Microbiology",
+      "course_abbreviation": "",
+      "parent_cluster": "SCIENCE & MATHEMATICS CLUSTER",
+      "course_description": "The Bachelor of Science in Microbiology studies microorganisms and their roles in health, agriculture, food, industry, and the environment. It differs from a broad Biology degree through its focused laboratory training in microbial identification, cultivation, genetics, physiology, ecology, and control.",
+      "obtainable_skills": [
+        "Microbial culture techniques",
+        "Microorganism identification",
+        "Aseptic technique",
+        "Microbiological analysis",
+        "Laboratory quality control",
+        "Scientific investigation"
+      ],
+      "career_paths": [
+        "Microbiology Laboratory Analyst",
+        "Quality Control Microbiologist",
+        "Research Assistant",
+        "Food Microbiology Analyst",
+        "Environmental Microbiology Technician",
+        "Laboratory Technician"
+      ],
+      "sources": [
+        {
+          "title": "University of Santo Tomas - Bachelor of Science in Microbiology",
+          "url": "https://www.ust.edu.ph/academics/programs/bachelor-of-science-in-microbiology/",
+          "used_for": "Exact degree identity, undergraduate status, focus, and career alignment"
+        }
+      ],
+      "program_duration_years": 4,
+      "duration_basis": "official_philippine_curriculum_or_disclosed_current_equivalent",
+      "year_levels": [
+        {
+          "year": 1,
+          "label": "1ST YEAR",
+          "overview": "General biology, chemistry, mathematics, and introductory microbiology establish scientific and laboratory foundations."
+        },
+        {
+          "year": 2,
+          "label": "2ND YEAR",
+          "overview": "Microbial physiology, genetics, taxonomy, ecology, biochemistry, and culture methods develop core microbiological knowledge."
+        },
+        {
+          "year": 3,
+          "label": "3RD YEAR",
+          "overview": "Medical, food, industrial, and environmental microbiology with laboratory quality methods broaden applied specialization."
+        },
+        {
+          "year": 4,
+          "label": "4TH YEAR",
+          "overview": "Advanced electives, research or thesis, practicum, biosafety, and integrated microbial analysis prepare students for laboratory and research work."
+        }
+      ],
+      "year_level_status": "completed",
+      "year_level_source_note": "Structured from the approved Philippine program and curriculum evidence retained in the canonical course sources.",
+      "year_level_confidence": "high",
+      "year_level_sources": [
+        {
+          "title": "University of Santo Tomas - Bachelor of Science in Microbiology",
+          "url": "https://www.ust.edu.ph/academics/programs/bachelor-of-science-in-microbiology/",
+          "accessed": "2026-09-23"
+        }
+      ],
+      "career_opportunities": [
+        {
+          "career_title": "Microbiology Laboratory Analyst",
+          "estimated_monthly_salary_php": {
+            "minimum": 20000,
+            "maximum": 65000,
+            "display": "Estimated ₱20,000–₱65,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Cultures, identifies, and evaluates microorganisms in food, health-related, environmental, or industrial laboratories.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Philippine Statistics Authority",
+            "source_title": "PSA 2024 Occupational Wages Survey",
+            "source_url": "https://psa.gov.ph/statistics/occupational-wages-survey",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2024,
+          "confidence": {
+            "level": "low",
+            "rationale": "Only a broad Philippine industry proxy is available; treat the range as indicative."
+          },
+          "career_id": "CRS350-CAR01",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        },
+        {
+          "career_title": "Quality Control Microbiologist",
+          "estimated_monthly_salary_php": {
+            "minimum": 20000,
+            "maximum": 65000,
+            "display": "Estimated ₱20,000–₱65,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Performs microbial quality tests and monitors contamination controls in regulated production environments.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Philippine Statistics Authority",
+            "source_title": "PSA 2024 Occupational Wages Survey",
+            "source_url": "https://psa.gov.ph/statistics/occupational-wages-survey",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2024,
+          "confidence": {
+            "level": "low",
+            "rationale": "Only a broad Philippine industry proxy is available; treat the range as indicative."
+          },
+          "career_id": "CRS350-CAR02",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        },
+        {
+          "career_title": "Food Microbiology Analyst",
+          "estimated_monthly_salary_php": {
+            "minimum": 20000,
+            "maximum": 65000,
+            "display": "Estimated ₱20,000–₱65,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Examines food samples and production conditions for microbial quality and safety indicators.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Philippine Statistics Authority",
+            "source_title": "PSA 2024 Occupational Wages Survey",
+            "source_url": "https://psa.gov.ph/statistics/occupational-wages-survey",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2024,
+          "confidence": {
+            "level": "low",
+            "rationale": "Only a broad Philippine industry proxy is available; treat the range as indicative."
+          },
+          "career_id": "CRS350-CAR03",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        },
+        {
+          "career_title": "Microbiology Research Assistant",
+          "estimated_monthly_salary_php": {
+            "minimum": 20000,
+            "maximum": 65000,
+            "display": "Estimated ₱20,000–₱65,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Supports microbial experiments, culture maintenance, data collection, and scientific reporting.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Philippine Statistics Authority",
+            "source_title": "PSA 2024 Occupational Wages Survey",
+            "source_url": "https://psa.gov.ph/statistics/occupational-wages-survey",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2024,
+          "confidence": {
+            "level": "low",
+            "rationale": "Only a broad Philippine industry proxy is available; treat the range as indicative."
+          },
+          "career_id": "CRS350-CAR04",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        }
+      ]
+    },
+    {
+      "course_id": "CRS351",
+      "course_name": "Bachelor of Science in Legal Management",
+      "course_abbreviation": "",
+      "parent_cluster": "LEGAL & PUBLIC SERVICE CLUSTER",
+      "course_description": "The Bachelor of Science in Legal Management combines business, management, and foundational legal studies. Its science-degree construction emphasizes analytical and organizational preparation for legal-support, compliance, governance, and business roles and remains distinct from Political Science, Public Administration, and the separately recognized BA Legal Management program.",
+      "obtainable_skills": [
+        "Legal research",
+        "Legal document analysis",
+        "Business law application",
+        "Compliance analysis",
+        "Policy interpretation",
+        "Management decision-making"
+      ],
+      "career_paths": [
+        "Legal Assistant",
+        "Compliance Analyst",
+        "Contracts Associate",
+        "Corporate Governance Assistant",
+        "Regulatory Affairs Associate",
+        "Business Operations Analyst"
+      ],
+      "sources": [
+        {
+          "title": "CHEDRO XI Programs per Higher Education Institution",
+          "url": "https://ro11.ched.gov.ph/programs-per-hei/",
+          "used_for": "Exact BS Legal Management identity and recognized undergraduate offering"
+        },
+        {
+          "title": "De La Salle University - Bachelor of Science in Legal Management",
+          "url": "https://old.dlsu.edu.ph/colleges/rvrcob/undergraduate-degree-programs/lgl/",
+          "used_for": "Program focus, legal and management curriculum, legal research, writing, and practicum competencies"
+        }
+      ],
+      "program_duration_years": 4,
+      "duration_basis": "official_philippine_curriculum_or_disclosed_current_equivalent",
+      "year_levels": [
+        {
+          "year": 1,
+          "label": "1ST YEAR",
+          "overview": "General education, business foundations, communication, economics, and introductory law establish the legal-management base."
+        },
+        {
+          "year": 2,
+          "label": "2ND YEAR",
+          "overview": "Obligations and contracts, business organizations, accounting, management, and legal research develop core analytical competence."
+        },
+        {
+          "year": 3,
+          "label": "3RD YEAR",
+          "overview": "Labor, taxation, corporate, commercial, and regulatory subjects are applied to compliance, governance, and organizational problems."
+        },
+        {
+          "year": 4,
+          "label": "4TH YEAR",
+          "overview": "Advanced legal-management electives, legal writing, internship or practicum, and integrative research prepare students for business and legal-support work."
+        }
+      ],
+      "year_level_status": "completed",
+      "year_level_source_note": "Structured from the approved Philippine program and curriculum evidence retained in the canonical course sources.",
+      "year_level_confidence": "high",
+      "year_level_sources": [
+        {
+          "title": "CHEDRO XI Programs per Higher Education Institution",
+          "url": "https://ro11.ched.gov.ph/programs-per-hei/",
+          "accessed": "2026-09-23"
+        },
+        {
+          "title": "De La Salle University - Bachelor of Science in Legal Management",
+          "url": "https://old.dlsu.edu.ph/colleges/rvrcob/undergraduate-degree-programs/lgl/",
+          "accessed": "2026-09-23"
+        }
+      ],
+      "career_opportunities": [
+        {
+          "career_title": "Legal Assistant",
+          "estimated_monthly_salary_php": {
+            "minimum": 20000,
+            "maximum": 55000,
+            "display": "Estimated ₱20,000–₱55,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Supports legal research, documents, filings, and case or corporate records under qualified legal professionals.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Philippine Statistics Authority",
+            "source_title": "PSA 2024 Occupational Wages Survey",
+            "source_url": "https://psa.gov.ph/statistics/occupational-wages-survey",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2024,
+          "confidence": {
+            "level": "low",
+            "rationale": "Only a broad Philippine industry proxy is available; treat the range as indicative."
+          },
+          "career_id": "CRS351-CAR01",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        },
+        {
+          "career_title": "Compliance Analyst",
+          "estimated_monthly_salary_php": {
+            "minimum": 20000,
+            "maximum": 55000,
+            "display": "Estimated ₱20,000–₱55,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Reviews organizational activities and documentation against laws, policies, and regulatory requirements.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Philippine Statistics Authority",
+            "source_title": "PSA 2024 Occupational Wages Survey",
+            "source_url": "https://psa.gov.ph/statistics/occupational-wages-survey",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2024,
+          "confidence": {
+            "level": "low",
+            "rationale": "Only a broad Philippine industry proxy is available; treat the range as indicative."
+          },
+          "career_id": "CRS351-CAR02",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        },
+        {
+          "career_title": "Contracts Associate",
+          "estimated_monthly_salary_php": {
+            "minimum": 20000,
+            "maximum": 55000,
+            "display": "Estimated ₱20,000–₱55,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Assists with contract review, tracking, documentation, and coordination for Philippine organizations.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Philippine Statistics Authority",
+            "source_title": "PSA 2024 Occupational Wages Survey",
+            "source_url": "https://psa.gov.ph/statistics/occupational-wages-survey",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2024,
+          "confidence": {
+            "level": "low",
+            "rationale": "Only a broad Philippine industry proxy is available; treat the range as indicative."
+          },
+          "career_id": "CRS351-CAR03",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        },
+        {
+          "career_title": "Corporate Governance Assistant",
+          "estimated_monthly_salary_php": {
+            "minimum": 20000,
+            "maximum": 55000,
+            "display": "Estimated ₱20,000–₱55,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Supports board records, governance documentation, disclosures, and compliance processes.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Philippine Statistics Authority",
+            "source_title": "PSA 2024 Occupational Wages Survey",
+            "source_url": "https://psa.gov.ph/statistics/occupational-wages-survey",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2024,
+          "confidence": {
+            "level": "low",
+            "rationale": "Only a broad Philippine industry proxy is available; treat the range as indicative."
+          },
+          "career_id": "CRS351-CAR04",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        }
+      ]
+    },
+    {
+      "course_id": "CRS352",
+      "course_name": "Bachelor of Arts in Legal Management",
+      "course_abbreviation": "",
+      "parent_cluster": "LEGAL & PUBLIC SERVICE CLUSTER",
+      "course_description": "The Bachelor of Arts in Legal Management integrates liberal-arts study with foundational law, governance, organizations, and management. It is preserved separately from BS Legal Management because the BA degree construction carries a distinct humanities and social-science orientation while supporting legal-support, policy, compliance, and administrative work.",
+      "obtainable_skills": [
+        "Legal research",
+        "Critical reading",
+        "Policy analysis",
+        "Legal writing",
+        "Organizational analysis",
+        "Argumentation and communication"
+      ],
+      "career_paths": [
+        "Legal Assistant",
+        "Policy Research Assistant",
+        "Compliance Associate",
+        "Administrative Officer",
+        "Contracts Assistant",
+        "Government Program Assistant"
+      ],
+      "sources": [
+        {
+          "title": "CHEDRO III Enrollment and Graduates per Discipline and Program",
+          "url": "https://www.chedro3.ched.gov.ph/wp-content/uploads/2020/07/Enrollment-Graduates-per-Discipline-per-Program.pdf",
+          "used_for": "Independent government evidence for the BA Legal Management degree identity"
+        },
+        {
+          "title": "University of Santo Tomas - Bachelor of Arts in Legal Management",
+          "url": "https://www.ust.edu.ph/academics/programs/bachelor-of-arts-in-legal-management/",
+          "used_for": "Exact degree identity, curriculum focus, learning outcomes, and career preparation"
+        }
+      ],
+      "program_duration_years": 4,
+      "duration_basis": "official_philippine_curriculum_or_disclosed_current_equivalent",
+      "year_levels": [
+        {
+          "year": 1,
+          "label": "1ST YEAR",
+          "overview": "Liberal arts, communication, social science, management, and introductory legal studies establish interdisciplinary foundations."
+        },
+        {
+          "year": 2,
+          "label": "2ND YEAR",
+          "overview": "Legal research and writing, obligations and contracts, governance, economics, and organizational studies develop analytical competence."
+        },
+        {
+          "year": 3,
+          "label": "3RD YEAR",
+          "overview": "Public, corporate, labor, and regulatory issues are examined through policy, ethics, and management perspectives."
+        },
+        {
+          "year": 4,
+          "label": "4TH YEAR",
+          "overview": "Advanced electives, internship or practicum, thesis or capstone work, and integrative legal-policy analysis prepare students for public and organizational roles."
+        }
+      ],
+      "year_level_status": "completed",
+      "year_level_source_note": "Structured from the approved Philippine program and curriculum evidence retained in the canonical course sources.",
+      "year_level_confidence": "high",
+      "year_level_sources": [
+        {
+          "title": "CHEDRO III Enrollment and Graduates per Discipline and Program",
+          "url": "https://www.chedro3.ched.gov.ph/wp-content/uploads/2020/07/Enrollment-Graduates-per-Discipline-per-Program.pdf",
+          "accessed": "2026-09-23"
+        },
+        {
+          "title": "University of Santo Tomas - Bachelor of Arts in Legal Management",
+          "url": "https://www.ust.edu.ph/academics/programs/bachelor-of-arts-in-legal-management/",
+          "accessed": "2026-09-23"
+        }
+      ],
+      "career_opportunities": [
+        {
+          "career_title": "Legal Research Assistant",
+          "estimated_monthly_salary_php": {
+            "minimum": 20000,
+            "maximum": 55000,
+            "display": "Estimated ₱20,000–₱55,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Researches laws, policies, and precedents and prepares summaries under appropriate professional supervision.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Philippine Statistics Authority",
+            "source_title": "PSA 2024 Occupational Wages Survey",
+            "source_url": "https://psa.gov.ph/statistics/occupational-wages-survey",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2024,
+          "confidence": {
+            "level": "low",
+            "rationale": "Only a broad Philippine industry proxy is available; treat the range as indicative."
+          },
+          "career_id": "CRS352-CAR01",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        },
+        {
+          "career_title": "Policy Research Assistant",
+          "estimated_monthly_salary_php": {
+            "minimum": 20000,
+            "maximum": 55000,
+            "display": "Estimated ₱20,000–₱55,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Collects evidence and supports analysis of government, organizational, or social-policy issues.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Philippine Statistics Authority",
+            "source_title": "PSA 2024 Occupational Wages Survey",
+            "source_url": "https://psa.gov.ph/statistics/occupational-wages-survey",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2024,
+          "confidence": {
+            "level": "low",
+            "rationale": "Only a broad Philippine industry proxy is available; treat the range as indicative."
+          },
+          "career_id": "CRS352-CAR02",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        },
+        {
+          "career_title": "Compliance Associate",
+          "estimated_monthly_salary_php": {
+            "minimum": 20000,
+            "maximum": 55000,
+            "display": "Estimated ₱20,000–₱55,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Assists with policy implementation, regulatory documentation, and organizational compliance monitoring.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Philippine Statistics Authority",
+            "source_title": "PSA 2024 Occupational Wages Survey",
+            "source_url": "https://psa.gov.ph/statistics/occupational-wages-survey",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2024,
+          "confidence": {
+            "level": "low",
+            "rationale": "Only a broad Philippine industry proxy is available; treat the range as indicative."
+          },
+          "career_id": "CRS352-CAR03",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        },
+        {
+          "career_title": "Administrative Officer",
+          "estimated_monthly_salary_php": {
+            "minimum": 20000,
+            "maximum": 55000,
+            "display": "Estimated ₱20,000–₱55,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Coordinates records, communications, procedures, and program activities in public or private organizations.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Philippine Statistics Authority",
+            "source_title": "PSA 2024 Occupational Wages Survey",
+            "source_url": "https://psa.gov.ph/statistics/occupational-wages-survey",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2024,
+          "confidence": {
+            "level": "low",
+            "rationale": "Only a broad Philippine industry proxy is available; treat the range as indicative."
+          },
+          "career_id": "CRS352-CAR04",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        }
+      ]
+    },
+    {
+      "course_id": "CRS353",
+      "course_name": "Bachelor of Science in Aircraft Maintenance Technology",
+      "course_abbreviation": "BSAMT",
+      "parent_cluster": "AVIATION & MARITIME CLUSTER",
+      "course_description": "The Bachelor of Science in Aircraft Maintenance Technology develops knowledge and practical competence in aircraft inspection, maintenance, repair, systems, structures, powerplants, documentation, and aviation safety. It differs from Aeronautical Engineering by concentrating on aircraft airworthiness and maintenance operations rather than aircraft engineering design.",
+      "obtainable_skills": [
+        "Aircraft inspection",
+        "Airframe maintenance",
+        "Aircraft powerplant maintenance",
+        "Maintenance documentation",
+        "Aviation safety procedures",
+        "Aircraft systems troubleshooting"
+      ],
+      "career_paths": [
+        "Aircraft Maintenance Technician",
+        "Aircraft Mechanic",
+        "Maintenance Planning Assistant",
+        "Aircraft Quality Assurance Assistant",
+        "Technical Records Analyst",
+        "Aviation Maintenance Operations Assistant"
+      ],
+      "sources": [
+        {
+          "title": "CHEDRO XI Recognized Programs Inventory",
+          "url": "https://ro11.ched.gov.ph/programs-inventory/",
+          "used_for": "Exact degree identity and government recognition"
+        },
+        {
+          "title": "National Aviation Academy of the Philippines - Programs Offered",
+          "url": "https://naap.edu.ph/programs-offered/",
+          "used_for": "Program focus and undergraduate offering"
+        }
+      ],
+      "program_duration_years": 4,
+      "duration_basis": "official_philippine_curriculum_or_disclosed_current_equivalent",
+      "year_levels": [
+        {
+          "year": 1,
+          "label": "1ST YEAR",
+          "overview": "Mathematics, physics, technical drawing, aviation fundamentals, tools, safety, and basic aircraft systems establish maintenance foundations."
+        },
+        {
+          "year": 2,
+          "label": "2ND YEAR",
+          "overview": "Airframe structures, aircraft materials, electrical fundamentals, powerplant systems, inspection, and maintenance practices build technical competence."
+        },
+        {
+          "year": 3,
+          "label": "3RD YEAR",
+          "overview": "Advanced airframe and powerplant maintenance, troubleshooting, regulations, human factors, and technical records are applied in laboratories."
+        },
+        {
+          "year": 4,
+          "label": "4TH YEAR",
+          "overview": "Maintenance integration, supervised industry training, quality and safety systems, and capstone work prepare students for aircraft-maintenance employment pathways."
+        }
+      ],
+      "year_level_status": "completed",
+      "year_level_source_note": "Structured from the approved Philippine program and curriculum evidence retained in the canonical course sources.",
+      "year_level_confidence": "high",
+      "year_level_sources": [
+        {
+          "title": "CHEDRO XI Recognized Programs Inventory",
+          "url": "https://ro11.ched.gov.ph/programs-inventory/",
+          "accessed": "2026-09-23"
+        },
+        {
+          "title": "National Aviation Academy of the Philippines - Programs Offered",
+          "url": "https://naap.edu.ph/programs-offered/",
+          "accessed": "2026-09-23"
+        }
+      ],
+      "career_opportunities": [
+        {
+          "career_title": "Aircraft Maintenance Technician",
+          "estimated_monthly_salary_php": {
+            "minimum": 20000,
+            "maximum": 65000,
+            "display": "Estimated ₱20,000–₱65,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Assists with inspection, servicing, and repair of aircraft systems; regulated duties require applicable CAAP authorization or ratings.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Philippine Statistics Authority",
+            "source_title": "PSA 2024 Occupational Wages Survey",
+            "source_url": "https://psa.gov.ph/statistics/occupational-wages-survey",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2024,
+          "confidence": {
+            "level": "low",
+            "rationale": "Only a broad Philippine industry proxy is available; treat the range as indicative."
+          },
+          "career_id": "CRS353-CAR01",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        },
+        {
+          "career_title": "Maintenance Planning Assistant",
+          "estimated_monthly_salary_php": {
+            "minimum": 20000,
+            "maximum": 65000,
+            "display": "Estimated ₱20,000–₱65,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Supports aircraft maintenance schedules, work packages, parts coordination, and compliance documentation.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Philippine Statistics Authority",
+            "source_title": "PSA 2024 Occupational Wages Survey",
+            "source_url": "https://psa.gov.ph/statistics/occupational-wages-survey",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2024,
+          "confidence": {
+            "level": "low",
+            "rationale": "Only a broad Philippine industry proxy is available; treat the range as indicative."
+          },
+          "career_id": "CRS353-CAR02",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        },
+        {
+          "career_title": "Aircraft Quality Assurance Assistant",
+          "estimated_monthly_salary_php": {
+            "minimum": 20000,
+            "maximum": 65000,
+            "display": "Estimated ₱20,000–₱65,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Reviews maintenance records and procedures against approved aviation quality and safety requirements.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Philippine Statistics Authority",
+            "source_title": "PSA 2024 Occupational Wages Survey",
+            "source_url": "https://psa.gov.ph/statistics/occupational-wages-survey",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2024,
+          "confidence": {
+            "level": "low",
+            "rationale": "Only a broad Philippine industry proxy is available; treat the range as indicative."
+          },
+          "career_id": "CRS353-CAR03",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        },
+        {
+          "career_title": "Technical Records Analyst",
+          "estimated_monthly_salary_php": {
+            "minimum": 20000,
+            "maximum": 65000,
+            "display": "Estimated ₱20,000–₱65,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Maintains and verifies aircraft maintenance histories, component records, and regulatory documentation.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Philippine Statistics Authority",
+            "source_title": "PSA 2024 Occupational Wages Survey",
+            "source_url": "https://psa.gov.ph/statistics/occupational-wages-survey",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2024,
+          "confidence": {
+            "level": "low",
+            "rationale": "Only a broad Philippine industry proxy is available; treat the range as indicative."
+          },
+          "career_id": "CRS353-CAR04",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        }
+      ]
+    },
+    {
+      "course_id": "CRS354",
+      "course_name": "Bachelor of Science in Aviation Electronics Technology",
+      "course_abbreviation": "BSAET",
+      "parent_cluster": "AVIATION & MARITIME CLUSTER",
+      "course_description": "The Bachelor of Science in Aviation Electronics Technology focuses on electronic, electrical, communication, navigation, instrumentation, and control systems used in aircraft and aviation operations. It differs from general Electronics programs through its specialized application of electronics to avionics equipment, aircraft systems, and aviation safety requirements.",
+      "obtainable_skills": [
+        "Avionics systems testing",
+        "Aircraft electronics troubleshooting",
+        "Electronic instrumentation",
+        "Communication and navigation systems",
+        "Electrical maintenance procedures",
+        "Technical documentation"
+      ],
+      "career_paths": [
+        "Avionics Technician",
+        "Aviation Electronics Technician",
+        "Aircraft Electronics Maintenance Assistant",
+        "Avionics Quality Assurance Assistant",
+        "Aviation Technical Records Analyst",
+        "Avionics Systems Support Associate"
+      ],
+      "sources": [
+        {
+          "title": "CHEDRO XI Recognized Programs Inventory",
+          "url": "https://ro11.ched.gov.ph/programs-inventory/",
+          "used_for": "Exact degree identity and government recognition"
+        },
+        {
+          "title": "CHEDRO III Bulletin 2018",
+          "url": "https://chedro3.ched.gov.ph/wp-content/uploads/2020/10/CHEDRO3%20Bulletin%202018.pdf",
+          "used_for": "Independent government confirmation of the program identity"
+        },
+        {
+          "title": "National Aviation Academy of the Philippines - Programs Offered",
+          "url": "https://naap.edu.ph/programs-offered/",
+          "used_for": "BSAET undergraduate structure, avionics curriculum focus, technical competencies, and career preparation"
+        }
+      ],
+      "program_duration_years": 4,
+      "duration_basis": "official_philippine_curriculum_or_disclosed_current_equivalent",
+      "year_levels": [
+        {
+          "year": 1,
+          "label": "1ST YEAR",
+          "overview": "Mathematics, physics, electricity, electronics, aviation fundamentals, technical drawing, and safety establish avionics foundations."
+        },
+        {
+          "year": 2,
+          "label": "2ND YEAR",
+          "overview": "Analog and digital electronics, aircraft electrical systems, instrumentation, wiring, and communication principles build technical competence."
+        },
+        {
+          "year": 3,
+          "label": "3RD YEAR",
+          "overview": "Navigation, communication, control, radar, and avionics systems are tested, maintained, and troubleshot in applied laboratories."
+        },
+        {
+          "year": 4,
+          "label": "4TH YEAR",
+          "overview": "Systems integration, supervised industry training, quality and safety requirements, advanced troubleshooting, and capstone work prepare students for avionics roles."
+        }
+      ],
+      "year_level_status": "completed",
+      "year_level_source_note": "Structured from the approved Philippine program and curriculum evidence retained in the canonical course sources.",
+      "year_level_confidence": "high",
+      "year_level_sources": [
+        {
+          "title": "CHEDRO XI Recognized Programs Inventory",
+          "url": "https://ro11.ched.gov.ph/programs-inventory/",
+          "accessed": "2026-09-23"
+        },
+        {
+          "title": "CHEDRO III Bulletin 2018",
+          "url": "https://chedro3.ched.gov.ph/wp-content/uploads/2020/10/CHEDRO3%20Bulletin%202018.pdf",
+          "accessed": "2026-09-23"
+        },
+        {
+          "title": "National Aviation Academy of the Philippines - Programs Offered",
+          "url": "https://naap.edu.ph/programs-offered/",
+          "accessed": "2026-09-23"
+        }
+      ],
+      "career_opportunities": [
+        {
+          "career_title": "Avionics Technician",
+          "estimated_monthly_salary_php": {
+            "minimum": 20000,
+            "maximum": 65000,
+            "display": "Estimated ₱20,000–₱65,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Tests, installs, and maintains aircraft electronic systems; regulated duties require applicable authorization or ratings.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Philippine Statistics Authority",
+            "source_title": "PSA 2024 Occupational Wages Survey",
+            "source_url": "https://psa.gov.ph/statistics/occupational-wages-survey",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2024,
+          "confidence": {
+            "level": "low",
+            "rationale": "Only a broad Philippine industry proxy is available; treat the range as indicative."
+          },
+          "career_id": "CRS354-CAR01",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        },
+        {
+          "career_title": "Aviation Electronics Technician",
+          "estimated_monthly_salary_php": {
+            "minimum": 20000,
+            "maximum": 65000,
+            "display": "Estimated ₱20,000–₱65,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Troubleshoots aircraft electrical, communication, navigation, and instrumentation equipment.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Philippine Statistics Authority",
+            "source_title": "PSA 2024 Occupational Wages Survey",
+            "source_url": "https://psa.gov.ph/statistics/occupational-wages-survey",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2024,
+          "confidence": {
+            "level": "low",
+            "rationale": "Only a broad Philippine industry proxy is available; treat the range as indicative."
+          },
+          "career_id": "CRS354-CAR02",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        },
+        {
+          "career_title": "Avionics Quality Assurance Assistant",
+          "estimated_monthly_salary_php": {
+            "minimum": 20000,
+            "maximum": 65000,
+            "display": "Estimated ₱20,000–₱65,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Reviews avionics maintenance work and records against approved technical and safety procedures.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Philippine Statistics Authority",
+            "source_title": "PSA 2024 Occupational Wages Survey",
+            "source_url": "https://psa.gov.ph/statistics/occupational-wages-survey",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2024,
+          "confidence": {
+            "level": "low",
+            "rationale": "Only a broad Philippine industry proxy is available; treat the range as indicative."
+          },
+          "career_id": "CRS354-CAR03",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        },
+        {
+          "career_title": "Avionics Systems Support Associate",
+          "estimated_monthly_salary_php": {
+            "minimum": 20000,
+            "maximum": 65000,
+            "display": "Estimated ₱20,000–₱65,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Supports diagnostics, documentation, parts coordination, and technical service for aviation electronic systems.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Philippine Statistics Authority",
+            "source_title": "PSA 2024 Occupational Wages Survey",
+            "source_url": "https://psa.gov.ph/statistics/occupational-wages-survey",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2024,
+          "confidence": {
+            "level": "low",
+            "rationale": "Only a broad Philippine industry proxy is available; treat the range as indicative."
+          },
+          "career_id": "CRS354-CAR04",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        }
+      ]
+    },
+    {
+      "course_id": "CRS355",
+      "course_name": "Bachelor of Science in Aviation Management",
+      "course_abbreviation": "BSAM",
+      "parent_cluster": "AVIATION & MARITIME CLUSTER",
+      "course_description": "The Bachelor of Science in Aviation Management applies business and management principles to airlines, airports, aviation services, safety, logistics, and regulatory operations. It differs from aircraft engineering and maintenance degrees by focusing on the planning, administration, and coordination of aviation organizations and services.",
+      "obtainable_skills": [
+        "Airline operations planning",
+        "Airport operations",
+        "Aviation safety management",
+        "Aviation logistics coordination",
+        "Service operations management",
+        "Regulatory compliance analysis"
+      ],
+      "career_paths": [
+        "Airline Operations Associate",
+        "Airport Operations Assistant",
+        "Aviation Safety Assistant",
+        "Ground Operations Supervisor",
+        "Aviation Logistics Coordinator",
+        "Aviation Management Trainee"
+      ],
+      "sources": [
+        {
+          "title": "Mapua Malayan Colleges Laguna - BS Aviation Management",
+          "url": "https://mcl.edu.ph/bs-aviation-management/",
+          "used_for": "Exact degree identity, curriculum focus, and undergraduate status"
+        },
+        {
+          "title": "Holy Angel University - Aviation Management",
+          "url": "https://www.hau.edu.ph/programs/school-of-business-and-accountancy/88",
+          "used_for": "Independent confirmation of the degree and career focus"
+        }
+      ],
+      "program_duration_years": 4,
+      "duration_basis": "official_philippine_curriculum_or_disclosed_current_equivalent",
+      "year_levels": [
+        {
+          "year": 1,
+          "label": "1ST YEAR",
+          "overview": "General education, business, economics, communication, and aviation-industry foundations introduce aviation organizations and services."
+        },
+        {
+          "year": 2,
+          "label": "2ND YEAR",
+          "overview": "Airline and airport operations, accounting, marketing, logistics, safety, and regulatory fundamentals develop management knowledge."
+        },
+        {
+          "year": 3,
+          "label": "3RD YEAR",
+          "overview": "Flight and ground operations, service quality, aviation security, planning, and operational analysis are applied through cases and projects."
+        },
+        {
+          "year": 4,
+          "label": "4TH YEAR",
+          "overview": "Strategic aviation management, internship or practicum, research or capstone work, and integrated safety and operations planning prepare students for industry roles."
+        }
+      ],
+      "year_level_status": "completed",
+      "year_level_source_note": "Structured from the approved Philippine program and curriculum evidence retained in the canonical course sources.",
+      "year_level_confidence": "high",
+      "year_level_sources": [
+        {
+          "title": "Mapua Malayan Colleges Laguna - BS Aviation Management",
+          "url": "https://mcl.edu.ph/bs-aviation-management/",
+          "accessed": "2026-09-23"
+        },
+        {
+          "title": "Holy Angel University - Aviation Management",
+          "url": "https://www.hau.edu.ph/programs/school-of-business-and-accountancy/88",
+          "accessed": "2026-09-23"
+        }
+      ],
+      "career_opportunities": [
+        {
+          "career_title": "Airline Operations Associate",
+          "estimated_monthly_salary_php": {
+            "minimum": 20000,
+            "maximum": 65000,
+            "display": "Estimated ₱20,000–₱65,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Supports schedules, flight coordination, service processes, and operational documentation for an airline.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Philippine Statistics Authority",
+            "source_title": "PSA 2024 Occupational Wages Survey",
+            "source_url": "https://psa.gov.ph/statistics/occupational-wages-survey",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2024,
+          "confidence": {
+            "level": "low",
+            "rationale": "Only a broad Philippine industry proxy is available; treat the range as indicative."
+          },
+          "career_id": "CRS355-CAR01",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        },
+        {
+          "career_title": "Airport Operations Assistant",
+          "estimated_monthly_salary_php": {
+            "minimum": 20000,
+            "maximum": 65000,
+            "display": "Estimated ₱20,000–₱65,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Coordinates terminal, airside, passenger-service, or facility activities under airport procedures.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Philippine Statistics Authority",
+            "source_title": "PSA 2024 Occupational Wages Survey",
+            "source_url": "https://psa.gov.ph/statistics/occupational-wages-survey",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2024,
+          "confidence": {
+            "level": "low",
+            "rationale": "Only a broad Philippine industry proxy is available; treat the range as indicative."
+          },
+          "career_id": "CRS355-CAR02",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        },
+        {
+          "career_title": "Aviation Safety Assistant",
+          "estimated_monthly_salary_php": {
+            "minimum": 20000,
+            "maximum": 65000,
+            "display": "Estimated ₱20,000–₱65,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Supports safety reporting, documentation, risk monitoring, and compliance activities in aviation organizations.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Philippine Statistics Authority",
+            "source_title": "PSA 2024 Occupational Wages Survey",
+            "source_url": "https://psa.gov.ph/statistics/occupational-wages-survey",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2024,
+          "confidence": {
+            "level": "low",
+            "rationale": "Only a broad Philippine industry proxy is available; treat the range as indicative."
+          },
+          "career_id": "CRS355-CAR03",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        },
+        {
+          "career_title": "Aviation Logistics Coordinator",
+          "estimated_monthly_salary_php": {
+            "minimum": 20000,
+            "maximum": 65000,
+            "display": "Estimated ₱20,000–₱65,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Coordinates aviation-related materials, suppliers, shipments, inventories, and operational requirements.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Philippine Statistics Authority",
+            "source_title": "PSA 2024 Occupational Wages Survey",
+            "source_url": "https://psa.gov.ph/statistics/occupational-wages-survey",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2024,
+          "confidence": {
+            "level": "low",
+            "rationale": "Only a broad Philippine industry proxy is available; treat the range as indicative."
+          },
+          "career_id": "CRS355-CAR04",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        }
+      ]
+    },
+    {
+      "course_id": "CRS356",
+      "course_name": "Bachelor of Science in Agricultural Biotechnology",
+      "course_abbreviation": "BSABT",
+      "parent_cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
+      "course_description": "The Bachelor of Science in Agricultural Biotechnology applies biology, genetics, molecular methods, and biotechnology to crops, livestock, food systems, and agricultural sustainability. It differs from general Agriculture and Biology through its specialized use of laboratory and biotechnological approaches to agricultural problems.",
+      "obtainable_skills": [
+        "Molecular biology techniques",
+        "Plant and animal biotechnology",
+        "Laboratory experimentation",
+        "Genetic data interpretation",
+        "Agricultural research",
+        "Biosafety practices"
+      ],
+      "career_paths": [
+        "Agricultural Biotechnology Research Assistant",
+        "Laboratory Analyst",
+        "Plant Biotechnology Technician",
+        "Quality Control Analyst",
+        "Seed Technology Associate",
+        "Agricultural Research Associate"
+      ],
+      "sources": [
+        {
+          "title": "UPLB Degree Programs Appeals Criteria 2025-2026",
+          "url": "https://our.uplb.edu.ph/wp-content/uploads/2025/06/UPCAT-2025-Sem-1-UPLB-Degree-Programs-Appeals-Criteria-1.pdf",
+          "used_for": "Exact degree identity, abbreviation, and current undergraduate offering"
+        },
+        {
+          "title": "UPLB Institute of Crop Science - BS Agricultural Biotechnology Undergraduate Program",
+          "url": "https://icrops.uplb.edu.ph/wp-content/uploads/2025/02/BS-ABT-Undergraduate-Program.pdf",
+          "used_for": "Curriculum, laboratory competencies, specializations, research, practicum, and agricultural biotechnology focus"
+        }
+      ],
+      "program_duration_years": 4,
+      "duration_basis": "official_philippine_curriculum_or_disclosed_current_equivalent",
+      "year_levels": [
+        {
+          "year": 1,
+          "label": "1ST YEAR",
+          "overview": "Biology, chemistry, mathematics, agriculture, genetics, and introductory laboratory work establish agricultural-biotechnology foundations."
+        },
+        {
+          "year": 2,
+          "label": "2ND YEAR",
+          "overview": "Molecular biology, microbiology, biochemistry, plant and animal science, and experimental techniques develop biotechnology competence."
+        },
+        {
+          "year": 3,
+          "label": "3RD YEAR",
+          "overview": "Recombinant DNA, molecular markers, bioinformatics, biosafety, and crop, animal, food, or protection biotechnology support specialization."
+        },
+        {
+          "year": 4,
+          "label": "4TH YEAR",
+          "overview": "Advanced electives, research or thesis, field practice or practicum, and biotechnology regulation integrate laboratory and agricultural application."
+        }
+      ],
+      "year_level_status": "completed",
+      "year_level_source_note": "Structured from the approved Philippine program and curriculum evidence retained in the canonical course sources.",
+      "year_level_confidence": "high",
+      "year_level_sources": [
+        {
+          "title": "UPLB Degree Programs Appeals Criteria 2025-2026",
+          "url": "https://our.uplb.edu.ph/wp-content/uploads/2025/06/UPCAT-2025-Sem-1-UPLB-Degree-Programs-Appeals-Criteria-1.pdf",
+          "accessed": "2026-09-23"
+        },
+        {
+          "title": "UPLB Institute of Crop Science - BS Agricultural Biotechnology Undergraduate Program",
+          "url": "https://icrops.uplb.edu.ph/wp-content/uploads/2025/02/BS-ABT-Undergraduate-Program.pdf",
+          "accessed": "2026-09-23"
+        }
+      ],
+      "career_opportunities": [
+        {
+          "career_title": "Agricultural Biotechnology Research Assistant",
+          "estimated_monthly_salary_php": {
+            "minimum": 20000,
+            "maximum": 65000,
+            "display": "Estimated ₱20,000–₱65,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Supports molecular, crop, animal, food, or protection-biotechnology experiments and documentation.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Philippine Statistics Authority",
+            "source_title": "PSA 2024 Occupational Wages Survey",
+            "source_url": "https://psa.gov.ph/statistics/occupational-wages-survey",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2024,
+          "confidence": {
+            "level": "low",
+            "rationale": "Only a broad Philippine industry proxy is available; treat the range as indicative."
+          },
+          "career_id": "CRS356-CAR01",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        },
+        {
+          "career_title": "Biotechnology Laboratory Analyst",
+          "estimated_monthly_salary_php": {
+            "minimum": 20000,
+            "maximum": 65000,
+            "display": "Estimated ₱20,000–₱65,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Performs sample preparation, molecular testing, and data recording in agricultural or biological laboratories.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Philippine Statistics Authority",
+            "source_title": "PSA 2024 Occupational Wages Survey",
+            "source_url": "https://psa.gov.ph/statistics/occupational-wages-survey",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2024,
+          "confidence": {
+            "level": "low",
+            "rationale": "Only a broad Philippine industry proxy is available; treat the range as indicative."
+          },
+          "career_id": "CRS356-CAR02",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        },
+        {
+          "career_title": "Plant Biotechnology Technician",
+          "estimated_monthly_salary_php": {
+            "minimum": 20000,
+            "maximum": 65000,
+            "display": "Estimated ₱20,000–₱65,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Supports tissue culture, molecular-marker, propagation, or crop-improvement laboratory activities.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Philippine Statistics Authority",
+            "source_title": "PSA 2024 Occupational Wages Survey",
+            "source_url": "https://psa.gov.ph/statistics/occupational-wages-survey",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2024,
+          "confidence": {
+            "level": "low",
+            "rationale": "Only a broad Philippine industry proxy is available; treat the range as indicative."
+          },
+          "career_id": "CRS356-CAR03",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        },
+        {
+          "career_title": "Quality Control Analyst",
+          "estimated_monthly_salary_php": {
+            "minimum": 20000,
+            "maximum": 65000,
+            "display": "Estimated ₱20,000–₱65,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Tests biological or agricultural materials against laboratory quality and biosafety procedures.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Philippine Statistics Authority",
+            "source_title": "PSA 2024 Occupational Wages Survey",
+            "source_url": "https://psa.gov.ph/statistics/occupational-wages-survey",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2024,
+          "confidence": {
+            "level": "low",
+            "rationale": "Only a broad Philippine industry proxy is available; treat the range as indicative."
+          },
+          "career_id": "CRS356-CAR04",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        }
+      ]
+    },
+    {
+      "course_id": "CRS357",
+      "course_name": "Bachelor of Science in Agricultural Chemistry",
+      "course_abbreviation": "BSAC",
+      "parent_cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
+      "course_description": "The Bachelor of Science in Agricultural Chemistry integrates chemistry with agricultural science to study soils, fertilizers, crops, feeds, pesticides, food materials, and other agricultural products. It differs from general Chemistry and Agriculture by emphasizing chemical analysis and research directed toward agricultural systems and materials.",
+      "obtainable_skills": [
+        "Agricultural chemical analysis",
+        "Analytical chemistry",
+        "Soil and fertilizer analysis",
+        "Food and feed analysis",
+        "Laboratory quality control",
+        "Scientific research"
+      ],
+      "career_paths": [
+        "Agricultural Chemistry Analyst",
+        "Laboratory Analyst",
+        "Quality Control Analyst",
+        "Soil and Fertilizer Analyst",
+        "Food and Feed Analyst",
+        "Research Assistant"
+      ],
+      "sources": [
+        {
+          "title": "UPLB - BS Agricultural Chemistry Curriculum",
+          "url": "https://our.uplb.edu.ph/wp-content/uploads/2023/03/BS-Agricultural-Chemistry.pdf",
+          "used_for": "Exact degree identity, curriculum, competencies, and undergraduate structure"
+        },
+        {
+          "title": "UPLB Degree Programs Appeals Criteria 2025-2026",
+          "url": "https://our.uplb.edu.ph/wp-content/uploads/2025/06/UPCAT-2025-Sem-1-UPLB-Degree-Programs-Appeals-Criteria-1.pdf",
+          "used_for": "Current offering and BSAC abbreviation"
+        }
+      ],
+      "program_duration_years": 4,
+      "duration_basis": "official_philippine_curriculum_or_disclosed_current_equivalent",
+      "year_levels": [
+        {
+          "year": 1,
+          "label": "1ST YEAR",
+          "overview": "General and organic chemistry, biology, mathematics, physics, and agricultural science establish the program's dual scientific foundation."
+        },
+        {
+          "year": 2,
+          "label": "2ND YEAR",
+          "overview": "Quantitative analysis, crop and animal science, soil science, biochemistry, and laboratory work develop analytical competence."
+        },
+        {
+          "year": 3,
+          "label": "3RD YEAR",
+          "overview": "Physical, analytical, environmental, food, feed, fertilizer, pesticide, and agricultural chemistry deepen technical specialization."
+        },
+        {
+          "year": 4,
+          "label": "4TH YEAR",
+          "overview": "Advanced agricultural chemical analysis, research or thesis, seminar, specialization electives, and integrated laboratory practice prepare students for scientific work."
+        }
+      ],
+      "year_level_status": "completed",
+      "year_level_source_note": "Structured from the approved Philippine program and curriculum evidence retained in the canonical course sources.",
+      "year_level_confidence": "high",
+      "year_level_sources": [
+        {
+          "title": "UPLB - BS Agricultural Chemistry Curriculum",
+          "url": "https://our.uplb.edu.ph/wp-content/uploads/2023/03/BS-Agricultural-Chemistry.pdf",
+          "accessed": "2026-09-23"
+        },
+        {
+          "title": "UPLB Degree Programs Appeals Criteria 2025-2026",
+          "url": "https://our.uplb.edu.ph/wp-content/uploads/2025/06/UPCAT-2025-Sem-1-UPLB-Degree-Programs-Appeals-Criteria-1.pdf",
+          "accessed": "2026-09-23"
+        }
+      ],
+      "career_opportunities": [
+        {
+          "career_title": "Agricultural Chemistry Analyst",
+          "estimated_monthly_salary_php": {
+            "minimum": 20000,
+            "maximum": 65000,
+            "display": "Estimated ₱20,000–₱65,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Performs chemical testing of soils, fertilizers, feeds, pesticides, foods, or other agricultural materials.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Philippine Statistics Authority",
+            "source_title": "PSA 2024 Occupational Wages Survey",
+            "source_url": "https://psa.gov.ph/statistics/occupational-wages-survey",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2024,
+          "confidence": {
+            "level": "low",
+            "rationale": "Only a broad Philippine industry proxy is available; treat the range as indicative."
+          },
+          "career_id": "CRS357-CAR01",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        },
+        {
+          "career_title": "Laboratory Analyst",
+          "estimated_monthly_salary_php": {
+            "minimum": 20000,
+            "maximum": 65000,
+            "display": "Estimated ₱20,000–₱65,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Conducts analytical tests, maintains records, and supports laboratory quality procedures.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Philippine Statistics Authority",
+            "source_title": "PSA 2024 Occupational Wages Survey",
+            "source_url": "https://psa.gov.ph/statistics/occupational-wages-survey",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2024,
+          "confidence": {
+            "level": "low",
+            "rationale": "Only a broad Philippine industry proxy is available; treat the range as indicative."
+          },
+          "career_id": "CRS357-CAR02",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        },
+        {
+          "career_title": "Quality Control Analyst",
+          "estimated_monthly_salary_php": {
+            "minimum": 20000,
+            "maximum": 65000,
+            "display": "Estimated ₱20,000–₱65,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Evaluates raw materials or products using chemical methods and documented specifications.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Philippine Statistics Authority",
+            "source_title": "PSA 2024 Occupational Wages Survey",
+            "source_url": "https://psa.gov.ph/statistics/occupational-wages-survey",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2024,
+          "confidence": {
+            "level": "low",
+            "rationale": "Only a broad Philippine industry proxy is available; treat the range as indicative."
+          },
+          "career_id": "CRS357-CAR03",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        },
+        {
+          "career_title": "Soil and Fertilizer Analyst",
+          "estimated_monthly_salary_php": {
+            "minimum": 20000,
+            "maximum": 65000,
+            "display": "Estimated ₱20,000–₱65,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Analyzes soil properties and fertilizer composition to support agriculture, laboratories, or regulatory work.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Philippine Statistics Authority",
+            "source_title": "PSA 2024 Occupational Wages Survey",
+            "source_url": "https://psa.gov.ph/statistics/occupational-wages-survey",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2024,
+          "confidence": {
+            "level": "low",
+            "rationale": "Only a broad Philippine industry proxy is available; treat the range as indicative."
+          },
+          "career_id": "CRS357-CAR04",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        }
+      ]
+    },
+    {
+      "course_id": "CRS358",
+      "course_name": "Bachelor of Arts in International Studies",
+      "course_abbreviation": "BAIS",
+      "parent_cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
+      "course_description": "The Bachelor of Arts in International Studies examines relations among states, societies, cultures, institutions, and global systems. It differs from Political Science through its sustained interdisciplinary attention to international affairs, regional studies, diplomacy, global development, intercultural communication, and transnational issues.",
+      "obtainable_skills": [
+        "International affairs analysis",
+        "Policy research",
+        "Cross-cultural communication",
+        "Regional studies research",
+        "Diplomatic communication",
+        "Global issue analysis"
+      ],
+      "career_paths": [
+        "Foreign Affairs Research Assistant",
+        "International Programs Assistant",
+        "Policy Research Assistant",
+        "Development Project Assistant",
+        "International Relations Associate",
+        "Government Affairs Assistant"
+      ],
+      "sources": [
+        {
+          "title": "CHEDRO XI Programs per Higher Education Institution",
+          "url": "https://ro11.ched.gov.ph/programs-per-hei/",
+          "used_for": "Exact BA International Studies identity and recognized undergraduate offerings"
+        },
+        {
+          "title": "Far Eastern University - Bachelor of Arts in International Studies",
+          "url": "https://www.feu.edu.ph/institute-of-arts-and-sciences/bachelor-of-arts-in-international-studies/",
+          "used_for": "BAIS abbreviation, curriculum, program competencies, internship, and career pathways"
+        }
+      ],
+      "program_duration_years": 4,
+      "duration_basis": "official_philippine_curriculum_or_disclosed_current_equivalent",
+      "year_levels": [
+        {
+          "year": 1,
+          "label": "1ST YEAR",
+          "overview": "General education, history, political science, economics, communication, and introductory international studies establish interdisciplinary foundations."
+        },
+        {
+          "year": 2,
+          "label": "2ND YEAR",
+          "overview": "International relations, globalization, regional studies, foreign language, international law, and research methods develop analytical breadth."
+        },
+        {
+          "year": 3,
+          "label": "3RD YEAR",
+          "overview": "International political economy, diplomacy, development, security, area studies, and policy analysis support specialization."
+        },
+        {
+          "year": 4,
+          "label": "4TH YEAR",
+          "overview": "Advanced seminars and electives, internship, thesis or capstone research, and applied international-program work integrate global perspectives."
+        }
+      ],
+      "year_level_status": "completed",
+      "year_level_source_note": "Structured from the approved Philippine program and curriculum evidence retained in the canonical course sources.",
+      "year_level_confidence": "high",
+      "year_level_sources": [
+        {
+          "title": "CHEDRO XI Programs per Higher Education Institution",
+          "url": "https://ro11.ched.gov.ph/programs-per-hei/",
+          "accessed": "2026-09-23"
+        },
+        {
+          "title": "Far Eastern University - Bachelor of Arts in International Studies",
+          "url": "https://www.feu.edu.ph/institute-of-arts-and-sciences/bachelor-of-arts-in-international-studies/",
+          "accessed": "2026-09-23"
+        }
+      ],
+      "career_opportunities": [
+        {
+          "career_title": "Foreign Affairs Research Assistant",
+          "estimated_monthly_salary_php": {
+            "minimum": 20000,
+            "maximum": 55000,
+            "display": "Estimated ₱20,000–₱55,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Supports research, briefs, and documentation on international and regional issues for public or private organizations.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Philippine Statistics Authority",
+            "source_title": "PSA 2024 Occupational Wages Survey",
+            "source_url": "https://psa.gov.ph/statistics/occupational-wages-survey",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2024,
+          "confidence": {
+            "level": "low",
+            "rationale": "Only a broad Philippine industry proxy is available; treat the range as indicative."
+          },
+          "career_id": "CRS358-CAR01",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        },
+        {
+          "career_title": "International Programs Assistant",
+          "estimated_monthly_salary_php": {
+            "minimum": 20000,
+            "maximum": 55000,
+            "display": "Estimated ₱20,000–₱55,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Coordinates documentation, communication, events, and partner activities for international programs.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Philippine Statistics Authority",
+            "source_title": "PSA 2024 Occupational Wages Survey",
+            "source_url": "https://psa.gov.ph/statistics/occupational-wages-survey",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2024,
+          "confidence": {
+            "level": "low",
+            "rationale": "Only a broad Philippine industry proxy is available; treat the range as indicative."
+          },
+          "career_id": "CRS358-CAR02",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        },
+        {
+          "career_title": "Policy Research Assistant",
+          "estimated_monthly_salary_php": {
+            "minimum": 20000,
+            "maximum": 55000,
+            "display": "Estimated ₱20,000–₱55,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Collects and analyzes information relevant to foreign policy, international development, or regional affairs.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Philippine Statistics Authority",
+            "source_title": "PSA 2024 Occupational Wages Survey",
+            "source_url": "https://psa.gov.ph/statistics/occupational-wages-survey",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2024,
+          "confidence": {
+            "level": "low",
+            "rationale": "Only a broad Philippine industry proxy is available; treat the range as indicative."
+          },
+          "career_id": "CRS358-CAR03",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        },
+        {
+          "career_title": "Development Project Assistant",
+          "estimated_monthly_salary_php": {
+            "minimum": 20000,
+            "maximum": 55000,
+            "display": "Estimated ₱20,000–₱55,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Supports planning, coordination, monitoring, and reporting for internationally oriented development projects.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Philippine Statistics Authority",
+            "source_title": "PSA 2024 Occupational Wages Survey",
+            "source_url": "https://psa.gov.ph/statistics/occupational-wages-survey",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2024,
+          "confidence": {
+            "level": "low",
+            "rationale": "Only a broad Philippine industry proxy is available; treat the range as indicative."
+          },
+          "career_id": "CRS358-CAR04",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        }
+      ]
+    },
+    {
+      "course_id": "CRS359",
+      "course_name": "Bachelor of Arts in Development Studies",
+      "course_abbreviation": "",
+      "parent_cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
+      "course_description": "The Bachelor of Arts in Development Studies examines social, economic, political, cultural, and environmental dimensions of development. It differs from Economics, Sociology, and Development Communication by integrating these perspectives to analyze inequality, institutions, public policy, communities, and sustainable social change.",
+      "obtainable_skills": [
+        "Development policy analysis",
+        "Social research",
+        "Community needs assessment",
+        "Project planning",
+        "Program monitoring and evaluation",
+        "Qualitative and quantitative analysis"
+      ],
+      "career_paths": [
+        "Development Project Assistant",
+        "Program Officer",
+        "Policy Research Assistant",
+        "Community Development Worker",
+        "Monitoring and Evaluation Assistant",
+        "Social Research Assistant"
+      ],
+      "sources": [
+        {
+          "title": "De La Salle University - Bachelor of Arts in Development Studies",
+          "url": "https://old.dlsu.edu.ph/colleges/cla/undergraduate-degree-programs/bachelor-of-arts-ab-in-development-studies/",
+          "used_for": "Exact degree identity, undergraduate status, curriculum focus, and careers"
+        }
+      ],
+      "program_duration_years": 4,
+      "duration_basis": "official_philippine_curriculum_or_disclosed_current_equivalent",
+      "year_levels": [
+        {
+          "year": 1,
+          "label": "1ST YEAR",
+          "overview": "General education, economics, sociology, political science, communication, and development concepts establish interdisciplinary foundations."
+        },
+        {
+          "year": 2,
+          "label": "2ND YEAR",
+          "overview": "Development theories, social research methods, statistics, institutions, communities, and public policy develop analytical competence."
+        },
+        {
+          "year": 3,
+          "label": "3RD YEAR",
+          "overview": "Program planning, development economics, governance, sustainability, monitoring, and community studies are applied to development problems."
+        },
+        {
+          "year": 4,
+          "label": "4TH YEAR",
+          "overview": "Internship or fieldwork, advanced policy electives, monitoring and evaluation, and thesis or capstone work integrate development practice."
+        }
+      ],
+      "year_level_status": "completed",
+      "year_level_source_note": "Structured from the approved Philippine program and curriculum evidence retained in the canonical course sources.",
+      "year_level_confidence": "high",
+      "year_level_sources": [
+        {
+          "title": "De La Salle University - Bachelor of Arts in Development Studies",
+          "url": "https://old.dlsu.edu.ph/colleges/cla/undergraduate-degree-programs/bachelor-of-arts-ab-in-development-studies/",
+          "accessed": "2026-09-23"
+        }
+      ],
+      "career_opportunities": [
+        {
+          "career_title": "Development Project Assistant",
+          "estimated_monthly_salary_php": {
+            "minimum": 18000,
+            "maximum": 50000,
+            "display": "Estimated ₱18,000–₱50,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Supports community or development-project planning, implementation, documentation, and coordination.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Philippine Statistics Authority",
+            "source_title": "PSA 2024 Occupational Wages Survey",
+            "source_url": "https://psa.gov.ph/statistics/occupational-wages-survey",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2024,
+          "confidence": {
+            "level": "low",
+            "rationale": "Only a broad Philippine industry proxy is available; treat the range as indicative."
+          },
+          "career_id": "CRS359-CAR01",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        },
+        {
+          "career_title": "Program Officer",
+          "estimated_monthly_salary_php": {
+            "minimum": 18000,
+            "maximum": 50000,
+            "display": "Estimated ₱18,000–₱50,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Coordinates activities, partners, reports, and implementation for nonprofit, government, or development programs.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Philippine Statistics Authority",
+            "source_title": "PSA 2024 Occupational Wages Survey",
+            "source_url": "https://psa.gov.ph/statistics/occupational-wages-survey",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2024,
+          "confidence": {
+            "level": "low",
+            "rationale": "Only a broad Philippine industry proxy is available; treat the range as indicative."
+          },
+          "career_id": "CRS359-CAR02",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        },
+        {
+          "career_title": "Community Development Worker",
+          "estimated_monthly_salary_php": {
+            "minimum": 18000,
+            "maximum": 50000,
+            "display": "Estimated ₱18,000–₱50,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Facilitates community consultations, needs assessment, local projects, and stakeholder participation.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Philippine Statistics Authority",
+            "source_title": "PSA 2024 Occupational Wages Survey",
+            "source_url": "https://psa.gov.ph/statistics/occupational-wages-survey",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2024,
+          "confidence": {
+            "level": "low",
+            "rationale": "Only a broad Philippine industry proxy is available; treat the range as indicative."
+          },
+          "career_id": "CRS359-CAR03",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        },
+        {
+          "career_title": "Monitoring and Evaluation Assistant",
+          "estimated_monthly_salary_php": {
+            "minimum": 18000,
+            "maximum": 50000,
+            "display": "Estimated ₱18,000–₱50,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Collects indicators, checks program data, and supports evaluation and reporting for development initiatives.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Philippine Statistics Authority",
+            "source_title": "PSA 2024 Occupational Wages Survey",
+            "source_url": "https://psa.gov.ph/statistics/occupational-wages-survey",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2024,
+          "confidence": {
+            "level": "low",
+            "rationale": "Only a broad Philippine industry proxy is available; treat the range as indicative."
+          },
+          "career_id": "CRS359-CAR04",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        }
+      ]
+    },
+    {
+      "course_id": "CRS360",
+      "course_name": "Bachelor of Secondary Education major in Science",
+      "course_abbreviation": "BSEd",
+      "parent_cluster": "EDUCATION CLUSTER",
+      "course_description": "The Bachelor of Secondary Education major in Science prepares future secondary-school teachers to teach integrated science and related subjects using sound scientific and pedagogical practice. Unlike a pure science degree, it combines disciplinary science with curriculum design, teaching methods, assessment, classroom management, and supervised teaching experience.",
+      "obtainable_skills": [
+        "Science lesson planning",
+        "Science teaching methods",
+        "Laboratory activity facilitation",
+        "Learning assessment",
+        "Classroom management",
+        "Curriculum implementation"
+      ],
+      "career_paths": [
+        "Secondary School Science Teacher",
+        "Science Learning Materials Developer",
+        "Science Education Program Assistant",
+        "Academic Tutor",
+        "Laboratory Learning Facilitator",
+        "Education Research Assistant"
+      ],
+      "sources": [
+        {
+          "title": "CHED ETEEAP Deputized HEIs and Degree Programs",
+          "url": "https://legacy.ched.gov.ph/wp-content/uploads/ETEAAP-list-as-of-19March2026-FINAL.pdf",
+          "used_for": "Exact BSEd Science major identity and recognized Philippine offering"
+        },
+        {
+          "title": "De La Salle University Undergraduate Degree Programs",
+          "url": "https://old.dlsu.edu.ph/admissions/undergraduate/degree-programs/",
+          "used_for": "Independent institutional confirmation of the Science major"
+        },
+        {
+          "title": "University of Santo Tomas - Bachelor of Secondary Education major in Science",
+          "url": "https://www.ust.edu.ph/academics/programs/bachelor-of-secondary-education-major-in-science/",
+          "used_for": "Four-year undergraduate status, science pedagogy, curriculum development, assessment, classroom management, and practice teaching"
+        }
+      ],
+      "program_duration_years": 4,
+      "duration_basis": "official_philippine_curriculum_or_disclosed_current_equivalent",
+      "year_levels": [
+        {
+          "year": 1,
+          "label": "1ST YEAR",
+          "overview": "General education, foundational biology, chemistry, physics, earth science, mathematics, and introductory education courses establish science-teaching foundations."
+        },
+        {
+          "year": 2,
+          "label": "2ND YEAR",
+          "overview": "Professional education, learner development, curriculum, assessment, laboratory methods, and intermediate science subjects develop pedagogical competence."
+        },
+        {
+          "year": 3,
+          "label": "3RD YEAR",
+          "overview": "Advanced science content, teaching strategies, educational technology, research in science teaching, and field-study experiences deepen practice."
+        },
+        {
+          "year": 4,
+          "label": "4TH YEAR",
+          "overview": "Practice teaching, action research, curriculum and learning-material development, and professional integration prepare students for secondary science education."
+        }
+      ],
+      "year_level_status": "completed",
+      "year_level_source_note": "Structured from the approved Philippine program and curriculum evidence retained in the canonical course sources.",
+      "year_level_confidence": "high",
+      "year_level_sources": [
+        {
+          "title": "CHED ETEEAP Deputized HEIs and Degree Programs",
+          "url": "https://legacy.ched.gov.ph/wp-content/uploads/ETEAAP-list-as-of-19March2026-FINAL.pdf",
+          "accessed": "2026-09-23"
+        },
+        {
+          "title": "De La Salle University Undergraduate Degree Programs",
+          "url": "https://old.dlsu.edu.ph/admissions/undergraduate/degree-programs/",
+          "accessed": "2026-09-23"
+        },
+        {
+          "title": "University of Santo Tomas - Bachelor of Secondary Education major in Science",
+          "url": "https://www.ust.edu.ph/academics/programs/bachelor-of-secondary-education-major-in-science/",
+          "accessed": "2026-09-23"
+        }
+      ],
+      "career_opportunities": [
+        {
+          "career_title": "Secondary School Science Teacher",
+          "estimated_monthly_salary_php": {
+            "minimum": 22000,
+            "maximum": 65000,
+            "display": "Estimated ₱22,000–₱65,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Teaches science after meeting applicable Philippine teacher-licensure and hiring requirements.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Philippine Statistics Authority",
+            "source_title": "PSA 2024 Occupational Wages Survey",
+            "source_url": "https://psa.gov.ph/statistics/occupational-wages-survey",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2024,
+          "confidence": {
+            "level": "low",
+            "rationale": "Only a broad Philippine industry proxy is available; treat the range as indicative."
+          },
+          "career_id": "CRS360-CAR01",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        },
+        {
+          "career_title": "Science Learning Materials Developer",
+          "estimated_monthly_salary_php": {
+            "minimum": 22000,
+            "maximum": 65000,
+            "display": "Estimated ₱22,000–₱65,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Creates and reviews lessons, activities, assessments, and instructional resources for science education.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Philippine Statistics Authority",
+            "source_title": "PSA 2024 Occupational Wages Survey",
+            "source_url": "https://psa.gov.ph/statistics/occupational-wages-survey",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2024,
+          "confidence": {
+            "level": "low",
+            "rationale": "Only a broad Philippine industry proxy is available; treat the range as indicative."
+          },
+          "career_id": "CRS360-CAR02",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        },
+        {
+          "career_title": "Science Education Program Assistant",
+          "estimated_monthly_salary_php": {
+            "minimum": 22000,
+            "maximum": 65000,
+            "display": "Estimated ₱22,000–₱65,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Supports curriculum, training, research, or program activities in schools and education organizations.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Philippine Statistics Authority",
+            "source_title": "PSA 2024 Occupational Wages Survey",
+            "source_url": "https://psa.gov.ph/statistics/occupational-wages-survey",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2024,
+          "confidence": {
+            "level": "low",
+            "rationale": "Only a broad Philippine industry proxy is available; treat the range as indicative."
+          },
+          "career_id": "CRS360-CAR03",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        },
+        {
+          "career_title": "Laboratory Learning Facilitator",
+          "estimated_monthly_salary_php": {
+            "minimum": 22000,
+            "maximum": 65000,
+            "display": "Estimated ₱22,000–₱65,000 per month",
+            "is_estimate": true
+          },
+          "philippines_description": "Prepares and facilitates safe school laboratory activities under institutional policies and supervision.",
+          "salary_basis": {
+            "basis_type": "industry_proxy",
+            "source_name": "Philippine Statistics Authority",
+            "source_title": "PSA 2024 Occupational Wages Survey",
+            "source_url": "https://psa.gov.ph/statistics/occupational-wages-survey",
+            "derivation_and_occupation_mapping": "No robust exact-title Philippine range was used; this broad estimate follows the dataset's related-industry or occupation-proxy convention and varies by role, experience, and employer."
+          },
+          "reference_year": 2024,
+          "confidence": {
+            "level": "low",
+            "rationale": "Only a broad Philippine industry proxy is available; treat the range as indicative."
+          },
+          "career_id": "CRS360-CAR04",
+          "career_relevance_basis": "approved_canonical_course_identity_and_career_paths"
+        }
+      ]
     }
   ],
   "enrichment_metadata": {

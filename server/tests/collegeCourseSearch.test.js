@@ -30,6 +30,19 @@ test('college course search limits selectable results to active courses', async 
   assert.match(capturedSql, /AND is_active = 1/)
 })
 
+test('college course search excludes deprecated and quarantined identities', async () => {
+  const database = {
+    query: async () => [[
+      { course_code: 'CRS021', course_name: 'Current' },
+      { course_code: 'CRS020', course_name: 'Duplicate' },
+      { course_code: 'CRS166', course_name: 'Quarantined' },
+    ]],
+  }
+
+  const results = await searchActiveCollegeCourses(database, 'course')
+  assert.deepEqual(results.map(({ course_code }) => course_code), ['CRS021'])
+})
+
 after(async () => {
   await pool.end()
 })

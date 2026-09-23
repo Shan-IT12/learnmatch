@@ -20,6 +20,7 @@ import {
   calculateRiasecCosineSimilarity,
   rankCourses,
 } from './recommendationEngine.js'
+import { isCurrentIndependentCourse } from './courseIdentityService.js'
 import {
   PERSONAL_FACTOR_CATEGORIES,
   parseStoredPersonalFactorCategories,
@@ -246,6 +247,10 @@ export function filterCoursesByCandidateClusters(courses, candidateClusters) {
   return courses.filter((course) => candidateNames.has(course.cluster_category))
 }
 
+export function filterCurrentIndependentCourses(courses) {
+  return courses.filter((course) => isCurrentIndependentCourse(course.course_code))
+}
+
 function validateMbtiType(mbtiType) {
   const normalizedType = String(mbtiType).toUpperCase()
 
@@ -445,7 +450,8 @@ export async function getTopCourseRecommendations(pool, userId) {
   const profileFactors = buildEffectivePersonalFactors(profileRows[0])
 
   const knownClusters = new Set(PARENT_CLUSTERS)
-  const eligibleCourses = courseRows.filter((course) => knownClusters.has(course.cluster_category))
+  const eligibleCourses = filterCurrentIndependentCourses(courseRows)
+    .filter((course) => knownClusters.has(course.cluster_category))
 
   if (eligibleCourses.length === 0) {
     throw new RecommendationDataError('No active courses have a recognized parent cluster.')
