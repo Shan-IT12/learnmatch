@@ -147,7 +147,7 @@ function Register() {
   }
 
   return (
-    <div className="min-h-screen bg-white overflow-hidden">
+    <div className="min-h-screen bg-white overflow-x-hidden">
 
       <style>{`
         @keyframes float {
@@ -160,7 +160,7 @@ function Register() {
         }
       `}</style>
 
-      <nav className="flex justify-between items-center px-10 py-5">
+      <nav className="flex justify-between items-center gap-3 px-5 sm:px-8 lg:px-10 py-4 sm:py-5">
         <Link to="/" className="text-xl font-bold tracking-tight text-gray-900">
           Learn<span className="text-orange-500">Match</span>
         </Link>
@@ -175,9 +175,9 @@ function Register() {
         </div>
       </nav>
 
-      <div className="max-w-7xl mx-auto px-10 pt-8 pb-16 grid grid-cols-2 gap-16 items-center min-h-[calc(100vh-80px)]">
+      <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-10 pt-6 sm:pt-8 pb-10 sm:pb-16 grid lg:grid-cols-2 gap-10 lg:gap-16 items-center lg:min-h-[calc(100vh-80px)]">
 
-        <div className="max-w-md w-full">
+        <div className="max-w-md w-full mx-auto lg:mx-0">
 
           {step === 'register' && (
             <div style={{ animation: 'fadeIn 0.3s ease-out' }}>
@@ -186,7 +186,7 @@ function Register() {
                 AI-assisted course recommendation
               </div>
 
-              <h1 className="text-4xl font-bold text-gray-900 leading-tight mb-3">
+              <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 leading-tight mb-3">
                 Create your account
               </h1>
               <p className="text-base text-gray-500 leading-relaxed mb-8">
@@ -334,7 +334,7 @@ function Register() {
                     value={otpCode}
                     onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
                     placeholder="000000"
-                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-center text-2xl font-bold tracking-[0.5em] focus:outline-none focus:ring-2 focus:ring-orange-400"
+                    className="w-full border border-gray-200 rounded-xl px-3 sm:px-4 py-3 text-center text-xl sm:text-2xl font-bold tracking-[0.3em] sm:tracking-[0.5em] focus:outline-none focus:ring-2 focus:ring-orange-400"
                     autoFocus
                   />
                 </div>
@@ -379,7 +379,7 @@ function Register() {
         </div>
 
         <div
-          className="relative h-[500px] rounded-[32px] overflow-hidden flex flex-col justify-between p-10"
+          className="relative hidden lg:flex h-[500px] rounded-[32px] overflow-hidden flex-col justify-between p-10"
           style={{ background: 'linear-gradient(150deg, #fb923c 0%, #f97316 55%, #ea580c 100%)' }}
         >
           <svg width="280" height="280" viewBox="0 0 280 280" className="absolute -top-16 -right-16 opacity-25">

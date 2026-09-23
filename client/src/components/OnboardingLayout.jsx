@@ -54,13 +54,13 @@ function OnboardingLayout({
 
       {/* Exit confirmation modal */}
       {showExitConfirm && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-6">
-          <div className="max-w-sm w-full bg-white rounded-2xl shadow-lg p-7 text-center">
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4 sm:px-6 overflow-y-auto">
+          <div className="max-w-sm w-full max-h-[calc(100dvh-2rem)] overflow-y-auto bg-white rounded-2xl shadow-lg p-5 sm:p-7 text-center">
             <h3 className="text-lg font-bold text-gray-900 mb-1">Leave this assessment?</h3>
             <p className="text-sm text-gray-500 mb-6">
               Your progress on this step hasn't been saved yet. If you leave now, you'll need to redo it.
             </p>
-            <div className="flex gap-3">
+            <div className="flex flex-col-reverse gap-3 sm:flex-row">
               <button
                 onClick={() => setShowExitConfirm(false)}
                 className="flex-1 bg-gray-100 text-gray-700 px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-200 transition"
@@ -133,7 +133,7 @@ function OnboardingLayout({
                     )}
                   </div>
                   {/* Label */}
-                  <span className={`text-xs mt-2 font-medium ${
+                  <span className={`text-[10px] sm:text-xs mt-2 font-medium ${
                     isCurrent ? 'text-orange-500' : isCompleted ? 'text-gray-500' : 'text-gray-300'
                   }`}>
                     {step.label}
@@ -152,10 +152,10 @@ function OnboardingLayout({
       </div>
 
       {/* Bottom navigation */}
-      <div className={`${stickyChrome ? 'sticky bottom-0 z-40 shrink-0 shadow-[0_-4px_12px_rgba(0,0,0,0.04)]' : ''} border-t border-gray-100 px-4 sm:px-8 py-4 grid grid-cols-[auto_minmax(0,1fr)_auto] gap-2 sm:gap-4 items-center bg-white`}>
+      <div className={`${stickyChrome ? 'sticky bottom-0 z-40 shrink-0 shadow-[0_-4px_12px_rgba(0,0,0,0.04)]' : ''} border-t border-gray-100 px-3 sm:px-8 py-3 sm:py-4 grid grid-cols-[auto_minmax(0,1fr)_auto] gap-1 sm:gap-4 items-center bg-white`}>
         <button
           onClick={handleBack}
-          className="flex items-center gap-1 sm:gap-2 text-sm text-gray-500 hover:text-gray-900 transition px-2 sm:px-4 py-2 rounded-lg hover:bg-gray-50"
+          className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-gray-500 hover:text-gray-900 transition px-2 sm:px-4 py-2 rounded-lg hover:bg-gray-50"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -170,7 +170,7 @@ function OnboardingLayout({
         <button
           onClick={handleNext}
           disabled={!isComplete}
-          className={`flex items-center gap-1 sm:gap-2 text-sm px-4 sm:px-6 py-2.5 rounded-lg font-medium transition ${
+          className={`flex items-center gap-1 sm:gap-2 whitespace-nowrap text-xs sm:text-sm px-3 sm:px-6 py-2.5 rounded-lg font-medium transition ${
             isComplete
               ? 'bg-orange-500 text-white hover:bg-orange-600'
               : 'bg-gray-100 text-gray-400 cursor-not-allowed'

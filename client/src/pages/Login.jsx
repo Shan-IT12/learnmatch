@@ -46,7 +46,7 @@ function Login() {
   }
 
   return (
-    <div className="min-h-screen bg-white overflow-hidden">
+    <div className="min-h-screen bg-white overflow-x-hidden">
 
       <style>{`
         @keyframes float {
@@ -56,12 +56,12 @@ function Login() {
       `}</style>
 
       {/* Nav */}
-      <nav className="flex justify-between items-center px-10 py-5">
+      <nav className="flex justify-between items-center gap-3 px-5 sm:px-8 lg:px-10 py-4 sm:py-5">
         <Link to="/" className="text-xl font-bold tracking-tight text-gray-900">
           Learn<span className="text-orange-500">Match</span>
         </Link>
         <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-400">No account?</span>
+          <span className="hidden sm:inline text-sm text-gray-400">No account?</span>
           <Link
             to="/register"
             className="text-sm bg-orange-500 text-white px-4 py-2.5 rounded-lg hover:bg-orange-600 transition font-medium"
@@ -72,16 +72,16 @@ function Login() {
       </nav>
 
       {/* Split layout */}
-      <div className="max-w-7xl mx-auto px-10 pt-8 pb-16 grid grid-cols-2 gap-16 items-center min-h-[calc(100vh-80px)]">
+      <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-10 pt-6 sm:pt-8 pb-10 sm:pb-16 grid lg:grid-cols-2 gap-10 lg:gap-16 items-center lg:min-h-[calc(100vh-80px)]">
 
         {/* Left side — form */}
-        <div className="max-w-md w-full">
+        <div className="max-w-md w-full mx-auto lg:mx-0">
           <div className="inline-flex items-center gap-2 bg-orange-50 text-orange-600 text-xs font-semibold px-3 py-1.5 rounded-full mb-6">
             <span className="w-1.5 h-1.5 bg-orange-500 rounded-full" />
             Welcome back
           </div>
 
-          <h1 className="text-4xl font-bold text-gray-900 leading-tight mb-3">
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 leading-tight mb-3">
             Log in to LearnMatch
           </h1>
           <p className="text-base text-gray-500 leading-relaxed mb-8">
@@ -163,7 +163,7 @@ function Login() {
 
         {/* Right side — gradient panel with heading and one card */}
         <div
-          className="relative h-[500px] rounded-[32px] overflow-hidden flex flex-col justify-between p-10"
+          className="relative hidden lg:flex h-[500px] rounded-[32px] overflow-hidden flex-col justify-between p-10"
           style={{ background: 'linear-gradient(150deg, #fb923c 0%, #f97316 55%, #ea580c 100%)' }}
         >
           <svg width="280" height="280" viewBox="0 0 280 280" className="absolute -top-16 -right-16 opacity-25">

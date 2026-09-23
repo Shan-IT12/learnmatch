@@ -140,7 +140,7 @@ function ForgotPassword() {
   }
 
   return (
-    <div className="min-h-screen bg-white overflow-hidden">
+    <div className="min-h-screen bg-white overflow-x-hidden">
       <style>{`
         @keyframes fadeIn {
           from { opacity: 0; transform: translateY(6px); }
@@ -148,7 +148,7 @@ function ForgotPassword() {
         }
       `}</style>
 
-      <nav className="flex justify-between items-center px-10 py-5">
+      <nav className="flex justify-between items-center gap-3 px-5 sm:px-8 lg:px-10 py-4 sm:py-5">
         <Link to="/" className="text-xl font-bold tracking-tight text-gray-900">
           Learn<span className="text-orange-500">Match</span>
         </Link>
@@ -157,8 +157,8 @@ function ForgotPassword() {
         </Link>
       </nav>
 
-      <div className="max-w-7xl mx-auto px-10 pt-8 pb-16 grid grid-cols-2 gap-16 items-center min-h-[calc(100vh-80px)]">
-        <div className="max-w-md w-full" style={{ animation: 'fadeIn 0.3s ease-out' }}>
+      <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-10 pt-6 sm:pt-8 pb-10 sm:pb-16 grid lg:grid-cols-2 gap-10 lg:gap-16 items-center lg:min-h-[calc(100vh-80px)]">
+        <div className="max-w-md w-full mx-auto lg:mx-0" style={{ animation: 'fadeIn 0.3s ease-out' }}>
           {step !== 'success' && (
             <>
               <div className="inline-flex items-center gap-2 bg-orange-50 text-orange-600 text-xs font-semibold px-3 py-1.5 rounded-full mb-6">
@@ -166,7 +166,7 @@ function ForgotPassword() {
                 Password recovery
               </div>
 
-              <h1 className="text-4xl font-bold text-gray-900 leading-tight mb-3">
+              <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 leading-tight mb-3">
                 {step === 'email' && 'Forgot your password?'}
                 {step === 'otp' && 'Check your email'}
                 {step === 'password' && 'Create a new password'}
@@ -198,7 +198,7 @@ function ForgotPassword() {
             <form onSubmit={verifyOtp} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Verification Code</label>
-                <input type="text" inputMode="numeric" maxLength={6} value={otpCode} onChange={(event) => setOtpCode(event.target.value.replace(/\D/g, ''))} placeholder="000000" className="w-full border border-gray-200 rounded-xl px-4 py-3 text-center text-2xl font-bold tracking-[0.5em] focus:outline-none focus:ring-2 focus:ring-orange-400" required autoFocus />
+                <input type="text" inputMode="numeric" maxLength={6} value={otpCode} onChange={(event) => setOtpCode(event.target.value.replace(/\D/g, ''))} placeholder="000000" className="w-full border border-gray-200 rounded-xl px-3 sm:px-4 py-3 text-center text-xl sm:text-2xl font-bold tracking-[0.3em] sm:tracking-[0.5em] focus:outline-none focus:ring-2 focus:ring-orange-400" required autoFocus />
               </div>
               <button type="submit" disabled={loading || otpCode.length !== 6} className="w-full bg-orange-500 text-white py-3 rounded-xl font-medium hover:bg-orange-600 transition text-sm disabled:opacity-50">
                 {loading ? 'Verifying...' : 'Verify Code'}
@@ -251,7 +251,7 @@ function ForgotPassword() {
           )}
         </div>
 
-        <div className="relative h-[500px] rounded-[32px] overflow-hidden flex flex-col justify-between p-10" style={{ background: 'linear-gradient(150deg, #fb923c 0%, #f97316 55%, #ea580c 100%)' }}>
+        <div className="relative hidden lg:flex h-[500px] rounded-[32px] overflow-hidden flex-col justify-between p-10" style={{ background: 'linear-gradient(150deg, #fb923c 0%, #f97316 55%, #ea580c 100%)' }}>
           <svg width="280" height="280" viewBox="0 0 280 280" className="absolute -top-16 -right-16 opacity-25"><circle cx="140" cy="140" r="120" fill="none" stroke="#fff" strokeWidth="1.5" /><circle cx="140" cy="140" r="80" fill="none" stroke="#fff" strokeWidth="1.5" /></svg>
           <div className="relative">
             <h2 className="text-3xl font-bold text-white leading-tight mb-3">Get back on track.</h2>

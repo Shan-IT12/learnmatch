@@ -62,7 +62,7 @@ function Feedback() {
   if (submitted) {
     return (
       <div className="min-h-screen bg-white">
-        <nav className="bg-white border-b border-gray-100 px-14 py-[18px] flex justify-between items-center">
+        <nav className="bg-white border-b border-gray-100 px-5 sm:px-8 lg:px-14 py-[18px] flex justify-between items-center gap-3">
           <button
             onClick={() => navigate('/dashboard')}
             className="text-lg font-bold text-gray-900 hover:opacity-80 transition"
@@ -70,7 +70,7 @@ function Feedback() {
             Learn<span className="text-orange-500">Match</span>
           </button>
         </nav>
-        <div className="max-w-md mx-auto px-6 py-24 text-center">
+        <div className="max-w-md mx-auto px-5 sm:px-6 py-16 sm:py-24 text-center">
           <div className="w-16 h-16 rounded-full bg-green-50 flex items-center justify-center mb-6 mx-auto">
             <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -91,7 +91,7 @@ function Feedback() {
 
   return (
     <div className="min-h-screen bg-white">
-      <nav className="bg-white border-b border-gray-100 px-14 py-[18px] flex justify-between items-center">
+      <nav className="bg-white border-b border-gray-100 px-5 sm:px-8 lg:px-14 py-[18px] flex justify-between items-center gap-3">
         <button
           onClick={() => navigate('/dashboard')}
           className="text-lg font-bold text-gray-900 hover:opacity-80 transition"
@@ -106,7 +106,7 @@ function Feedback() {
         </button>
       </nav>
 
-      <div className="max-w-lg mx-auto px-6 py-16">
+      <div className="max-w-lg mx-auto px-5 sm:px-6 py-10 sm:py-16">
         <h1 className="text-2xl font-bold text-gray-900 mb-2">Send Feedback</h1>
         <p className="text-sm text-gray-500 mb-8">
           Tell us what's working, what's not, or what you'd like to see.

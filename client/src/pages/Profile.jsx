@@ -183,7 +183,7 @@ function Profile() {
 
   return (
     <div className="min-h-screen bg-white">
-      <nav className="bg-white border-b border-gray-100 px-14 py-[18px] flex justify-between items-center">
+      <nav className="bg-white border-b border-gray-100 px-5 sm:px-8 lg:px-14 py-[18px] flex justify-between items-center gap-3">
         <button
           onClick={() => navigate('/dashboard')}
           className="text-lg font-bold text-gray-900 hover:opacity-80 transition"
@@ -198,7 +198,7 @@ function Profile() {
         </button>
       </nav>
 
-      <div className="max-w-[900px] mx-auto px-14 py-11">
+      <div className="max-w-[900px] mx-auto px-5 sm:px-8 lg:px-14 py-8 sm:py-11">
         <h1 className="text-2xl font-bold text-gray-900 mb-1">Personal Information</h1>
         <p className="text-sm text-gray-500 mb-8">
           This helps LearnMatch personalize your course recommendations.
@@ -338,7 +338,7 @@ function Profile() {
                   {/* Info icon + hover tooltip */}
                   <span className="relative group ml-auto shrink-0">
                     <IconInfoCircle size={16} stroke={1.75} className="text-gray-300 hover:text-orange-500 transition" />
-                    <span className="pointer-events-none absolute right-0 top-6 z-10 w-64 rounded-xl bg-gray-900 text-white text-xs leading-relaxed p-3 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
+            <span className="pointer-events-none absolute right-0 top-6 z-10 w-[min(16rem,calc(100vw-2.5rem))] rounded-xl bg-gray-900 text-white text-xs leading-relaxed p-3 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
                       {factor.meaning}
                     </span>
                   </span>

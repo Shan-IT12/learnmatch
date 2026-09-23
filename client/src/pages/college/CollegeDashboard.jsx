@@ -315,7 +315,7 @@ function CollegeDashboard() {
                 See where you are in your course roadmap and how your alignment develops through each semester check-in.
               </p>
             </div>
-            <div className="grid grid-cols-2 gap-6 lg:border-l lg:border-orange-300 lg:pl-8">
+            <div className="grid sm:grid-cols-2 gap-4 sm:gap-6 lg:border-l lg:border-orange-300 lg:pl-8">
               <div>
                 <p className="text-xs font-bold uppercase tracking-wide text-gray-500">Academic / Program</p>
                 <p className="text-xs text-gray-500 mt-2">{timingHeading}</p>
@@ -508,7 +508,7 @@ function CollegeDashboard() {
               <h2 className="text-2xl font-bold text-gray-900">{collegeInfo?.semester} check-ins</h2>
               <p className="text-sm text-gray-500 mt-1">Your stored Early, Mid, and End results show how alignment changes over time.</p>
             </div>
-            <div className="rounded-xl bg-gray-50 px-4 py-3 min-w-[220px]">
+              <div className="rounded-xl bg-gray-50 px-4 py-3 min-w-0 sm:min-w-[220px]">
               <p className="text-sm text-gray-500">Current trend</p>
               {trend.direction === 'insufficient' ? (
                 <p className="text-sm font-semibold text-gray-600 mt-1">More check-ins needed</p>

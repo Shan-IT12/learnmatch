@@ -1,5 +1,21 @@
 @import "tailwindcss";
 
+html { min-width: 320px; overflow-x: hidden; }
+body, #root { min-width: 320px; min-height: 100%; }
+body { margin: 0; overflow-x: hidden; }
+*, *::before, *::after { box-sizing: border-box; }
+img, svg, canvas { max-width: 100%; }
+button, input, select, textarea { max-width: 100%; }
+
+.responsive-table {
+  width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.responsive-table > table { min-width: 42rem; }
+
 .school-locator-map {
   height: min(52vh, 32rem);
   min-height: 22rem;
@@ -7,7 +23,7 @@
 
 @media (max-width: 640px) {
   .school-locator-map {
-    height: 22rem;
-    min-height: 22rem;
+    height: 18rem;
+    min-height: 18rem;
   }
 }

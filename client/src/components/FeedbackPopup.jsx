@@ -46,7 +46,7 @@ function FeedbackPopup() {
   if (!visible) return null
 
   return (
-    <div className="fixed bottom-6 right-6 z-40 bg-white rounded-2xl shadow-xl border border-gray-100 p-5 w-72 animate-[fadeIn_0.3s_ease-out]">
+    <div className="fixed bottom-4 left-4 right-4 z-40 bg-white rounded-2xl shadow-xl border border-gray-100 p-5 sm:bottom-6 sm:left-auto sm:right-6 sm:w-72 animate-[fadeIn_0.3s_ease-out]">
       <style>{`
         @keyframes fadeIn {
           from { opacity: 0; transform: translateY(10px); }

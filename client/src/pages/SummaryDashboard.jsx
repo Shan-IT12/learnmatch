@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { IconArrowRight, IconRefresh, IconSchool, IconHistory } from '@tabler/icons-react'
+import { IconArrowRight, IconRefresh, IconSchool, IconHistory, IconUser, IconHeart, IconBrain, IconShieldCheck } from '@tabler/icons-react'
 
 const personalFactorLabels = {
   factor_physical: 'Physical / Mobility Condition',
@@ -111,6 +111,12 @@ function SummaryDashboard() {
   if (profile?.factor_others) {
     checkedFactors.push(`Other: ${profile.factor_others}`)
   }
+
+  const skillTotals = Object.values(domainScores).reduce(
+    (totals, score) => ({ correct: totals.correct + score.correct, total: totals.total + score.total }),
+    { correct: 0, total: 0 }
+  )
+  const skillPercent = skillTotals.total ? Math.round((skillTotals.correct / skillTotals.total) * 100) : null
  
   const mbtiDimensionLabels = {
     EI: ['E', 'I'],
@@ -120,16 +126,16 @@ function SummaryDashboard() {
   }
  
   return (
-    <div className="min-h-screen bg-white">
-      <nav className="bg-white border-b border-gray-100 px-14 py-[18px] flex justify-between items-center">
+    <div className="min-h-screen bg-slate-50/70">
+      <nav className="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-gray-100 px-5 sm:px-8 lg:px-14 py-4 flex flex-wrap justify-between items-center gap-3">
         <button
           onClick={() => navigate('/dashboard')}
           className="text-lg font-bold text-gray-900 hover:opacity-80 transition"
         >
           Learn<span className="text-orange-500">Match</span>
         </button>
-        <div className="flex items-center gap-4">
-          <span className="text-sm text-gray-500">
+        <div className="flex flex-wrap items-center justify-end gap-2 sm:gap-4">
+          <span className="hidden md:inline text-sm text-gray-500">
             Welcome, <strong className="text-gray-900">{username}</strong>
           </span>
           <button
@@ -153,28 +159,32 @@ function SummaryDashboard() {
         </div>
       </nav>
  
-      <div className="max-w-[1320px] mx-auto px-14 py-11">
+      <div className="max-w-[1240px] mx-auto px-5 sm:px-8 lg:px-12 py-8 sm:py-11">
+
+        <div className="mb-7">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-orange-500 mb-2">Your complete LearnMatch report</p>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-950">Assessment Summary</h1>
+          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-gray-500">A consolidated view of your profile, assessment results, personal considerations, and recommended direction.</p>
+        </div>
  
         {/* Top recommendation preview */}
         {topRecommendation && (
-          <div
-            className="rounded-[20px] p-8 mb-5 flex justify-between items-center shadow-[0_8px_30px_-8px_rgba(249,115,22,0.35)]"
-            style={{ background: 'linear-gradient(135deg, #ffe4c4 0%, #ffd0a8 40%, #ffb8a8 100%)' }}
-          >
-            <div>
-              <p className="text-[11px] font-semibold uppercase tracking-wide mb-2" style={{ color: '#b45309' }}>
+          <div className="relative overflow-hidden rounded-3xl p-6 sm:p-8 mb-5 flex flex-col sm:flex-row gap-6 sm:justify-between sm:items-center bg-gradient-to-br from-orange-500 via-orange-500 to-amber-400 shadow-[0_20px_50px_-28px_rgba(234,88,12,0.75)]">
+            <div className="absolute -right-12 -top-20 h-56 w-56 rounded-full border-[36px] border-white/10" aria-hidden="true" />
+            <div className="relative min-w-0">
+              <p className="text-[11px] font-bold uppercase tracking-[0.16em] mb-2 text-orange-100">
                 Top Recommendation
               </p>
-              <p className="text-xl font-bold mb-1" style={{ color: '#2b1002' }}>
+              <p className="text-xl sm:text-2xl font-bold mb-2 text-white leading-snug">
                 {topRecommendation.course_name}
               </p>
-              <p className="text-sm" style={{ color: '#7c3f0e' }}>
-                {topRecommendation.match_score}% match
-              </p>
+              <div className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1.5 text-sm font-semibold text-white ring-1 ring-white/20">
+                <span className="h-2 w-2 rounded-full bg-white" /> {topRecommendation.match_score}% overall match
+              </div>
             </div>
             <button
               onClick={() => navigate('/results')}
-              className="inline-flex items-center gap-1.5 bg-gray-900 text-white px-5 py-3 rounded-xl text-sm font-medium hover:bg-gray-800 hover:-translate-y-0.5 hover:shadow-lg transition-all duration-200 shrink-0"
+              className="relative inline-flex items-center justify-center gap-1.5 bg-white text-orange-700 px-5 py-3 rounded-xl text-sm font-bold hover:-translate-y-0.5 hover:shadow-lg transition-all duration-200 shrink-0"
             >
               View Full Results <IconArrowRight size={16} stroke={2} />
             </button>
@@ -182,12 +192,13 @@ function SummaryDashboard() {
         )}
  
         {/* Profile + Personal Factors */}
-        <div className="grid grid-cols-2 gap-5 mb-5">
+        <div className="grid md:grid-cols-2 gap-5 mb-5">
  
-          <div className="rounded-[20px] px-7 py-6 border border-gray-100 shadow-sm">
-            <p className="text-[11px] font-semibold uppercase tracking-wide mb-4 text-gray-400">
-              Your Profile
-            </p>
+          <div className="rounded-3xl p-5 sm:p-6 border border-gray-200 bg-white shadow-sm">
+            <div className="flex items-center gap-3 mb-4">
+              <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-blue-50 text-blue-600"><IconUser size={20} stroke={1.8} /></span>
+              <div><p className="text-[11px] font-semibold uppercase tracking-wide text-gray-400">Your Profile</p><p className="text-sm font-bold text-gray-900">Personal details</p></div>
+            </div>
             {profile ? (
               <div className="space-y-1.5">
                 <p className="text-sm text-gray-900 font-medium">{profile.full_name}</p>
@@ -202,16 +213,17 @@ function SummaryDashboard() {
             )}
           </div>
  
-          <div className="rounded-[20px] px-7 py-6 border border-gray-100 shadow-sm">
-            <p className="text-[11px] font-semibold uppercase tracking-wide mb-4 text-gray-400">
-              Personal Factors
-            </p>
+          <div className="rounded-3xl p-5 sm:p-6 border border-gray-200 bg-white shadow-sm">
+            <div className="flex items-center justify-between gap-3 mb-4">
+              <div className="flex items-center gap-3"><span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600"><IconShieldCheck size={20} stroke={1.8} /></span><div><p className="text-[11px] font-semibold uppercase tracking-wide text-gray-400">Personal Factors</p><p className="text-sm font-bold text-gray-900">Recommendation considerations</p></div></div>
+              <span className={`rounded-full px-2.5 py-1 text-[11px] font-bold ${checkedFactors.length ? 'bg-emerald-50 text-emerald-700' : 'bg-gray-100 text-gray-500'}`}>{checkedFactors.length ? 'Considered' : 'None selected'}</span>
+            </div>
             <div className="flex flex-wrap gap-2">
               {checkedFactors.length > 0 ? (
                 checkedFactors.map((label) => (
                   <span
                     key={label}
-                    className="text-xs px-3 py-1.5 rounded-full bg-gray-100 text-gray-600 font-medium"
+                    className="text-xs px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-800 font-medium"
                   >
                     {label}
                   </span>
@@ -224,12 +236,10 @@ function SummaryDashboard() {
         </div>
  
         {/* Interests + Skills */}
-        <div className="grid grid-cols-2 gap-5 mb-5">
+        <div className="grid md:grid-cols-2 gap-5 mb-5">
  
-          <div className="rounded-[20px] px-7 py-6 border border-gray-100 shadow-sm">
-            <p className="text-[11px] font-semibold uppercase tracking-wide mb-4 text-gray-400">
-              Your Interests
-            </p>
+          <div className="rounded-3xl p-5 sm:p-6 border border-gray-200 bg-white shadow-sm">
+            <div className="flex items-center gap-3 mb-4"><span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-orange-50 text-orange-600"><IconHeart size={20} stroke={1.8} /></span><div><p className="text-[11px] font-semibold uppercase tracking-wide text-gray-400">Your Interests</p><p className="text-sm font-bold text-gray-900">{interests.length} selected hobbies</p></div></div>
             <div className="flex flex-wrap gap-2">
               {interests.length > 0 ? (
                 interests.map((interest) => (
@@ -246,10 +256,8 @@ function SummaryDashboard() {
             </div>
           </div>
  
-          <div className="rounded-[20px] px-7 py-6 border border-gray-100 shadow-sm">
-            <p className="text-[11px] font-semibold uppercase tracking-wide mb-4 text-gray-400">
-              Skills Quiz Results
-            </p>
+          <div className="rounded-3xl p-5 sm:p-6 border border-gray-200 bg-white shadow-sm">
+            <div className="flex items-center justify-between gap-3 mb-4"><div className="flex items-center gap-3"><span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-violet-50 text-violet-600"><IconBrain size={20} stroke={1.8} /></span><div><p className="text-[11px] font-semibold uppercase tracking-wide text-gray-400">Skills Quiz</p><p className="text-sm font-bold text-gray-900">{skillTotals.total ? `${skillTotals.correct} of ${skillTotals.total} correct` : 'No result yet'}</p></div></div>{skillPercent !== null && <span className="rounded-full bg-violet-50 px-2.5 py-1 text-xs font-bold text-violet-700">{skillPercent}%</span>}</div>
             <div className="flex flex-col gap-3">
               {Object.keys(domainScores).length > 0 ? (
                 Object.entries(domainScores).map(([domain, score]) => (
@@ -262,7 +270,7 @@ function SummaryDashboard() {
                     </div>
                     <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-orange-500 rounded-full"
+                        className="h-full bg-violet-500 rounded-full"
                         style={{ width: `${(score.correct / score.total) * 100}%` }}
                       />
                     </div>
@@ -276,14 +284,11 @@ function SummaryDashboard() {
         </div>
  
         {/* MBTI */}
-        <div className="rounded-[20px] px-7 py-6 border border-gray-100 shadow-sm mb-5">
-          <p className="text-[11px] font-semibold uppercase tracking-wide mb-4 text-gray-400">
-            Personality Type
-          </p>
+        <div className="rounded-3xl p-5 sm:p-7 border border-gray-200 bg-white shadow-sm mb-5">
           {mbti ? (
-            <div>
-              <p className="text-2xl font-bold text-orange-500 mb-4">{mbti.mbtiType}</p>
-              <div className="grid grid-cols-4 gap-4">
+            <div className="grid gap-6 md:grid-cols-[13rem_minmax(0,1fr)] md:items-center">
+              <div className="rounded-2xl bg-slate-950 p-5 text-white"><p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Personality Type</p><p className="mt-2 text-4xl font-black tracking-[0.16em] text-orange-400">{mbti.mbtiType}</p><p className="mt-2 text-xs leading-relaxed text-slate-400">Your four-letter preference profile</p></div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 {Object.entries(mbtiDimensionLabels).map(([key, [first, second]]) => {
                   const percent = Math.round(mbti.scores[key])
                   return (
@@ -294,7 +299,7 @@ function SummaryDashboard() {
                       </div>
                       <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
                         <div
-                          className="h-full bg-orange-500 rounded-full"
+                          className="h-full bg-gradient-to-r from-orange-400 to-orange-600 rounded-full"
                           style={{ width: `${percent}%` }}
                         />
                       </div>
@@ -312,25 +317,23 @@ function SummaryDashboard() {
  
         {/* Career Path preview for top recommendation */}
         {topRecommendation && (
-          <div className="rounded-[20px] px-7 py-6 border border-gray-100 shadow-sm mb-5">
-            <div className="flex justify-between items-start mb-1">
-              <p className="text-[11px] font-semibold uppercase tracking-wide text-gray-400">
+          <div className="rounded-3xl border border-gray-200 bg-white shadow-sm mb-5 overflow-hidden">
+            <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center border-b border-gray-100 bg-gray-50/70 px-5 py-4 sm:px-7">
+              <div><p className="text-[11px] font-semibold uppercase tracking-wide text-orange-500">
                 Career Path — {topRecommendation.course_name}
-              </p>
+              </p><p className="mt-1 text-sm font-bold text-gray-900">Full course and career overview</p></div>
               <button
                 onClick={() => navigate('/results/career-path')}
                 className="text-xs font-medium text-orange-500 hover:text-orange-600 transition inline-flex items-center gap-1 shrink-0"
               >
-                View Full Career Path →
+                Explore Detailed Career Path →
               </button>
             </div>
-            <p className="text-sm text-gray-600 leading-relaxed mb-4 max-w-3xl">
-              {topCourseDetail?.description || 'Course description not yet available.'}
-            </p>
- 
-            <p className="text-xs font-semibold text-gray-700 mb-2">Obtainable Skills</p>
-            <div className="flex flex-wrap gap-2 mb-5">
-              {(topCourseDetail?.obtainable_skills || []).slice(0, 8).map((skill) => (
+            <div className="grid gap-7 p-5 sm:p-7 lg:grid-cols-[minmax(0,1.3fr)_minmax(17rem,.7fr)]">
+              <div><p className="text-sm text-gray-600 leading-7 mb-5">{topCourseDetail?.description || 'Course description not yet available.'}</p>
+            <p className="text-xs font-bold uppercase tracking-wide text-gray-500 mb-3">Obtainable Skills</p>
+            <div className="flex flex-wrap gap-2">
+              {(topCourseDetail?.obtainable_skills || []).map((skill) => (
                 <span
                   key={skill}
                   className="text-xs px-3 py-1.5 rounded-full bg-orange-50 text-orange-700 font-medium"
@@ -338,17 +341,17 @@ function SummaryDashboard() {
                   {skill}
                 </span>
               ))}
-            </div>
- 
-            <p className="text-xs font-semibold text-gray-700 mb-2">Career Opportunities</p>
+            </div></div>
+            <div className="lg:border-l lg:border-gray-100 lg:pl-7"><p className="text-xs font-bold uppercase tracking-wide text-gray-500 mb-2">Career Opportunities</p>
             <p className="text-xs text-gray-400 mb-3">Salary figures are estimates and may vary by employer, experience, location, and industry.</p>
             <div className="space-y-2">
               {(topCourseDetail?.career_opportunities || []).map((job) => (
-                <div key={job.career_id} className="flex justify-between items-center gap-4 text-sm">
+                <div key={job.career_id} className="flex justify-between items-center gap-4 rounded-xl bg-gray-50 px-3 py-2.5 text-sm">
                   <span className="text-gray-700">{job.career_title}</span>
                   <span className="text-xs text-gray-400 text-right">{job.estimated_monthly_salary_php?.display}</span>
                 </div>
               ))}
+            </div></div>
             </div>
           </div>
         )}
@@ -356,7 +359,7 @@ function SummaryDashboard() {
         {/* MBTI placeholder removed — replaced with real section above */}
  
         {/* Action buttons */}
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid sm:grid-cols-3 gap-4">
           <button
             onClick={() => navigate('/onboarding/profile')}
             className="flex items-center justify-center gap-2 bg-gray-900 text-white px-5 py-4 rounded-xl text-sm font-medium hover:bg-gray-800 transition"
