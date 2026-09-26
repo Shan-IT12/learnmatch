@@ -1,18 +1,33 @@
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
-import pool from '../config/db.js'
+import mysql from 'mysql2/promise'
+import localPool from '../config/db.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const EXPECTED_DATABASE = 'learnmatch_db'
 const EXPECTED_HOSTS = new Set(['localhost', '127.0.0.1', '::1'])
+const EXPECTED_RAILWAY_PROJECT = 'humorous-gentleness'
+const EXPECTED_RAILWAY_ENVIRONMENT = 'production'
+const EXPECTED_RAILWAY_SERVICE = 'MySQL'
 const RIASEC_TYPES = ['R', 'I', 'A', 'S', 'E', 'C']
+const pool = process.env.MYSQL_PUBLIC_URL
+  ? mysql.createPool(process.env.MYSQL_PUBLIC_URL)
+  : localPool
 
 async function assertLocalTarget(connection) {
   const configuredHost = String(process.env.DB_HOST || '').trim().toLowerCase()
   const [[identity]] = await connection.query('SELECT DATABASE() AS database_name')
-  if (!EXPECTED_HOSTS.has(configuredHost) || identity.database_name !== EXPECTED_DATABASE) {
-    throw new Error('Refusing profile sync: database target is not confirmed local LearnMatch.')
+  const isConfirmedLocal =
+    EXPECTED_HOSTS.has(configuredHost) && identity.database_name === EXPECTED_DATABASE
+  const isConfirmedProduction =
+    process.env.RAILWAY_PROJECT_NAME === EXPECTED_RAILWAY_PROJECT &&
+    process.env.RAILWAY_ENVIRONMENT_NAME === EXPECTED_RAILWAY_ENVIRONMENT &&
+    process.env.RAILWAY_SERVICE_NAME === EXPECTED_RAILWAY_SERVICE &&
+    identity.database_name === 'railway' &&
+    Boolean(process.env.MYSQL_PUBLIC_URL)
+  if (!isConfirmedLocal && !isConfirmedProduction) {
+    throw new Error('Refusing profile sync: LearnMatch database target is not confirmed.')
   }
 }
 
@@ -51,30 +66,38 @@ async function importMatchingProfiles() {
     }
 
     await connection.beginTransaction()
+    const skillValues = []
+    const riasecValues = []
     for (const profile of profiles) {
       const internalCourseId = courseIdsByCode.get(profile.course_id)
       if (!internalCourseId) throw new Error(`No COURSE row found for ${profile.course_id}.`)
 
       for (const skill of profile.skills_profile || []) {
-        await connection.execute(
-          `INSERT INTO COURSE_SKILL_PROFILE (course_id, skill_domain, weight, evidence)
-           VALUES (?, ?, ?, ?)
-           ON DUPLICATE KEY UPDATE weight = VALUES(weight), evidence = VALUES(evidence)`,
-          [internalCourseId, skill.skill, skill.weight, skill.evidence || null]
-        )
+        skillValues.push(internalCourseId, skill.skill, skill.weight, skill.evidence || null)
       }
 
       for (const riasecType of RIASEC_TYPES) {
         const riasec = profile.riasec_profile?.[riasecType]
         if (!riasec) throw new Error(`${profile.course_id} is missing RIASEC ${riasecType}.`)
-        await connection.execute(
-          `INSERT INTO COURSE_RIASEC_PROFILE (course_id, riasec_type, weight, evidence)
-           VALUES (?, ?, ?, ?)
-           ON DUPLICATE KEY UPDATE weight = VALUES(weight), evidence = VALUES(evidence)`,
-          [internalCourseId, riasecType, riasec.weight, riasec.evidence || null]
-        )
+        riasecValues.push(internalCourseId, riasecType, riasec.weight, riasec.evidence || null)
       }
     }
+    if (skillValues.length) {
+      const placeholders = Array(skillValues.length / 4).fill('(?, ?, ?, ?)').join(',')
+      await connection.execute(
+        `INSERT INTO COURSE_SKILL_PROFILE (course_id, skill_domain, weight, evidence)
+         VALUES ${placeholders}
+         ON DUPLICATE KEY UPDATE weight = VALUES(weight), evidence = VALUES(evidence)`,
+        skillValues
+      )
+    }
+    const riasecPlaceholders = Array(riasecValues.length / 4).fill('(?, ?, ?, ?)').join(',')
+    await connection.execute(
+      `INSERT INTO COURSE_RIASEC_PROFILE (course_id, riasec_type, weight, evidence)
+       VALUES ${riasecPlaceholders}
+       ON DUPLICATE KEY UPDATE weight = VALUES(weight), evidence = VALUES(evidence)`,
+      riasecValues
+    )
 
     const [[counts]] = await connection.query(
       `SELECT
@@ -125,7 +148,7 @@ async function importMatchingProfiles() {
   }
 }
 
-importMatchingProfiles().catch((error) => {
+await importMatchingProfiles().catch((error) => {
   console.error(error.message)
   process.exitCode = 1
 })

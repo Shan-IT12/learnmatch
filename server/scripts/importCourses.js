@@ -1,11 +1,18 @@
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
-import pool from '../config/db.js'
+import mysql from 'mysql2/promise'
+import localPool from '../config/db.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const EXPECTED_DATABASE = 'learnmatch_db'
 const EXPECTED_HOSTS = new Set(['localhost', '127.0.0.1', '::1'])
+const EXPECTED_RAILWAY_PROJECT = 'humorous-gentleness'
+const EXPECTED_RAILWAY_ENVIRONMENT = 'production'
+const EXPECTED_RAILWAY_SERVICE = 'MySQL'
+const pool = process.env.MYSQL_PUBLIC_URL
+  ? mysql.createPool(process.env.MYSQL_PUBLIC_URL)
+  : localPool
 
 function validateCanonicalCourses(courses) {
   if (!Array.isArray(courses) || courses.length !== 360) {
@@ -23,8 +30,16 @@ function validateCanonicalCourses(courses) {
 async function assertLocalTarget(connection) {
   const configuredHost = String(process.env.DB_HOST || '').trim().toLowerCase()
   const [[identity]] = await connection.query('SELECT DATABASE() AS database_name')
-  if (!EXPECTED_HOSTS.has(configuredHost) || identity.database_name !== EXPECTED_DATABASE) {
-    throw new Error('Refusing course sync: database target is not confirmed local LearnMatch.')
+  const isConfirmedLocal =
+    EXPECTED_HOSTS.has(configuredHost) && identity.database_name === EXPECTED_DATABASE
+  const isConfirmedProduction =
+    process.env.RAILWAY_PROJECT_NAME === EXPECTED_RAILWAY_PROJECT &&
+    process.env.RAILWAY_ENVIRONMENT_NAME === EXPECTED_RAILWAY_ENVIRONMENT &&
+    process.env.RAILWAY_SERVICE_NAME === EXPECTED_RAILWAY_SERVICE &&
+    identity.database_name === 'railway' &&
+    Boolean(process.env.MYSQL_PUBLIC_URL)
+  if (!isConfirmedLocal && !isConfirmedProduction) {
+    throw new Error('Refusing course sync: LearnMatch database target is not confirmed.')
   }
 }
 
@@ -44,31 +59,30 @@ async function importCourses() {
     )
 
     await connection.beginTransaction()
-    for (const course of courses) {
-      const obtainableSkills = Array.isArray(course.obtainable_skills)
-        ? course.obtainable_skills.join('\n')
-        : null
-      await connection.execute(
-        `INSERT INTO COURSE (
-           course_code, course_name, course_abbreviation, program_type,
-           cluster_category, psced_group, description, obtainable_skills, is_active
-         ) VALUES (?, ?, ?, NULL, ?, NULL, ?, ?, 1)
-         ON DUPLICATE KEY UPDATE
-           course_name = VALUES(course_name),
-           course_abbreviation = VALUES(course_abbreviation),
-           cluster_category = VALUES(cluster_category),
-           description = VALUES(description),
-           obtainable_skills = VALUES(obtainable_skills)`,
-        [
-          course.course_id,
-          course.course_name,
-          course.course_abbreviation || null,
-          course.parent_cluster,
-          course.course_description || null,
-          obtainableSkills,
-        ]
-      )
-    }
+    const courseValues = courses.map((course) => [
+      existingIdsByCode.get(course.course_id) || null,
+      course.course_id,
+      course.course_name,
+      course.course_abbreviation || null,
+      course.parent_cluster,
+      course.course_description || null,
+      Array.isArray(course.obtainable_skills) ? course.obtainable_skills.join('\n') : null,
+    ]).flat()
+    const coursePlaceholders = courses.map(() => '(?, ?, ?, ?, NULL, ?, NULL, ?, ?, 1)').join(',')
+    await connection.execute(
+      `INSERT INTO COURSE (
+         course_id, course_code, course_name, course_abbreviation, program_type,
+         cluster_category, psced_group, description, obtainable_skills, is_active
+       ) VALUES ${coursePlaceholders}
+       ON DUPLICATE KEY UPDATE
+         course_code = VALUES(course_code),
+         course_name = VALUES(course_name),
+         course_abbreviation = VALUES(course_abbreviation),
+         cluster_category = VALUES(cluster_category),
+         description = VALUES(description),
+         obtainable_skills = VALUES(obtainable_skills)`,
+      courseValues
+    )
 
     const [syncedCourses] = await connection.query(
       'SELECT course_id, course_code FROM COURSE ORDER BY course_code'
@@ -106,7 +120,7 @@ async function importCourses() {
   }
 }
 
-importCourses().catch((error) => {
+await importCourses().catch((error) => {
   console.error(error.message)
   process.exitCode = 1
 })
