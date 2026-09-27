@@ -1,35 +1,50 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import {
+  IconArrowRight,
+  IconBrain,
+  IconChevronRight,
+  IconCompass,
+  IconSearch,
+  IconTargetArrow,
+  IconUserCircle,
+} from '@tabler/icons-react'
 import { STUDENT_ACTIVE_INDEPENDENT_COURSE_COUNT } from '../constants/courseCatalog'
+import landingPathwayIllustration from '../assets/landing-pathway-illustration.png'
 
-const matchCards = [
-  { label: 'Top recommendation', score: 92, color: 'bg-orange-500', delay: '0s' },
-  { label: 'Strong match', score: 78, color: 'bg-gray-800', delay: '0.4s' },
-  { label: 'Good match', score: 65, color: 'bg-orange-400', delay: '0.8s' },
+const journeySteps = [
+  {
+    step: '01',
+    title: 'Set up your profile',
+    description: 'Share relevant factors that may affect your course options.',
+    icon: IconUserCircle,
+  },
+  {
+    step: '02',
+    title: 'Take the assessment',
+    description: 'Answer questions about your interests, academic skills, and personality.',
+    icon: IconBrain,
+  },
+  {
+    step: '03',
+    title: 'Explore your matches',
+    description: 'See personalized course matches, why they fit, and where they can lead.',
+    icon: IconCompass,
+  },
 ]
 
-function MatchCard({ label, score, color, delay }) {
+function PathwayVisual() {
   return (
-    <div
-      className="bg-white rounded-2xl shadow-lg px-5 py-4 w-56 border border-gray-100"
-      style={{
-        animation: `float 4s ease-in-out infinite`,
-        animationDelay: delay,
-      }}
-    >
-      <div className="flex items-center justify-between mb-3">
-        <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-          Match
-        </span>
-        <span className="text-sm font-bold text-gray-900">{score}%</span>
-      </div>
-      <p className="text-sm font-semibold text-gray-800 mb-3">{label}</p>
-      <div className="w-full bg-gray-100 rounded-full h-1.5">
-        <div
-          className={`${color} h-1.5 rounded-full transition-all`}
-          style={{ width: `${score}%` }}
-        />
-      </div>
+    <div className="relative isolate flex min-h-[330px] items-center justify-center overflow-hidden sm:min-h-[430px] lg:min-h-[560px]">
+      <div className="pointer-events-none absolute inset-x-[5%] bottom-[4%] top-[7%] rounded-[46%_54%_42%_58%/48%_39%_61%_52%] bg-gradient-to-br from-orange-100 via-orange-200/75 to-orange-300/60" />
+      <div className="pointer-events-none absolute right-[4%] top-[8%] h-[74%] w-[74%] rounded-full border border-orange-200/70" />
+      <div className="pointer-events-none absolute bottom-[9%] left-[4%] h-24 w-24 rounded-full bg-white/60 blur-2xl sm:h-36 sm:w-36" />
+      <div className="pointer-events-none absolute inset-0 opacity-25 [background-image:radial-gradient(rgba(194,65,12,.5)_1px,transparent_1px)] [background-size:18px_18px] [mask-image:linear-gradient(to_bottom_left,black,transparent_52%)]" />
+      <img
+        src={landingPathwayIllustration}
+        alt="Student exploring education and career pathways"
+        className="relative z-10 h-auto max-h-[340px] w-auto max-w-[98%] object-contain drop-shadow-[0_24px_28px_rgba(124,45,18,.16)] transition duration-200 motion-safe:hover:-translate-y-1 sm:max-h-[440px] lg:max-h-[570px]"
+      />
     </div>
   )
 }
@@ -43,9 +58,7 @@ function Landing() {
   useEffect(() => {
     const trimmedQuery = query.trim()
     const controller = new AbortController()
-    if (!trimmedQuery) {
-      return () => controller.abort()
-    }
+    if (!trimmedQuery) return () => controller.abort()
 
     const timer = setTimeout(() => {
       setSearching(true)
@@ -54,11 +67,9 @@ function Landing() {
           if (!response.ok) throw new Error('Search request failed')
           return response.json()
         })
-        .then((data) => setResults({ courses: data.courses || [], schools: [] }))
+        .then((data) => setResults({ courses: data.courses || [] }))
         .catch((error) => {
-          if (error.name !== 'AbortError') {
-            setResults({ courses: [], schools: [] })
-          }
+          if (error.name !== 'AbortError') setResults({ courses: [] })
         })
         .finally(() => setSearching(false))
     }, 250)
@@ -69,280 +80,156 @@ function Landing() {
     }
   }, [query])
 
-  const handleSearch = (e) => {
-    e.preventDefault()
+  const handleSearch = (event) => {
+    event.preventDefault()
     if (!query.trim()) return
     navigate(`/courses/search?q=${encodeURIComponent(query.trim())}`)
   }
 
   return (
-    <div className="min-h-screen bg-white overflow-hidden">
+    <div className="min-h-screen overflow-x-hidden bg-[#fbf8f3] text-gray-900">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-[760px] bg-[radial-gradient(circle_at_13%_18%,rgba(251,146,60,.13),transparent_28%),radial-gradient(circle_at_78%_28%,rgba(253,186,116,.16),transparent_31%),linear-gradient(115deg,rgba(255,255,255,.8),rgba(255,247,237,.25))]" />
 
-      <style>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-10px); }
-        }
-      `}</style>
-
-      {/* Nav */}
-      <nav className="flex justify-between items-center px-5 sm:px-10 py-5">
-        <span className="text-xl font-bold tracking-tight text-gray-900">
-          Learn<span className="text-orange-500">Match</span>
-        </span>
-        <div className="flex items-center gap-2">
-          <Link
-            to="/login"
-            className="text-sm text-gray-500 hover:text-gray-900 transition px-4 py-2 rounded-lg hover:bg-gray-50"
-          >
-            Log In
-          </Link>
-          <Link
-            to="/register"
-            className="text-sm bg-orange-500 text-white px-4 py-2.5 rounded-lg hover:bg-orange-600 transition font-medium"
-          >
-            Get Started
-          </Link>
+      <header className="relative z-30 mx-auto flex max-w-[1440px] items-center justify-between px-5 py-5 sm:px-8 lg:px-10">
+        <Link to="/" className="text-xl font-bold tracking-tight text-gray-900">Learn<span className="text-orange-500">Match</span></Link>
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          <Link to="/login" className="rounded-xl px-3 py-2.5 text-sm font-medium text-gray-600 transition duration-150 hover:bg-white/75 hover:text-gray-900 sm:px-4">Log In</Link>
+          <Link to="/register" className="rounded-xl bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white shadow-[0_8px_20px_-10px_rgba(234,88,12,.85)] transition duration-150 hover:-translate-y-0.5 hover:bg-orange-600 active:translate-y-0">Get Started</Link>
         </div>
-      </nav>
+      </header>
 
-      {/* Hero — split layout */}
-      <div className="max-w-7xl mx-auto px-5 sm:px-10 pt-8 sm:pt-12 pb-16 grid lg:grid-cols-2 gap-12 lg:gap-16 items-center min-h-[calc(100vh-80px)]">
-
-        {/* Left side — content */}
-        <div className="max-w-lg">
-          <div className="inline-flex items-center gap-2 bg-orange-50 text-orange-600 text-xs font-semibold px-3 py-1.5 rounded-full mb-6">
-            <span className="w-1.5 h-1.5 bg-orange-500 rounded-full" />
-            AI-assisted course recommendation
-          </div>
-
-          <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 leading-tight mb-5">
-            Find the right
-            <br />
-            course for{' '}
-            <span className="text-orange-500">your</span>
-            <br />
-            <span className="text-orange-500">future.</span>
-          </h1>
-
-          <p className="text-base text-gray-500 leading-relaxed mb-8">
-            Answer a few questions about your skills, interests, and personality.
-            Get personalized course recommendations that actually fit who you are.
-          </p>
-
-          <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-5 mb-10">
-            <Link
-              to="/register"
-              className="inline-flex items-center gap-2 bg-orange-500 text-white px-6 py-3 rounded-xl font-medium hover:bg-orange-600 transition text-sm"
-            >
-              Start Assessment
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
-            </Link>
-            <Link
-              to="/login"
-              className="inline-flex items-center text-[15px] text-gray-700 transition py-2 sm:py-3"
-            >
-              Already have an account?&nbsp;
-              <span className="font-semibold text-orange-600 hover:text-orange-700 hover:underline underline-offset-4">Log in</span>
-            </Link>
-          </div>
-
-          {/* Search */}
-          <div className="relative">
-            <form
-              onSubmit={handleSearch}
-              className="flex items-center gap-2 border border-gray-200 rounded-xl px-4 py-3 bg-white shadow-sm hover:shadow-md transition hover:border-orange-200"
-            >
-              <svg className="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              <input
-                type="text"
-                value={query}
-                onChange={(e) => {
-                  setQuery(e.target.value)
-                  setResults(null)
-                }}
-                placeholder="Search courses, skills or careers..."
-                aria-label="Search courses"
-                className="flex-1 text-sm outline-none text-gray-700 placeholder-gray-400 bg-transparent"
-              />
-              <button
-                type="submit"
-                className="text-xs text-orange-500 font-semibold hover:text-orange-600 transition px-2"
-              >
-                {searching ? '...' : 'Search'}
-              </button>
-            </form>
-
-            {/* Search results dropdown */}
-            {results && (
-              <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-100 rounded-xl shadow-xl overflow-hidden z-50">
-                {results.courses?.length === 0 && results.schools?.length === 0 ? (
-                  <div className="px-5 py-4 text-sm text-gray-400">
-                    No results for "{query}"
-                  </div>
-                ) : (
-                  <>
-                    {results.courses?.length > 0 && (
-                      <div>
-                        <div className="px-5 py-2 bg-gray-50 text-xs font-semibold text-gray-400 uppercase tracking-widest">
-                          Courses
-                        </div>
-                        {results.courses.map((course, i) => (
-                          <button
-                            type="button"
-                            key={course.course_code || i}
-                            onClick={() => navigate(`/courses/${course.course_code}`)}
-                            className="block w-full text-left px-5 py-3 border-t border-gray-50 hover:bg-orange-50 transition cursor-pointer group"
-                          >
-                            <p className="text-sm font-medium text-gray-800 group-hover:text-orange-600 transition">
-                              {course.course_name}{course.course_abbreviation ? ` (${course.course_abbreviation})` : ''}
-                            </p>
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                    {results.schools?.length > 0 && (
-                      <div>
-                        <div className="px-5 py-2 bg-gray-50 text-xs font-semibold text-gray-400 uppercase tracking-widest border-t border-gray-100">
-                          Schools
-                        </div>
-                        {results.schools.map((school, i) => (
-                          <div
-                            key={i}
-                            onClick={() => navigate('/register')}
-                            className="px-5 py-3 border-t border-gray-50 hover:bg-orange-50 transition cursor-pointer group"
-                          >
-                            <p className="text-sm font-medium text-gray-800 group-hover:text-orange-600 transition">
-                              {school.school_name}
-                            </p>
-                            <p className="text-xs text-gray-400 mt-0.5">
-                              {school.hei_type} · {school.address}
-                            </p>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </>
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* Stats */}
-          <div className="flex items-center gap-6 mt-8">
-            <div>
-              <p className="text-xl font-bold text-gray-900">13</p>
-              <p className="text-xs text-gray-400">Schools</p>
+      <main className="relative">
+        <section className="mx-auto grid max-w-[1380px] gap-10 px-5 pb-14 pt-8 sm:px-8 sm:pb-16 sm:pt-12 lg:grid-cols-[minmax(390px,.86fr)_minmax(500px,1.14fr)] lg:items-center lg:gap-12 lg:px-10 lg:pb-20 lg:pt-14 xl:gap-16">
+          <div className="mx-auto w-full max-w-xl lg:mx-0">
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-orange-100 bg-white/70 px-3.5 py-2 text-xs font-semibold text-orange-700 shadow-sm backdrop-blur-md">
+              <IconTargetArrow size={15} stroke={1.9} /> Personalized course guidance
             </div>
-            <div className="w-px h-8 bg-gray-200" />
-            <div>
-              <p className="text-xl font-bold text-gray-900">{STUDENT_ACTIVE_INDEPENDENT_COURSE_COUNT}</p>
-              <p className="text-xs text-gray-400">Courses</p>
+            <h1 className="max-w-lg text-[2.65rem] font-bold leading-[1.02] tracking-[-0.045em] text-gray-950 sm:text-6xl lg:text-[4rem]">
+              Find the right course <span className="text-orange-500">for your future.</span>
+            </h1>
+            <p className="mt-5 max-w-lg text-base leading-relaxed text-gray-600 sm:text-lg">
+              Discover courses that match your strengths, interests, personality, and situation.
+            </p>
+
+            <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
+              <Link to="/register" className="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-orange-500 to-orange-600 px-6 py-3.5 text-sm font-semibold text-white shadow-[0_14px_30px_-14px_rgba(234,88,12,.8)] transition duration-150 hover:-translate-y-0.5 hover:shadow-[0_18px_34px_-14px_rgba(234,88,12,.7)] active:translate-y-0">
+                Start Assessment <IconArrowRight size={17} stroke={2} />
+              </Link>
+              <Link to="/login" className="inline-flex items-center justify-center gap-1 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 transition duration-150 hover:bg-white/70 hover:text-orange-700">
+                Already registered? Log in <IconChevronRight size={15} />
+              </Link>
             </div>
-            <div className="w-px h-8 bg-gray-200" />
-            <div>
-              <p className="text-xl font-bold text-gray-900">1</p>
-              <p className="text-xs text-gray-400">City</p>
-            </div>
-          </div>
-        </div>
 
-        {/* Right side — visual */}
-        <div className="relative hidden lg:flex items-center justify-center h-[500px]">
-
-          {/* Geometric background shapes */}
-          <div className="absolute w-80 h-80 bg-orange-100 rounded-full opacity-40 top-10 right-10" />
-          <div className="absolute w-48 h-48 bg-orange-200 rounded-full opacity-30 bottom-10 left-10" />
-          <div className="absolute w-32 h-32 bg-gray-100 rounded-full opacity-60 top-20 left-20" />
-          <div
-            className="absolute w-24 h-24 border-2 border-orange-200 rounded-2xl opacity-40 bottom-20 right-20"
-            style={{ transform: 'rotate(15deg)' }}
-          />
-          <div
-            className="absolute w-16 h-16 border-2 border-gray-200 rounded-xl opacity-40 top-32 right-32"
-            style={{ transform: 'rotate(-10deg)' }}
-          />
-
-          {/* Floating match cards */}
-          <div className="relative flex flex-col gap-4 items-center z-10">
-            <div style={{ transform: 'translateX(40px)' }}>
-              <MatchCard {...matchCards[0]} />
-            </div>
-            <div style={{ transform: 'translateX(-30px)' }}>
-              <MatchCard {...matchCards[1]} />
-            </div>
-            <div style={{ transform: 'translateX(20px)' }}>
-              <MatchCard {...matchCards[2]} />
-            </div>
-          </div>
-
-          {/* Small decorative dot grid */}
-          <div className="absolute bottom-8 right-8 grid grid-cols-4 gap-2 opacity-20">
-            {Array.from({ length: 16 }).map((_, i) => (
-              <div key={i} className="w-1.5 h-1.5 bg-orange-400 rounded-full" />
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* How it works section */}
-      <div className="border-t border-gray-100 bg-gray-50 px-5 sm:px-10 py-16 sm:py-20">
-        <div className="max-w-5xl mx-auto">
-          <p className="text-xs font-semibold text-orange-500 uppercase tracking-widest mb-3 text-center">
-            How it works
-          </p>
-          <h2 className="text-3xl font-bold text-gray-900 text-center mb-14">
-            Three steps to your right course
-          </h2>
-
-          <div className="grid md:grid-cols-3 gap-10">
-            {[
-              {
-                step: '01',
-                title: 'Tell us about yourself',
-                desc: 'Set up your profile and share your personal factors — things like budget, location, and schedule that affect what courses are realistic for you.',
-              },
-              {
-                step: '02',
-                title: 'Take the assessment',
-                desc: 'Answer questions about your interests, academic skills, and personality. The whole thing takes about 15 minutes.',
-              },
-              {
-                step: '03',
-                title: 'Get your matches',
-                desc: 'See your top course matches with a personalized explanation of why each one fits you — and which SJDM schools offer them.',
-              },
-            ].map((item) => (
-              <div key={item.step} className="relative">
-                <span className="text-5xl font-bold text-orange-100 select-none">
-                  {item.step}
+            <div className="relative z-20 mt-8 max-w-xl">
+              <p className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.15em] text-orange-700">
+                <span className="h-px w-5 bg-orange-400" /> Explore the course catalog
+              </p>
+              <form onSubmit={handleSearch} className="flex items-center gap-2 rounded-2xl border border-orange-200/90 bg-[#fffdf9] p-2 shadow-[0_14px_32px_-24px_rgba(154,52,18,.58)] transition duration-150 hover:border-orange-300 hover:shadow-[0_16px_34px_-24px_rgba(154,52,18,.68)] focus-within:border-orange-400 focus-within:ring-4 focus-within:ring-orange-100/90">
+                <span className="ml-1.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-orange-50 text-orange-600">
+                  <IconSearch size={19} stroke={2} />
                 </span>
-                <h3 className="text-base font-semibold text-gray-900 mt-2 mb-2">
-                  {item.title}
-                </h3>
-                <p className="text-sm text-gray-500 leading-relaxed">
-                  {item.desc}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+                <input
+                  type="text"
+                  value={query}
+                  onChange={(event) => {
+                    setQuery(event.target.value)
+                    setResults(null)
+                  }}
+                  placeholder="Search by course, skill, or career"
+                  aria-label="Search courses"
+                  className="min-w-0 flex-1 bg-transparent px-1 py-2.5 text-sm font-medium text-slate-900 outline-none placeholder:font-normal placeholder:text-slate-500"
+                />
+                <button type="submit" className="rounded-xl bg-orange-500 px-4 py-2.5 text-xs font-semibold text-white shadow-[0_8px_18px_-10px_rgba(234,88,12,.8)] transition duration-150 hover:bg-orange-600 hover:shadow-[0_10px_22px_-10px_rgba(234,88,12,.75)] active:translate-y-px sm:px-5">
+                  {searching ? 'Searching…' : 'Search'}
+                </button>
+              </form>
 
-      {/* Footer */}
-      <footer className="border-t border-gray-100 px-5 sm:px-10 py-6">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row gap-2 justify-between items-center">
-          <span className="text-sm font-bold text-gray-900">
-            Learn<span className="text-orange-500">Match</span>
-          </span>
+              {results && (
+                <div className="absolute left-0 right-0 top-full z-50 mt-2 overflow-hidden rounded-2xl border border-orange-100 bg-white shadow-2xl">
+                  {results.courses.length === 0 ? (
+                    <div className="px-5 py-4 text-sm text-gray-500">No courses found for “{query}”.</div>
+                  ) : (
+                    <>
+                      <div className="bg-orange-50/70 px-5 py-2 text-[10px] font-bold uppercase tracking-[0.16em] text-orange-600">Courses</div>
+                      {results.courses.map((course, index) => (
+                        <button
+                          type="button"
+                          key={course.course_code || index}
+                          onClick={() => navigate(`/courses/${course.course_code}`)}
+                          className="block w-full border-t border-orange-50 px-5 py-3 text-left transition duration-150 hover:bg-orange-50"
+                        >
+                          <span className="text-sm font-medium text-gray-800">{course.course_name}{course.course_abbreviation ? ` (${course.course_abbreviation})` : ''}</span>
+                        </button>
+                      ))}
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <dl className="mt-6 grid grid-cols-3 overflow-hidden rounded-2xl border border-white/90 bg-white/55 shadow-sm backdrop-blur-lg">
+              {[
+                ['13', 'Schools'],
+                [String(STUDENT_ACTIVE_INDEPENDENT_COURSE_COUNT), 'Active courses'],
+                ['1', 'City'],
+              ].map(([value, label], index) => (
+                <div key={label} className={`px-3 py-3.5 sm:px-4 ${index ? 'border-l border-orange-100/80' : ''}`}>
+                  <dt className="text-lg font-bold text-gray-950 sm:text-xl">{value}</dt>
+                  <dd className="mt-0.5 text-[10px] leading-tight text-gray-500 sm:text-xs">{label}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+
+          <PathwayVisual />
+        </section>
+
+        <section className="relative border-y border-orange-100/70 bg-white/48 px-5 py-16 sm:px-8 sm:py-20 lg:px-10">
+          <div className="mx-auto max-w-6xl">
+            <div className="mx-auto max-w-2xl text-center">
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-orange-500">How it works</p>
+              <h2 className="mt-3 text-3xl font-bold tracking-[-0.03em] text-gray-950 sm:text-4xl">A clearer path, one step at a time.</h2>
+              <p className="mt-4 text-sm leading-relaxed text-gray-500 sm:text-base">Build your profile, understand your fit, then explore courses with context.</p>
+            </div>
+
+            <div className="relative mt-12 grid gap-5 md:grid-cols-3 md:gap-6">
+              <div className="pointer-events-none absolute left-[16%] right-[16%] top-9 hidden border-t border-dashed border-orange-300 md:block" />
+              {journeySteps.map((item, index) => {
+                const StepIcon = item.icon
+                return (
+                  <article key={item.step} className={`group relative rounded-[24px] border border-white bg-white/75 p-6 shadow-[0_18px_50px_-38px_rgba(120,53,15,.55)] backdrop-blur-lg transition duration-200 motion-safe:hover:-translate-y-1 ${index === 1 ? 'md:mt-8' : index === 2 ? 'md:mt-16' : ''}`}>
+                    <div className="relative z-10 flex items-center justify-between">
+                      <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-100 text-orange-600 transition duration-200 group-hover:bg-orange-500 group-hover:text-white"><StepIcon size={23} stroke={1.7} /></span>
+                      <span className="text-3xl font-bold tracking-[-0.05em] text-orange-200">{item.step}</span>
+                    </div>
+                    <h3 className="mt-6 text-lg font-bold tracking-tight text-gray-900">{item.title}</h3>
+                    <p className="mt-2 text-sm leading-relaxed text-gray-500">{item.description}</p>
+                  </article>
+                )
+              })}
+            </div>
+          </div>
+        </section>
+
+        <section className="px-5 py-14 sm:px-8 sm:py-16 lg:px-10">
+          <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-6 rounded-[28px] border border-orange-200/70 bg-orange-950 px-6 py-8 text-white shadow-[0_24px_60px_-38px_rgba(67,20,7,.7)] sm:px-9 md:flex-row md:items-center">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.17em] text-orange-300">Your direction starts here</p>
+              <h2 className="mt-2 max-w-xl text-2xl font-bold tracking-tight sm:text-3xl">Explore your options with more clarity.</h2>
+            </div>
+            <Link to="/register" className="inline-flex shrink-0 items-center gap-2 rounded-2xl bg-orange-500 px-5 py-3 text-sm font-semibold shadow-lg shadow-orange-950/20 transition duration-150 hover:-translate-y-0.5 hover:bg-orange-400 active:translate-y-0">
+              Get Started <IconArrowRight size={17} />
+            </Link>
+          </div>
+        </section>
+      </main>
+
+      <footer className="border-t border-orange-100/70 px-5 py-6 sm:px-8 lg:px-10">
+        <div className="mx-auto flex max-w-[1380px] flex-col items-center justify-between gap-2 sm:flex-row">
+          <span className="text-sm font-bold text-gray-900">Learn<span className="text-orange-500">Match</span></span>
           <p className="text-xs text-gray-400">© 2026 LearnMatch</p>
         </div>
       </footer>
-
     </div>
   )
 }

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { IconEye, IconEyeOff } from '@tabler/icons-react'
+import AuthJourneyPanel from '../components/AuthJourneyPanel'
 
 
 function Login() {
@@ -46,17 +47,11 @@ function Login() {
   }
 
   return (
-    <div className="min-h-screen bg-white overflow-x-hidden">
-
-      <style>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-10px); }
-        }
-      `}</style>
+    <div className="relative min-h-screen overflow-x-hidden bg-[#fbf8f3] text-gray-900">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_18%,rgba(251,146,60,0.13),transparent_28%),radial-gradient(circle_at_72%_75%,rgba(253,186,116,0.11),transparent_31%),linear-gradient(115deg,rgba(255,255,255,.78),rgba(255,247,237,.34))]" />
 
       {/* Nav */}
-      <nav className="flex justify-between items-center gap-3 px-5 sm:px-8 lg:px-10 py-4 sm:py-5">
+      <nav className="relative z-10 mx-auto flex max-w-[1440px] items-center justify-between gap-3 px-5 py-5 sm:px-8 lg:px-10">
         <Link to="/" className="text-xl font-bold tracking-tight text-gray-900">
           Learn<span className="text-orange-500">Match</span>
         </Link>
@@ -64,7 +59,7 @@ function Login() {
           <span className="hidden sm:inline text-sm text-gray-400">No account?</span>
           <Link
             to="/register"
-            className="text-sm bg-orange-500 text-white px-4 py-2.5 rounded-lg hover:bg-orange-600 transition font-medium"
+            className="rounded-xl bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white shadow-sm shadow-orange-100 transition duration-150 hover:bg-orange-600 active:translate-y-px"
           >
             Get Started
           </Link>
@@ -72,30 +67,31 @@ function Login() {
       </nav>
 
       {/* Split layout */}
-      <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-10 pt-6 sm:pt-8 pb-10 sm:pb-16 grid lg:grid-cols-2 gap-10 lg:gap-16 items-center lg:min-h-[calc(100vh-80px)]">
+      <main className="relative z-0 mx-auto grid max-w-[1380px] items-center gap-8 px-5 pb-10 pt-3 sm:px-8 sm:pb-14 sm:pt-6 lg:min-h-[calc(100vh-84px)] lg:grid-cols-[minmax(380px,0.82fr)_minmax(500px,1.18fr)] lg:gap-10 lg:px-10 lg:py-8 xl:gap-16">
 
         {/* Left side — form */}
-        <div className="max-w-md w-full mx-auto lg:mx-0">
+        <section className="relative mx-auto w-full max-w-[500px] overflow-hidden rounded-[28px] border border-white/90 bg-white/72 px-6 py-8 shadow-[0_24px_70px_-42px_rgba(120,53,15,.42)] backdrop-blur-xl sm:px-9 sm:py-10 lg:mx-0 lg:px-10 lg:py-11">
+          <div className="absolute inset-y-10 left-0 w-1 rounded-r-full bg-gradient-to-b from-orange-400 via-orange-500 to-amber-300" />
           <div className="inline-flex items-center gap-2 bg-orange-50 text-orange-600 text-xs font-semibold px-3 py-1.5 rounded-full mb-6">
             <span className="w-1.5 h-1.5 bg-orange-500 rounded-full" />
             Welcome back
           </div>
 
-          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 leading-tight mb-3">
+          <h1 className="mb-3 text-3xl font-bold leading-[1.12] tracking-[-0.025em] text-gray-900 sm:text-[2.5rem]">
             Log in to LearnMatch
           </h1>
           <p className="text-base text-gray-500 leading-relaxed mb-8">
-            Pick up right where you left off with your assessment and results.
+            Continue where you left off and explore your next steps.
           </p>
 
           {error && (
-            <div className="bg-red-50 text-red-600 px-4 py-3 rounded-xl text-sm mb-6">
+            <div role="alert" className="mb-6 rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-600">
               {error}
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
+            <div className="group/field">
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Email or Username
               </label>
@@ -104,7 +100,7 @@ function Login() {
                 name="identifier"
                 value={formData.identifier}
                 onChange={handleChange}
-                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+                className="w-full rounded-2xl border border-stone-200/90 bg-white/85 px-4 py-3.5 text-sm shadow-[inset_0_1px_0_rgba(255,255,255,.8)] outline-none transition duration-150 hover:border-orange-200 focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100/80"
                 required
               />
             </div>
@@ -124,14 +120,14 @@ function Login() {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  className="w-full border border-gray-200 rounded-xl px-4 py-3 pr-11 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+                  className="w-full rounded-2xl border border-stone-200/90 bg-white/85 px-4 py-3.5 pr-11 text-sm shadow-[inset_0_1px_0_rgba(255,255,255,.8)] outline-none transition duration-150 hover:border-orange-200 focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100/80"
                   required
                   minLength={8}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((prev) => !prev)}
-                  className="absolute right-1 top-1/2 -translate-y-1/2 w-10 h-10 inline-flex items-center justify-center text-gray-400 hover:text-gray-600 transition"
+                  className="absolute right-1 top-1/2 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-lg text-gray-400 transition duration-150 hover:bg-gray-50 hover:text-gray-600 active:scale-95"
                   tabIndex={-1}
                 >
                   {showPassword ? <IconEyeOff size={18} stroke={1.75} /> : <IconEye size={18} stroke={1.75} />}
@@ -142,7 +138,7 @@ function Login() {
             <button
               type="submit"
               disabled={submitting}
-              className="w-full bg-orange-500 text-white py-3 rounded-xl font-medium hover:bg-orange-600 transition text-sm disabled:opacity-50 flex items-center justify-center gap-2"
+              className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-orange-500 to-orange-600 py-3.5 text-sm font-semibold text-white shadow-[0_12px_28px_-12px_rgba(234,88,12,.8)] transition duration-150 hover:-translate-y-0.5 hover:shadow-[0_16px_32px_-12px_rgba(234,88,12,.72)] active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {submitting ? 'Logging in...' : 'Log In'}
               {!submitting && (
@@ -159,47 +155,10 @@ function Login() {
               Register
             </Link>
           </p>
-        </div>
+        </section>
 
-        {/* Right side — gradient panel with heading and one card */}
-        <div
-          className="relative hidden lg:flex h-[500px] rounded-[32px] overflow-hidden flex-col justify-between p-10"
-          style={{ background: 'linear-gradient(150deg, #fb923c 0%, #f97316 55%, #ea580c 100%)' }}
-        >
-          <svg width="280" height="280" viewBox="0 0 280 280" className="absolute -top-16 -right-16 opacity-25">
-            <circle cx="140" cy="140" r="120" fill="none" stroke="#fff" strokeWidth="1.5" />
-            <circle cx="140" cy="140" r="80" fill="none" stroke="#fff" strokeWidth="1.5" />
-          </svg>
-          <div className="absolute bottom-10 left-10 grid grid-cols-4 gap-2 opacity-25">
-            {Array.from({ length: 16 }).map((_, i) => (
-              <div key={i} className="w-1.5 h-1.5 bg-white rounded-full" />
-            ))}
-          </div>
-
-          <div className="relative">
-            <h2 className="text-3xl font-bold text-white leading-tight mb-3">
-              Welcome back.
-            </h2>
-            <p className="text-sm text-orange-50 leading-relaxed max-w-xs">
-              Log back in to check your matches, continue an assessment, or track your semester alignment.
-            </p>
-          </div>
-
-          <div
-            className="relative bg-white rounded-2xl shadow-lg px-5 py-4 w-60 border border-orange-100"
-            style={{ animation: 'float 4s ease-in-out infinite' }}
-          >
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Match</span>
-              <span className="text-sm font-bold text-gray-900">92%</span>
-            </div>
-            <p className="text-sm font-semibold text-gray-800 mb-3">Engineering / STEM</p>
-            <div className="w-full bg-gray-100 rounded-full h-1.5">
-              <div className="bg-orange-500 h-1.5 rounded-full" style={{ width: '92%' }} />
-            </div>
-          </div>
-        </div>
-      </div>
+        <AuthJourneyPanel heading="Welcome back." supportingText="Pick up where you left off and keep building your path." />
+      </main>
     </div>
   )
 }

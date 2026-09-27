@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { IconEye, IconEyeOff } from '@tabler/icons-react'
+import AuthJourneyPanel from '../components/AuthJourneyPanel'
 
 const isValidEmail = (email) => {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
@@ -147,54 +148,55 @@ function Register() {
   }
 
   return (
-    <div className="min-h-screen bg-white overflow-x-hidden">
+    <div className="relative min-h-screen overflow-x-hidden bg-[#fbf8f3] text-gray-900">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_18%,rgba(251,146,60,0.13),transparent_28%),radial-gradient(circle_at_72%_75%,rgba(253,186,116,0.11),transparent_31%),linear-gradient(115deg,rgba(255,255,255,.78),rgba(255,247,237,.34))]" />
 
       <style>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-10px); }
-        }
         @keyframes fadeIn {
           from { opacity: 0; transform: translateY(6px); }
           to { opacity: 1; transform: translateY(0); }
         }
+        @media (prefers-reduced-motion: reduce) {
+          .auth-fade-in { animation: none !important; }
+        }
       `}</style>
 
-      <nav className="flex justify-between items-center gap-3 px-5 sm:px-8 lg:px-10 py-4 sm:py-5">
+      <nav className="relative z-10 mx-auto flex max-w-[1440px] items-center justify-between gap-3 px-5 py-5 sm:px-8 lg:px-10">
         <Link to="/" className="text-xl font-bold tracking-tight text-gray-900">
           Learn<span className="text-orange-500">Match</span>
         </Link>
         <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-400">Already have an account?</span>
+          <span className="hidden text-sm text-gray-400 sm:inline">Already have an account?</span>
           <Link
             to="/login"
-            className="text-sm text-gray-700 px-4 py-2.5 rounded-lg hover:bg-gray-50 transition font-medium"
+            className="rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition duration-150 hover:border-orange-200 hover:bg-orange-50 hover:text-orange-700 active:translate-y-px"
           >
             Log In
           </Link>
         </div>
       </nav>
 
-      <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-10 pt-6 sm:pt-8 pb-10 sm:pb-16 grid lg:grid-cols-2 gap-10 lg:gap-16 items-center lg:min-h-[calc(100vh-80px)]">
+      <main className="relative z-0 mx-auto grid max-w-[1380px] items-center gap-8 px-5 pb-10 pt-3 sm:px-8 sm:pb-14 sm:pt-6 lg:grid-cols-[minmax(400px,0.82fr)_minmax(500px,1.18fr)] lg:gap-10 lg:px-10 lg:py-8 xl:gap-16">
 
-        <div className="max-w-md w-full mx-auto lg:mx-0">
+        <section className="relative mx-auto w-full max-w-[520px] overflow-hidden rounded-[28px] border border-white/90 bg-white/72 px-6 py-8 shadow-[0_24px_70px_-42px_rgba(120,53,15,.42)] backdrop-blur-xl sm:px-9 sm:py-10 lg:mx-0 lg:px-10 lg:py-11">
+          <div className="absolute inset-y-10 left-0 w-1 rounded-r-full bg-gradient-to-b from-orange-400 via-orange-500 to-amber-300" />
 
           {step === 'register' && (
-            <div style={{ animation: 'fadeIn 0.3s ease-out' }}>
+            <div className="auth-fade-in" style={{ animation: 'fadeIn 0.3s ease-out' }}>
               <div className="inline-flex items-center gap-2 bg-orange-50 text-orange-600 text-xs font-semibold px-3 py-1.5 rounded-full mb-6">
                 <span className="w-1.5 h-1.5 bg-orange-500 rounded-full" />
-                AI-assisted course recommendation
+                Personalized course guidance
               </div>
 
-              <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 leading-tight mb-3">
+              <h1 className="mb-3 text-3xl font-bold leading-[1.12] tracking-[-0.025em] text-gray-900 sm:text-[2.5rem]">
                 Create your account
               </h1>
               <p className="text-base text-gray-500 leading-relaxed mb-8">
-                Answer a few questions and get course recommendations that actually fit who you are.
+                Create your account and start exploring courses that fit your strengths and goals.
               </p>
 
               {error && (
-                <div className="bg-red-50 text-red-600 px-4 py-3 rounded-xl text-sm mb-6">
+                <div role="alert" className="mb-6 rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-600">
                   {error}
                 </div>
               )}
@@ -207,7 +209,7 @@ function Register() {
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
-                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+                    className="w-full rounded-2xl border border-stone-200/90 bg-white/85 px-4 py-3.5 text-sm outline-none transition duration-150 hover:border-orange-200 focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100/80"
                     required
                   />
                 </div>
@@ -219,7 +221,7 @@ function Register() {
                     name="username"
                     value={formData.username}
                     onChange={handleChange}
-                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+                    className="w-full rounded-2xl border border-stone-200/90 bg-white/85 px-4 py-3.5 text-sm outline-none transition duration-150 hover:border-orange-200 focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100/80"
                     required
                   />
                 </div>
@@ -232,14 +234,14 @@ function Register() {
                       name="password"
                       value={formData.password}
                       onChange={handleChange}
-                      className="w-full border border-gray-200 rounded-xl px-4 py-3 pr-11 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+                      className="w-full rounded-2xl border border-stone-200/90 bg-white/85 px-4 py-3.5 pr-11 text-sm outline-none transition duration-150 hover:border-orange-200 focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100/80"
                       required
                       minLength={8}
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword((prev) => !prev)}
-                      className="absolute right-1 top-1/2 -translate-y-1/2 w-10 h-10 inline-flex items-center justify-center text-gray-400 hover:text-gray-600 transition"
+                      className="absolute right-1 top-1/2 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-lg text-gray-400 transition duration-150 hover:bg-gray-50 hover:text-gray-600 active:scale-95"
                       tabIndex={-1}
                     >
                       {showPassword ? <IconEyeOff size={18} stroke={1.75} /> : <IconEye size={18} stroke={1.75} />}
@@ -258,14 +260,14 @@ function Register() {
                       name="confirmPassword"
                       value={formData.confirmPassword}
                       onChange={handleChange}
-                      className="w-full border border-gray-200 rounded-xl px-4 py-3 pr-11 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+                      className="w-full rounded-2xl border border-stone-200/90 bg-white/85 px-4 py-3.5 pr-11 text-sm outline-none transition duration-150 hover:border-orange-200 focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100/80"
                       required
                       minLength={8}
                     />
                     <button
                       type="button"
                       onClick={() => setShowConfirmPassword((prev) => !prev)}
-                      className="absolute right-1 top-1/2 -translate-y-1/2 w-10 h-10 inline-flex items-center justify-center text-gray-400 hover:text-gray-600 transition"
+                      className="absolute right-1 top-1/2 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-lg text-gray-400 transition duration-150 hover:bg-gray-50 hover:text-gray-600 active:scale-95"
                       tabIndex={-1}
                     >
                       {showConfirmPassword ? <IconEyeOff size={18} stroke={1.75} /> : <IconEye size={18} stroke={1.75} />}
@@ -276,7 +278,7 @@ function Register() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="w-full bg-orange-500 text-white py-3 rounded-xl font-medium hover:bg-orange-600 transition text-sm disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-orange-500 to-orange-600 py-3.5 text-sm font-semibold text-white shadow-[0_12px_28px_-12px_rgba(234,88,12,.8)] transition duration-150 hover:-translate-y-0.5 hover:shadow-[0_16px_32px_-12px_rgba(234,88,12,.72)] active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {submitting ? 'Creating account...' : 'Register'}
                   {!submitting && (
@@ -297,7 +299,7 @@ function Register() {
           )}
 
           {step === 'otp' && (
-            <div style={{ animation: 'fadeIn 0.3s ease-out' }}>
+            <div className="auth-fade-in" style={{ animation: 'fadeIn 0.3s ease-out' }}>
               <div className="w-14 h-14 rounded-2xl bg-orange-50 flex items-center justify-center mb-6">
                 <svg className="w-7 h-7 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -313,13 +315,13 @@ function Register() {
               </p>
 
               {otpError && (
-                <div className="bg-red-50 text-red-600 px-4 py-3 rounded-xl text-sm mb-6">
+                <div role="alert" className="mb-6 rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-600">
                   {otpError}
                 </div>
               )}
 
               {otpMessage && (
-                <div className="bg-green-50 text-green-700 px-4 py-3 rounded-xl text-sm mb-6">
+                <div role="status" className="mb-6 rounded-xl border border-green-100 bg-green-50 px-4 py-3 text-sm text-green-700">
                   {otpMessage}
                 </div>
               )}
@@ -334,7 +336,7 @@ function Register() {
                     value={otpCode}
                     onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
                     placeholder="000000"
-                    className="w-full border border-gray-200 rounded-xl px-3 sm:px-4 py-3 text-center text-xl sm:text-2xl font-bold tracking-[0.3em] sm:tracking-[0.5em] focus:outline-none focus:ring-2 focus:ring-orange-400"
+                    className="w-full rounded-2xl border border-stone-200/90 bg-white/85 px-3 py-3.5 text-center text-xl font-bold tracking-[0.3em] outline-none transition duration-150 hover:border-orange-200 focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100/80 sm:px-4 sm:text-2xl sm:tracking-[0.5em]"
                     autoFocus
                   />
                 </div>
@@ -342,7 +344,7 @@ function Register() {
                 <button
                   type="submit"
                   disabled={verifying}
-                  className="w-full bg-orange-500 text-white py-3 rounded-xl font-medium hover:bg-orange-600 transition text-sm disabled:opacity-50"
+                  className="w-full rounded-2xl bg-gradient-to-r from-orange-500 to-orange-600 py-3.5 text-sm font-semibold text-white shadow-[0_12px_28px_-12px_rgba(234,88,12,.8)] transition duration-150 hover:-translate-y-0.5 active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {verifying ? 'Verifying...' : 'Verify Account'}
                 </button>
@@ -362,7 +364,7 @@ function Register() {
           )}
 
           {step === 'verified' && (
-            <div style={{ animation: 'fadeIn 0.3s ease-out' }} className="text-center">
+            <div style={{ animation: 'fadeIn 0.3s ease-out' }} className="auth-fade-in text-center">
               <div className="w-16 h-16 rounded-full bg-green-50 flex items-center justify-center mb-6 mx-auto">
                 <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -376,46 +378,13 @@ function Register() {
               </p>
             </div>
           )}
-        </div>
+        </section>
 
-        <div
-          className="relative hidden lg:flex h-[500px] rounded-[32px] overflow-hidden flex-col justify-between p-10"
-          style={{ background: 'linear-gradient(150deg, #fb923c 0%, #f97316 55%, #ea580c 100%)' }}
-        >
-          <svg width="280" height="280" viewBox="0 0 280 280" className="absolute -top-16 -right-16 opacity-25">
-            <circle cx="140" cy="140" r="120" fill="none" stroke="#fff" strokeWidth="1.5" />
-            <circle cx="140" cy="140" r="80" fill="none" stroke="#fff" strokeWidth="1.5" />
-          </svg>
-          <div className="absolute bottom-10 left-10 grid grid-cols-4 gap-2 opacity-25">
-            {Array.from({ length: 16 }).map((_, i) => (
-              <div key={i} className="w-1.5 h-1.5 bg-white rounded-full" />
-            ))}
-          </div>
-
-          <div className="relative">
-            <h2 className="text-3xl font-bold text-white leading-tight mb-3">
-              Find your fit.
-            </h2>
-            <p className="text-sm text-orange-50 leading-relaxed max-w-xs">
-              Join students getting personalized course recommendations based on their skills, interests, and personality.
-            </p>
-          </div>
-
-          <div
-            className="relative bg-white rounded-2xl shadow-lg px-5 py-4 w-60 border border-orange-100"
-            style={{ animation: 'float 4s ease-in-out infinite' }}
-          >
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Match</span>
-              <span className="text-sm font-bold text-gray-900">78%</span>
-            </div>
-            <p className="text-sm font-semibold text-gray-800 mb-3">Healthcare Science</p>
-            <div className="w-full bg-gray-100 rounded-full h-1.5">
-              <div className="bg-orange-500 h-1.5 rounded-full" style={{ width: '78%' }} />
-            </div>
-          </div>
-        </div>
-      </div>
+        <AuthJourneyPanel
+          heading="Find a path that fits you."
+          supportingText="Discover courses that align with your strengths, interests, and goals."
+        />
+      </main>
     </div>
   )
 }
