@@ -272,6 +272,13 @@ function CollegeDashboard() {
     }
   }
 
+  const handleLogout = () => {
+    localStorage.removeItem('token')
+    localStorage.removeItem('userId')
+    localStorage.removeItem('username')
+    navigate('/login')
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
@@ -283,18 +290,21 @@ function CollegeDashboard() {
   return (
     <div className="min-h-screen bg-slate-50">
       <nav className="bg-white border-b border-gray-100 px-4 sm:px-8 lg:px-14 py-[18px] flex justify-between items-center">
-        <button onClick={() => navigate('/dashboard')} className="text-lg font-bold text-gray-900 hover:opacity-80 transition">
+        <button onClick={() => navigate('/college')} className="text-lg font-bold text-gray-900 hover:opacity-80 transition">
           Learn<span className="text-orange-500">Match</span>
         </button>
         <div className="flex items-center gap-3 sm:gap-4">
           <span className="hidden sm:inline text-sm text-gray-500">
             Welcome, <strong className="text-gray-900">{username}</strong>
           </span>
-          <button onClick={() => navigate('/feedback')} className="text-sm text-gray-500 hover:text-gray-900 transition">
+          <button onClick={() => navigate('/feedback', { state: { entryContext: 'college' } })} className="text-sm text-gray-500 hover:text-gray-900 transition">
             Feedback
           </button>
-          <button onClick={() => navigate('/dashboard')} className="text-sm text-gray-500 hover:text-gray-900 transition">
+          <button onClick={() => navigate('/college')} className="text-sm text-gray-500 hover:text-gray-900 transition">
             Dashboard
+          </button>
+          <button onClick={handleLogout} className="rounded-lg px-2.5 py-2 text-sm font-medium text-gray-500 transition hover:bg-red-50 hover:text-red-600">
+            Logout
           </button>
         </div>
       </nav>
@@ -302,46 +312,47 @@ function CollegeDashboard() {
       <main className="max-w-[1280px] mx-auto px-4 sm:px-8 lg:px-12 py-8 lg:py-11 space-y-6">
         {error && <div className="rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700">{error}</div>}
 
-        <section className="rounded-[20px] p-6 sm:p-8 bg-orange-100 border border-orange-200">
+        <section className="relative overflow-hidden rounded-[24px] border border-slate-800 bg-slate-950 p-6 text-white shadow-[0_22px_55px_-34px_rgba(15,23,42,.8)] sm:p-8">
+          <div className="pointer-events-none absolute inset-y-0 left-0 w-1.5 bg-gradient-to-b from-orange-400 via-orange-500 to-amber-300" />
           <div className="grid lg:grid-cols-[1.5fr_1fr] gap-8 items-end">
             <div>
-              <p className="text-sm font-semibold text-orange-700 mb-2">Career Alignment Tracking</p>
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-950">{collegeInfo?.courseName}</h1>
-              <p className="text-sm text-orange-900/75 mt-2">
+              <p className="mb-2 text-sm font-semibold text-orange-400">Career Alignment Tracking</p>
+              <h1 className="text-2xl font-bold text-white sm:text-3xl">{collegeInfo?.courseName}</h1>
+              <p className="mt-2 text-sm text-slate-300">
                 {[collegeInfo?.yearLevel, collegeInfo?.semester].filter(Boolean).join(' • ')}
               </p>
-              {collegeInfo?.academicYear && <p className="text-sm text-orange-900/75 mt-1">AY {collegeInfo.academicYear.replace('-', '–')}</p>}
-              <p className="text-sm text-gray-700 mt-5 max-w-2xl leading-relaxed">
+              {collegeInfo?.academicYear && <p className="mt-1 text-sm text-slate-300">AY {collegeInfo.academicYear.replace('-', '–')}</p>}
+              <p className="mt-5 max-w-2xl text-sm leading-relaxed text-slate-400">
                 See where you are in your course roadmap and how your alignment develops through each semester check-in.
               </p>
             </div>
-            <div className="grid sm:grid-cols-2 gap-4 sm:gap-6 lg:border-l lg:border-orange-300 lg:pl-8">
+            <div className="grid gap-4 sm:grid-cols-2 sm:gap-6 lg:border-l lg:border-slate-700 lg:pl-8">
               <div>
-                <p className="text-xs font-bold uppercase tracking-wide text-gray-500">Academic / Program</p>
-                <p className="text-xs text-gray-500 mt-2">{timingHeading}</p>
-                <p className="text-lg font-bold text-gray-900 mt-1">{timingValue}</p>
+                <p className="text-xs font-bold uppercase tracking-wide text-orange-300">Academic / Program</p>
+                <p className="mt-2 text-xs text-slate-400">{timingHeading}</p>
+                <p className="mt-1 text-lg font-bold text-white">{timingValue}</p>
                 {collegeInfo?.timingAvailable && (
-                  <p className="text-sm text-gray-600 mt-1">
+                  <p className="mt-1 text-sm text-slate-300">
                     {collegeInfo.timingEstimated ? 'Estimated Current Phase' : 'Current Phase'}: {collegeInfo.expectedPhase}
                   </p>
                 )}
                 {!collegeInfo?.timingEstimated && collegeInfo?.semesterStartDate && collegeInfo?.semesterEndDate && (
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="mt-1 text-xs text-slate-400">
                     {formatCheckinDate(collegeInfo.semesterStartDate)} – {formatCheckinDate(collegeInfo.semesterEndDate)}
                   </p>
                 )}
               </div>
               <div>
-                <p className="text-xs font-bold uppercase tracking-wide text-gray-500">Career Alignment</p>
-                <p className="text-lg font-bold text-gray-900 mt-2">{latestResult?.status || 'Not checked yet'}</p>
-                <p className="text-sm text-gray-600 mt-1">{latestAlignment === null ? 'Complete your first check-in' : `${latestAlignment}% aligned`}</p>
+                <p className="text-xs font-bold uppercase tracking-wide text-orange-300">Career Alignment</p>
+                <p className="mt-2 text-lg font-bold text-white">{latestResult?.status || 'Not checked yet'}</p>
+                <p className="mt-1 text-sm text-slate-300">{latestAlignment === null ? 'Complete your first check-in' : `${latestAlignment}% aligned`}</p>
               </div>
             </div>
           </div>
           {collegeInfo?.timingMode === 'manual' && (
-            <div className="mt-5 rounded-xl bg-white/70 px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-              <p className="text-sm text-orange-900">Semester timing not set. You can still complete your check-ins in order.</p>
-              <button type="button" onClick={() => navigate('/college/setup')} className="text-sm font-semibold text-orange-700 hover:text-orange-800">Add semester schedule</button>
+            <div className="mt-5 flex flex-col gap-3 rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-sm text-slate-300">Semester timing not set. You can still complete your check-ins in order.</p>
+              <button type="button" onClick={() => navigate('/college/setup')} className="text-sm font-semibold text-orange-400 hover:text-orange-300">Add semester schedule</button>
             </div>
           )}
         </section>
@@ -365,7 +376,10 @@ function CollegeDashboard() {
           {roadmapYears.length > 0 ? (
             <div className="relative">
               <div className="hidden sm:block absolute left-8 right-8 top-7 h-0.5 bg-gray-200" />
-              <div className="grid sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-5 relative">
+              <div
+                className="relative grid gap-5 sm:grid-cols-2 lg:grid-cols-[repeat(var(--roadmap-years),minmax(0,1fr))]"
+                style={{ '--roadmap-years': roadmapYears.length }}
+              >
                 {roadmapYears.map((yearLevel) => {
                   const year = Number(yearLevel.year)
                   const isCompleted = currentYearNumber !== null && year < currentYearNumber

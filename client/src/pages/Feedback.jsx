@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import {
   IconAlertTriangle,
   IconArrowLeft,
@@ -12,6 +12,11 @@ import {
   IconStar,
   IconStarFilled,
 } from '@tabler/icons-react'
+import {
+  FEEDBACK_ENTRY_CONTEXT_KEY,
+  getFeedbackDashboardPath,
+  getFeedbackEntryContext,
+} from '../utils/feedbackNavigation'
 
 const categories = [
   { value: 'Bug Report', label: 'Something is broken', icon: IconBug, iconClass: 'bg-rose-50 text-rose-500' },
@@ -23,7 +28,17 @@ const ratingLabels = ['', 'Poor', 'Fair', 'Good', 'Very Good', 'Excellent']
 
 function Feedback() {
   const navigate = useNavigate()
+  const location = useLocation()
   const token = localStorage.getItem('token')
+  const [entryContext] = useState(() => getFeedbackEntryContext(
+    location.state?.entryContext,
+    sessionStorage.getItem(FEEDBACK_ENTRY_CONTEXT_KEY)
+  ))
+  const dashboardPath = getFeedbackDashboardPath(entryContext)
+
+  useEffect(() => {
+    sessionStorage.setItem(FEEDBACK_ENTRY_CONTEXT_KEY, entryContext)
+  }, [entryContext])
 
   const [rating, setRating] = useState(0)
   const [hoverRating, setHoverRating] = useState(0)
@@ -78,12 +93,12 @@ function Feedback() {
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(251,146,60,0.08),transparent_30%),radial-gradient(circle_at_100%_35%,rgba(196,181,253,0.07),transparent_28%)]" />
         <nav className="relative z-10 flex items-center justify-between gap-3 border-b border-white/80 bg-white/85 px-4 py-4 shadow-[0_1px_12px_rgba(15,23,42,0.03)] backdrop-blur-md sm:px-8 lg:px-14">
           <button
-            onClick={() => navigate('/dashboard')}
+            onClick={() => navigate(dashboardPath)}
             className="text-lg font-bold tracking-tight text-gray-900 transition hover:opacity-75"
           >
             Learn<span className="text-orange-500">Match</span>
           </button>
-          <button onClick={() => navigate('/dashboard')} className="inline-flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-xs font-medium text-gray-500 transition hover:bg-gray-50 hover:text-gray-900 sm:text-sm">
+          <button onClick={() => navigate(dashboardPath)} className="inline-flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-xs font-medium text-gray-500 transition hover:bg-gray-50 hover:text-gray-900 sm:text-sm">
             <IconArrowLeft size={16} stroke={2} /> Back to Dashboard
           </button>
         </nav>
@@ -92,7 +107,7 @@ function Feedback() {
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600"><IconCircleCheck size={34} stroke={1.8} /></div>
             <h1 className="mt-6 text-2xl font-bold tracking-tight text-gray-950">Thanks for your feedback!</h1>
             <p className="mt-2 text-sm text-gray-500">It genuinely helps us improve LearnMatch.</p>
-            <button onClick={() => navigate('/dashboard')} className="mt-8 inline-flex items-center justify-center gap-2 rounded-xl bg-orange-500 px-6 py-3 text-sm font-semibold text-white shadow-sm shadow-orange-200 transition hover:-translate-y-0.5 hover:bg-orange-600 focus:outline-none focus:ring-4 focus:ring-orange-100">
+            <button onClick={() => navigate(dashboardPath)} className="mt-8 inline-flex items-center justify-center gap-2 rounded-xl bg-orange-500 px-6 py-3 text-sm font-semibold text-white shadow-sm shadow-orange-200 transition hover:-translate-y-0.5 hover:bg-orange-600 focus:outline-none focus:ring-4 focus:ring-orange-100">
               <IconArrowLeft size={16} stroke={2} /> Back to Dashboard
             </button>
           </section>
@@ -106,13 +121,13 @@ function Feedback() {
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(251,146,60,0.08),transparent_30%),radial-gradient(circle_at_100%_35%,rgba(196,181,253,0.07),transparent_28%)]" />
       <nav className="relative z-10 flex items-center justify-between gap-3 border-b border-white/80 bg-white/85 px-4 py-4 shadow-[0_1px_12px_rgba(15,23,42,0.03)] backdrop-blur-md sm:px-8 lg:px-14">
         <button
-          onClick={() => navigate('/dashboard')}
+          onClick={() => navigate(dashboardPath)}
           className="text-lg font-bold tracking-tight text-gray-900 transition hover:opacity-75"
         >
           Learn<span className="text-orange-500">Match</span>
         </button>
         <button
-          onClick={() => navigate('/dashboard')}
+          onClick={() => navigate(dashboardPath)}
           className="inline-flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-xs font-medium text-gray-500 transition hover:bg-gray-50 hover:text-gray-900 sm:text-sm"
         >
           <IconArrowLeft size={16} stroke={2} /> Back to Dashboard

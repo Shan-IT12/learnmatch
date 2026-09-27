@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { IconArrowRight, IconRefresh, IconSchool, IconHistory, IconUser, IconHeart, IconBrain, IconShieldCheck } from '@tabler/icons-react'
+import { IconArrowRight, IconRefresh, IconSchool, IconHistory, IconUser, IconHeart, IconBrain, IconShieldCheck, IconStar } from '@tabler/icons-react'
 
 const personalFactorLabels = {
   factor_physical: 'Physical / Mobility',
@@ -125,7 +125,8 @@ function SummaryDashboard() {
   }
  
   return (
-    <div className="min-h-screen bg-slate-50/70">
+    <div className="relative min-h-screen overflow-x-hidden bg-[#fbf8f3] text-gray-900">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-[620px] bg-[radial-gradient(circle_at_12%_15%,rgba(251,146,60,.1),transparent_27%),radial-gradient(circle_at_85%_20%,rgba(253,186,116,.08),transparent_25%),linear-gradient(115deg,rgba(255,255,255,.72),rgba(255,247,237,.2))]" />
       <nav className="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-gray-100 px-5 sm:px-8 lg:px-14 py-4 flex flex-wrap justify-between items-center gap-3">
         <button
           onClick={() => navigate('/dashboard')}
@@ -144,7 +145,7 @@ function SummaryDashboard() {
              View Profile
           </button>
           <button
-            onClick={() => navigate('/feedback')}
+            onClick={() => navigate('/feedback', { state: { entryContext: 'dashboard' } })}
             className="text-sm text-gray-500 hover:text-gray-900 transition"
           >
             Feedback
@@ -158,42 +159,47 @@ function SummaryDashboard() {
         </div>
       </nav>
  
-      <div className="max-w-[1240px] mx-auto px-5 sm:px-8 lg:px-12 py-8 sm:py-11">
+      <main className="relative z-0 mx-auto max-w-[1240px] px-5 py-8 sm:px-8 sm:py-11 lg:px-12">
 
         <div className="mb-7">
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-orange-500 mb-2">Your complete LearnMatch report</p>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-950">Assessment Summary</h1>
+          <p className="mb-2 text-xs font-bold uppercase tracking-[0.18em] text-orange-600">Assessment Summary</p>
+          <h1 className="text-3xl font-bold tracking-[-0.03em] text-gray-950 sm:text-4xl">Your LearnMatch report</h1>
           <p className="mt-2 max-w-2xl text-sm leading-relaxed text-gray-500">A consolidated view of your profile, assessment results, personal considerations, and recommended direction.</p>
         </div>
  
         {/* Top recommendation preview */}
         {topRecommendation && (
-          <div className="relative overflow-hidden rounded-3xl p-6 sm:p-8 mb-5 flex flex-col sm:flex-row gap-6 sm:justify-between sm:items-center bg-gradient-to-br from-orange-500 via-orange-500 to-amber-400 shadow-[0_20px_50px_-28px_rgba(234,88,12,0.75)]">
-            <div className="absolute -right-12 -top-20 h-56 w-56 rounded-full border-[36px] border-white/10" aria-hidden="true" />
+          <section className="relative mb-10 overflow-hidden rounded-[26px] border border-orange-200/80 bg-[#fffdf9] p-6 shadow-[0_22px_60px_-42px_rgba(120,53,15,.5)] sm:flex sm:items-center sm:justify-between sm:gap-8 sm:p-8">
+            <div className="absolute inset-y-0 left-0 w-1.5 bg-gradient-to-b from-orange-400 via-orange-500 to-amber-300" aria-hidden="true" />
             <div className="relative min-w-0">
-              <p className="text-[11px] font-bold uppercase tracking-[0.16em] mb-2 text-orange-100">
-                Top Recommendation
+              <p className="mb-3 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.16em] text-orange-600">
+                <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-orange-100"><IconStar size={15} fill="currentColor" stroke={1.7} /></span> Top Recommendation
               </p>
-              <p className="text-xl sm:text-2xl font-bold mb-2 text-white leading-snug">
+              <p className="mb-4 max-w-3xl text-xl font-bold leading-snug tracking-tight text-gray-950 sm:text-2xl">
                 {topRecommendation.course_name}
               </p>
-              <div className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1.5 text-sm font-semibold text-white ring-1 ring-white/20">
-                <span className="h-2 w-2 rounded-full bg-white" /> {topRecommendation.match_score}% overall match
+              <div className="inline-flex items-center gap-2 rounded-full border border-orange-200 bg-orange-50 px-3 py-1.5 text-sm font-semibold text-orange-800">
+                <span className="h-2 w-2 rounded-full bg-orange-500" /> {topRecommendation.match_score}% overall match
               </div>
             </div>
             <button
               onClick={() => navigate('/results')}
-              className="relative inline-flex items-center justify-center gap-1.5 bg-white text-orange-700 px-5 py-3 rounded-xl text-sm font-bold hover:-translate-y-0.5 hover:shadow-lg transition-all duration-200 shrink-0"
+              className="relative mt-5 inline-flex shrink-0 items-center justify-center gap-1.5 rounded-xl border border-orange-200 bg-white px-5 py-3 text-sm font-bold text-orange-700 shadow-sm transition duration-150 hover:-translate-y-0.5 hover:border-orange-300 hover:bg-orange-50 sm:mt-0"
             >
               View Full Results <IconArrowRight size={16} stroke={2} />
             </button>
-          </div>
+          </section>
         )}
+
+        <div className="mb-5">
+          <p className="text-xs font-bold uppercase tracking-[0.17em] text-orange-600">Your Assessment</p>
+          <h2 className="mt-1 text-xl font-bold tracking-tight text-gray-950">Assessment overview</h2>
+        </div>
  
-        {/* Profile + Personal Factors */}
-        <div className="grid md:grid-cols-2 gap-5 mb-5">
- 
-          <div className="rounded-3xl p-5 sm:p-6 border border-gray-200 bg-white shadow-sm">
+        {/* Assessment overview */}
+        <div className="mb-10 grid items-start gap-5 md:grid-cols-2">
+          <div className="space-y-5">
+          <section className="rounded-2xl border border-white/90 bg-white/78 p-5 shadow-[0_18px_48px_-40px_rgba(120,53,15,.5)] sm:p-6">
             <div className="flex items-center gap-3 mb-4">
               <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-blue-50 text-blue-600"><IconUser size={20} stroke={1.8} /></span>
               <div><p className="text-[11px] font-semibold uppercase tracking-wide text-gray-400">Your Profile</p><p className="text-sm font-bold text-gray-900">Personal details</p></div>
@@ -210,9 +216,9 @@ function SummaryDashboard() {
             ) : (
               <p className="text-sm text-gray-400">No profile info yet.</p>
             )}
-          </div>
+          </section>
  
-          <div className="rounded-3xl p-5 sm:p-6 border border-gray-200 bg-white shadow-sm">
+          <section className="rounded-2xl border border-white/90 bg-white/78 p-5 shadow-[0_18px_48px_-40px_rgba(120,53,15,.5)] sm:p-6">
             <div className="flex items-center justify-between gap-3 mb-4">
               <div className="flex items-center gap-3"><span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600"><IconShieldCheck size={20} stroke={1.8} /></span><div><p className="text-[11px] font-semibold uppercase tracking-wide text-gray-400">Personal Factors</p><p className="text-sm font-bold text-gray-900">Recommendation considerations</p></div></div>
               <span className={`rounded-full px-2.5 py-1 text-[11px] font-bold ${checkedFactors.length ? 'bg-emerald-50 text-emerald-700' : 'bg-gray-100 text-gray-500'}`}>{checkedFactors.length ? 'Considered' : 'None selected'}</span>
@@ -231,13 +237,9 @@ function SummaryDashboard() {
                 <p className="text-sm text-gray-400">No personal factors selected.</p>
               )}
             </div>
-          </div>
-        </div>
- 
-        {/* Interests + Skills */}
-        <div className="grid md:grid-cols-2 gap-5 mb-5">
- 
-          <div className="rounded-3xl p-5 sm:p-6 border border-gray-200 bg-white shadow-sm">
+          </section>
+
+          <section className="rounded-2xl border border-white/90 bg-white/78 p-5 shadow-[0_18px_48px_-40px_rgba(120,53,15,.5)] sm:p-6">
             <div className="flex items-center gap-3 mb-4"><span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-orange-50 text-orange-600"><IconHeart size={20} stroke={1.8} /></span><div><p className="text-[11px] font-semibold uppercase tracking-wide text-gray-400">Your Interests</p><p className="text-sm font-bold text-gray-900">{interests.length} selected hobbies</p></div></div>
             <div className="flex flex-wrap gap-2">
               {interests.length > 0 ? (
@@ -253,9 +255,10 @@ function SummaryDashboard() {
                 <p className="text-sm text-gray-400">No interests recorded yet.</p>
               )}
             </div>
+          </section>
           </div>
- 
-          <div className="rounded-3xl p-5 sm:p-6 border border-gray-200 bg-white shadow-sm">
+
+          <section className="rounded-2xl border border-white/90 bg-white/78 p-5 shadow-[0_18px_48px_-40px_rgba(120,53,15,.5)] sm:p-6">
             <div className="flex items-center justify-between gap-3 mb-4"><div className="flex items-center gap-3"><span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-violet-50 text-violet-600"><IconBrain size={20} stroke={1.8} /></span><div><p className="text-[11px] font-semibold uppercase tracking-wide text-gray-400">Skills Quiz</p><p className="text-sm font-bold text-gray-900">{skillTotals.total ? `${skillTotals.correct} of ${skillTotals.total} correct` : 'No result yet'}</p></div></div>{skillPercent !== null && <span className="rounded-full bg-violet-50 px-2.5 py-1 text-xs font-bold text-violet-700">{skillPercent}%</span>}</div>
             <div className="flex flex-col gap-3">
               {Object.keys(domainScores).length > 0 ? (
@@ -267,9 +270,9 @@ function SummaryDashboard() {
                         {score.correct}/{score.total}
                       </span>
                     </div>
-                    <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                    <div className="h-2 overflow-hidden rounded-full bg-gray-100">
                       <div
-                        className="h-full bg-violet-500 rounded-full"
+                        className="h-full rounded-full bg-gradient-to-r from-violet-400 to-violet-600"
                         style={{ width: `${(score.correct / score.total) * 100}%` }}
                       />
                     </div>
@@ -279,14 +282,18 @@ function SummaryDashboard() {
                 <p className="text-sm text-gray-400">No quiz results yet.</p>
               )}
             </div>
-          </div>
+          </section>
         </div>
  
         {/* MBTI */}
-        <div className="rounded-3xl p-5 sm:p-7 border border-gray-200 bg-white shadow-sm mb-5">
+        <div className="mb-5">
+          <p className="text-xs font-bold uppercase tracking-[0.17em] text-orange-600">Personality</p>
+          <h2 className="mt-1 text-xl font-bold tracking-tight text-gray-950">Personality profile</h2>
+        </div>
+        <section className="mb-10 rounded-[26px] border border-white/90 bg-white/78 p-5 shadow-[0_20px_55px_-42px_rgba(120,53,15,.5)] sm:p-7">
           {mbti ? (
             <div className="grid gap-6 md:grid-cols-[13rem_minmax(0,1fr)] md:items-center">
-              <div className="rounded-2xl bg-slate-950 p-5 text-white"><p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Personality Type</p><p className="mt-2 text-4xl font-black tracking-[0.16em] text-orange-400">{mbti.mbtiType}</p><p className="mt-2 text-xs leading-relaxed text-slate-400">Your four-letter preference profile</p></div>
+              <div className="rounded-2xl bg-slate-950 p-5 text-white shadow-[0_16px_34px_-24px_rgba(15,23,42,.75)]"><p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Personality Type</p><p className="mt-2 text-4xl font-black tracking-[0.16em] text-orange-400">{mbti.mbtiType}</p><p className="mt-2 text-xs leading-relaxed text-slate-400">Your four-letter preference profile</p></div>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 {Object.entries(mbtiDimensionLabels).map(([key, [first, second]]) => {
                   const percent = Math.round(mbti.scores[key])
@@ -312,12 +319,17 @@ function SummaryDashboard() {
               Coming soon — take the Personality assessment to see your MBTI type here.
             </p>
           )}
-        </div>
+        </section>
  
         {/* Career Path preview for top recommendation */}
         {topRecommendation && (
-          <div className="rounded-3xl border border-gray-200 bg-white shadow-sm mb-5 overflow-hidden">
-            <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center border-b border-gray-100 bg-gray-50/70 px-5 py-4 sm:px-7">
+          <section className="mb-10">
+            <div className="mb-5">
+              <p className="text-xs font-bold uppercase tracking-[0.17em] text-orange-600">Course &amp; Career Overview</p>
+              <h2 className="mt-1 text-xl font-bold tracking-tight text-gray-950">Your recommended direction</h2>
+            </div>
+          <div className="overflow-hidden rounded-[26px] border border-white/90 bg-white/78 shadow-[0_20px_55px_-42px_rgba(120,53,15,.5)]">
+            <div className="flex flex-col gap-3 border-b border-orange-100/70 bg-orange-50/40 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-7">
               <div><p className="text-[11px] font-semibold uppercase tracking-wide text-orange-500">
                 Career Path — {topRecommendation.course_name}
               </p><p className="mt-1 text-sm font-bold text-gray-900">Full course and career overview</p></div>
@@ -328,7 +340,7 @@ function SummaryDashboard() {
                 Explore Detailed Career Path →
               </button>
             </div>
-            <div className="grid gap-7 p-5 sm:p-7 lg:grid-cols-[minmax(0,1.3fr)_minmax(17rem,.7fr)]">
+            <div className="grid gap-7 p-5 sm:p-7 lg:grid-cols-[minmax(0,1.65fr)_minmax(17rem,1fr)]">
               <div><p className="text-sm text-gray-600 leading-7 mb-5">{topCourseDetail?.description || 'Course description not yet available.'}</p>
             <p className="text-xs font-bold uppercase tracking-wide text-gray-500 mb-3">Obtainable Skills</p>
             <div className="flex flex-wrap gap-2">
@@ -353,33 +365,38 @@ function SummaryDashboard() {
             </div></div>
             </div>
           </div>
+          </section>
         )}
  
         {/* MBTI placeholder removed — replaced with real section above */}
  
         {/* Action buttons */}
-        <div className="grid sm:grid-cols-3 gap-4">
+        <div className="mb-5">
+          <p className="text-xs font-bold uppercase tracking-[0.17em] text-orange-600">Actions</p>
+          <h2 className="mt-1 text-xl font-bold tracking-tight text-gray-950">Continue your LearnMatch journey</h2>
+        </div>
+        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
           <button
             onClick={() => navigate('/onboarding/profile')}
-            className="flex items-center justify-center gap-2 bg-gray-900 text-white px-5 py-4 rounded-xl text-sm font-medium hover:bg-gray-800 transition"
+            className="flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-5 py-3 text-sm font-semibold text-gray-700 shadow-sm transition duration-150 hover:border-orange-200 hover:bg-orange-50 hover:text-orange-700"
           >
             <IconRefresh size={16} stroke={2} /> Retake Assessment
           </button>
           <button
             onClick={() => navigate('/college/setup')}
-            className="flex items-center justify-center gap-2 bg-orange-500 text-white px-5 py-4 rounded-xl text-sm font-medium hover:bg-orange-600 transition"
+            className="flex items-center justify-center gap-2 rounded-xl bg-orange-500 px-6 py-3 text-sm font-semibold text-white shadow-[0_10px_24px_-12px_rgba(234,88,12,.8)] transition duration-150 hover:-translate-y-0.5 hover:bg-orange-600 active:translate-y-0"
           >
             <IconSchool size={16} stroke={2} /> Go to College Phase
           </button>
           <button
             disabled
-            className="flex items-center justify-center gap-2 bg-gray-100 text-gray-400 px-5 py-4 rounded-xl text-sm font-medium cursor-not-allowed"
+            className="flex cursor-not-allowed items-center justify-center gap-2 rounded-xl border border-gray-200 bg-gray-100 px-5 py-3 text-sm font-medium text-gray-400"
           >
             <IconHistory size={16} stroke={2} /> Assessment History
           </button>
         </div>
  
-      </div>
+      </main>
     </div>
   )
 }

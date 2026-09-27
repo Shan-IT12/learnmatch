@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { IconSearch, IconX } from '@tabler/icons-react'
+import { IconCalendarEvent, IconSchool, IconSearch, IconX } from '@tabler/icons-react'
 
 const MONTHS = [
   'January', 'February', 'March', 'April', 'May', 'June',
@@ -218,61 +218,72 @@ function CollegeSetup() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="relative min-h-screen overflow-x-hidden bg-[#fbf8f3] text-gray-900">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-[520px] bg-[radial-gradient(circle_at_12%_16%,rgba(251,146,60,.11),transparent_28%),radial-gradient(circle_at_82%_22%,rgba(253,186,116,.1),transparent_28%),linear-gradient(115deg,rgba(255,255,255,.8),rgba(255,247,237,.24))]" />
       {/* Nav */}
-      <nav className="bg-white border-b border-gray-100 px-8 py-5 flex justify-between items-center">
-        <span className="text-lg font-bold">
+      <nav className="relative z-10 mx-auto flex max-w-[1440px] items-center justify-between gap-4 px-5 py-5 sm:px-8 lg:px-10">
+        <span className="text-xl font-bold tracking-tight">
           Learn<span className="text-orange-500">Match</span>
         </span>
         <button
           onClick={() => navigate('/dashboard')}
-          className="text-sm text-gray-500 hover:text-gray-900 transition"
+          className="rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition duration-150 hover:border-orange-200 hover:bg-orange-50 hover:text-orange-700 active:translate-y-px"
         >
           ← Back to Dashboard
         </button>
       </nav>
 
-      <div className="max-w-lg mx-auto px-6 py-12">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">
+      <main className="relative z-0 mx-auto max-w-[1100px] px-5 pb-14 pt-7 sm:px-8 sm:pt-10 lg:px-10 lg:pb-20">
+        <div className="mx-auto mb-9 max-w-2xl text-center">
+        <p className="mb-3 text-xs font-bold uppercase tracking-[0.18em] text-orange-600">College Phase</p>
+        <h1 className="text-3xl font-bold tracking-[-0.03em] text-gray-950 sm:text-4xl">
           Set up your College Phase
         </h1>
-        <p className="text-gray-500 text-sm mb-8">
+        <p className="mt-3 text-sm leading-relaxed text-gray-500 sm:text-base">
           Tell us about your current enrollment so we can track your academic alignment.
         </p>
+        </div>
 
         {error && (
-          <div className="bg-red-50 text-red-600 px-4 py-3 rounded-xl text-sm mb-6">
+          <div role="alert" className="mx-auto mb-6 max-w-3xl rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-600">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="grid gap-6 lg:grid-cols-2 lg:items-start">
+
+          <section className="rounded-[26px] border border-white/90 bg-white/75 p-5 shadow-[0_22px_60px_-42px_rgba(120,53,15,.48)] backdrop-blur-xl sm:p-7">
+            <div className="mb-6 flex items-start gap-3">
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-orange-100 text-orange-600"><IconSchool size={22} stroke={1.7} /></span>
+              <div>
+                <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-orange-600">Current enrollment</p>
+                <h2 className="mt-1 text-lg font-bold tracking-tight text-gray-900">Enrollment Details</h2>
+              </div>
+            </div>
+            <div className="space-y-6">
+
+          <p className="text-sm font-semibold text-gray-800">What course are you enrolled in?</p>
 
           {savedRecommendations.length > 0 && (
-            <section className="bg-white border border-orange-100 rounded-2xl p-5 shadow-sm">
-              <h2 className="text-sm font-semibold text-gray-900">Based on your LearnMatch recommendations</h2>
-              <p className="text-xs text-gray-500 mt-1 mb-4">Choose one of your recommended courses or search for another course.</p>
-              <div className="space-y-3">
-                {savedRecommendations.map((recommendation) => (
-                  <div key={recommendation.course_id} className="border border-gray-100 rounded-xl p-4 sm:flex sm:items-center sm:justify-between gap-4">
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-xs font-bold text-orange-600">#{recommendation.rank_position}</span>
-                        {recommendation.course_abbreviation && (
-                          <span className="text-xs text-gray-400">{recommendation.course_abbreviation}</span>
-                        )}
-                      </div>
-                      <p className="text-sm font-medium text-gray-800">{recommendation.course_name}</p>
-                      <p className="text-xs text-gray-400 mt-1">{recommendation.match_score}% compatibility</p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => selectCourse(recommendation)}
-                      className="mt-3 sm:mt-0 shrink-0 text-xs font-medium text-orange-600 border border-orange-200 px-3 py-2 rounded-lg hover:bg-orange-50 focus:outline-none focus:ring-2 focus:ring-orange-400"
-                    >
-                      {selectedCourse?.course_id === recommendation.course_id ? 'Selected' : 'Choose this course'}
-                    </button>
-                  </div>
+            <section>
+              <h2 className="mb-3 text-[11px] font-bold uppercase tracking-[0.15em] text-orange-600">Based on your recommendations</h2>
+              <div className="overflow-hidden rounded-2xl border border-orange-100 bg-white">
+                {savedRecommendations.slice(0, 3).map((recommendation) => (
+                  <button
+                    key={recommendation.course_id}
+                    type="button"
+                    onClick={() => selectCourse(recommendation)}
+                    className={`flex w-full items-center gap-3 border-t px-4 py-3 text-left transition duration-150 first:border-t-0 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-orange-400 ${selectedCourse?.course_id === recommendation.course_id ? 'border-orange-200 bg-orange-50' : 'border-gray-100 bg-white hover:bg-orange-50/50'}`}
+                  >
+                    <span className="text-xs font-bold tabular-nums text-orange-500">{String(recommendation.rank_position).padStart(2, '0')}</span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-sm font-semibold leading-snug text-gray-800">{recommendation.course_name}</span>
+                      {recommendation.course_abbreviation && <span className="mt-0.5 block text-xs text-gray-400">{recommendation.course_abbreviation}</span>}
+                    </span>
+                    <span aria-hidden="true" className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border ${selectedCourse?.course_id === recommendation.course_id ? 'border-orange-500 bg-orange-500 text-white' : 'border-gray-300 bg-white'}`}>
+                      {selectedCourse?.course_id === recommendation.course_id && <span className="h-1.5 w-1.5 rounded-full bg-white" />}
+                    </span>
+                  </button>
                 ))}
               </div>
             </section>
@@ -280,8 +291,10 @@ function CollegeSetup() {
 
           {/* Course search */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              What course are you enrolled in?
+            <label className="mb-3 flex items-center gap-3 text-xs font-medium text-gray-500">
+              <span className="h-px flex-1 bg-gray-200" />
+              {savedRecommendations.length > 0 ? 'or search another course' : 'Search for your enrolled course'}
+              <span className="h-px flex-1 bg-gray-200" />
             </label>
             <div className="relative">
               <IconSearch size={18} stroke={1.75} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
@@ -291,7 +304,7 @@ function CollegeSetup() {
                 onChange={handleSearchChange}
                 placeholder="Search by course name, abbreviation, or code..."
                 aria-label="Search active courses by name, abbreviation, or code"
-                className="w-full border border-gray-200 rounded-xl pl-10 pr-10 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+                className="w-full rounded-2xl border border-orange-200 bg-[#fffdf9] py-3.5 pl-11 pr-11 text-sm outline-none transition duration-150 hover:border-orange-300 focus:border-orange-400 focus:ring-4 focus:ring-orange-100/80"
               />
               {search && !selectedCourse && (
                 <button
@@ -310,7 +323,7 @@ function CollegeSetup() {
               <p className="mt-2 text-xs text-gray-400">Finding courses...</p>
             )}
             {searchStatus === 'success' && courses.length > 0 && !selectedCourse && (
-              <div className="border border-gray-100 rounded-xl shadow-sm mt-2 overflow-hidden">
+              <div className="mt-2 max-h-64 overflow-y-auto rounded-xl border border-orange-100 bg-white shadow-lg">
                 {courses.map((course) => (
                   <button
                     key={course.course_id}
@@ -366,7 +379,7 @@ function CollegeSetup() {
               value={academicYear}
               onChange={handleAcademicYearChange}
               placeholder="2026-2027"
-              className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+              className="w-full rounded-2xl border border-stone-200 bg-white px-4 py-3.5 text-sm outline-none transition duration-150 hover:border-orange-200 focus:border-orange-400 focus:ring-4 focus:ring-orange-100/80"
             />
           </div>
 
@@ -375,16 +388,16 @@ function CollegeSetup() {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               What year level are you in?
             </label>
-            <div className="grid grid-cols-5 gap-2">
+            <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
               {['1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year'].map((year) => (
                 <button
                   key={year}
                   type="button"
                   onClick={() => setYearLevel(year)}
-                  className={`py-3 rounded-xl text-sm font-medium border transition ${
+                  className={`rounded-xl border py-3 text-sm font-medium transition duration-150 ${
                     yearLevel === year
-                      ? 'bg-orange-500 text-white border-orange-500'
-                      : 'bg-white text-gray-600 border-gray-200 hover:border-orange-300'
+                      ? 'border-orange-400 bg-orange-50 text-orange-700 shadow-sm ring-1 ring-orange-200'
+                      : 'border-gray-200 bg-white text-gray-600 hover:border-orange-300 hover:bg-orange-50/40'
                   }`}
                 >
                   {year.replace(' Year', '')}
@@ -404,10 +417,10 @@ function CollegeSetup() {
                   key={sem}
                   type="button"
                   onClick={() => handleSemesterChoice(sem)}
-                  className={`py-3 rounded-xl text-sm font-medium border transition ${
+                  className={`rounded-xl border py-3 text-sm font-medium transition duration-150 ${
                     semester === sem
-                      ? 'bg-orange-500 text-white border-orange-500'
-                      : 'bg-white text-gray-600 border-gray-200 hover:border-orange-300'
+                      ? 'border-orange-400 bg-orange-50 text-orange-700 shadow-sm ring-1 ring-orange-200'
+                      : 'border-gray-200 bg-white text-gray-600 hover:border-orange-300 hover:bg-orange-50/40'
                   }`}
                 >
                   {sem}
@@ -416,10 +429,17 @@ function CollegeSetup() {
             </div>
           </div>
 
-          <section className="border-t border-gray-200 pt-6 space-y-4">
-            <div>
-              <h2 className="text-base font-semibold text-gray-900">Semester Tracking</h2>
+            </div>
+          </section>
+
+          <section className="space-y-5 rounded-[26px] border border-white/90 bg-white/75 p-5 shadow-[0_22px_60px_-42px_rgba(120,53,15,.48)] backdrop-blur-xl sm:p-7">
+            <div className="flex items-start gap-3">
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-orange-100 text-orange-600"><IconCalendarEvent size={22} stroke={1.7} /></span>
+              <div>
+              <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-orange-600">Semester tracking</p>
+              <h2 className="mt-1 text-lg font-bold tracking-tight text-gray-900">Plan your check-ins</h2>
               <p className="text-sm text-gray-500 mt-1">Help LearnMatch determine when your Early, Mid, and End check-ins should happen.</p>
+              </div>
             </div>
 
             <div className="space-y-2">
@@ -428,8 +448,8 @@ function CollegeSetup() {
                 ['approximate', 'I only know the approximate schedule'],
                 ['unknown', "I don't know my semester schedule"],
               ].map(([value, label]) => (
-                <label key={value} className={`flex items-center gap-3 rounded-xl border px-4 py-3 cursor-pointer ${timingChoice === value ? 'border-orange-400 bg-orange-50' : 'border-gray-200 bg-white'}`}>
-                  <input type="radio" name="timing-choice" value={value} checked={timingChoice === value} onChange={() => setTimingChoice(value)} className="accent-orange-500" />
+                <label key={value} className={`flex cursor-pointer items-center gap-3 rounded-2xl border px-4 py-3.5 transition duration-150 ${timingChoice === value ? 'border-orange-300 bg-orange-50/80 shadow-sm' : 'border-gray-200 bg-white hover:border-orange-200 hover:bg-orange-50/30'}`}>
+                  <input type="radio" name="timing-choice" value={value} checked={timingChoice === value} onChange={() => setTimingChoice(value)} className="h-4 w-4 accent-orange-500" />
                   <span className="text-sm font-medium text-gray-700">{label}</span>
                 </label>
               ))}
@@ -439,11 +459,11 @@ function CollegeSetup() {
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
                   <label htmlFor="semester-start" className="block text-sm font-medium text-gray-700 mb-2">Semester start</label>
-                  <input id="semester-start" type="date" value={semesterStartDate} onChange={(event) => setSemesterStartDate(event.target.value)} className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400" />
+                  <input id="semester-start" type="date" value={semesterStartDate} onChange={(event) => setSemesterStartDate(event.target.value)} className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100/80" />
                 </div>
                 <div>
                   <label htmlFor="semester-end" className="block text-sm font-medium text-gray-700 mb-2">Semester end</label>
-                  <input id="semester-end" type="date" min={semesterStartDate || undefined} value={semesterEndDate} onChange={(event) => setSemesterEndDate(event.target.value)} className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400" />
+                  <input id="semester-end" type="date" min={semesterStartDate || undefined} value={semesterEndDate} onChange={(event) => setSemesterEndDate(event.target.value)} className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100/80" />
                 </div>
               </div>
             )}
@@ -457,15 +477,15 @@ function CollegeSetup() {
                   <fieldset key={label}>
                     <legend className="text-sm font-medium text-gray-700 mb-2">{label}</legend>
                     <div className="grid sm:grid-cols-3 gap-2">
-                      <select aria-label={`${label} month`} value={value.month} onChange={(event) => setter({ ...value, month: event.target.value })} className="border border-gray-200 rounded-xl px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400">
+                      <select aria-label={`${label} month`} value={value.month} onChange={(event) => setter({ ...value, month: event.target.value })} className="rounded-xl border border-gray-200 bg-white px-3 py-3 text-sm outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100/80">
                         <option value="">Month</option>
                         {MONTHS.map((month, index) => <option key={month} value={String(index + 1)}>{month}</option>)}
                       </select>
-                      <select aria-label={`${label} year`} value={value.year} onChange={(event) => setter({ ...value, year: event.target.value })} className="border border-gray-200 rounded-xl px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400">
+                      <select aria-label={`${label} year`} value={value.year} onChange={(event) => setter({ ...value, year: event.target.value })} className="rounded-xl border border-gray-200 bg-white px-3 py-3 text-sm outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100/80">
                         <option value="">Year</option>
                         {academicYears.map((year) => <option key={year} value={year}>{year}</option>)}
                       </select>
-                      <select aria-label={`${label} part of month`} value={value.part} onChange={(event) => setter({ ...value, part: event.target.value })} className="border border-gray-200 rounded-xl px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400">
+                      <select aria-label={`${label} part of month`} value={value.part} onChange={(event) => setter({ ...value, part: event.target.value })} className="rounded-xl border border-gray-200 bg-white px-3 py-3 text-sm outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100/80">
                         <option value="">Part of month</option>
                         {MONTH_PARTS.map((part) => <option key={part.value} value={part.value}>{part.label}</option>)}
                       </select>
@@ -480,7 +500,7 @@ function CollegeSetup() {
                 <legend className="text-sm font-medium text-gray-700 mb-3">How far along are you in your current semester?</legend>
                 <div className="space-y-2">
                   {POSITION_OPTIONS.map((option) => (
-                    <label key={option.label} className={`flex items-center gap-3 rounded-xl border px-4 py-3 cursor-pointer ${semesterPosition === option.value ? 'border-orange-400 bg-orange-50' : 'border-gray-200 bg-white'}`}>
+                    <label key={option.label} className={`flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 transition duration-150 ${semesterPosition === option.value ? 'border-orange-300 bg-orange-50/80 shadow-sm' : 'border-gray-200 bg-white hover:border-orange-200 hover:bg-orange-50/30'}`}>
                       <input type="radio" name="semester-position" value={option.value || 'unsure'} checked={semesterPosition === option.value} onChange={() => setSemesterPosition(option.value)} className="accent-orange-500" />
                       <span className="text-sm text-gray-700">{option.label}</span>
                     </label>
@@ -490,15 +510,17 @@ function CollegeSetup() {
             )}
           </section>
 
+          <div className="flex justify-center lg:col-span-2">
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-orange-500 text-white py-3 rounded-xl font-medium hover:bg-orange-600 transition text-sm disabled:opacity-50"
+            className="inline-flex w-full max-w-md items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-orange-500 to-orange-600 px-7 py-3.5 text-sm font-semibold text-white shadow-[0_12px_28px_-12px_rgba(234,88,12,.8)] transition duration-150 hover:-translate-y-0.5 hover:shadow-[0_16px_32px_-12px_rgba(234,88,12,.72)] active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {loading ? 'Setting up...' : 'Continue to College Phase →'}
           </button>
+          </div>
         </form>
-      </div>
+      </main>
     </div>
   )
 }
