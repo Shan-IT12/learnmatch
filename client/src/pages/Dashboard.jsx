@@ -90,7 +90,7 @@ function Dashboard() {
         </button>
         <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           <span className="hidden md:inline text-sm text-gray-500 mr-1">Welcome, <strong className="text-gray-900">{username}</strong></span>
-          <button onClick={() => navigate('/profile', { state: { entryContext: 'dashboard' } })} className="bg-orange-500 text-white px-3.5 py-2.5 rounded-xl text-xs font-medium hover:bg-orange-600 transition">View Profile</button>
+          <button onClick={() => navigate('/profile', { state: { entryContext: 'dashboard' } })} className="bg-orange-500 text-white px-3.5 py-2.5 rounded-xl text-xs font-medium hover:bg-orange-600 transition">{hasProfile ? 'View Profile' : 'Setup Profile'}</button>
           <button onClick={() => navigate('/feedback')} className="text-sm text-gray-600 hover:text-orange-600 transition px-2 py-2">Feedback</button>
           <button onClick={handleLogout} className="bg-red-50 text-red-600 px-3.5 py-2.5 rounded-xl text-xs font-medium hover:bg-red-100 transition">Logout</button>
         </div>

@@ -6,8 +6,7 @@ const personalFactorLabels = {
   factor_physical: 'Physical / Mobility',
   factor_health: 'Health',
   factor_financial: 'Financial',
-  factor_family: 'Family Obligations',
-  factor_distance: 'Distance / Commute',
+  factor_family: 'Family Responsibilities',
   factor_working_student: 'Working Student',
 }
 

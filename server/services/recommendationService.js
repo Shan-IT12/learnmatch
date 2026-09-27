@@ -35,13 +35,17 @@ export function buildEffectivePersonalFactors(profile = {}) {
     factor_health: profile.factor_health,
     factor_financial: profile.factor_financial,
     factor_family: profile.factor_family,
-    factor_distance: profile.factor_distance,
     factor_working_student: profile.factor_working_student,
   }
 
-  const categories = parseStoredPersonalFactorCategories(
+  const storedCategories = parseStoredPersonalFactorCategories(
     profile.factor_others_classification
   )
+  // Historical classifications may contain the retired distance category.
+  // Ignore unsupported entries while retaining any supported categories.
+  const categories = Array.isArray(storedCategories)
+    ? storedCategories.filter((category) => personalFactorCategorySet.has(category))
+    : storedCategories
   const classification = validatePersonalFactorClassification({
     status: profile.factor_others_classification_status,
     categories,

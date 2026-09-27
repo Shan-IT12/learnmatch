@@ -5,7 +5,6 @@ export const PERSONAL_FACTOR_CATEGORIES = Object.freeze([
   'factor_health',
   'factor_financial',
   'factor_family',
-  'factor_distance',
   'factor_working_student',
 ])
 
@@ -137,7 +136,7 @@ export async function classifyPersonalFactorText(
       },
       body: JSON.stringify({
         model,
-        instructions: `Evaluate the student's full custom personal-factor paragraph in one request. It may be English, Filipino/Tagalog, Taglish, another language, or mixed-language. Classify its semantic meaning without translating, rewriting, summarizing, or inferring circumstances that were not expressed. Return every clearly expressed applicable category from this closed list: factor_physical for physical or mobility limitations; factor_health for health or medical needs; factor_financial for financial constraints; factor_family for family caregiving or obligations; factor_distance for distance or commute difficulty; factor_working_student for employment while studying. Return MATCHED with one or more categories when factors are clearly expressed; multiple clear factors are not ambiguous. Return AMBIGUOUS with an empty array only when meaning cannot be mapped reliably. Return UNMATCHED with an empty array when no category fits. Never create categories, scores, recommendations, course advice, or explanations.`,
+        instructions: `Evaluate the student's full custom personal-factor paragraph in one request. It may be English, Filipino/Tagalog, Taglish, another language, or mixed-language. Classify its semantic meaning without translating, rewriting, summarizing, or inferring circumstances that were not expressed. Return every clearly expressed applicable category from this closed list: factor_physical for physical or mobility limitations; factor_health for health or medical needs; factor_financial for financial constraints; factor_family for family caregiving or obligations; factor_working_student for employment while studying. Distance, transportation, travel time, commuting, or living far from school are unsupported and must not be mapped to another category unless the text independently expresses that supported category. Return MATCHED with one or more categories when supported factors are clearly expressed; multiple clear supported factors are not ambiguous. Return AMBIGUOUS with an empty array only when meaning cannot be mapped reliably. Return UNMATCHED with an empty array when no supported category fits. Never create categories, scores, recommendations, course advice, or explanations.`,
         input: text,
         max_output_tokens: 80,
         text: {

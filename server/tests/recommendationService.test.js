@@ -48,13 +48,13 @@ test('manual and AI selection of the same category remains one effective boolean
   assert.equal(calculatePersonalFactorScore(effective, 'HEALTHCARE SCIENCE CLUSTER'), 0)
 })
 
-test('distance classification remains non-scoreable', () => {
+test('historical distance values remain non-scoreable and are not effective factors', () => {
   const baseline = calculatePersonalFactorScore({}, 'AVIATION & MARITIME CLUSTER')
   const effective = buildEffectivePersonalFactors({
     factor_others_classification_status: 'MATCHED',
     factor_others_classification: '["factor_distance","factor_working_student"]',
   })
-  assert.equal(effective.factor_distance, true)
+  assert.equal(effective.factor_distance, undefined)
   assert.equal(effective.factor_working_student, true)
   assert.notEqual(calculatePersonalFactorScore(effective, 'AVIATION & MARITIME CLUSTER'), baseline)
   assert.equal(

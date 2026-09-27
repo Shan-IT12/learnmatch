@@ -25,7 +25,6 @@ export const saveProfileWithDependencies = async (
     factor_health,
     factor_financial,
     factor_family,
-    factor_distance,
     factor_working_student,
     factor_others
   } = req.body
@@ -95,14 +94,14 @@ export const saveProfileWithDependencies = async (
         `UPDATE PROFILE SET 
           full_name = ?, height_cm = ?, weight_kg = ?,
           factor_physical = ?, factor_health = ?, factor_financial = ?,
-          factor_family = ?, factor_distance = ?, factor_working_student = ?,
+          factor_family = ?, factor_working_student = ?,
           factor_others = ?, factor_others_classification_status = ?,
           factor_others_classification = ?
         WHERE user_id = ?`,
         [
           full_name, normalizedHeight, normalizedWeight,
           factor_physical, factor_health, factor_financial,
-          factor_family, factor_distance, factor_working_student,
+          factor_family, factor_working_student,
           normalizedOther, classificationStatus, classification, userId
         ]
       )
@@ -119,7 +118,7 @@ export const saveProfileWithDependencies = async (
       [
         userId, full_name, normalizedHeight, normalizedWeight,
         factor_physical, factor_health, factor_financial,
-        factor_family, factor_distance, factor_working_student,
+        factor_family, false, factor_working_student,
         normalizedOther, classificationStatus, classification
       ]
     )

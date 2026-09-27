@@ -14,7 +14,9 @@ function responseWith(payload) {
   }
 }
 
-test('accepts all six allowlisted matched categories', async () => {
+test('accepts all five allowlisted matched categories', async () => {
+  assert.equal(PERSONAL_FACTOR_CATEGORIES.length, 5)
+  assert.equal(PERSONAL_FACTOR_CATEGORIES.includes('factor_distance'), false)
   for (const category of PERSONAL_FACTOR_CATEGORIES) {
     const result = await classifyPersonalFactorText('A private custom circumstance', {
       apiKey: 'test-key',
@@ -24,7 +26,7 @@ test('accepts all six allowlisted matched categories', async () => {
   }
 })
 
-test('accepts two, three, and all six distinct matched categories', async () => {
+test('accepts two, three, and all five distinct matched categories', async () => {
   for (const categories of [
     ['factor_family', 'factor_financial'],
     ['factor_working_student', 'factor_financial', 'factor_family'],
@@ -76,6 +78,7 @@ test('rejects invalid status, duplicates, unknown categories, empty matches, and
   const invalid = [
     { status: 'CERTAIN', categories: ['factor_family'] },
     { status: 'MATCHED', categories: ['factor_academic'] },
+    { status: 'MATCHED', categories: ['factor_distance'] },
     { status: 'MATCHED', categories: [] },
     { status: 'MATCHED', categories: ['factor_family', 'factor_family'] },
     { status: 'AMBIGUOUS', categories: ['factor_family'] },
@@ -126,7 +129,7 @@ test('sends Tagalog, Taglish, and mixed-language paragraphs whole in one request
     },
     {
       text: 'Malayo bahay namin and I also work after class.',
-      categories: ['factor_distance', 'factor_working_student'],
+      categories: ['factor_working_student'],
     },
     {
       text: 'Kailangan kong magtrabaho habang nag-aaral dahil kulang ang income ng pamilya namin. Ako rin ang nag-aalaga sa kapatid ko pagkatapos ng klase.',
@@ -148,6 +151,20 @@ test('sends Tagalog, Taglish, and mixed-language paragraphs whole in one request
     assert.equal(calls, 1)
     assert.deepEqual(result, { status: 'MATCHED', categories })
   }
+})
+
+test('prompt treats commute-only text as unsupported instead of inferring another factor', async () => {
+  const text = 'Malayo ang school sa bahay namin.'
+  const result = await classifyPersonalFactorText(text, {
+    apiKey: 'test-key',
+    fetchImpl: async (_url, options) => {
+      const request = JSON.parse(options.body)
+      assert.doesNotMatch(request.instructions, /factor_distance/)
+      assert.match(request.instructions, /commuting.*unsupported|unsupported.*commuting/i)
+      return responseWith({ status: 'UNMATCHED', categories: [] })
+    },
+  })
+  assert.deepEqual(result, { status: 'UNMATCHED', categories: [] })
 })
 
 test('development observability logs only result metadata', () => {

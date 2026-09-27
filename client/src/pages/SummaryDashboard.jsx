@@ -3,11 +3,10 @@ import { useNavigate } from 'react-router-dom'
 import { IconArrowRight, IconRefresh, IconSchool, IconHistory, IconUser, IconHeart, IconBrain, IconShieldCheck } from '@tabler/icons-react'
 
 const personalFactorLabels = {
-  factor_physical: 'Physical / Mobility Condition',
-  factor_health: 'Health Condition',
-  factor_financial: 'Financial Constraint',
-  factor_family: 'Family Obligation',
-  factor_distance: 'Distance / Commute',
+  factor_physical: 'Physical / Mobility',
+  factor_health: 'Health',
+  factor_financial: 'Financial',
+  factor_family: 'Family Responsibilities',
   factor_working_student: 'Working Student',
 }
 

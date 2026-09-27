@@ -91,9 +91,9 @@ test('whitespace-only or removed text clears both classification fields', async 
   })
   assert.equal(classificationCalls, 0)
   assert.equal(write.params[6], true)
+  assert.equal(write.params[8], null)
   assert.equal(write.params[9], null)
   assert.equal(write.params[10], null)
-  assert.equal(write.params[11], null)
 })
 
 test('editing custom text replaces the stored classification', async () => {
@@ -109,9 +109,9 @@ test('editing custom text replaces the stored classification', async () => {
       categories: ['factor_working_student', 'factor_financial'],
     }),
   })
-  assert.equal(write.params[9], 'I work evenings.')
-  assert.equal(write.params[10], 'MATCHED')
-  assert.equal(write.params[11], '["factor_working_student","factor_financial"]')
+  assert.equal(write.params[8], 'I work evenings.')
+  assert.equal(write.params[9], 'MATCHED')
+  assert.equal(write.params[10], '["factor_working_student","factor_financial"]')
 })
 
 test('unchanged matched, ambiguous, and unmatched results avoid another AI call', async () => {
@@ -131,8 +131,8 @@ test('unchanged matched, ambiguous, and unmatched results avoid another AI call'
       classify: async () => { classificationCalls += 1 },
     })
     assert.equal(classificationCalls, 0)
-    assert.equal(write.params[10], stored.status)
-    assert.equal(write.params[11], JSON.stringify(stored.categories))
+    assert.equal(write.params[9], stored.status)
+    assert.equal(write.params[10], JSON.stringify(stored.categories))
   }
 })
 
@@ -179,8 +179,8 @@ test('unchanged unavailable result triggers one new classification attempt', asy
     },
   })
   assert.equal(classificationCalls, 1)
-  assert.equal(write.params[10], 'MATCHED')
-  assert.equal(write.params[11], '["factor_working_student"]')
+  assert.equal(write.params[9], 'MATCHED')
+  assert.equal(write.params[10], '["factor_working_student"]')
 })
 
 test('failed retry of unchanged unavailable result still saves unavailable and empty categories', async () => {
@@ -199,8 +199,8 @@ test('failed retry of unchanged unavailable result still saves unavailable and e
   })
   assert.equal(classificationCalls, 1)
   assert.equal(res.statusCode, 200)
-  assert.equal(write.params[10], 'UNAVAILABLE')
-  assert.equal(write.params[11], '[]')
+  assert.equal(write.params[9], 'UNAVAILABLE')
+  assert.equal(write.params[10], '[]')
 })
 
 test('rejects non-string and over-limit custom input without writing', async () => {
@@ -209,4 +209,12 @@ test('rejects non-string and over-limit custom input without writing', async () 
     assert.equal(res.statusCode, 400)
     assert.equal(db.calls.length, 0)
   }
+})
+
+test('updates leave the historical distance field untouched', async () => {
+  const { write } = await save({ factor_distance: true, factor_family: true }, {
+    existing: [{ profile_id: 1, factor_others: null }],
+  })
+  assert.doesNotMatch(write.sql, /factor_distance\s*=\s*\?/)
+  assert.equal(write.params[6], true)
 })
