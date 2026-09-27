@@ -19,6 +19,11 @@ function PublicCourseDetails() {
   const location = useLocation()
   const isAuthenticated = Boolean(localStorage.getItem('token'))
   const fromDashboard = location.state?.entryContext === 'dashboard'
+  const schoolLocatorSource = fromDashboard
+    ? 'explorer'
+    : isAuthenticated
+      ? undefined
+      : 'public-search'
   const [course, setCourse] = useState(null)
   const [status, setStatus] = useState('loading')
   const [resolvedCourseCode, setResolvedCourseCode] = useState(null)
@@ -79,7 +84,7 @@ function PublicCourseDetails() {
               <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 leading-tight">{course.course_name}</h1>
               {course.description && <p className="text-gray-600 leading-7 whitespace-pre-line mt-6">{course.description}</p>}
 
-              <Link to={`/schools/${encodeURIComponent(course.course_code)}`} className="inline-flex mt-6 bg-orange-500 text-white px-5 py-3 rounded-xl text-sm font-semibold hover:bg-orange-600 transition">
+              <Link to={`/schools/${encodeURIComponent(course.course_code)}`} state={schoolLocatorSource ? { source: schoolLocatorSource } : undefined} className="inline-flex mt-6 bg-orange-500 text-white px-5 py-3 rounded-xl text-sm font-semibold hover:bg-orange-600 transition">
                 Find Schools in SJDM
               </Link>
 

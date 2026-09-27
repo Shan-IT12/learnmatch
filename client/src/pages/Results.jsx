@@ -268,7 +268,7 @@ function Results() {
                 View Career Path →
               </button>
                   <button
-                    onClick={() => navigate(`/schools/${encodeURIComponent(rec.course_code)}`)}
+                    onClick={() => navigate(`/schools/${encodeURIComponent(rec.course_code)}`, { state: { source: 'results' } })}
                     className="text-sm font-medium text-gray-600 hover:text-orange-600 transition"
                   >
                     Find Schools in SJDM

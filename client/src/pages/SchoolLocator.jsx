@@ -1,13 +1,15 @@
 import { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useLocation, useParams } from 'react-router-dom'
 import { IconAlertCircle, IconArrowLeft, IconBook2, IconMapPin, IconSchool } from '@tabler/icons-react'
 import PublicHeader from '../components/PublicHeader'
 import SchoolLocatorMap from '../components/SchoolLocatorMap'
+import { getSchoolLocatorBackNavigation } from '../utils/schoolLocatorNavigation'
 
 const apiUrl = import.meta.env.VITE_API_URL || ''
 
 function SchoolLocator() {
   const { courseCode } = useParams()
+  const location = useLocation()
   const isAuthenticated = Boolean(localStorage.getItem('token'))
   const [result, setResult] = useState(null)
   const [status, setStatus] = useState('loading')
@@ -47,15 +49,14 @@ function SchoolLocator() {
     return () => controller.abort()
   }, [courseCode, retryCount])
 
-  const backPath = isAuthenticated ? '/results' : '/courses/search'
-  const backLabel = isAuthenticated ? 'Back to results' : 'Back to course explorer'
+  const backNavigation = getSchoolLocatorBackNavigation(location.state?.source, isAuthenticated)
 
   return (
     <div className="min-h-screen bg-[#fcfaf7] text-gray-900">
       <PublicHeader />
       <main className="max-w-6xl mx-auto px-5 sm:px-8 lg:px-10 py-8 sm:py-12">
-        <Link to={backPath} className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-orange-600 transition">
-          <IconArrowLeft size={17} stroke={2} /> {backLabel}
+        <Link to={backNavigation.path} className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-orange-600 transition">
+          <IconArrowLeft size={17} stroke={2} /> {backNavigation.label}
         </Link>
 
         {displayStatus === 'loading' && (
@@ -107,7 +108,7 @@ function SchoolLocator() {
                 <h2 className="text-xl sm:text-2xl font-bold mt-5">No school match is currently available for this course.</h2>
                 <p className="text-sm text-gray-500 leading-6 mt-3 max-w-2xl mx-auto">This does not necessarily mean the course is unavailable in San Jose del Monte. Some school program information may not yet be available in LearnMatch.</p>
                 <div className="flex flex-col sm:flex-row justify-center gap-3 mt-7">
-                  {isAuthenticated && <Link to="/results" className="bg-gray-900 text-white px-5 py-3 rounded-xl text-sm font-semibold hover:bg-gray-800 transition">Back to results</Link>}
+                  <Link to={backNavigation.path} className="bg-gray-900 text-white px-5 py-3 rounded-xl text-sm font-semibold hover:bg-gray-800 transition">{backNavigation.label}</Link>
                   <Link to="/courses/search" className="border border-orange-200 bg-orange-50 text-orange-700 px-5 py-3 rounded-xl text-sm font-semibold hover:bg-orange-100 transition">Explore other courses</Link>
                 </div>
               </section>
