@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { STUDENT_ACTIVE_INDEPENDENT_COURSE_COUNT } from '../constants/courseCatalog'
 
-const clusterCards = [
-  { label: 'Engineering / STEM', score: 92, color: 'bg-orange-500', delay: '0s' },
-  { label: 'Healthcare Science', score: 78, color: 'bg-gray-800', delay: '0.4s' },
-  { label: 'Business', score: 65, color: 'bg-orange-400', delay: '0.8s' },
+const matchCards = [
+  { label: 'Top recommendation', score: 92, color: 'bg-orange-500', delay: '0s' },
+  { label: 'Strong match', score: 78, color: 'bg-gray-800', delay: '0.4s' },
+  { label: 'Good match', score: 65, color: 'bg-orange-400', delay: '0.8s' },
 ]
 
-function ClusterCard({ label, score, color, delay }) {
+function MatchCard({ label, score, color, delay }) {
   return (
     <div
       className="bg-white rounded-2xl shadow-lg px-5 py-4 w-56 border border-gray-100"
@@ -200,9 +201,6 @@ function Landing() {
                             <p className="text-sm font-medium text-gray-800 group-hover:text-orange-600 transition">
                               {course.course_name}{course.course_abbreviation ? ` (${course.course_abbreviation})` : ''}
                             </p>
-                            <p className="text-xs text-gray-400 mt-0.5">
-                              {course.cluster_category}
-                            </p>
                           </button>
                         ))}
                       </div>
@@ -242,7 +240,7 @@ function Landing() {
             </div>
             <div className="w-px h-8 bg-gray-200" />
             <div>
-              <p className="text-xl font-bold text-gray-900">342</p>
+              <p className="text-xl font-bold text-gray-900">{STUDENT_ACTIVE_INDEPENDENT_COURSE_COUNT}</p>
               <p className="text-xs text-gray-400">Courses</p>
             </div>
             <div className="w-px h-8 bg-gray-200" />
@@ -269,16 +267,16 @@ function Landing() {
             style={{ transform: 'rotate(-10deg)' }}
           />
 
-          {/* Floating cluster cards */}
+          {/* Floating match cards */}
           <div className="relative flex flex-col gap-4 items-center z-10">
             <div style={{ transform: 'translateX(40px)' }}>
-              <ClusterCard {...clusterCards[0]} />
+              <MatchCard {...matchCards[0]} />
             </div>
             <div style={{ transform: 'translateX(-30px)' }}>
-              <ClusterCard {...clusterCards[1]} />
+              <MatchCard {...matchCards[1]} />
             </div>
             <div style={{ transform: 'translateX(20px)' }}>
-              <ClusterCard {...clusterCards[2]} />
+              <MatchCard {...matchCards[2]} />
             </div>
           </div>
 
@@ -316,7 +314,7 @@ function Landing() {
               {
                 step: '03',
                 title: 'Get your matches',
-                desc: 'See your top course cluster matches with a personalized explanation of why each one fits you — and which SJDM schools offer them.',
+                desc: 'See your top course matches with a personalized explanation of why each one fits you — and which SJDM schools offer them.',
               },
             ].map((item) => (
               <div key={item.step} className="relative">

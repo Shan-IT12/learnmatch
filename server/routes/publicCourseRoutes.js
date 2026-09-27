@@ -13,8 +13,8 @@ router.get('/search', async (req, res) => {
 
   try {
     const requestedLimit = Number.parseInt(req.query.limit, 10)
-    const limit = Number.isFinite(requestedLimit) ? requestedLimit : 342
-    const courses = await searchAvailablePublicCourses(query, { limit })
+    const options = Number.isFinite(requestedLimit) ? { limit: requestedLimit } : {}
+    const courses = await searchAvailablePublicCourses(query, options)
     res.json({ query, courses })
   } catch (error) {
     console.error('Public course search error:', error)

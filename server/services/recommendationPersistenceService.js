@@ -8,6 +8,7 @@ import {
   buildDeterministicExplanation,
   generateRecommendationExplanations,
 } from './recommendationExplanationService.js'
+import { isCurrentIndependentCourse } from './courseIdentityService.js'
 
 function toNormalizedScore(displayPercent, label) {
   const score = Number(displayPercent) / 100
@@ -103,7 +104,10 @@ async function getRecommendationItems(database, recommendationId, activeOnly = f
      ORDER BY ri.rank_position ASC`,
     [recommendationId]
   )
-  return rows.map(shapeSavedRecommendation)
+  const visibleRows = activeOnly
+    ? rows.filter(({ course_code }) => isCurrentIndependentCourse(course_code))
+    : rows
+  return visibleRows.map(shapeSavedRecommendation)
 }
 
 export async function getSavedRecommendationForAssessment(database, userId, assessmentId) {

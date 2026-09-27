@@ -98,7 +98,7 @@
     {
       "course_id": "CRS003",
       "course_name": "Bachelor of Science in Aeronautical Engineering",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSAeE",
       "parent_cluster": "AVIATION & MARITIME CLUSTER",
       "course_description": "The Bachelor of Science in Aeronautical Engineering is a professional engineering degree program that prepares students for careers involving the design, analysis, development, manufacturing, operation, maintenance, and improvement of aircraft and related aeronautical systems.\nThe program develops a strong foundation in mathematics, physics, basic engineering sciences, and aeronautical engineering principles. Students study areas related to aircraft structures, aerodynamics, propulsion, aircraft systems, aircraft design, maintenance, and other technologies used in the aviation industry.\nThe program prepares students to contribute to the technological and socioeconomic development of the aviation industry, particularly in areas such as aircraft research, development, manufacturing, maintenance, operation, and aviation education. The profession is regulated in the Philippines, and aeronautical engineering practice includes professional services involving aircraft structures, power plants, accessories, and related engineering activities.",
       "obtainable_skills": [
@@ -326,7 +326,7 @@
     {
       "course_id": "CRS008",
       "course_name": "Bachelor of Science in Agriculture",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSA",
       "parent_cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
       "course_description": "The Bachelor of Science in Agriculture is a comprehensive program that provides students with a broad understanding of agricultural sciences, including crop production, animal science, soil science, agricultural economics, and agricultural extension. The program prepares students for various careers in agriculture, agribusiness, research, and government service. Students learn to apply scientific principles to solve problems in agricultural production, resource management, and sustainable farming systems. The program emphasizes the development of competencies needed to address challenges in food security, sustainable agriculture, and rural development.",
       "obtainable_skills": [
@@ -522,7 +522,7 @@
     {
       "course_id": "CRS013",
       "course_name": "Bachelor of Science in Biology",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSBio",
       "parent_cluster": "SCIENCE & MATHEMATICS CLUSTER",
       "course_description": "This program introduces students to the principles and practices of Biology. Coursework develops in-depth understanding of biological principles, critical analysis and problem-solving, laboratory and field research skills. Graduates can explore entry-level opportunities such as Research Assistant and Biological Laboratory Technician.",
       "obtainable_skills": [
@@ -613,7 +613,7 @@
     {
       "course_id": "CRS015",
       "course_name": "Bachelor of Science in Business Administration major in Financial Management",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSBA",
       "parent_cluster": "BUSINESS CLUSTER",
       "course_description": "An undergraduate program centered on Business Administration major in Financial Management. Key learning areas include financial analysis and decision-making, quantitative and analytical skills, strategic financial management. It prepares students for entry-level work in fields such as Financial Analyst and Finance Manager.",
       "obtainable_skills": [
@@ -732,7 +732,7 @@
     {
       "course_id": "CRS018",
       "course_name": "Bachelor of Science in Chemical Engineering",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSChE",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "course_description": "An undergraduate program centered on Chemical Engineering. Key learning areas include process engineering, thermodynamics and transport phenomena, reaction engineering. It prepares students for entry-level work in fields such as Chemical Engineer and Process Engineer.",
       "obtainable_skills": [
@@ -769,7 +769,7 @@
     {
       "course_id": "CRS019",
       "course_name": "Bachelor of Science in Chemistry",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSChem",
       "parent_cluster": "SCIENCE & MATHEMATICS CLUSTER",
       "course_description": "This program introduces students to the principles and practices of Chemistry. Coursework develops skills in the evaluation, interpretation, and synthesis of chemical information and data, ability to recognize and implement accurate and precise scientific measurements, computational and data processing skills relating to chemical information and data. Graduates can explore entry-level opportunities such as Analytical Chemist and Teaching assistants in colleges and universities (with further training, MS and PhD, for tenured positions).",
       "obtainable_skills": [
@@ -839,7 +839,7 @@
     {
       "course_id": "CRS021",
       "course_name": "Bachelor of Science in Civil Engineering",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSCE",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "course_description": "An undergraduate program centered on Civil Engineering. Key learning areas include structural engineering, geotechnical engineering, transportation engineering. It prepares students for entry-level work in fields such as Civil Engineer and Structural Engineer.",
       "obtainable_skills": [
@@ -946,7 +946,7 @@
     {
       "course_id": "CRS024",
       "course_name": "Bachelor of Science in Computer Engineering",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSCpE",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "course_description": "An undergraduate program centered on Computer Engineering. Key learning areas include hardware design, software development, systems integration. It prepares students for entry-level work in fields such as Computer Engineer and Hardware Engineer.",
       "obtainable_skills": [
@@ -1013,8 +1013,8 @@
     },
     {
       "course_id": "CRS026",
-      "course_name": "Bachelor of Computer Science",
-      "course_abbreviation": "",
+      "course_name": "Bachelor of Science in Computer Science",
+      "course_abbreviation": "BSCS",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "course_description": "Students in this program study Computer Science and its practical applications. They strengthen programming and software development, algorithmic and computational thinking, data management. The program supports entry-level roles such as Software Developer and Systems Analyst.",
       "obtainable_skills": [
@@ -1049,7 +1049,7 @@
     {
       "course_id": "CRS027",
       "course_name": "Bachelor of Science in Criminology",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSCrim",
       "parent_cluster": "CRIMINOLOGY CLUSTER",
       "course_description": "An undergraduate program centered on Criminology. Key learning areas include criminal investigation, forensic science, law enforcement. It prepares students for entry-level work in fields such as Law Enforcement Officer (PNP, NBI, etc.) and Correctional Officer (BJMP, BuCor).",
       "obtainable_skills": [
@@ -1087,7 +1087,7 @@
     {
       "course_id": "CRS028",
       "course_name": "Bachelor of Customs Administration",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSCA",
       "parent_cluster": "LEGAL & PUBLIC SERVICE CLUSTER",
       "course_description": "The Bachelor of Science in Customs Administration program (also commonly referred to as Bachelor of Customs Administration) is designed to produce competent and ethical professionals who can effectively manage customs operations and facilitate international trade. The program provides students with a comprehensive understanding of customs laws, procedures, and regulations, as well as the broader context of global trade and supply chain management.\nStudents learn about customs valuation, tariff classification, customs clearance procedures, anti-smuggling operations, and the use of information technology in customs administration. The curriculum also covers international trade agreements, trade facilitation, risk management, and ethical practices in customs and border management. Graduates are prepared for careers in the Bureau of Customs, logistics companies, import-export firms, and related government agencies.",
       "obtainable_skills": [
@@ -1121,7 +1121,7 @@
     {
       "course_id": "CRS029",
       "course_name": "Bachelor of Early Childhood Education",
-      "course_abbreviation": "",
+      "course_abbreviation": "BECEd",
       "parent_cluster": "EDUCATION CLUSTER",
       "course_description": "Students in this program study Early Childhood Education and its practical applications. They strengthen classroom management: skills in managing early childhood classrooms and creating a positive learning environment., observation and assessment: skills in observing and assessing young children's development and learning., inclusive education: understanding of inclusive practices for children with diverse needs.. The program supports entry-level roles such as Preschool Teacher and Kindergarten Teacher.",
       "obtainable_skills": [
@@ -1224,7 +1224,7 @@
     {
       "course_id": "CRS032",
       "course_name": "Bachelor of Science in Electrical Engineering",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSEE",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "course_description": "Students in this program study Electrical Engineering and its practical applications. They strengthen circuit analysis: skills in analyzing and designing electrical circuits, including analog and digital circuits., electronics: knowledge of electronic devices, circuits, and systems., power systems: understanding of power generation, transmission, distribution, and protection.. The program supports entry-level roles such as Electrical Engineer and Power Systems Engineer.",
       "obtainable_skills": [
@@ -1288,7 +1288,7 @@
     {
       "course_id": "CRS034",
       "course_name": "Bachelor of Science in Electronics Engineering",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSECE",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "course_description": "This program introduces students to the principles and practices of Electronics Engineering. Coursework develops electronic circuit design: ability to design and analyze analog and digital electronic circuits., signal processing: skills in processing and analyzing signals for various applications., microelectronics: understanding of semiconductor devices and integrated circuit design.. Graduates can explore entry-level opportunities such as Electronics Engineer and Communication Engineer.",
       "obtainable_skills": [
@@ -1320,7 +1320,7 @@
     {
       "course_id": "CRS035",
       "course_name": "Bachelor of Science in Elementary Education",
-      "course_abbreviation": "",
+      "course_abbreviation": "BEEd",
       "parent_cluster": "EDUCATION CLUSTER",
       "course_description": "Students in this program study Elementary Education and its practical applications. They strengthen teaching skills: ability to plan, implement, and evaluate effective instruction for elementary students., classroom management: skills in managing elementary classrooms and creating a positive learning environment., child development: understanding of child development and its application to teaching practices.. The program supports entry-level roles such as Elementary School Teacher (Grades 1-6) and Special Education Teacher (with additional training).",
       "obtainable_skills": [
@@ -1350,7 +1350,7 @@
     {
       "course_id": "CRS036",
       "course_name": "Bachelor in Elementary Education",
-      "course_abbreviation": "",
+      "course_abbreviation": "BEEd",
       "parent_cluster": "EDUCATION CLUSTER",
       "course_description": "An undergraduate program centered on Elementary Education. Key learning areas include teaching skills: ability to plan, implement, and evaluate effective instruction for elementary students., classroom management: skills in managing elementary classrooms and creating a positive learning environment., child development: understanding of child development and its application to teaching practices.. It prepares students for entry-level work in fields such as Elementary School Teacher (Grades 1-6) and Special Education Teacher (with additional training).",
       "obtainable_skills": [
@@ -1431,7 +1431,7 @@
     {
       "course_id": "CRS038",
       "course_name": "Bachelor of Science in Entertainment and Multimedia Computing",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSEMC",
       "parent_cluster": "ARTS & MULTIMEDIA CLUSTER",
       "course_description": "The Bachelor of Science in Entertainment and Multimedia Computing (BS EMC) is a four-year undergraduate program that prepares students to design, develop, and manage digital entertainment and interactive multimedia applications. The program integrates computing, software development, digital media, animation, game design, interactive technologies, and creative content production to meet the needs of the entertainment and multimedia industries. Students develop competencies in programming, multimedia production, game development, animation, visual design, user experience, project management, and emerging digital technologies while applying creativity, innovation, and technical problem-solving to produce interactive entertainment solutions. Depending on the institution, students may specialize in areas such as Game Development or Digital Animation Technology.",
       "obtainable_skills": [
@@ -1529,7 +1529,7 @@
     {
       "course_id": "CRS040",
       "course_name": "Bachelor of Science in Entrepreneurship",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSEntrep",
       "parent_cluster": "BUSINESS CLUSTER",
       "course_description": "The Bachelor of Science in Entrepreneurship (BS Entrep) is a four-year undergraduate degree program that prepares students to identify business opportunities, develop innovative products and services, establish and manage enterprises, and create sustainable value through entrepreneurial leadership. The program integrates business management, innovation, marketing, finance, operations, and strategic decision-making while emphasizing experiential learning through enterprise creation and business incubation. Students are trained to become opportunity-driven entrepreneurs capable of starting new ventures, managing family businesses, leading entrepreneurial organizations, or driving innovation within existing companies. The curriculum follows outcomes-based education and encourages creativity, ethical leadership, and responsiveness to changing business environments.",
       "obtainable_skills": [
@@ -1624,7 +1624,7 @@
     {
       "course_id": "CRS042",
       "course_name": "Bachelor of Science in Environmental Science",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSES",
       "parent_cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
       "course_description": "The Bachelor of Science in Environmental Science (BS ES) is a four-year interdisciplinary undergraduate program that prepares students to understand environmental systems and address environmental problems through scientific investigation and sustainable resource management. The program integrates biological sciences, chemistry, physics, earth sciences, social sciences, and environmental policy to examine the interactions between human activities and the natural environment. Students develop competencies in environmental assessment, ecosystem management, pollution prevention and control, environmental monitoring, conservation, environmental planning, scientific research, and sustainable development. Graduates are equipped to develop science-based solutions for environmental protection, resource conservation, and environmental management in government, industry, research institutions, and non-government organizations.",
       "obtainable_skills": [
@@ -2006,7 +2006,7 @@
     {
       "course_id": "CRS050",
       "course_name": "Bachelor of Science in Forestry",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSF",
       "parent_cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
       "course_description": "The Bachelor of Science in Forestry (BS Forestry) is an undergraduate program focused on the scientific management, conservation, development, and sustainable use of forest resources and forest ecosystems. It prepares students to understand forest ecology and biodiversity while developing technical competencies for managing forests, watersheds, wildlife habitats, and forest-based resources. The program combines natural sciences with applied forestry, including forest resource assessment, forest management, silviculture, forest protection, biodiversity conservation, watershed management, forest products, and related environmental and resource-management practices.",
       "obtainable_skills": [
@@ -2593,7 +2593,7 @@
     {
       "course_id": "CRS061",
       "course_name": "Bachelor of Industrial Technology",
-      "course_abbreviation": "",
+      "course_abbreviation": "BIndTech",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "course_description": "This program introduces students to the principles and practices of Industrial Technology. Coursework develops technical problem-solving, operation of industrial equipment and tools, equipment maintenance. Graduates can explore entry-level opportunities such as Industrial Technology Technician and Production Technician.",
       "obtainable_skills": [
@@ -2693,7 +2693,7 @@
     {
       "course_id": "CRS063",
       "course_name": "Bachelor of Science in Interior Design",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSID",
       "parent_cluster": "ARTS & MULTIMEDIA CLUSTER",
       "course_description": "Interior Design is the art and science of planning, specifying, selecting, and organizing interior spaces, including surface finishes, materials, furniture, furnishings, fixtures, and other interior elements. The discipline focuses on creating interior environments that appropriately respond to their intended function, movement, character, users, and surrounding built environment. The program develops students' ability to identify and solve interior design problems, formulate design concepts and strategies, integrate design theories and philosophies, and communicate design proposals through visual, oral, written, and digital/virtual methods. It also incorporates knowledge of art and design history, period styles, materials, furniture, building construction, utilities, color, legislation, technology, and professional practice.",
       "obtainable_skills": [
@@ -3133,7 +3133,7 @@
     {
       "course_id": "CRS070",
       "course_name": "Bachelor of Science in Manufacturing Engineering",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSMfgE",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "course_description": "This program introduces students to the principles and practices of Manufacturing Engineering. Coursework develops manufacturing process design, manufacturing systems analysis, production planning. Graduates can explore entry-level opportunities such as Manufacturing Engineer and Production Engineer.",
       "obtainable_skills": [
@@ -3203,7 +3203,7 @@
     {
       "course_id": "CRS071",
       "course_name": "Bachelor of Science in Marine Biology",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSMB",
       "parent_cluster": "SCIENCE & MATHEMATICS CLUSTER",
       "course_description": "Students in this program study Marine Biology and its practical applications. They strengthen marine organism identification, biological observation and documentation, marine biodiversity assessment. The program supports entry-level roles such as Marine Biologist and Marine Biology Research Assistant.",
       "obtainable_skills": [
@@ -3298,7 +3298,7 @@
     {
       "course_id": "CRS073",
       "course_name": "Bachelor of Science in Materials Engineering",
-      "course_abbreviation": "BS MatE",
+      "course_abbreviation": "BSMatE",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "course_description": "The Bachelor of Science in Materials Engineering is an engineering discipline dedicated to the study of materials and their behavior, focusing on the interconnection between composition, structure, processing, and properties. It equips students with the theoretical and practical knowledge to design, develop, and optimize materials such as metals, polymers, ceramics, semiconductors, and composites for targeted applications across various industries.",
       "obtainable_skills": [
@@ -3324,7 +3324,7 @@
     {
       "course_id": "CRS074",
       "course_name": "Bachelor of Science in Mathematics",
-      "course_abbreviation": "BS Math",
+      "course_abbreviation": "BSMath",
       "parent_cluster": "SCIENCE & MATHEMATICS CLUSTER",
       "course_description": "The Bachelor of Science in Mathematics is an undergraduate program that provides students with a deep and broad understanding of mathematics as both a theoretical discipline and a practical tool. Mathematics is described as the science of patterns, where mathematicians seek to discover, analyze, and classify patterns in abstract objects and natural phenomena. The program covers traditional domains such as quantity (arithmetic), structure (algebra), space (geometry), and change (analysis). The program emphasizes distinctive mathematical modes of thought including abstraction, generalization, deduction, inference, use of symbols, and the axiomatic method.",
       "obtainable_skills": [
@@ -3480,7 +3480,7 @@
     {
       "course_id": "CRS079",
       "course_name": "Bachelor of Science in Meteorology",
-      "course_abbreviation": "BS Met",
+      "course_abbreviation": "BSMet",
       "parent_cluster": "SCIENCE & MATHEMATICS CLUSTER",
       "course_description": "The Bachelor of Science in Meteorology is a four-year undergraduate program that provides students with a comprehensive and rigorous training in the study of weather processes and forecasting. Meteorology is a branch of atmospheric science that draws on basic knowledge, theory, and laws from physics, mathematics, and chemistry to develop a strong understanding of the physical and dynamical processes affecting atmospheric motions and behavior. The program covers the study of the atmosphere for various purposes, including severe and extreme weather systems (e.g., tropical cyclones), agriculture, military defense, navigation, and disaster risk reduction and management.",
       "obtainable_skills": [
@@ -3794,7 +3794,7 @@
     {
       "course_id": "CRS088",
       "course_name": "Bachelor of Science in Pharmacy",
-      "course_abbreviation": "BS Pharmacy",
+      "course_abbreviation": "BSPharm",
       "parent_cluster": "HEALTHCARE SCIENCE CLUSTER",
       "course_description": "The Bachelor of Science in Pharmacy is a four-year undergraduate program that prepares students for careers as pharmacists. The program provides students with the theoretical knowledge and practical skills necessary to ensure the safe and effective use of medications. Pharmacists are medication experts who play a vital role in healthcare delivery, patient care, and public health. The curriculum integrates the pharmaceutical sciences, clinical sciences, and pharmacy practice.",
       "obtainable_skills": [
@@ -3931,7 +3931,7 @@
     {
       "course_id": "CRS092",
       "course_name": "Bachelor of Science in Physics",
-      "course_abbreviation": "BS Physics",
+      "course_abbreviation": "BSPhysics",
       "parent_cluster": "SCIENCE & MATHEMATICS CLUSTER",
       "course_description": "The Bachelor of Science in Physics is an undergraduate program that provides students with a comprehensive and rigorous training in the fundamental principles of physics. Physics is the science of matter, energy, and their interactions, seeking to understand the laws that govern the universe from the smallest subatomic particles to the largest galaxies. The program provides students with a strong foundation in classical and modern physics, including mechanics, electromagnetism, thermodynamics, quantum mechanics, and relativity.",
       "obtainable_skills": [
@@ -3997,7 +3997,7 @@
     {
       "course_id": "CRS094",
       "course_name": "Bachelor of Science in Psychology",
-      "course_abbreviation": "BS Psychology",
+      "course_abbreviation": "BSPsych",
       "parent_cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
       "course_description": "The Bachelor of Science in Psychology is an undergraduate program that provides students with a scientific understanding of human behavior and mental processes. Psychology applies scientific methods to study how people think, feel, and behave, and how these processes are influenced by biological, social, and environmental factors. The program provides students with a strong foundation in psychological theories, research methods, and statistical analysis.",
       "obtainable_skills": [
@@ -4031,7 +4031,7 @@
     {
       "course_id": "CRS095",
       "course_name": "Bachelor of Arts in Psychology",
-      "course_abbreviation": "BA Psychology",
+      "course_abbreviation": "BAPsych",
       "parent_cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
       "course_description": "The Bachelor of Arts in Psychology is an undergraduate program that provides students with a liberal arts foundation in the scientific study of human behavior and mental processes. Psychology applies scientific methods to study how people think, feel, and behave, and how these processes are influenced by biological, social, and environmental factors. The program provides students with a strong foundation in psychological theories, research methods, and statistical analysis.",
       "obtainable_skills": [
@@ -4099,7 +4099,7 @@
     {
       "course_id": "CRS097",
       "course_name": "Bachelor of Science in Public Health",
-      "course_abbreviation": "BS Public Health",
+      "course_abbreviation": "BSPH",
       "parent_cluster": "HEALTHCARE SCIENCE CLUSTER",
       "course_description": "The Bachelor of Science in Public Health is an undergraduate program that prepares students for careers in public health practice, research, and policy. The program provides students with the theoretical knowledge and practical skills necessary to understand and address health issues at the population level, promote health and prevent disease, and improve health outcomes for communities. The curriculum integrates the biological, physical, social, and behavioral sciences with public health theory and practice.",
       "obtainable_skills": [
@@ -4167,7 +4167,7 @@
     {
       "course_id": "CRS099",
       "course_name": "Bachelor of Science in Real Estate Management",
-      "course_abbreviation": "BS REM",
+      "course_abbreviation": "BSREM",
       "parent_cluster": "BUSINESS CLUSTER",
       "course_description": "The Bachelor of Science in Real Estate Management is an undergraduate program that prepares students for careers in the real estate industry. The program provides students with the theoretical knowledge and practical skills necessary to manage real estate properties, facilitate real estate transactions, and provide professional real estate services. The curriculum integrates business, finance, law, and management with real estate theory and practice.",
       "obtainable_skills": [
@@ -4269,7 +4269,7 @@
     {
       "course_id": "CRS102",
       "course_name": "Bachelor of Secondary Education major in English",
-      "course_abbreviation": "BSEd English",
+      "course_abbreviation": "BSEd",
       "parent_cluster": "EDUCATION CLUSTER",
       "course_description": "The Bachelor of Secondary Education major in English is an undergraduate teacher education program designed to prepare competent, effective, and dedicated secondary school teachers specializing in English. The program integrates deep mastery of English language and literature content with professional education courses and pedagogical training to develop graduates who can facilitate meaningful learning experiences in diverse secondary school settings. The program is founded on the National Competency-Based Teacher Standards (NCBTS).",
       "obtainable_skills": [
@@ -4397,7 +4397,7 @@
     {
       "course_id": "CRS106",
       "course_name": "Bachelor of Arts in Sociology",
-      "course_abbreviation": "BA Sociology",
+      "course_abbreviation": "BASoc",
       "parent_cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
       "course_description": "The Bachelor of Arts in Sociology is an undergraduate program that studies human society, social relationships, and social institutions. Sociology examines the patterns of social behavior, social change, and the social causes and consequences of human behavior. The program provides students with a scientific understanding of society and the ability to analyze social issues critically. The program provides students with a strong foundation in sociological theory, research methods, and specialized areas of sociology.",
       "obtainable_skills": [
@@ -4533,7 +4533,7 @@
     {
       "course_id": "CRS110",
       "course_name": "Bachelor of Science in Statistics",
-      "course_abbreviation": "BS Stat",
+      "course_abbreviation": "BSStat",
       "parent_cluster": "SCIENCE & MATHEMATICS CLUSTER",
       "course_description": "The Bachelor of Science in Statistics is a four-year undergraduate program that prepares students for careers as statisticians and data scientists. Statistics is the science and art of uncertainty, with roots from biology and mathematics. Its role is to characterize and understand the random process that leads to uncertainty, equipping one with tools that facilitate decision-making. Statistics aggregates data into meaningful information that is used in decision-making.",
       "obtainable_skills": [
@@ -4632,7 +4632,7 @@
     {
       "course_id": "CRS113",
       "course_name": "Bachelor of Science in Tourism Management",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSTM",
       "parent_cluster": "HOSPITALITY & TOURISM CLUSTER",
       "course_description": "The Bachelor of Science in Tourism Management is a four-year undergraduate program that prepares students for careers in the tourism and hospitality industry. The program provides students with comprehensive knowledge and skills in tourism planning, development, marketing, and management. Students learn about tourism operations, destination management, travel and tour operations, hospitality management, and sustainable tourism practices. The curriculum integrates theoretical foundations with practical applications through industry immersion, field trips, and on-the-job training.",
       "obtainable_skills": [
@@ -4854,7 +4854,7 @@
     {
       "course_id": "CRS118",
       "course_name": "Bachelor of Science in Agriculture major in Agricultural Economics",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSA",
       "parent_cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
       "course_description": "The Bachelor of Science in Agriculture major in Agricultural Economics is a four-year undergraduate program that prepares students to apply economic principles and quantitative methods to agricultural production, resource management, and rural development. The program combines core agricultural sciences with economic theory, farm management, agricultural marketing, agricultural policy, and development economics. Students develop competencies in analyzing agricultural markets, evaluating farm profitability, managing agricultural resources, assessing agricultural policies, and making data-driven decisions for agricultural and rural development.",
       "obtainable_skills": [
@@ -4903,7 +4903,7 @@
     {
       "course_id": "CRS119",
       "course_name": "Bachelor of Science in Agriculture major in Agricultural Economics and Marketing",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSA",
       "parent_cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
       "course_description": "The Bachelor of Science in Agriculture major in Agricultural Economics and Marketing is a four-year undergraduate program that prepares students to apply economic principles and marketing strategies to agricultural production, agribusiness, and rural development. The program combines core agricultural sciences with economic theory, farm management, agricultural marketing, agricultural finance, agricultural policy, and development economics. Students develop competencies in analyzing agricultural markets, evaluating farm profitability, managing agricultural resources, developing marketing strategies for agricultural products, and making data-driven decisions for agricultural and rural development.",
       "obtainable_skills": [
@@ -4949,7 +4949,7 @@
     {
       "course_id": "CRS120",
       "course_name": "Bachelor of Science in Agriculture major in Agricultural Extension and Communication",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSA",
       "parent_cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
       "course_description": "The Bachelor of Science in Agriculture major in Agricultural Extension and Communication is a four-year undergraduate program that prepares students to facilitate the transfer of agricultural technologies, innovations, and research to farmers, cooperatives, local government units, and rural communities. The program combines agricultural sciences with communication, education, leadership, and community development to improve agricultural productivity and promote sustainable rural development. Students develop competencies in extension program planning, farmer education, agricultural communication, participatory rural development, technology transfer, and community capacity building to support agricultural modernization and food security.",
       "obtainable_skills": [
@@ -5163,7 +5163,7 @@
     {
       "course_id": "CRS125",
       "course_name": "Bachelor of Science in Architecture",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSArch",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "course_description": "Students in this program study Architecture and its practical applications. They strengthen technical problem solving, data analysis, project planning. The program supports entry-level roles such as Architectural Designer and CAD Technician.",
       "obtainable_skills": [
@@ -5391,7 +5391,7 @@
     {
       "course_id": "CRS132",
       "course_name": "Bachelor of Secondary Education major in Values Education With Emphasis in Christian Education",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSEd",
       "parent_cluster": "EDUCATION CLUSTER",
       "course_description": "The Bachelor of Secondary Education major in Values Education (BSEd Values Education) is a four-year undergraduate teacher education program that prepares students to teach Values Education at the secondary level. The program combines professional education with specialized studies in values education, philosophy, ethics, psychology, and community development. Students develop competencies in instructional planning, curriculum development, classroom management, assessment, and educational research while gaining extensive teaching experience through field study and practice teaching. The curriculum includes courses such as Foundation of Values Education, Philosophical and Ethical Foundations of Values Education, Psychological Theories of Values Development, and Teaching Approaches and Strategies in Values Education.",
       "obtainable_skills": [
@@ -5651,7 +5651,7 @@
     {
       "course_id": "CRS139",
       "course_name": "Bachelor of Culture and Arts Education",
-      "course_abbreviation": "",
+      "course_abbreviation": "BCAEd",
       "parent_cluster": "EDUCATION CLUSTER",
       "course_description": "The Bachelor of Culture and Arts Education (BCAEd) is a four-year undergraduate teacher education program designed to prepare future educators to teach Culture and Arts at the secondary level. The program combines professional education courses with specialized studies in arts, culture, humanities, and aesthetics. Students develop competencies in curriculum planning, instructional material development, arts instruction, classroom management, educational assessment, educational technology, and research to effectively promote cultural and arts education.",
       "obtainable_skills": [
@@ -5725,7 +5725,7 @@
     {
       "course_id": "CRS141",
       "course_name": "Bachelor of Elementary Education major in Pre-School",
-      "course_abbreviation": "",
+      "course_abbreviation": "BEEd",
       "parent_cluster": "EDUCATION CLUSTER",
       "course_description": "The Bachelor of Early Childhood Education (BECEd) is a four-year undergraduate teacher education program that focuses on developmentally appropriate education and care for young children. The program covers child development, pedagogy, curriculum development, assessment, and family/community involvement. Students develop competencies in child development knowledge, developmentally appropriate pedagogy, classroom management, observation and assessment, family and community engagement, inclusive education, and communication and interpersonal skills.",
       "obtainable_skills": [
@@ -5935,7 +5935,7 @@
     },
     {
       "course_id": "CRS147",
-      "course_name": "Bachelor of Science in Engineering Technology Management major in Engineering Technology Management",
+      "course_name": "Bachelor of Science in Engineering Technology Management",
       "course_abbreviation": "",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "course_description": "Engineering Technology Management combines engineering technology with management principles. Students learn to apply engineering technology concepts in the planning, operation, supervision, and improvement of industrial and technological systems. The program develops competencies in engineering technology application, industrial operations management, production planning and control, project management, quality assurance, and process improvement.",
@@ -7340,7 +7340,7 @@
     {
       "course_id": "CRS176",
       "course_name": "Bachelor of Science in Industrial Engineering",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSIE",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "course_description": "Industrial Engineering is an engineering discipline concerned with designing, improving, and managing integrated systems involving people, materials, information, equipment, energy, and processes. The program prepares students to analyze how work and production systems operate and to improve their efficiency, productivity, quality, safety, cost-effectiveness, and overall performance. Students apply mathematics, engineering principles, statistics, operations research, systems analysis, human factors, and management concepts to solve problems in manufacturing, services, logistics, healthcare, business, and other organizational environments. Unlike engineering disciplines focused primarily on designing a particular physical structure or machine, Industrial Engineering focuses on optimizing systems and processes as a whole.",
       "obtainable_skills": [
@@ -7764,7 +7764,7 @@
     {
       "course_id": "CRS186",
       "course_name": "Bachelor of Science in Mathematics major in Computer Information Technology",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSMath",
       "parent_cluster": "SCIENCE & MATHEMATICS CLUSTER",
       "course_description": "The Bachelor of Science in Mathematics is a four-year program that provides students with a deep understanding of mathematical theories, principles, and applications. It develops critical thinking, analytical reasoning, and problem-solving skills through the study of algebra, analysis, geometry, number theory, and other mathematical disciplines. A Computer Information Technology major prepares students to be Mathematics professionals and researchers who are proficient in designing and developing computing solutions . The program combines mathematical foundations with computing and information technology applications.",
       "obtainable_skills": [
@@ -7884,7 +7884,7 @@
     {
       "course_id": "CRS189",
       "course_name": "Bachelor of Technical-Vocational Teacher Education major in Automotive Technology",
-      "course_abbreviation": "",
+      "course_abbreviation": "BTVTEd",
       "parent_cluster": "EDUCATION CLUSTER",
       "course_description": "The Bachelor of Technical-Vocational Teacher Education (BTVTEd) major in Automotive Technology is a four-year undergraduate teacher education program that prepares students to teach technical-vocational courses in automotive technology at the secondary or post-secondary level. The program combines professional teacher education with specialized knowledge and practical competencies in automotive technology. Students develop the ability to understand, perform, demonstrate, and teach automotive technology skills while also learning instructional planning, assessment, classroom management, curriculum development, and other professional teaching competencies .",
       "obtainable_skills": [
@@ -8534,7 +8534,7 @@
     {
       "course_id": "CRS207",
       "course_name": "Bachelor of Elementary Education major in General",
-      "course_abbreviation": "",
+      "course_abbreviation": "BEEd",
       "parent_cluster": "EDUCATION CLUSTER",
       "course_description": "The Bachelor of Elementary Education (BEEd) is a four-year teacher education program designed to prepare students to teach learners at the elementary level. The program develops both pedagogical knowledge and multidisciplinary content knowledge needed to teach the major learning areas encountered in elementary education. The General/Generalist track provides broad preparation rather than limiting students to a single subject specialization. Students develop competencies in learner development, teaching strategies, curriculum planning, assessment, classroom management, inclusive education, educational technology, and elementary-level content areas such as language, mathematics, science, social studies, and values education.",
       "obtainable_skills": [
@@ -10441,7 +10441,7 @@
     {
       "course_id": "CRS246",
       "course_name": "Bachelor of Science in Marine Engineering major in Marine Engineering and Machine Shop",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSMarE",
       "parent_cluster": "AVIATION & MARITIME CLUSTER",
       "course_description": "An undergraduate program centered on Marine Engineering major in Marine Engineering and Machine Shop. Key learning areas include machine shop operations and machining skills, operation, maintenance, and repair of marine machinery and systems, watchkeeping and engine room operations. It prepares students for entry-level work in fields such as Marine engineer / officer on board merchant vessels and Marine engineering and machine shop positions in shipping and maritime industries.",
       "obtainable_skills": [
@@ -11021,7 +11021,7 @@
     {
       "course_id": "CRS264",
       "course_name": "Bachelor of Music major in Music Education",
-      "course_abbreviation": "",
+      "course_abbreviation": "BM",
       "parent_cluster": "EDUCATION CLUSTER",
       "course_description": "An undergraduate program centered on Music major in Music Education. Key learning areas include music education teaching competencies, music content knowledge (theory, history, performance), curriculum development and lesson planning. It prepares students for entry-level work in fields such as Music teacher at various educational levels and Music education curriculum developer and instructional materials developer.",
       "obtainable_skills": [
@@ -11054,7 +11054,7 @@
     {
       "course_id": "CRS265",
       "course_name": "Bachelor of Music in Music Education",
-      "course_abbreviation": "",
+      "course_abbreviation": "BM",
       "parent_cluster": "EDUCATION CLUSTER",
       "course_description": "This program introduces students to the principles and practices of Music in Music Education. Coursework develops music education teaching competencies, music content knowledge (theory, history, performance), curriculum development and lesson planning. Graduates can explore entry-level opportunities such as Music teacher at various educational levels and Music education curriculum developer and instructional materials developer.",
       "obtainable_skills": [
@@ -11359,7 +11359,7 @@
     {
       "course_id": "CRS275",
       "course_name": "Bachelor of Science in Physical Education",
-      "course_abbreviation": "",
+      "course_abbreviation": "BPEd",
       "parent_cluster": "SPORTS & PHYSICAL EDUCATION CLUSTER",
       "course_description": "Students in this program study Physical Education and its practical applications. They strengthen physical education teaching competencies, sports and physical activity instruction, health and wellness promotion. The program supports entry-level roles such as Physical education teacher and Sports coach / trainer.",
       "obtainable_skills": [
@@ -11773,7 +11773,7 @@
     {
       "course_id": "CRS289",
       "course_name": "Bachelor in Science Education With Specialization in Physics",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSE",
       "parent_cluster": "EDUCATION CLUSTER",
       "course_description": "This program introduces students to the principles and practices of Science Education With Specialization in Physics. Coursework develops secondary education teaching competencies, physics content knowledge for secondary teaching, curriculum development and lesson planning. Graduates can explore entry-level opportunities such as Secondary school physics teacher and Physics teacher at the secondary level.",
       "obtainable_skills": [
@@ -11807,7 +11807,7 @@
     {
       "course_id": "CRS290",
       "course_name": "Bachelor of Science in Secondary Education major in English",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSEd",
       "parent_cluster": "EDUCATION CLUSTER",
       "course_description": "Students in this program study Secondary Education major in English and its practical applications. They strengthen secondary education teaching competencies, english language and literature content knowledge, curriculum development and lesson planning. The program supports entry-level roles such as Secondary school English teacher and English teacher at the secondary level.",
       "obtainable_skills": [
@@ -11875,7 +11875,7 @@
     {
       "course_id": "CRS292",
       "course_name": "Bachelor in Secondary Education major in English",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSEd",
       "parent_cluster": "EDUCATION CLUSTER",
       "course_description": "This program introduces students to the principles and practices of Secondary Education major in English. Coursework develops secondary education teaching competencies, english language and literature content knowledge, curriculum development and lesson planning. Graduates can explore entry-level opportunities such as Secondary school English teacher and English teacher at the secondary level.",
       "obtainable_skills": [
@@ -12116,7 +12116,7 @@
     {
       "course_id": "CRS300",
       "course_name": "Bachelor of Science in Special Needs Education",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSNEd",
       "parent_cluster": "EDUCATION CLUSTER",
       "course_description": "An undergraduate program centered on Special Needs Education. Key learning areas include special needs education teaching competencies, understanding of various disabilities and special needs, individualized education program (iep) development. It prepares students for entry-level work in fields such as Special education teacher and Special needs education specialist.",
       "obtainable_skills": [
@@ -12145,7 +12145,7 @@
     {
       "course_id": "CRS301",
       "course_name": "Bachelor of Secondary Education Major in Special Prog. Sped",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSEd",
       "parent_cluster": "EDUCATION CLUSTER",
       "course_description": "This program introduces students to the principles and practices of Secondary Education Major in Special Prog. Sped. Coursework develops secondary education teaching competencies, special needs education teaching competencies, understanding of various disabilities and special needs. Graduates can explore entry-level opportunities such as Secondary school special education teacher and Special needs education specialist.",
       "obtainable_skills": [
@@ -12416,7 +12416,7 @@
     {
       "course_id": "CRS309",
       "course_name": "Bachelor of Technology & Livelihood Technology major in Home Economics",
-      "course_abbreviation": "",
+      "course_abbreviation": "BTLEd",
       "parent_cluster": "BUSINESS CLUSTER",
       "course_description": "An undergraduate program centered on Technology & Livelihood Technology major in Home Economics. Key learning areas include teaching competencies in technology and livelihood education, home economics content knowledge, curriculum development and lesson planning. It prepares students for entry-level work in fields such as Home economics teacher and Curriculum developer and instructional materials developer.",
       "obtainable_skills": [
@@ -12536,7 +12536,7 @@
     {
       "course_id": "CRS313",
       "course_name": "Bachelor of Arts in Theology",
-      "course_abbreviation": "",
+      "course_abbreviation": "BATh",
       "parent_cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
       "course_description": "This program introduces students to the principles and practices of Theology. Coursework develops theological principles and methods, biblical studies and interpretation, church history and tradition. Graduates can explore entry-level opportunities such as Theology teacher / professor and Religious education teacher / catechist.",
       "obtainable_skills": [
@@ -12772,7 +12772,7 @@
     {
       "course_id": "CRS321",
       "course_name": "Bachelor of Engineering Technology major in Avionics Maintenance Technology",
-      "course_abbreviation": "",
+      "course_abbreviation": "BET",
       "parent_cluster": "AVIATION & MARITIME CLUSTER",
       "course_description": "An undergraduate program centered on Engineering Technology major in Avionics Maintenance Technology. Key learning areas include avionics maintenance technology principles and methods, aircraft electronics and avionics systems, maintenance and repair of avionics equipment. It prepares students for entry-level work in fields such as Avionics maintenance technology positions in aviation and aerospace industries and Technical and supervisory roles in aircraft maintenance and operations.",
       "obtainable_skills": [
@@ -12799,8 +12799,8 @@
     },
     {
       "course_id": "CRS322",
-      "course_name": "Bachelor of Arts in Behavioral Sciences major in Organizational and Social Systems Development and Bachelor of Science in Advertising Management Bachelor of Science in Advertising Management",
-      "course_abbreviation": "",
+      "course_name": "Bachelor of Arts in Behavioral Sciences major in Organizational and Social Systems Development",
+      "course_abbreviation": "ABBHS",
       "parent_cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
       "course_description": "This program introduces students to the principles and practices of Behavioral Sciences major in Organizational and Social Systems Development and Bachelor of Science in Advertising Management Bachelor of Science in Advertising Management. Coursework develops behavioral science principles and methods, understanding of human behavior and social systems, communication and media literacy. Graduates can explore entry-level opportunities such as Behavioral science researcher / counselor and Advertising manager / marketing professional.",
       "obtainable_skills": [
@@ -13309,7 +13309,7 @@
     {
       "course_id": "CRS339",
       "course_name": "Bachelor of Science in Industrial Technology major in Electronics and Communication Technology",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSIndTech",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "course_description": "An undergraduate program centered on Industrial Technology major in Electronics and Communication Technology. Key learning areas include electronics and communication technology principles and methods, electronic circuits and systems, communication systems and networks. It prepares students for entry-level work in fields such as Electronics and communication technology positions in various industries and Technical and supervisory roles in electronics and communication operations.",
       "obtainable_skills": [
@@ -13341,7 +13341,7 @@
     {
       "course_id": "CRS340",
       "course_name": "Bachelor of Science in Industrial Technology major in Electronics & Communications Technology",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSIndTech",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "course_description": "This program introduces students to the principles and practices of Industrial Technology major in Electronics & Communications Technology. Coursework develops electronics and communications technology principles and methods, electronic circuits and systems, communication systems and networks. Graduates can explore entry-level opportunities such as Electronics and communications technology positions in various industries and Technical and supervisory roles in electronics and communications operations.",
       "obtainable_skills": [
@@ -13373,7 +13373,7 @@
     {
       "course_id": "CRS341",
       "course_name": "Bachelor in Industrial Technology major in Electronics and Communications Technology",
-      "course_abbreviation": "",
+      "course_abbreviation": "BIndTech",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "course_description": "Students in this program study Industrial Technology major in Electronics and Communications Technology and its practical applications. They strengthen electronics and communications technology principles and methods, electronic circuits and systems, communication systems and networks. The program supports entry-level roles such as Electronics and communications technology positions in various industries and Technical and supervisory roles in electronics and communications operations.",
       "obtainable_skills": [
@@ -13404,7 +13404,7 @@
     },
     {
       "course_id": "CRS342",
-      "course_name": "Bachelor of Science in Electronics and Computer Technology major in Communications Systems",
+      "course_name": "Bachelor of Science in Electronics and Computer Technology Option in Communications Systems",
       "course_abbreviation": "BSECT",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "course_description": "An undergraduate program centered on Electronics and Computer Technology major in Communications Systems. Key learning areas include electronics and computer technology principles and methods, electronic circuits and systems, computer hardware and software. It prepares students for entry-level work in fields such as Electronics and computer technology positions in various industries and Technical and supervisory roles in electronics and computer operations.",

@@ -90,6 +90,21 @@ export function searchPublicCourses(query, { limit = currentIndexedCourses.lengt
   const phrase = normalize(query)
   if (!phrase) return []
 
+  const normalizedLimit = Math.max(0, Math.min(
+    Number(limit) || currentIndexedCourses.length,
+    currentIndexedCourses.length
+  ))
+  const hasKnownExactAbbreviation = indexedCourses.some(({ abbreviation }) => abbreviation === phrase)
+  if (hasKnownExactAbbreviation) {
+    return currentIndexedCourses
+      .filter(({ course, abbreviation }) => (
+        abbreviation === phrase && (!courseCodes || courseCodes.has(course.course_id))
+      ))
+      .sort((left, right) => left.course.course_name.localeCompare(right.course.course_name))
+      .slice(0, normalizedLimit)
+      .map(({ course }) => publicCourse(course))
+  }
+
   const tokens = [...new Set(
     phrase.split(' ').filter((token) => token.length > 1 && !ignoredTokens.has(token))
   )]
@@ -114,10 +129,7 @@ export function searchPublicCourses(query, { limit = currentIndexedCourses.lengt
       right.score - left.score ||
       left.item.course.course_name.localeCompare(right.item.course.course_name)
     )
-    .slice(0, Math.max(0, Math.min(
-      Number(limit) || currentIndexedCourses.length,
-      currentIndexedCourses.length
-    )))
+    .slice(0, normalizedLimit)
     .map(({ item }) => publicCourse(item.course))
 }
 

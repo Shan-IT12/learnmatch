@@ -3,7 +3,7 @@
     {
       "course_id": "CRS001",
       "course_name": "Bachelor of Management Accounting",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSMA",
       "parent_cluster": "BUSINESS CLUSTER",
       "skills_profile": [
         {
@@ -169,7 +169,7 @@
     {
       "course_id": "CRS003",
       "course_name": "Bachelor of Science in Aeronautical Engineering",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSAeE",
       "parent_cluster": "AVIATION & MARITIME CLUSTER",
       "skills_profile": [
         {
@@ -633,7 +633,7 @@
     {
       "course_id": "CRS008",
       "course_name": "Bachelor of Science in Agriculture",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSA",
       "parent_cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
       "skills_profile": [
         {
@@ -1072,7 +1072,7 @@
     {
       "course_id": "CRS013",
       "course_name": "Bachelor of Science in Biology",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSBio",
       "parent_cluster": "SCIENCE & MATHEMATICS CLUSTER",
       "skills_profile": [
         {
@@ -1250,7 +1250,7 @@
     {
       "course_id": "CRS015",
       "course_name": "Bachelor of Science in Business Administration major in Financial Management",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSBA",
       "parent_cluster": "BUSINESS CLUSTER",
       "skills_profile": [
         {
@@ -1330,7 +1330,7 @@
     {
       "course_id": "CRS016",
       "course_name": "Bachelor of Science in Business Administration major in HRDM",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSBA",
       "parent_cluster": "BUSINESS CLUSTER",
       "skills_profile": [
         {
@@ -1484,7 +1484,7 @@
     {
       "course_id": "CRS018",
       "course_name": "Bachelor of Science in Chemical Engineering",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSChE",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "skills_profile": [
         {
@@ -1583,7 +1583,7 @@
     {
       "course_id": "CRS019",
       "course_name": "Bachelor of Science in Chemistry",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSChem",
       "parent_cluster": "SCIENCE & MATHEMATICS CLUSTER",
       "skills_profile": [
         {
@@ -1674,7 +1674,7 @@
     {
       "course_id": "CRS020",
       "course_name": "Bachelor of Science in Civil Engineering Major in Civil",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSCE",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "skills_profile": [
         {
@@ -1766,7 +1766,7 @@
     {
       "course_id": "CRS021",
       "course_name": "Bachelor of Science in Civil Engineering",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSCE",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "skills_profile": [
         {
@@ -2026,7 +2026,7 @@
     {
       "course_id": "CRS024",
       "course_name": "Bachelor of Science in Computer Engineering",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSCpE",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "skills_profile": [
         {
@@ -2207,8 +2207,8 @@
     },
     {
       "course_id": "CRS026",
-      "course_name": "Bachelor of Computer Science",
-      "course_abbreviation": "",
+      "course_name": "Bachelor of Science in Computer Science",
+      "course_abbreviation": "BSCS",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "skills_profile": [
         {
@@ -2294,7 +2294,7 @@
     {
       "course_id": "CRS027",
       "course_name": "Bachelor of Science in Criminology",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSCrim",
       "parent_cluster": "CRIMINOLOGY CLUSTER",
       "skills_profile": [
         {
@@ -2373,7 +2373,7 @@
     {
       "course_id": "CRS028",
       "course_name": "Bachelor of Customs Administration",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSCA",
       "parent_cluster": "LEGAL & PUBLIC SERVICE CLUSTER",
       "skills_profile": [
         {
@@ -2454,7 +2454,7 @@
     {
       "course_id": "CRS029",
       "course_name": "Bachelor of Early Childhood Education",
-      "course_abbreviation": "",
+      "course_abbreviation": "BECEd",
       "parent_cluster": "EDUCATION CLUSTER",
       "skills_profile": [
         {
@@ -2688,7 +2688,7 @@
     {
       "course_id": "CRS032",
       "course_name": "Bachelor of Science in Electrical Engineering",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSEE",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "skills_profile": [
         {
@@ -2773,7 +2773,7 @@
     {
       "course_id": "CRS033",
       "course_name": "Bachelor of Science in Electronic Engineering major in Electronic Engineering",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSECE",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "skills_profile": [
         {
@@ -2858,7 +2858,7 @@
     {
       "course_id": "CRS034",
       "course_name": "Bachelor of Science in Electronics Engineering",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSECE",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "skills_profile": [
         {
@@ -2943,7 +2943,7 @@
     {
       "course_id": "CRS035",
       "course_name": "Bachelor of Science in Elementary Education",
-      "course_abbreviation": "",
+      "course_abbreviation": "BEEd",
       "parent_cluster": "EDUCATION CLUSTER",
       "skills_profile": [
         {
@@ -3010,7 +3010,7 @@
     {
       "course_id": "CRS036",
       "course_name": "Bachelor in Elementary Education",
-      "course_abbreviation": "",
+      "course_abbreviation": "BEEd",
       "parent_cluster": "EDUCATION CLUSTER",
       "skills_profile": [
         {
@@ -3077,7 +3077,7 @@
     {
       "course_id": "CRS037",
       "course_name": "Bachelor of Arts in English Language",
-      "course_abbreviation": "",
+      "course_abbreviation": "BAEL",
       "parent_cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
       "skills_profile": [
         {
@@ -3156,7 +3156,7 @@
     {
       "course_id": "CRS038",
       "course_name": "Bachelor of Science in Entertainment and Multimedia Computing",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSEMC",
       "parent_cluster": "ARTS & MULTIMEDIA CLUSTER",
       "skills_profile": [
         {
@@ -3240,7 +3240,7 @@
     {
       "course_id": "CRS039",
       "course_name": "Bachelor of Multimedia Arts",
-      "course_abbreviation": "",
+      "course_abbreviation": "BMMA",
       "parent_cluster": "ARTS & MULTIMEDIA CLUSTER",
       "skills_profile": [
         {
@@ -3325,7 +3325,7 @@
     {
       "course_id": "CRS040",
       "course_name": "Bachelor of Science in Entrepreneurship",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSEntrep",
       "parent_cluster": "BUSINESS CLUSTER",
       "skills_profile": [
         {
@@ -3406,7 +3406,7 @@
     {
       "course_id": "CRS041",
       "course_name": "Bachelor of Science in Environmental Planning",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSEP",
       "parent_cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
       "skills_profile": [
         {
@@ -3497,7 +3497,7 @@
     {
       "course_id": "CRS042",
       "course_name": "Bachelor of Science in Environmental Science",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSES",
       "parent_cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
       "skills_profile": [
         {
@@ -3836,7 +3836,7 @@
     {
       "course_id": "CRS046",
       "course_name": "Bachelor of Fine Arts",
-      "course_abbreviation": "",
+      "course_abbreviation": "BFA",
       "parent_cluster": "ARTS & MULTIMEDIA CLUSTER",
       "skills_profile": [
         {
@@ -3921,7 +3921,7 @@
     {
       "course_id": "CRS047",
       "course_name": "Bachelor of Science in Fisheries",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSF",
       "parent_cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
       "skills_profile": [
         {
@@ -4019,7 +4019,7 @@
     {
       "course_id": "CRS048",
       "course_name": "Bachelor of Science in Food Technology",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSFT",
       "parent_cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
       "skills_profile": [
         {
@@ -4189,7 +4189,7 @@
     {
       "course_id": "CRS050",
       "course_name": "Bachelor of Science in Forestry",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSF",
       "parent_cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
       "skills_profile": [
         {
@@ -4447,7 +4447,7 @@
     {
       "course_id": "CRS053",
       "course_name": "Bachelor of Science in Hospitality Management",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSHM",
       "parent_cluster": "HOSPITALITY & TOURISM CLUSTER",
       "skills_profile": [
         {
@@ -4612,7 +4612,7 @@
     {
       "course_id": "CRS055",
       "course_name": "Bachelor of Science in Industrial Design (BSID)",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSID",
       "parent_cluster": "ARTS & MULTIMEDIA CLUSTER",
       "skills_profile": [
         {
@@ -4785,7 +4785,7 @@
     {
       "course_id": "CRS057",
       "course_name": "Bachelor of Science in Industrial Engineering Minor in Service Management",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSIE",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "skills_profile": [
         {
@@ -4866,7 +4866,7 @@
     {
       "course_id": "CRS058",
       "course_name": "Bachelor of Science in Industrial Engineering with Specialization in Service Management",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSIE",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "skills_profile": [
         {
@@ -5064,7 +5064,7 @@
     {
       "course_id": "CRS061",
       "course_name": "Bachelor of Industrial Technology",
-      "course_abbreviation": "",
+      "course_abbreviation": "BIndTech",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "skills_profile": [
         {
@@ -5150,7 +5150,7 @@
     {
       "course_id": "CRS062",
       "course_name": "Bachelor of Science in Information Technology",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSIT",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "skills_profile": [
         {
@@ -5231,7 +5231,7 @@
     {
       "course_id": "CRS063",
       "course_name": "Bachelor of Science in Interior Design",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSID",
       "parent_cluster": "ARTS & MULTIMEDIA CLUSTER",
       "skills_profile": [
         {
@@ -5311,7 +5311,7 @@
     {
       "course_id": "CRS064",
       "course_name": "Bachelor of Science in Internal Auditing",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSIA",
       "parent_cluster": "BUSINESS CLUSTER",
       "skills_profile": [
         {
@@ -5548,7 +5548,7 @@
     {
       "course_id": "CRS067",
       "course_name": "Bachelor of Landscape Architecture",
-      "course_abbreviation": "",
+      "course_abbreviation": "BLA",
       "parent_cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
       "skills_profile": [
         {
@@ -5640,7 +5640,7 @@
     {
       "course_id": "CRS068",
       "course_name": "Bachelor of Library and Information Science",
-      "course_abbreviation": "",
+      "course_abbreviation": "BLIS",
       "parent_cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
       "skills_profile": [
         {
@@ -5806,7 +5806,7 @@
     {
       "course_id": "CRS070",
       "course_name": "Bachelor of Science in Manufacturing Engineering",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSMfgE",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "skills_profile": [
         {
@@ -5898,7 +5898,7 @@
     {
       "course_id": "CRS071",
       "course_name": "Bachelor of Science in Marine Biology",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSMB",
       "parent_cluster": "SCIENCE & MATHEMATICS CLUSTER",
       "skills_profile": [
         {
@@ -5997,7 +5997,7 @@
     {
       "course_id": "CRS072",
       "course_name": "Bachelor of Science in Marine Transportation (BSMT)",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSMT",
       "parent_cluster": "AVIATION & MARITIME CLUSTER",
       "skills_profile": [],
       "riasec_profile": {
@@ -6057,7 +6057,7 @@
     {
       "course_id": "CRS073",
       "course_name": "Bachelor of Science in Materials Engineering (BS MatE)",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSMatE",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "skills_profile": [
         {
@@ -6129,7 +6129,7 @@
     {
       "course_id": "CRS074",
       "course_name": "Bachelor of Science in Mathematics (BS Math)",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSMath",
       "parent_cluster": "SCIENCE & MATHEMATICS CLUSTER",
       "skills_profile": [
         {
@@ -6201,7 +6201,7 @@
     {
       "course_id": "CRS075",
       "course_name": "Bachelor of Science in Mechanical Engineering (BSME)",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSME",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "skills_profile": [
         {
@@ -6287,7 +6287,7 @@
     {
       "course_id": "CRS076",
       "course_name": "Bachelor of Science in Medical Technology (BSMT) / Bachelor of Science in Medical Laboratory Science (BSMLS)",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSMT",
       "parent_cluster": "HEALTHCARE SCIENCE CLUSTER",
       "skills_profile": [
         {
@@ -6378,7 +6378,7 @@
     {
       "course_id": "CRS077",
       "course_name": "Bachelor of Science in Medical Laboratory Science (BSMLS) / Bachelor of Science in Medical Technology (BSMT)",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSMLS",
       "parent_cluster": "HEALTHCARE SCIENCE CLUSTER",
       "skills_profile": [
         {
@@ -6469,7 +6469,7 @@
     {
       "course_id": "CRS078",
       "course_name": "Bachelor of Science in Metallurgical Engineering (BSMetE)",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSMetE",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "skills_profile": [
         {
@@ -6567,7 +6567,7 @@
     {
       "course_id": "CRS079",
       "course_name": "Bachelor of Science in Meteorology (BS Met)",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSMet",
       "parent_cluster": "SCIENCE & MATHEMATICS CLUSTER",
       "skills_profile": [
         {
@@ -6659,7 +6659,7 @@
     {
       "course_id": "CRS080",
       "course_name": "Bachelor of Science in Midwifery (BSM)",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSM",
       "parent_cluster": "HEALTHCARE SCIENCE CLUSTER",
       "skills_profile": [
         {
@@ -6731,7 +6731,7 @@
     {
       "course_id": "CRS081",
       "course_name": "Bachelor of Science in Mining Engineering (BSEM)",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSEM",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "skills_profile": [
         {
@@ -6823,7 +6823,7 @@
     {
       "course_id": "CRS082",
       "course_name": "Bachelor of Science in Naval Architecture and Marine Engineering (BSNAME)",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSNAME",
       "parent_cluster": "AVIATION & MARITIME CLUSTER",
       "skills_profile": [
         {
@@ -6920,7 +6920,7 @@
     {
       "course_id": "CRS083",
       "course_name": "Bachelor of Science in Nursing (BSN)",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSN",
       "parent_cluster": "HEALTHCARE SCIENCE CLUSTER",
       "skills_profile": [
         {
@@ -6998,7 +6998,7 @@
     {
       "course_id": "CRS084",
       "course_name": "Bachelor of Science in Nutrition and Dietetics (BSND)",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSND",
       "parent_cluster": "HEALTHCARE SCIENCE CLUSTER",
       "skills_profile": [
         {
@@ -7078,7 +7078,7 @@
     {
       "course_id": "CRS085",
       "course_name": "Bachelor of Science in Occupational Therapy (BSOT)",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSOT",
       "parent_cluster": "HEALTHCARE SCIENCE CLUSTER",
       "skills_profile": [
         {
@@ -7162,7 +7162,7 @@
     {
       "course_id": "CRS086",
       "course_name": "Bachelor of Science in Office Administration (BSOA)",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSOA",
       "parent_cluster": "BUSINESS CLUSTER",
       "skills_profile": [
         {
@@ -7228,7 +7228,7 @@
     {
       "course_id": "CRS087",
       "course_name": "Bachelor of Performing Arts (BPeA)",
-      "course_abbreviation": "",
+      "course_abbreviation": "BPeA",
       "parent_cluster": "ARTS & MULTIMEDIA CLUSTER",
       "skills_profile": [
         {
@@ -7300,7 +7300,7 @@
     {
       "course_id": "CRS088",
       "course_name": "Bachelor of Science in Pharmacy (BS Pharmacy)",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSPharm",
       "parent_cluster": "HEALTHCARE SCIENCE CLUSTER",
       "skills_profile": [
         {
@@ -7373,7 +7373,7 @@
     {
       "course_id": "CRS089",
       "course_name": "Bachelor of Arts in Philosophy (AB Philosophy)",
-      "course_abbreviation": "",
+      "course_abbreviation": "AB Philosophy",
       "parent_cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
       "skills_profile": [
         {
@@ -7452,7 +7452,7 @@
     {
       "course_id": "CRS090",
       "course_name": "Bachelor of Physical Education (BPEd)",
-      "course_abbreviation": "",
+      "course_abbreviation": "BPEd",
       "parent_cluster": "SPORTS & PHYSICAL EDUCATION CLUSTER",
       "skills_profile": [
         {
@@ -7525,7 +7525,7 @@
     {
       "course_id": "CRS091",
       "course_name": "Bachelor of Science in Physical Therapy (BSPT)",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSPT",
       "parent_cluster": "HEALTHCARE SCIENCE CLUSTER",
       "skills_profile": [
         {
@@ -7615,7 +7615,7 @@
     {
       "course_id": "CRS092",
       "course_name": "Bachelor of Science in Physics (BS Physics)",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSPhysics",
       "parent_cluster": "SCIENCE & MATHEMATICS CLUSTER",
       "skills_profile": [
         {
@@ -7698,7 +7698,7 @@
     {
       "course_id": "CRS093",
       "course_name": "Bachelor of Arts in Political Science (BA Political Science)",
-      "course_abbreviation": "",
+      "course_abbreviation": "BA Political Science",
       "parent_cluster": "LEGAL & PUBLIC SERVICE CLUSTER",
       "skills_profile": [
         {
@@ -7771,7 +7771,7 @@
     {
       "course_id": "CRS094",
       "course_name": "Bachelor of Science in Psychology (BS Psychology)",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSPsych",
       "parent_cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
       "skills_profile": [
         {
@@ -7863,7 +7863,7 @@
     {
       "course_id": "CRS095",
       "course_name": "Bachelor of Arts in Psychology (BA Psychology)",
-      "course_abbreviation": "",
+      "course_abbreviation": "BAPsych",
       "parent_cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
       "skills_profile": [
         {
@@ -7955,7 +7955,7 @@
     {
       "course_id": "CRS096",
       "course_name": "Bachelor of Public Administration (BPA)",
-      "course_abbreviation": "",
+      "course_abbreviation": "BPA",
       "parent_cluster": "LEGAL & PUBLIC SERVICE CLUSTER",
       "skills_profile": [
         {
@@ -8034,7 +8034,7 @@
     {
       "course_id": "CRS097",
       "course_name": "Bachelor of Science in Public Health (BS Public Health)",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSPH",
       "parent_cluster": "HEALTHCARE SCIENCE CLUSTER",
       "skills_profile": [
         {
@@ -8119,7 +8119,7 @@
     {
       "course_id": "CRS098",
       "course_name": "Bachelor of Science in Radiologic Technology (BSRT)",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSRT",
       "parent_cluster": "HEALTHCARE SCIENCE CLUSTER",
       "skills_profile": [
         {
@@ -8197,7 +8197,7 @@
     {
       "course_id": "CRS099",
       "course_name": "Bachelor of Science in Real Estate Management (BS REM)",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSREM",
       "parent_cluster": "BUSINESS CLUSTER",
       "skills_profile": [
         {
@@ -8261,7 +8261,7 @@
     {
       "course_id": "CRS100",
       "course_name": "Bachelor of Science in Respiratory Therapy (BSRT)",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSRT",
       "parent_cluster": "HEALTHCARE SCIENCE CLUSTER",
       "skills_profile": [
         {
@@ -8341,7 +8341,7 @@
     {
       "course_id": "CRS101",
       "course_name": "Bachelor of Science in Sanitary Engineering (BSSE)",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSSE",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "skills_profile": [
         {
@@ -8433,7 +8433,7 @@
     {
       "course_id": "CRS102",
       "course_name": "Bachelor of Secondary Education major in English (BSEd English)",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSEd",
       "parent_cluster": "EDUCATION CLUSTER",
       "skills_profile": [
         {
@@ -8499,7 +8499,7 @@
     {
       "course_id": "CRS103",
       "course_name": "Bachelor of Science in Industrial Security Management (BSISM)",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSISM",
       "parent_cluster": "CRIMINOLOGY CLUSTER",
       "skills_profile": [],
       "riasec_profile": {
@@ -8559,7 +8559,7 @@
     {
       "course_id": "CRS104",
       "course_name": "Bachelor of Arts in Social Science (AB Social Science)",
-      "course_abbreviation": "",
+      "course_abbreviation": "AB Social Science",
       "parent_cluster": "LEGAL & PUBLIC SERVICE CLUSTER",
       "skills_profile": [
         {
@@ -8631,7 +8631,7 @@
     {
       "course_id": "CRS105",
       "course_name": "Bachelor of Science in Social Work (BSSW)",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSSW",
       "parent_cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
       "skills_profile": [
         {
@@ -8695,7 +8695,7 @@
     {
       "course_id": "CRS106",
       "course_name": "Bachelor of Arts in Sociology (BA Sociology)",
-      "course_abbreviation": "",
+      "course_abbreviation": "BASoc",
       "parent_cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
       "skills_profile": [
         {
@@ -8771,7 +8771,7 @@
     {
       "course_id": "CRS107",
       "course_name": "Bachelor of Special Needs Education (BSNEd)",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSNEd",
       "parent_cluster": "EDUCATION CLUSTER",
       "skills_profile": [
         {
@@ -8837,7 +8837,7 @@
     {
       "course_id": "CRS108",
       "course_name": "Bachelor of Science in Speech-Language Pathology (BSSLP)",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSSLP",
       "parent_cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
       "skills_profile": [
         {
@@ -8921,7 +8921,7 @@
     {
       "course_id": "CRS109",
       "course_name": "Bachelor of Science in Exercise and Sports Sciences (BSESS)",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSESS",
       "parent_cluster": "SPORTS & PHYSICAL EDUCATION CLUSTER",
       "skills_profile": [
         {
@@ -9001,7 +9001,7 @@
     {
       "course_id": "CRS110",
       "course_name": "Bachelor of Science in Statistics (BS Stat)",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSStat",
       "parent_cluster": "SCIENCE & MATHEMATICS CLUSTER",
       "skills_profile": [
         {
@@ -9093,7 +9093,7 @@
     {
       "course_id": "CRS111",
       "course_name": "Bachelor of Technical-Vocational Teacher Education major in Food and Service Management (BTVTEd - Food and Service Management)",
-      "course_abbreviation": "",
+      "course_abbreviation": "BTVTEd",
       "parent_cluster": "EDUCATION CLUSTER",
       "skills_profile": [
         {
@@ -9172,7 +9172,7 @@
     {
       "course_id": "CRS112",
       "course_name": "Bachelor of Technology and Livelihood Education major in Home Economics (BTLEd - Home Economics)",
-      "course_abbreviation": "",
+      "course_abbreviation": "BTLEd",
       "parent_cluster": "EDUCATION CLUSTER",
       "skills_profile": [
         {
@@ -9244,7 +9244,7 @@
     {
       "course_id": "CRS113",
       "course_name": "Bachelor of Science in Tourism Management",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSTM",
       "parent_cluster": "HOSPITALITY & TOURISM CLUSTER",
       "skills_profile": [
         {
@@ -9316,7 +9316,7 @@
     {
       "course_id": "CRS114",
       "course_name": "Bs in Accounting Information System (Information Technology Related)",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSAIS",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "skills_profile": [
         {
@@ -9488,7 +9488,7 @@
     {
       "course_id": "CRS116",
       "course_name": "Bachelor of Science in Agriculture major in Agri-Business",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSA",
       "parent_cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
       "skills_profile": [
         {
@@ -9654,7 +9654,7 @@
     {
       "course_id": "CRS118",
       "course_name": "Bachelor of Science in Agriculture major in Agricultural Economics",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSA",
       "parent_cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
       "skills_profile": [
         {
@@ -9745,7 +9745,7 @@
     {
       "course_id": "CRS119",
       "course_name": "Bachelor of Science in Agriculture major in Agricultural Economics and Marketing",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSA",
       "parent_cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
       "skills_profile": [
         {
@@ -9830,7 +9830,7 @@
     {
       "course_id": "CRS120",
       "course_name": "Bachelor of Science in Agriculture major in Agricultural Extension and Communication",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSA",
       "parent_cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
       "skills_profile": [
         {
@@ -9909,7 +9909,7 @@
     {
       "course_id": "CRS121",
       "course_name": "Bachelor of Agricultural Technology",
-      "course_abbreviation": "",
+      "course_abbreviation": "BAT",
       "parent_cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
       "skills_profile": [
         {
@@ -9988,7 +9988,7 @@
     {
       "course_id": "CRS122",
       "course_name": "Bachelor of Science in Agricultural Engineering",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSABE",
       "parent_cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
       "skills_profile": [
         {
@@ -10244,7 +10244,7 @@
     {
       "course_id": "CRS125",
       "course_name": "Bachelor of Science in Architecture",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSArch",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "skills_profile": [
         {
@@ -10789,7 +10789,7 @@
     {
       "course_id": "CRS132",
       "course_name": "Bachelor of Secondary Education major in Values Education With Emphasis in Christian Education",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSEd",
       "parent_cluster": "EDUCATION CLUSTER",
       "skills_profile": [
         {
@@ -11358,7 +11358,7 @@
     {
       "course_id": "CRS139",
       "course_name": "Bachelor of Culture and Arts Education",
-      "course_abbreviation": "",
+      "course_abbreviation": "BCAEd",
       "parent_cluster": "EDUCATION CLUSTER",
       "skills_profile": [
         {
@@ -11517,7 +11517,7 @@
     {
       "course_id": "CRS141",
       "course_name": "Bachelor of Elementary Education major in Pre-School",
-      "course_abbreviation": "",
+      "course_abbreviation": "BEEd",
       "parent_cluster": "EDUCATION CLUSTER",
       "skills_profile": [
         {
@@ -11664,7 +11664,7 @@
     {
       "course_id": "CRS143",
       "course_name": "Bachelor of Science in Electronics and Communications Engineering",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSECE",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "skills_profile": [
         {
@@ -11754,7 +11754,7 @@
     {
       "course_id": "CRS144",
       "course_name": "Bachelor of Electronics and Communication Engineering major in Electronics and Communication Engineering",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSECE",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "skills_profile": [
         {
@@ -12015,7 +12015,7 @@
     },
     {
       "course_id": "CRS147",
-      "course_name": "Bachelor of Science in Engineering Technology Management major in Engineering Technology Management",
+      "course_name": "Bachelor of Science in Engineering Technology Management",
       "course_abbreviation": "",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "skills_profile": [
@@ -12101,7 +12101,7 @@
     {
       "course_id": "CRS148",
       "course_name": "Bachelor of Science in English Language Arts",
-      "course_abbreviation": "",
+      "course_abbreviation": "BAEL",
       "parent_cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
       "skills_profile": [
         {
@@ -12180,7 +12180,7 @@
     {
       "course_id": "CRS149",
       "course_name": "Bachelor in Arts in English",
-      "course_abbreviation": "",
+      "course_abbreviation": "BAEL",
       "parent_cluster": "EDUCATION CLUSTER",
       "skills_profile": [
         {
@@ -13002,7 +13002,7 @@
     {
       "course_id": "CRS159",
       "course_name": "Bachelor of Science in Exercise and Sports Science",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSESS",
       "parent_cluster": "SPORTS & PHYSICAL EDUCATION CLUSTER",
       "skills_profile": [
         {
@@ -13487,7 +13487,7 @@
     {
       "course_id": "CRS165",
       "course_name": "Bachelor of Science in Fine Arts",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSFA",
       "parent_cluster": "ARTS & MULTIMEDIA CLUSTER",
       "skills_profile": [
         {
@@ -13658,7 +13658,7 @@
     {
       "course_id": "CRS167",
       "course_name": "Bachelor of Fisheries and Aquatic Sciences major in General Fisheries",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSF",
       "parent_cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
       "skills_profile": [
         {
@@ -13756,7 +13756,7 @@
     {
       "course_id": "CRS168",
       "course_name": "Bachelor of Science in Food Science",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSFT",
       "parent_cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
       "skills_profile": [
         {
@@ -13849,7 +13849,7 @@
     {
       "course_id": "CRS169",
       "course_name": "Bachelor of Science in Food Science and Technology",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSFT",
       "parent_cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
       "skills_profile": [
         {
@@ -14213,7 +14213,7 @@
     {
       "course_id": "CRS173",
       "course_name": "Bachelor of Science in Geiodetic Engineering",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSGE",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "skills_profile": [
         {
@@ -14302,7 +14302,7 @@
     {
       "course_id": "CRS174",
       "course_name": "Bachelor of Science in Geodetic Engineering",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSGE",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "skills_profile": [
         {
@@ -14380,7 +14380,7 @@
     {
       "course_id": "CRS175",
       "course_name": "Bachelor of Science in Civil Engineering major in Geotechnical Engineering",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSCE",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "skills_profile": [
         {
@@ -14471,7 +14471,7 @@
     {
       "course_id": "CRS176",
       "course_name": "Bachelor of Science in Industrial Engineering",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSIE",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "skills_profile": [
         {
@@ -14823,7 +14823,7 @@
     {
       "course_id": "CRS180",
       "course_name": "Bachelor of Science in Aviation Engineering Technology major in Aviation Engineering Technology",
-      "course_abbreviation": "",
+      "course_abbreviation": "BAET",
       "parent_cluster": "AVIATION & MARITIME CLUSTER",
       "skills_profile": [],
       "riasec_profile": {
@@ -15045,7 +15045,7 @@
     {
       "course_id": "CRS183",
       "course_name": "Bachelor of Science in Civil Engineering With Specialization in Hydraulics and Water Resources Engineering",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSCE",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "skills_profile": [
         {
@@ -15124,7 +15124,7 @@
     {
       "course_id": "CRS184",
       "course_name": "Bachelor of Science in Civil Engineering-Water Resources",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSCE",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "skills_profile": [
         {
@@ -15276,7 +15276,7 @@
     {
       "course_id": "CRS186",
       "course_name": "Bachelor of Science in Mathematics major in Computer Information Technology",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSMath",
       "parent_cluster": "SCIENCE & MATHEMATICS CLUSTER",
       "skills_profile": [
         {
@@ -15513,7 +15513,7 @@
     {
       "course_id": "CRS189",
       "course_name": "Bachelor of Technical-Vocational Teacher Education major in Automotive Technology",
-      "course_abbreviation": "",
+      "course_abbreviation": "BTVTEd",
       "parent_cluster": "EDUCATION CLUSTER",
       "skills_profile": [
         {
@@ -15677,7 +15677,7 @@
     {
       "course_id": "CRS191",
       "course_name": "Bachelor of Science in Electronics and Communications Engineering major in Electronics Communication Engineering",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSECE",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "skills_profile": [
         {
@@ -16731,7 +16731,7 @@
     {
       "course_id": "CRS204",
       "course_name": "Bachelor of Science in Entertainment and Multimedia Computing (BSEMC) major in Game Design and Development",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSEMC",
       "parent_cluster": "ARTS & MULTIMEDIA CLUSTER",
       "skills_profile": [
         {
@@ -16901,7 +16901,7 @@
     {
       "course_id": "CRS206",
       "course_name": "Bachelor of Industrial Technology (E-TEEAP) major in Garments, Fashion and Design Technology",
-      "course_abbreviation": "",
+      "course_abbreviation": "BIT",
       "parent_cluster": "ARTS & MULTIMEDIA CLUSTER",
       "skills_profile": [
         {
@@ -16988,7 +16988,7 @@
     {
       "course_id": "CRS207",
       "course_name": "Bachelor of Elementary Education major in General",
-      "course_abbreviation": "",
+      "course_abbreviation": "BEEd",
       "parent_cluster": "EDUCATION CLUSTER",
       "skills_profile": [
         {
@@ -17073,7 +17073,7 @@
     {
       "course_id": "CRS208",
       "course_name": "Bachelor of Science in Geodetic Engineering major in Land Surveying",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSGE",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "skills_profile": [
         {
@@ -17317,7 +17317,7 @@
     {
       "course_id": "CRS211",
       "course_name": "Bachelor of Science in Civil Engineering major in Geotechnical",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSCE",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "skills_profile": [
         {
@@ -17465,7 +17465,7 @@
     {
       "course_id": "CRS213",
       "course_name": "Bachelor of Science in Graphics and Design (BSGD)",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSGD",
       "parent_cluster": "ARTS & MULTIMEDIA CLUSTER",
       "skills_profile": [
         {
@@ -17550,7 +17550,7 @@
     {
       "course_id": "CRS214",
       "course_name": "Bachelor of Engineering Technology major in Heating, Ventilating and Airconditioning-Refrigeration Engineering Technology",
-      "course_abbreviation": "",
+      "course_abbreviation": "BET",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "skills_profile": [
         {
@@ -17735,7 +17735,7 @@
     {
       "course_id": "CRS216",
       "course_name": "Bachelor of Technical and Livelihood Education major in Home Economics (BTLed - Home Economics)",
-      "course_abbreviation": "",
+      "course_abbreviation": "BTLEd",
       "parent_cluster": "EDUCATION CLUSTER",
       "skills_profile": [
         {
@@ -17819,7 +17819,7 @@
     {
       "course_id": "CRS217",
       "course_name": "Bachelor of Science in Hotel, Restaurant and Tourism Management",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSHRTM",
       "parent_cluster": "HOSPITALITY & TOURISM CLUSTER",
       "skills_profile": [
         {
@@ -18639,7 +18639,7 @@
     {
       "course_id": "CRS228",
       "course_name": "Bachelor of Science in Information System major in Information System",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSIS",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "skills_profile": [
         {
@@ -18712,7 +18712,7 @@
     {
       "course_id": "CRS229",
       "course_name": "Bachelor of Information Systems",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSIS",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "skills_profile": [
         {
@@ -19211,7 +19211,7 @@
     {
       "course_id": "CRS235",
       "course_name": "Bachelor of Science in Agricultural and Biosystems Engineering major in Land and Water Resources Engineering",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSABE",
       "parent_cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
       "skills_profile": [
         {
@@ -19887,7 +19887,7 @@
     {
       "course_id": "CRS244",
       "course_name": "Bachelor of Science in Marine Engineering",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSMarE",
       "parent_cluster": "AVIATION & MARITIME CLUSTER",
       "skills_profile": [
         {
@@ -19967,7 +19967,7 @@
     {
       "course_id": "CRS245",
       "course_name": "Bachelor of Science in Marine Engineering and Electro Technology",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSMEET",
       "parent_cluster": "AVIATION & MARITIME CLUSTER",
       "skills_profile": [
         {
@@ -20040,7 +20040,7 @@
     {
       "course_id": "CRS246",
       "course_name": "Bachelor of Science in Marine Engineering major in Marine Engineering and Machine Shop",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSMarE",
       "parent_cluster": "AVIATION & MARITIME CLUSTER",
       "skills_profile": [
         {
@@ -20199,7 +20199,7 @@
     {
       "course_id": "CRS248",
       "course_name": "Bachelor of Science in Marine Transportation",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSMT",
       "parent_cluster": "AVIATION & MARITIME CLUSTER",
       "skills_profile": [
         {
@@ -20713,7 +20713,7 @@
     {
       "course_id": "CRS255",
       "course_name": "Bachelor of Science in Industrial Technology major in Mechanical",
-      "course_abbreviation": "",
+      "course_abbreviation": "BS IndTech",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "skills_profile": [
         {
@@ -20792,7 +20792,7 @@
     {
       "course_id": "CRS256",
       "course_name": "Bachelor of Mechanical Engineering",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSME",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "skills_profile": [
         {
@@ -21415,7 +21415,7 @@
     {
       "course_id": "CRS264",
       "course_name": "Bachelor of Music major in Music Education",
-      "course_abbreviation": "",
+      "course_abbreviation": "BM",
       "parent_cluster": "EDUCATION CLUSTER",
       "skills_profile": [
         {
@@ -21480,7 +21480,7 @@
     {
       "course_id": "CRS265",
       "course_name": "Bachelor of Music in Music Education",
-      "course_abbreviation": "",
+      "course_abbreviation": "BM",
       "parent_cluster": "EDUCATION CLUSTER",
       "skills_profile": [
         {
@@ -21630,7 +21630,7 @@
     {
       "course_id": "CRS267",
       "course_name": "Bachelor of Nursing",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSN",
       "parent_cluster": "HEALTHCARE SCIENCE CLUSTER",
       "skills_profile": [
         {
@@ -21801,7 +21801,7 @@
     {
       "course_id": "CRS269",
       "course_name": "Bachelor of Science in Industrial Engineering major in Organization and Decision System",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSIE",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "skills_profile": [
         {
@@ -22279,7 +22279,7 @@
     {
       "course_id": "CRS275",
       "course_name": "Bachelor of Science in Physical Education",
-      "course_abbreviation": "",
+      "course_abbreviation": "BPEd",
       "parent_cluster": "SPORTS & PHYSICAL EDUCATION CLUSTER",
       "skills_profile": [
         {
@@ -22343,7 +22343,7 @@
     {
       "course_id": "CRS276",
       "course_name": "Bachelor in Physical Therapy (Foreign Student) 1St Year",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSPT",
       "parent_cluster": "HEALTHCARE SCIENCE CLUSTER",
       "skills_profile": [
         {
@@ -22793,7 +22793,7 @@
     {
       "course_id": "CRS282",
       "course_name": "Bachelor of Science in Public Administration",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSPA",
       "parent_cluster": "LEGAL & PUBLIC SERVICE CLUSTER",
       "skills_profile": [
         {
@@ -22939,7 +22939,7 @@
     {
       "course_id": "CRS284",
       "course_name": "Bachelor of Radiologic Technology",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSRT",
       "parent_cluster": "HEALTHCARE SCIENCE CLUSTER",
       "skills_profile": [
         {
@@ -23318,7 +23318,7 @@
     {
       "course_id": "CRS289",
       "course_name": "Bachelor in Science Education With Specialization in Physics",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSE",
       "parent_cluster": "EDUCATION CLUSTER",
       "skills_profile": [
         {
@@ -23388,7 +23388,7 @@
     {
       "course_id": "CRS290",
       "course_name": "Bachelor of Science in Secondary Education major in English",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSEd",
       "parent_cluster": "EDUCATION CLUSTER",
       "skills_profile": [
         {
@@ -23516,7 +23516,7 @@
     {
       "course_id": "CRS292",
       "course_name": "Bachelor in Secondary Education major in English",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSEd",
       "parent_cluster": "EDUCATION CLUSTER",
       "skills_profile": [
         {
@@ -23580,7 +23580,7 @@
     {
       "course_id": "CRS293",
       "course_name": "Bachelor of Industrial Security Management",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSISM",
       "parent_cluster": "CRIMINOLOGY CLUSTER",
       "skills_profile": [
         {
@@ -23644,7 +23644,7 @@
     {
       "course_id": "CRS294",
       "course_name": "Bachelor in Sign Language Interpretation",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSLI",
       "parent_cluster": "EDUCATION CLUSTER",
       "skills_profile": [
         {
@@ -24042,7 +24042,7 @@
     {
       "course_id": "CRS300",
       "course_name": "Bachelor of Science in Special Needs Education",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSNEd",
       "parent_cluster": "EDUCATION CLUSTER",
       "skills_profile": [
         {
@@ -24107,7 +24107,7 @@
     {
       "course_id": "CRS301",
       "course_name": "Bachelor of Secondary Education Major in Special Prog. Sped",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSEd",
       "parent_cluster": "EDUCATION CLUSTER",
       "skills_profile": [
         {
@@ -24172,7 +24172,7 @@
     {
       "course_id": "CRS302",
       "course_name": "Bachelor of Sports Science",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSS",
       "parent_cluster": "SPORTS & PHYSICAL EDUCATION CLUSTER",
       "skills_profile": [],
       "riasec_profile": {
@@ -24231,7 +24231,7 @@
     {
       "course_id": "CRS303",
       "course_name": "Bachelor of Science in Exercise and Sports Sciences major in Fitness and Sports Coaching",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSESS",
       "parent_cluster": "SPORTS & PHYSICAL EDUCATION CLUSTER",
       "skills_profile": [],
       "riasec_profile": {
@@ -24349,7 +24349,7 @@
     {
       "course_id": "CRS305",
       "course_name": "Bachelor of Science in Civil Engineering major in Structural Engineering",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSCE",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "skills_profile": [
         {
@@ -24614,7 +24614,7 @@
     {
       "course_id": "CRS309",
       "course_name": "Bachelor of Technology & Livelihood Technology major in Home Economics",
-      "course_abbreviation": "",
+      "course_abbreviation": "BTLEd",
       "parent_cluster": "BUSINESS CLUSTER",
       "skills_profile": [
         {
@@ -24901,7 +24901,7 @@
     {
       "course_id": "CRS313",
       "course_name": "Bachelor of Arts in Theology",
-      "course_abbreviation": "",
+      "course_abbreviation": "BATh",
       "parent_cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
       "skills_profile": [
         {
@@ -24972,7 +24972,7 @@
     {
       "course_id": "CRS314",
       "course_name": "Bachelor of Theology",
-      "course_abbreviation": "",
+      "course_abbreviation": "BTh",
       "parent_cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
       "skills_profile": [
         {
@@ -25043,7 +25043,7 @@
     {
       "course_id": "CRS315",
       "course_name": "Bachelor of Science in Civil Engineering major in Transportation",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSCE",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "skills_profile": [
         {
@@ -25115,7 +25115,7 @@
     {
       "course_id": "CRS316",
       "course_name": "Bachelor of Science in Civil Engineering major in Transportation Engineering",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSCE",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "skills_profile": [
         {
@@ -25187,7 +25187,7 @@
     {
       "course_id": "CRS317",
       "course_name": "Bachelor of Science in Civil Engineering major in Water Resource Engineering",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSCE",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "skills_profile": [
         {
@@ -25266,7 +25266,7 @@
     {
       "course_id": "CRS318",
       "course_name": "Bachelor of Science in Civil Engineering major in Water Resources Engineering",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSCE",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "skills_profile": [
         {
@@ -25497,7 +25497,7 @@
     {
       "course_id": "CRS321",
       "course_name": "Bachelor of Engineering Technology major in Avionics Maintenance Technology",
-      "course_abbreviation": "",
+      "course_abbreviation": "BET",
       "parent_cluster": "AVIATION & MARITIME CLUSTER",
       "skills_profile": [
         {
@@ -25569,8 +25569,8 @@
     },
     {
       "course_id": "CRS322",
-      "course_name": "Bachelor of Arts in Behavioral Sciences major in Organizational and Social Systems Development and Bachelor of Science in Advertising Management Bachelor of Science in Advertising Management",
-      "course_abbreviation": "",
+      "course_name": "Bachelor of Arts in Behavioral Sciences major in Organizational and Social Systems Development",
+      "course_abbreviation": "ABBHS",
       "parent_cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
       "skills_profile": [
         {
@@ -26015,7 +26015,7 @@
     {
       "course_id": "CRS328",
       "course_name": "Bachelor of Industrial Technology major in Computer",
-      "course_abbreviation": "",
+      "course_abbreviation": "BIT",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "skills_profile": [
         {
@@ -26087,7 +26087,7 @@
     {
       "course_id": "CRS329",
       "course_name": "Bachelor of Science in Industrial Technology major in Computer Technology",
-      "course_abbreviation": "",
+      "course_abbreviation": "BS IndTech",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "skills_profile": [
         {
@@ -26574,7 +26574,7 @@
     {
       "course_id": "CRS336",
       "course_name": "Bachelor of Science in Industrial Technology major in Electrical",
-      "course_abbreviation": "",
+      "course_abbreviation": "BS IndTech",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "skills_profile": [
         {
@@ -26646,7 +26646,7 @@
     {
       "course_id": "CRS337",
       "course_name": "Bachelor of Science in Industrial Technology major in Electronics",
-      "course_abbreviation": "",
+      "course_abbreviation": "BS IndTech",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "skills_profile": [
         {
@@ -26718,7 +26718,7 @@
     {
       "course_id": "CRS338",
       "course_name": "Bachelor in Industrial Technology major in Electronics",
-      "course_abbreviation": "",
+      "course_abbreviation": "BIT",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "skills_profile": [
         {
@@ -26790,7 +26790,7 @@
     {
       "course_id": "CRS339",
       "course_name": "Bachelor of Science in Industrial Technology major in Electronics and Communication Technology",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSIndTech",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "skills_profile": [
         {
@@ -26862,7 +26862,7 @@
     {
       "course_id": "CRS340",
       "course_name": "Bachelor of Science in Industrial Technology major in Electronics & Communications Technology",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSIndTech",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "skills_profile": [
         {
@@ -26934,7 +26934,7 @@
     {
       "course_id": "CRS341",
       "course_name": "Bachelor in Industrial Technology major in Electronics and Communications Technology",
-      "course_abbreviation": "",
+      "course_abbreviation": "BIndTech",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "skills_profile": [
         {
@@ -27005,8 +27005,8 @@
     },
     {
       "course_id": "CRS342",
-      "course_name": "Bachelor of Science in Electronics and Computer Technology major in Communications Systems",
-      "course_abbreviation": "",
+      "course_name": "Bachelor of Science in Electronics and Computer Technology Option in Communications Systems",
+      "course_abbreviation": "BSECT",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "skills_profile": [
         {

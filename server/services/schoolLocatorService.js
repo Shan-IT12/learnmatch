@@ -1,5 +1,6 @@
 import pool from '../config/db.js'
 import schoolLocatorLocations from '../data/schoolLocatorLocations.js'
+import { resolveCanonicalCourseIds } from './courseIdentityService.js'
 
 export const SCHOOL_LOCATOR_SCOPE = 'San Jose del Monte, Bulacan'
 export const SCHOOL_LOCATOR_ACADEMIC_YEAR = '2024-25'
@@ -25,12 +26,14 @@ const getReviewedCoordinates = (uii) => {
 export async function getSchoolsForCourse(courseCode, database = pool) {
   const normalizedCode = normalizeCourseCode(courseCode)
   if (!/^CRS\d{3}$/.test(normalizedCode)) return null
+  const resolvedCourseCodes = resolveCanonicalCourseIds(normalizedCode)
+  if (resolvedCourseCodes.length !== 1) return null
 
   const [courseRows] = await database.query(
     `SELECT course_id, course_code, course_name, course_abbreviation
      FROM COURSE
      WHERE course_code = ? AND is_active = 1`,
-    [normalizedCode]
+    [resolvedCourseCodes[0]]
   )
 
   if (courseRows.length !== 1) return null

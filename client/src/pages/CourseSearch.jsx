@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
+import { STUDENT_ACTIVE_INDEPENDENT_COURSE_COUNT } from '../constants/courseCatalog'
 import PublicHeader from '../components/PublicHeader'
 
 const apiUrl = import.meta.env.VITE_API_URL || ''
@@ -151,7 +152,6 @@ function CourseSearch() {
                       <p className="text-sm font-medium text-gray-800 group-hover:text-orange-600 transition">
                         {course.course_name}{course.course_abbreviation ? ` (${course.course_abbreviation})` : ''}
                       </p>
-                      <p className="text-xs text-gray-400 mt-0.5">{course.cluster_category}</p>
                     </button>
                   ))}
                 </div>
@@ -161,7 +161,7 @@ function CourseSearch() {
         </div>
 
         <section className="mt-9" aria-live="polite">
-          {displayStatus === 'idle' && <p className="text-gray-500">Enter a keyword to explore the 342 validated courses.</p>}
+          {displayStatus === 'idle' && <p className="text-gray-500">Enter a keyword to explore {STUDENT_ACTIVE_INDEPENDENT_COURSE_COUNT} validated programs.</p>}
           {displayStatus === 'loading' && <p className="text-gray-500">Searching courses…</p>}
           {displayStatus === 'error' && (
             <div className="bg-red-50 border border-red-100 text-red-700 rounded-xl p-5">We couldn’t load courses. Please try again.</div>
@@ -180,7 +180,6 @@ function CourseSearch() {
                   <Link key={course.course_code} to={`/courses/${course.course_code}`} state={fromDashboard ? { entryContext: 'dashboard' } : undefined} className="block bg-white border border-gray-100 rounded-2xl p-5 sm:p-6 shadow-sm hover:shadow-md hover:border-orange-200 transition group">
                     <div className="flex flex-wrap items-center gap-2 mb-2">
                       {course.course_abbreviation && <span className="text-xs font-bold text-orange-600 bg-orange-50 px-2.5 py-1 rounded-full">{course.course_abbreviation}</span>}
-                      <span className="text-xs text-gray-400 uppercase tracking-wide">{course.cluster_category}</span>
                     </div>
                     <h2 className="text-lg font-semibold text-gray-900 group-hover:text-orange-600 transition">{course.course_name}</h2>
                     {course.description && <p className="text-sm text-gray-500 leading-relaxed mt-2 line-clamp-2">{course.description}</p>}

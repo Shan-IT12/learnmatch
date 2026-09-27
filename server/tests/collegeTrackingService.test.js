@@ -100,7 +100,7 @@ test('legacy timing fallback exposes the next sequential phase', () => {
   )
 })
 
-function setupPool({ activeCourse = true, existingCheckin = null } = {}) {
+function setupPool({ activeCourse = true, courseCode = 'CRS001', existingCheckin = null } = {}) {
   const state = { inserts: 0, updates: 0, committed: false, rolledBack: false }
   const connection = {
     beginTransaction: async () => {},
@@ -109,7 +109,7 @@ function setupPool({ activeCourse = true, existingCheckin = null } = {}) {
     release: () => {},
     query: async (sql) => {
       if (sql.includes('FROM COURSE')) {
-        return [activeCourse ? [{ course_id: 430, course_code: 'CRS001', course_name: 'Course One' }] : []]
+        return [activeCourse ? [{ course_id: 430, course_code: courseCode, course_name: 'Course One' }] : []]
       }
       if (sql.includes('FROM COLLEGE_TERM')) {
         return [existingCheckin ? [{ term_id: existingCheckin }] : []]
@@ -240,6 +240,24 @@ test('College Setup rejects inactive or unavailable courses', async () => {
     (error) => error.code === 'COURSE_UNAVAILABLE' && error.status === 404
   )
   assert.equal(state.inserts, 0)
+})
+
+test('College Setup rejects deprecated and quarantined course identities', async () => {
+  for (const courseCode of ['CRS020', 'CRS166']) {
+    const { pool, state } = setupPool({ courseCode })
+    await assert.rejects(
+      createCollegeSetup(pool, 7, {
+        courseId: 430,
+        academicYear: '2026-2027',
+        yearLevel: '2nd Year',
+        semester: '1st Semester',
+        semesterStartDate: '2026-08-01',
+        semesterEndDate: '2026-12-15',
+      }),
+      (error) => error.code === 'COURSE_UNAVAILABLE' && error.status === 404
+    )
+    assert.equal(state.inserts, 0)
+  }
 })
 
 test('College Setup rejects a year level beyond the canonical program duration', async () => {

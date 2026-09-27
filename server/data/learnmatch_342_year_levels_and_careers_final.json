@@ -346,7 +346,7 @@
     {
       "course_id": "CRS003",
       "course_name": "Bachelor of Science in Aeronautical Engineering",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSAeE",
       "parent_cluster": "AVIATION & MARITIME CLUSTER",
       "course_description": "The Bachelor of Science in Aeronautical Engineering is a professional engineering degree program that prepares students for careers involving the design, analysis, development, manufacturing, operation, maintenance, and improvement of aircraft and related aeronautical systems.\nThe program develops a strong foundation in mathematics, physics, basic engineering sciences, and aeronautical engineering principles. Students study areas related to aircraft structures, aerodynamics, propulsion, aircraft systems, aircraft design, maintenance, and other technologies used in the aviation industry.\nThe program prepares students to contribute to the technological and socioeconomic development of the aviation industry, particularly in areas such as aircraft research, development, manufacturing, maintenance, operation, and aviation education. The profession is regulated in the Philippines, and aeronautical engineering practice includes professional services involving aircraft structures, power plants, accessories, and related engineering activities.",
       "obtainable_skills": [
@@ -1205,7 +1205,7 @@
     {
       "course_id": "CRS008",
       "course_name": "Bachelor of Science in Agriculture",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSA",
       "parent_cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
       "course_description": "The Bachelor of Science in Agriculture is a comprehensive program that provides students with a broad understanding of agricultural sciences, including crop production, animal science, soil science, agricultural economics, and agricultural extension. The program prepares students for various careers in agriculture, agribusiness, research, and government service. Students learn to apply scientific principles to solve problems in agricultural production, resource management, and sustainable farming systems. The program emphasizes the development of competencies needed to address challenges in food security, sustainable agriculture, and rural development.",
       "obtainable_skills": [
@@ -2024,7 +2024,7 @@
     {
       "course_id": "CRS013",
       "course_name": "Bachelor of Science in Biology",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSBio",
       "parent_cluster": "SCIENCE & MATHEMATICS CLUSTER",
       "course_description": "Based on the official CHED PSG (CMO No. 49, s. 2017), the Bachelor of Science in Biology program is structured as a generalized framework for biological study. Its primary purpose is to ground students in the fundamental concepts, principles, and theories of the biological sciences and to introduce them to the conduct of biological research. The program moves beyond the common perception of being solely a pre-medical track and aims to produce professional biologists.\nThe study of biology encompasses a wide range of specializations, from the traditional fields like botany, zoology, and microbiology to modern areas such as molecular biology, biotechnology, and genomics. The curriculum provides a balanced treatment of all major branches of biology, ensuring students gain a comprehensive understanding of life from the molecular to the ecosystem level. Students learn to apply biological knowledge to address real-world problems, including those related to health, food security, and environmental sustainability.",
       "obtainable_skills": [
@@ -2365,7 +2365,7 @@
     {
       "course_id": "CRS015",
       "course_name": "Bachelor of Science in Business Administration major in Financial Management",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSBA",
       "parent_cluster": "BUSINESS CLUSTER",
       "course_description": "Based on the official CHED PSG (CMO No. 17, s. 2017), the Bachelor of Science in Business Administration program is designed to provide students with a strong foundation in business and management principles. The program aims to develop competent, ethical, and socially responsible business professionals who can effectively manage organizations in a dynamic and globalized environment.\nThe Financial Management major focuses on the effective management of financial resources within organizations. Students learn to analyze financial data, make investment decisions, manage risks, and develop strategies to maximize shareholder value. The curriculum covers key areas such as financial analysis, capital budgeting, portfolio management, working capital management, and financial markets and institutions. Graduates are prepared for careers in corporate finance, investment banking, financial planning, and related fields.",
       "obtainable_skills": [
@@ -2532,7 +2532,7 @@
     {
       "course_id": "CRS016",
       "course_name": "Bachelor of Science in Business Administration major in HRDM",
-      "course_abbreviation": "HRDM",
+      "course_abbreviation": "BSBA",
       "parent_cluster": "BUSINESS CLUSTER",
       "course_description": "Based on the official CHED PSG (CMO No. 17, s. 2017), the Bachelor of Science in Business Administration program is designed to provide students with a strong foundation in business and management principles. The program aims to develop competent, ethical, and socially responsible business professionals who can effectively manage organizations in a dynamic and globalized environment.\nThe Human Resource Development Management (HRDM) major focuses on the strategic management of an organization's most valuable asset - its people. Students learn to attract, develop, motivate, and retain talent to achieve organizational goals. The curriculum covers key areas such as recruitment and selection, training and development, performance management, compensation and benefits, labor relations, and organizational development. Graduates are prepared for careers in human resource management, training and development, organizational consulting, and related fields.",
       "obtainable_skills": [
@@ -2859,7 +2859,7 @@
     {
       "course_id": "CRS018",
       "course_name": "Bachelor of Science in Chemical Engineering",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSChE",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "course_description": "Based on the official CHED PSG (CMO No. 91, s. 2017), the Bachelor of Science in Chemical Engineering program is designed to produce graduates who can apply the principles of chemistry, physics, mathematics, and engineering to design, develop, and operate processes and equipment for the production of chemicals, fuels, materials, and other products. Chemical engineers are involved in the conversion of raw materials into useful products through chemical and physical transformations.\nThe program covers fundamental areas such as thermodynamics, fluid mechanics, heat and mass transfer, reaction kinetics, process design, and process control. Students learn to analyze and solve problems related to chemical processes, including environmental and safety considerations. The curriculum emphasizes both theoretical understanding and practical skills through laboratory work, design projects, and industrial training. Graduates are prepared for careers in various industries, including petrochemicals, pharmaceuticals, food processing, energy, and environmental management.",
       "obtainable_skills": [
@@ -3024,7 +3024,7 @@
     {
       "course_id": "CRS019",
       "course_name": "Bachelor of Science in Chemistry",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSChem",
       "parent_cluster": "SCIENCE & MATHEMATICS CLUSTER",
       "course_description": "Based on the official CHED PSG (CMO No. 47, s. 2017), the Bachelor of Science in Chemistry program is designed to provide students with a comprehensive education in the fundamental principles and practices of chemistry. The program covers the five core disciplines of chemistry: inorganic, organic, analytical, physical, and biochemistry.\nThe BS Chemistry program is structured to produce graduates who can apply chemical principles to solve problems in various fields, including industry, research, and education. Students develop a strong foundation in chemical theory, laboratory skills, and analytical techniques. The curriculum includes extensive laboratory work, research projects, and professional exposure to prepare graduates for careers as professional chemists or for advanced studies in chemistry and related fields. The program also prepares students for the Chemistry Licensure Examinations.",
       "obtainable_skills": [
@@ -3184,7 +3184,7 @@
     {
       "course_id": "CRS020",
       "course_name": "Bachelor of Science in Civil Engineering Major in Civil",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSCE",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "course_description": "Based on the official CHED PSG (CMO No. 92, s. 2017), the Bachelor of Science in Civil Engineering program is designed to produce graduates who can apply engineering principles to the planning, design, construction, and maintenance of infrastructure and facilities essential to modern society. Civil engineers are involved in projects such as buildings, bridges, roads, dams, water supply systems, and environmental protection systems.\nThe program covers fundamental areas such as structural analysis and design, geotechnical engineering, transportation engineering, water resources engineering, and construction management. Students learn to analyze and solve problems related to the built environment, considering factors such as safety, sustainability, and economic feasibility. The curriculum emphasizes both theoretical understanding and practical skills through laboratory work, design projects, and field training. Graduates are prepared for careers in various sectors, including construction, consulting, government, and research.",
       "obtainable_skills": [
@@ -3346,7 +3346,7 @@
     {
       "course_id": "CRS021",
       "course_name": "Bachelor of Science in Civil Engineering",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSCE",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "course_description": "Based on the official CHED PSG (CMO No. 92, s. 2017), the Bachelor of Science in Civil Engineering program is designed to produce graduates who can apply engineering principles to the planning, design, construction, and maintenance of infrastructure and facilities essential to modern society. Civil engineers are involved in projects such as buildings, bridges, roads, dams, water supply systems, and environmental protection systems.\nThe program covers fundamental areas such as structural analysis and design, geotechnical engineering, transportation engineering, water resources engineering, and construction management. Students learn to analyze and solve problems related to the built environment, considering factors such as safety, sustainability, and economic feasibility. The curriculum emphasizes both theoretical understanding and practical skills through laboratory work, design projects, and field training. Graduates are prepared for careers in various sectors, including construction, consulting, government, and research.",
       "obtainable_skills": [
@@ -3827,7 +3827,7 @@
     {
       "course_id": "CRS024",
       "course_name": "Bachelor of Science in Computer Engineering",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSCpE",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "course_description": "Based on the official CHED PSG (CMO No. 87, s. 2017), the Bachelor of Science in Computer Engineering program is designed to produce graduates who can apply engineering principles to the design, development, and integration of computer systems and networks. The program combines electrical engineering and computer science to prepare students for the design and implementation of hardware and software systems.\nThe curriculum covers fundamental areas such as digital logic design, computer architecture, programming, data structures, algorithms, operating systems, networks, and embedded systems. Students learn to analyze, design, and implement computer-based systems, considering factors such as performance, reliability, and security. The program emphasizes both theoretical understanding and practical skills through laboratory work, design projects, and industrial training. Graduates are prepared for careers in various industries, including technology, telecommunications, manufacturing, and research.",
       "obtainable_skills": [
@@ -4148,8 +4148,8 @@
     },
     {
       "course_id": "CRS026",
-      "course_name": "Bachelor of Computer Science",
-      "course_abbreviation": "",
+      "course_name": "Bachelor of Science in Computer Science",
+      "course_abbreviation": "BSCS",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "course_description": "Based on the official CHED PSG (CMO No. 25, s. 2015), the Bachelor of Science in Computer Science program (also commonly referred to as Bachelor in Computer Science) is designed to provide students with a strong foundation in the principles and practices of computing. The program emphasizes the theoretical and algorithmic foundations of computing, as well as the design and implementation of software systems.\nThe BSCS program covers core areas such as programming, data structures, algorithms, computer organization, operating systems, databases, and software engineering. Students develop skills in problem-solving, computational thinking, and software development. The curriculum also includes mathematics and science courses to support the theoretical aspects of the field. Graduates are prepared for careers in software development, systems analysis, research, and other computing-related fields. The program also prepares students for advanced studies in computer science.",
       "obtainable_skills": [
@@ -4309,7 +4309,7 @@
     {
       "course_id": "CRS027",
       "course_name": "Bachelor of Science in Criminology",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSCrim",
       "parent_cluster": "CRIMINOLOGY CLUSTER",
       "course_description": "Based on the official CHED PSG (CMO No. 5, s. 2018), the Bachelor of Science in Criminology program is designed to provide students with a comprehensive understanding of crime, criminal behavior, and the criminal justice system. The program aims to produce professionally competent and morally upright graduates who can deliver efficient and effective services in the field of criminology.\nThe curriculum covers the study of crimes, criminals, victims, crime prevention, law enforcement, criminalistics, criminal law, and correctional administration. Students develop skills in crime investigation, forensic science, and criminal justice administration. The program also emphasizes ethical conduct, leadership, and service to the community. Graduates are prepared for careers in law enforcement, criminology education, corrections, and other criminal justice-related fields.",
       "obtainable_skills": [
@@ -4471,7 +4471,7 @@
     {
       "course_id": "CRS028",
       "course_name": "Bachelor of Customs Administration",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSCA",
       "parent_cluster": "LEGAL & PUBLIC SERVICE CLUSTER",
       "course_description": "The Bachelor of Science in Customs Administration program (also commonly referred to as Bachelor of Customs Administration) is designed to produce competent and ethical professionals who can effectively manage customs operations and facilitate international trade. The program provides students with a comprehensive understanding of customs laws, procedures, and regulations, as well as the broader context of global trade and supply chain management.\nStudents learn about customs valuation, tariff classification, customs clearance procedures, anti-smuggling operations, and the use of information technology in customs administration. The curriculum also covers international trade agreements, trade facilitation, risk management, and ethical practices in customs and border management. Graduates are prepared for careers in the Bureau of Customs, logistics companies, import-export firms, and related government agencies.",
       "obtainable_skills": [
@@ -4629,7 +4629,7 @@
     {
       "course_id": "CRS029",
       "course_name": "Bachelor of Early Childhood Education",
-      "course_abbreviation": "",
+      "course_abbreviation": "BECEd",
       "parent_cluster": "EDUCATION CLUSTER",
       "course_description": "Based on the official CHED PSG (CMO No. 76, s. 2017), the Bachelor of Early Childhood Education program is designed to prepare students for teaching children from birth to age 8 (or kindergarten to Grade 3). The program equips students with the knowledge, skills, and attitudes necessary to provide developmentally appropriate education and care for young children. The curriculum covers child development, early childhood pedagogy, curriculum development, assessment, and family and community involvement. Students learn about the physical, cognitive, social, and emotional development of young children, and how to create learning environments that promote their holistic development. The program emphasizes play-based learning, inclusive education, and the use of developmentally appropriate practices. Graduates are prepared to become effective early childhood educators who can work in preschools, kindergartens, daycare centers, and other early childhood settings.",
       "obtainable_skills": [
@@ -5105,7 +5105,7 @@
     {
       "course_id": "CRS032",
       "course_name": "Bachelor of Science in Electrical Engineering",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSEE",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "course_description": "Based on the official CHED PSG (CMO No. 88, s. 2017), the Bachelor of Science in Electrical Engineering program is designed to produce graduates who can apply engineering principles to the design, development, and maintenance of electrical systems and equipment. The program covers the generation, transmission, distribution, and utilization of electrical energy. The curriculum covers fundamental areas such as circuits, electronics, electromagnetics, power systems, control systems, and electrical machines. Students learn to analyze, design, and implement electrical systems, considering factors such as safety, efficiency, and sustainability. The program emphasizes both theoretical understanding and practical skills through laboratory work, design projects, and industrial training. Graduates are prepared for careers in various industries, including power generation, manufacturing, telecommunications, and research.",
       "obtainable_skills": [
@@ -5264,7 +5264,7 @@
     {
       "course_id": "CRS033",
       "course_name": "Bachelor of Science in Electronic Engineering major in Electronic Engineering",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSECE",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "course_description": "Based on the official CHED PSG (CMO No. 101, s. 2017), the Bachelor of Science in Electronics Engineering program is designed to produce graduates who can apply engineering principles to the design, development, and maintenance of electronic systems, devices, and communication networks. The program covers the fundamental principles of electronics, telecommunications, and signal processing. The curriculum covers core areas such as electronic circuits, digital and analog electronics, communication systems, signal processing, and control systems. Students learn to analyze, design, and implement electronic systems, considering factors such as performance, reliability, and cost-effectiveness. The program emphasizes both theoretical understanding and practical skills through laboratory work, design projects, and industrial training. Graduates are prepared for careers in various industries, including telecommunications, consumer electronics, manufacturing, and research.",
       "obtainable_skills": [
@@ -5424,7 +5424,7 @@
     {
       "course_id": "CRS034",
       "course_name": "Bachelor of Science in Electronics Engineering",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSECE",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "course_description": "Based on the official CHED PSG (CMO No. 101, s. 2017), the Bachelor of Science in Electronics Engineering program is designed to produce graduates who can apply engineering principles to the design, development, and maintenance of electronic systems, devices, and communication networks. The program covers the fundamental principles of electronics, telecommunications, and signal processing. The curriculum covers core areas such as electronic circuits, digital and analog electronics, communication systems, signal processing, and control systems. Students learn to analyze, design, and implement electronic systems, considering factors such as performance, reliability, and cost-effectiveness. The program emphasizes both theoretical understanding and practical skills through laboratory work, design projects, and industrial training. Graduates are prepared for careers in various industries, including telecommunications, consumer electronics, manufacturing, and research.",
       "obtainable_skills": [
@@ -5583,7 +5583,7 @@
     {
       "course_id": "CRS035",
       "course_name": "Bachelor of Science in Elementary Education",
-      "course_abbreviation": "",
+      "course_abbreviation": "BEEd",
       "parent_cluster": "EDUCATION CLUSTER",
       "course_description": "Based on the official CHED PSG (CMO No. 74, s. 2017), the Bachelor of Elementary Education program is designed to prepare students for teaching in the elementary level (Grades 1-6). The program equips students with the knowledge, skills, and attitudes necessary to effectively teach various subjects to young learners. The curriculum covers general education, professional education (pedagogical courses), and a specialization component. Students learn about child development, teaching methodologies, curriculum development, assessment, and classroom management specific to the elementary level. The program emphasizes the integration of theory and practice through field study and student teaching. Graduates are prepared to become effective elementary school teachers who can foster the holistic development of children.",
       "obtainable_skills": [
@@ -5738,7 +5738,7 @@
     {
       "course_id": "CRS036",
       "course_name": "Bachelor in Elementary Education",
-      "course_abbreviation": "",
+      "course_abbreviation": "BEEd",
       "parent_cluster": "EDUCATION CLUSTER",
       "course_description": "Based on the official CHED PSG (CMO No. 74, s. 2017), the Bachelor of Elementary Education program is designed to prepare students for teaching in the elementary level (Grades 1-6). The program equips students with the knowledge, skills, and attitudes necessary to effectively teach various subjects to young learners. The curriculum covers general education, professional education (pedagogical courses), and a specialization component. Students learn about child development, teaching methodologies, curriculum development, assessment, and classroom management specific to the elementary level. The program emphasizes the integration of theory and practice through field study and student teaching. Graduates are prepared to become effective elementary school teachers who can foster the holistic development of children.",
       "obtainable_skills": [
@@ -6069,7 +6069,7 @@
     {
       "course_id": "CRS038",
       "course_name": "Bachelor of Science in Entertainment and Multimedia Computing",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSEMC",
       "parent_cluster": "ARTS & MULTIMEDIA CLUSTER",
       "course_description": "The Bachelor of Science in Entertainment and Multimedia Computing (BS EMC) is a four-year undergraduate program that prepares students to design, develop, and manage digital entertainment and interactive multimedia applications. The program integrates computing, software development, digital media, animation, game design, interactive technologies, and creative content production to meet the needs of the entertainment and multimedia industries. Students develop competencies in programming, multimedia production, game development, animation, visual design, user experience, project management, and emerging digital technologies while applying creativity, innovation, and technical problem-solving to produce interactive entertainment solutions. Depending on the institution, students may specialize in areas such as Game Development or Digital Animation Technology.",
       "obtainable_skills": [
@@ -6415,7 +6415,7 @@
     {
       "course_id": "CRS040",
       "course_name": "Bachelor of Science in Entrepreneurship",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSEntrep",
       "parent_cluster": "BUSINESS CLUSTER",
       "course_description": "The Bachelor of Science in Entrepreneurship (BS Entrep) is a four-year undergraduate degree program that prepares students to identify business opportunities, develop innovative products and services, establish and manage enterprises, and create sustainable value through entrepreneurial leadership. The program integrates business management, innovation, marketing, finance, operations, and strategic decision-making while emphasizing experiential learning through enterprise creation and business incubation. Students are trained to become opportunity-driven entrepreneurs capable of starting new ventures, managing family businesses, leading entrepreneurial organizations, or driving innovation within existing companies. The curriculum follows outcomes-based education and encourages creativity, ethical leadership, and responsiveness to changing business environments.",
       "obtainable_skills": [
@@ -6758,7 +6758,7 @@
     {
       "course_id": "CRS042",
       "course_name": "Bachelor of Science in Environmental Science",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSES",
       "parent_cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
       "course_description": "The Bachelor of Science in Environmental Science (BS ES) is a four-year interdisciplinary undergraduate program that prepares students to understand environmental systems and address environmental problems through scientific investigation and sustainable resource management. The program integrates biological sciences, chemistry, physics, earth sciences, social sciences, and environmental policy to examine the interactions between human activities and the natural environment. Students develop competencies in environmental assessment, ecosystem management, pollution prevention and control, environmental monitoring, conservation, environmental planning, scientific research, and sustainable development. Graduates are equipped to develop science-based solutions for environmental protection, resource conservation, and environmental management in government, industry, research institutions, and non-government organizations.",
       "obtainable_skills": [
@@ -8140,7 +8140,7 @@
     {
       "course_id": "CRS050",
       "course_name": "Bachelor of Science in Forestry",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSF",
       "parent_cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
       "course_description": "The Bachelor of Science in Forestry (BS Forestry) is an undergraduate program focused on the scientific management, conservation, development, and sustainable use of forest resources and forest ecosystems. It prepares students to understand forest ecology and biodiversity while developing technical competencies for managing forests, watersheds, wildlife habitats, and forest-based resources. The program combines natural sciences with applied forestry, including forest resource assessment, forest management, silviculture, forest protection, biodiversity conservation, watershed management, forest products, and related environmental and resource-management practices.",
       "obtainable_skills": [
@@ -9448,7 +9448,7 @@
     {
       "course_id": "CRS057",
       "course_name": "Bachelor of Science in Industrial Engineering Minor in Service Management",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSIE",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "course_description": "Bachelor of Science in Industrial Engineering prepares students to analyze, design, improve, and manage integrated systems involving people, materials, information, equipment, energy, and processes. With a Service Management minor, the program would additionally emphasize the application of Industrial Engineering principles to service organizations and service-delivery systems. This can involve improving customer-facing processes, service quality, capacity, waiting times, resource utilization, workflow, and overall service efficiency.",
       "obtainable_skills": [
@@ -10108,7 +10108,7 @@
     {
       "course_id": "CRS061",
       "course_name": "Bachelor of Industrial Technology",
-      "course_abbreviation": "",
+      "course_abbreviation": "BIndTech",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "course_description": "The Bachelor of Industrial Technology (BIndTech) is an undergraduate technology program focused on developing practical, technical, and industry-oriented competencies for the application of technology in industrial and related work environments. The program combines foundational academic learning with specialized technical and practical training. Students develop the ability to operate and work with technological equipment, apply technical procedures, troubleshoot problems, perform measurements and testing, maintain equipment, and apply appropriate technologies in production and service environments. The program may be offered through different technology specializations, so the specific technical competencies students acquire depend on their chosen major. CHED-recognized program inventories, for example, show BIndTech offerings with majors such as Automotive Technology, Civil Construction Technology, Electrical Technology, Electronics Technology, Mechanical Technology, and Refrigeration & Airconditioning Technology.",
       "obtainable_skills": [
@@ -10460,7 +10460,7 @@
     {
       "course_id": "CRS063",
       "course_name": "Bachelor of Science in Interior Design",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSID",
       "parent_cluster": "ARTS & MULTIMEDIA CLUSTER",
       "course_description": "Interior Design is the art and science of planning, specifying, selecting, and organizing interior spaces, including surface finishes, materials, furniture, furnishings, fixtures, and other interior elements. The discipline focuses on creating interior environments that appropriately respond to their intended function, movement, character, users, and surrounding built environment. The program develops students' ability to identify and solve interior design problems, formulate design concepts and strategies, integrate design theories and philosophies, and communicate design proposals through visual, oral, written, and digital/virtual methods. It also incorporates knowledge of art and design history, period styles, materials, furniture, building construction, utilities, color, legislation, technology, and professional practice.",
       "obtainable_skills": [
@@ -11773,7 +11773,7 @@
     {
       "course_id": "CRS070",
       "course_name": "Bachelor of Science in Manufacturing Engineering",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSMfgE",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "course_description": "The Bachelor of Science in Manufacturing Engineering (BSMfgE) is an engineering program focused on the design, development, operation, improvement, and management of manufacturing systems and processes. The program prepares students to apply mathematics, science, engineering principles, modern engineering tools, and management principles to manufacturing problems. Students learn to design and improve manufacturing processes and systems, conduct experiments, analyze production data, manage multidisciplinary projects, and address manufacturing challenges while considering technical, economic, environmental, societal, ethical, and global factors. The official CHED PSG specifically requires graduates to be able to solve complex manufacturing-engineering problems, design systems/components/processes under realistic constraints, conduct and interpret experiments, use modern engineering tools, and apply engineering and management principles in multidisciplinary project environments.",
       "obtainable_skills": [
@@ -11970,7 +11970,7 @@
     {
       "course_id": "CRS071",
       "course_name": "Bachelor of Science in Marine Biology",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSMB",
       "parent_cluster": "SCIENCE & MATHEMATICS CLUSTER",
       "course_description": "The Bachelor of Science in Marine Biology (BS Marine Biology) is a biological science program specializing in the study of marine organisms, marine ecosystems, their biological processes, and their interactions with the physical and human environment. The program develops students' understanding of marine biodiversity and ecological systems while preparing them to conduct scientific investigation, collect and analyze biological and environmental data, and apply biological knowledge to marine-resource and environmental concerns. CMO No. 46, s. 2017 establishes the core competencies expected of BS Marine Biology graduates.",
       "obtainable_skills": [
@@ -12298,7 +12298,7 @@
     {
       "course_id": "CRS073",
       "course_name": "Bachelor of Science in Materials Engineering (BS MatE)",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSMatE",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "course_description": "The Bachelor of Science in Materials Engineering is an engineering discipline dedicated to the study of materials and their behavior, focusing on the interconnection between composition, structure, processing, and properties. It equips students with the theoretical and practical knowledge to design, develop, and optimize materials such as metals, polymers, ceramics, semiconductors, and composites for targeted applications across various industries.",
       "obtainable_skills": [
@@ -12451,7 +12451,7 @@
     {
       "course_id": "CRS074",
       "course_name": "Bachelor of Science in Mathematics (BS Math)",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSMath",
       "parent_cluster": "SCIENCE & MATHEMATICS CLUSTER",
       "course_description": "The Bachelor of Science in Mathematics is an undergraduate program that provides students with a deep and broad understanding of mathematics as both a theoretical discipline and a practical tool. Mathematics is described as the science of patterns, where mathematicians seek to discover, analyze, and classify patterns in abstract objects and natural phenomena. The program covers traditional domains such as quantity (arithmetic), structure (algebra), space (geometry), and change (analysis). The program emphasizes distinctive mathematical modes of thought including abstraction, generalization, deduction, inference, use of symbols, and the axiomatic method.",
       "obtainable_skills": [
@@ -13105,7 +13105,7 @@
     {
       "course_id": "CRS078",
       "course_name": "Bachelor of Science in Metallurgical Engineering (BSMetE)",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSMetE",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "course_description": "The Bachelor of Science in Metallurgical Engineering is a four-year undergraduate engineering program that prepares students for careers in the extraction, processing, and application of metals and materials. Metallurgical engineering is a specialized field that deals with the physical and chemical behavior of metallic elements, their intermetallic compounds, and their mixtures, which are called alloys. The program provides students with a strong foundation in chemistry, physics, mathematics, and engineering sciences.",
       "obtainable_skills": [
@@ -13263,7 +13263,7 @@
     {
       "course_id": "CRS079",
       "course_name": "Bachelor of Science in Meteorology (BS Met)",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSMet",
       "parent_cluster": "SCIENCE & MATHEMATICS CLUSTER",
       "course_description": "The Bachelor of Science in Meteorology is a four-year undergraduate program that provides students with a comprehensive and rigorous training in the study of weather processes and forecasting. Meteorology is a branch of atmospheric science that draws on basic knowledge, theory, and laws from physics, mathematics, and chemistry to develop a strong understanding of the physical and dynamical processes affecting atmospheric motions and behavior. The program covers the study of the atmosphere for various purposes, including severe and extreme weather systems (e.g., tropical cyclones), agriculture, military defense, navigation, and disaster risk reduction and management.",
       "obtainable_skills": [
@@ -14546,7 +14546,7 @@
     {
       "course_id": "CRS087",
       "course_name": "Bachelor of Performing Arts (BPeA)",
-      "course_abbreviation": "",
+      "course_abbreviation": "BPeA",
       "parent_cluster": "ARTS & MULTIMEDIA CLUSTER",
       "course_description": "The Bachelor of Performing Arts (BPeA) is an undergraduate program that prepares students for careers in dance and theater. The program produces graduates who are highly skilled practitioners of their specific technique, genre, and style and who are competent in the theory, history, literature, and production of dance and theater. The curriculum provides mandatory course components in theory and criticism, aesthetics and semiotics, music, movement and choreography.",
       "obtainable_skills": [
@@ -14705,7 +14705,7 @@
     {
       "course_id": "CRS088",
       "course_name": "Bachelor of Science in Pharmacy (BS Pharmacy)",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSPharm",
       "parent_cluster": "HEALTHCARE SCIENCE CLUSTER",
       "course_description": "The Bachelor of Science in Pharmacy is a four-year undergraduate program that prepares students for careers as pharmacists. The program provides students with the theoretical knowledge and practical skills necessary to ensure the safe and effective use of medications. Pharmacists are medication experts who play a vital role in healthcare delivery, patient care, and public health. The curriculum integrates the pharmaceutical sciences, clinical sciences, and pharmacy practice.",
       "obtainable_skills": [
@@ -14865,7 +14865,7 @@
     {
       "course_id": "CRS089",
       "course_name": "Bachelor of Arts in Philosophy (AB Philosophy)",
-      "course_abbreviation": "",
+      "course_abbreviation": "AB Philosophy",
       "parent_cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
       "course_description": "The Bachelor of Arts in Philosophy is an undergraduate program that engages students in the critical and systematic study of fundamental questions about existence, knowledge, values, reason, mind, and language. Philosophy seeks to understand and evaluate the foundational principles of various fields and to cultivate the ability to think clearly, rigorously, and creatively. The program provides students with a strong foundation in the history of philosophy, logic, ethics, and major philosophical disciplines such as epistemology, metaphysics, and social philosophy.",
       "obtainable_skills": [
@@ -15024,7 +15024,7 @@
     {
       "course_id": "CRS090",
       "course_name": "Bachelor of Physical Education (BPEd)",
-      "course_abbreviation": "",
+      "course_abbreviation": "BPEd",
       "parent_cluster": "SPORTS & PHYSICAL EDUCATION CLUSTER",
       "course_description": "The Bachelor of Physical Education is a four-year undergraduate teacher education program that prepares students for careers as physical education teachers and sports professionals. The program provides students with the theoretical knowledge and practical skills necessary to teach physical education, coach sports, and promote physical activity and wellness. The curriculum integrates the biological, physical, and behavioral sciences with physical education theory and practice.",
       "obtainable_skills": [
@@ -15347,7 +15347,7 @@
     {
       "course_id": "CRS092",
       "course_name": "Bachelor of Science in Physics (BS Physics)",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSPhysics",
       "parent_cluster": "SCIENCE & MATHEMATICS CLUSTER",
       "course_description": "The Bachelor of Science in Physics is an undergraduate program that provides students with a comprehensive and rigorous training in the fundamental principles of physics. Physics is the science of matter, energy, and their interactions, seeking to understand the laws that govern the universe from the smallest subatomic particles to the largest galaxies. The program provides students with a strong foundation in classical and modern physics, including mechanics, electromagnetism, thermodynamics, quantum mechanics, and relativity.",
       "obtainable_skills": [
@@ -15504,7 +15504,7 @@
     {
       "course_id": "CRS093",
       "course_name": "Bachelor of Arts in Political Science (BA Political Science)",
-      "course_abbreviation": "",
+      "course_abbreviation": "BA Political Science",
       "parent_cluster": "LEGAL & PUBLIC SERVICE CLUSTER",
       "course_description": "The Bachelor of Arts in Political Science is an undergraduate program that studies the theory and practice of politics, government, and public policy. Political science examines the distribution of power, the organization of states and governments, political behavior, and the relationship between citizens and the state. The program provides students with a strong foundation in political theory, comparative politics, international relations, public administration, and research methods.",
       "obtainable_skills": [
@@ -15662,7 +15662,7 @@
     {
       "course_id": "CRS094",
       "course_name": "Bachelor of Science in Psychology (BS Psychology)",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSPsych",
       "parent_cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
       "course_description": "The Bachelor of Science in Psychology is an undergraduate program that provides students with a scientific understanding of human behavior and mental processes. Psychology applies scientific methods to study how people think, feel, and behave, and how these processes are influenced by biological, social, and environmental factors. The program provides students with a strong foundation in psychological theories, research methods, and statistical analysis.",
       "obtainable_skills": [
@@ -15821,7 +15821,7 @@
     {
       "course_id": "CRS095",
       "course_name": "Bachelor of Arts in Psychology (BA Psychology)",
-      "course_abbreviation": "",
+      "course_abbreviation": "BAPsych",
       "parent_cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
       "course_description": "The Bachelor of Arts in Psychology is an undergraduate program that provides students with a liberal arts foundation in the scientific study of human behavior and mental processes. Psychology applies scientific methods to study how people think, feel, and behave, and how these processes are influenced by biological, social, and environmental factors. The program provides students with a strong foundation in psychological theories, research methods, and statistical analysis.",
       "obtainable_skills": [
@@ -16138,7 +16138,7 @@
     {
       "course_id": "CRS097",
       "course_name": "Bachelor of Science in Public Health (BS Public Health)",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSPH",
       "parent_cluster": "HEALTHCARE SCIENCE CLUSTER",
       "course_description": "The Bachelor of Science in Public Health is an undergraduate program that prepares students for careers in public health practice, research, and policy. The program provides students with the theoretical knowledge and practical skills necessary to understand and address health issues at the population level, promote health and prevent disease, and improve health outcomes for communities. The curriculum integrates the biological, physical, social, and behavioral sciences with public health theory and practice.",
       "obtainable_skills": [
@@ -16455,7 +16455,7 @@
     {
       "course_id": "CRS099",
       "course_name": "Bachelor of Science in Real Estate Management (BS REM)",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSREM",
       "parent_cluster": "BUSINESS CLUSTER",
       "course_description": "The Bachelor of Science in Real Estate Management is an undergraduate program that prepares students for careers in the real estate industry. The program provides students with the theoretical knowledge and practical skills necessary to manage real estate properties, facilitate real estate transactions, and provide professional real estate services. The curriculum integrates business, finance, law, and management with real estate theory and practice.",
       "obtainable_skills": [
@@ -16932,7 +16932,7 @@
     {
       "course_id": "CRS102",
       "course_name": "Bachelor of Secondary Education major in English (BSEd English)",
-      "course_abbreviation": "NCBTS",
+      "course_abbreviation": "BSEd",
       "parent_cluster": "EDUCATION CLUSTER",
       "course_description": "The Bachelor of Secondary Education major in English is an undergraduate teacher education program designed to prepare competent, effective, and dedicated secondary school teachers specializing in English. The program integrates deep mastery of English language and literature content with professional education courses and pedagogical training to develop graduates who can facilitate meaningful learning experiences in diverse secondary school settings. The program is founded on the National Competency-Based Teacher Standards (NCBTS).",
       "obtainable_skills": [
@@ -17243,7 +17243,7 @@
     {
       "course_id": "CRS104",
       "course_name": "Bachelor of Arts in Social Science (AB Social Science)",
-      "course_abbreviation": "",
+      "course_abbreviation": "AB Social Science",
       "parent_cluster": "LEGAL & PUBLIC SERVICE CLUSTER",
       "course_description": "The Bachelor of Arts in Social Science is an undergraduate program that provides students with a broad understanding of the social sciences, including history, political science, psychology, sociology, anthropology, and economics. The program aims to develop critical thinking, effective communication, sound judgment, and formation of values. The curriculum is designed to provide a foundation for advancement into a major field of specialization within the social sciences.",
       "obtainable_skills": [
@@ -17558,7 +17558,7 @@
     {
       "course_id": "CRS106",
       "course_name": "Bachelor of Arts in Sociology (BA Sociology)",
-      "course_abbreviation": "",
+      "course_abbreviation": "BASoc",
       "parent_cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
       "course_description": "The Bachelor of Arts in Sociology is an undergraduate program that studies human society, social relationships, and social institutions. Sociology examines the patterns of social behavior, social change, and the social causes and consequences of human behavior. The program provides students with a scientific understanding of society and the ability to analyze social issues critically. The program provides students with a strong foundation in sociological theory, research methods, and specialized areas of sociology.",
       "obtainable_skills": [
@@ -17724,7 +17724,7 @@
     {
       "course_id": "CRS107",
       "course_name": "Bachelor of Special Needs Education (BSNEd)",
-      "course_abbreviation": "NCBTS",
+      "course_abbreviation": "BSNEd",
       "parent_cluster": "EDUCATION CLUSTER",
       "course_description": "The Bachelor of Special Needs Education is a four-year undergraduate teacher education program designed to prepare competent, effective, and dedicated teachers specializing in special needs education. The program provides students with the theoretical knowledge, practical skills, and professional values necessary to teach and support learners with special needs in various educational settings. The program is founded on the National Competency-Based Teacher Standards (NCBTS).",
       "obtainable_skills": [
@@ -18200,7 +18200,7 @@
     {
       "course_id": "CRS110",
       "course_name": "Bachelor of Science in Statistics (BS Stat)",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSStat",
       "parent_cluster": "SCIENCE & MATHEMATICS CLUSTER",
       "course_description": "The Bachelor of Science in Statistics is a four-year undergraduate program that prepares students for careers as statisticians and data scientists. Statistics is the science and art of uncertainty, with roots from biology and mathematics. Its role is to characterize and understand the random process that leads to uncertainty, equipping one with tools that facilitate decision-making. Statistics aggregates data into meaningful information that is used in decision-making.",
       "obtainable_skills": [
@@ -18358,7 +18358,7 @@
     {
       "course_id": "CRS111",
       "course_name": "Bachelor of Technical-Vocational Teacher Education major in Food and Service Management (BTVTEd - Food and Service Management)",
-      "course_abbreviation": "NCBTS",
+      "course_abbreviation": "BTVTEd",
       "parent_cluster": "EDUCATION CLUSTER",
       "course_description": "The Bachelor of Technical-Vocational Teacher Education major in Food and Service Management is a four-year undergraduate teacher education program designed to prepare competent, effective, and dedicated teachers specializing in food and service management for technical-vocational education. The program provides students with the theoretical knowledge, practical skills, and professional values necessary to teach food and service management at the secondary and post-secondary levels. The program is founded on the National Competency-Based Teacher Standards (NCBTS).",
       "obtainable_skills": [
@@ -18516,7 +18516,7 @@
     {
       "course_id": "CRS112",
       "course_name": "Bachelor of Technology and Livelihood Education major in Home Economics (BTLEd - Home Economics)",
-      "course_abbreviation": "NCBTS",
+      "course_abbreviation": "BTLEd",
       "parent_cluster": "EDUCATION CLUSTER",
       "course_description": "The Bachelor of Technology and Livelihood Education major in Home Economics is a four-year undergraduate teacher education program designed to prepare competent, effective, and dedicated teachers specializing in Home Economics and Livelihood Education. The program provides students with the theoretical knowledge, practical skills, and professional values necessary to teach technology and livelihood education at the secondary level. The program is founded on the National Competency-Based Teacher Standards (NCBTS).",
       "obtainable_skills": [
@@ -18673,7 +18673,7 @@
     {
       "course_id": "CRS113",
       "course_name": "Bachelor of Science in Tourism Management",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSTM",
       "parent_cluster": "HOSPITALITY & TOURISM CLUSTER",
       "course_description": "The Bachelor of Science in Tourism Management is a four-year undergraduate program that prepares students for careers in the tourism and hospitality industry. The program provides students with comprehensive knowledge and skills in tourism planning, development, marketing, and management. Students learn about tourism operations, destination management, travel and tour operations, hospitality management, and sustainable tourism practices. The curriculum integrates theoretical foundations with practical applications through industry immersion, field trips, and on-the-job training.",
       "obtainable_skills": [
@@ -19176,7 +19176,7 @@
     {
       "course_id": "CRS116",
       "course_name": "Bachelor of Science in Agriculture major in Agri-Business",
-      "course_abbreviation": "BSAB",
+      "course_abbreviation": "BSA",
       "parent_cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
       "course_description": "The Bachelor of Science in Agribusiness (BSAB) is a four-year undergraduate program that prepares students for careers in the business side of agriculture and the food industry. The program integrates core agricultural disciplines like crop science, animal science, and agricultural economics with business courses in accounting, finance, marketing, law, and management. Students develop competencies in agribusiness management, agricultural marketing, farm management, agricultural finance, agribusiness entrepreneurship, and the application of business principles to agricultural and food systems.",
       "obtainable_skills": [
@@ -19525,7 +19525,7 @@
     {
       "course_id": "CRS118",
       "course_name": "Bachelor of Science in Agriculture major in Agricultural Economics",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSA",
       "parent_cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
       "course_description": "The Bachelor of Science in Agriculture major in Agricultural Economics is a four-year undergraduate program that prepares students to apply economic principles and quantitative methods to agricultural production, resource management, and rural development. The program combines core agricultural sciences with economic theory, farm management, agricultural marketing, agricultural policy, and development economics. Students develop competencies in analyzing agricultural markets, evaluating farm profitability, managing agricultural resources, assessing agricultural policies, and making data-driven decisions for agricultural and rural development.",
       "obtainable_skills": [
@@ -19706,7 +19706,7 @@
     {
       "course_id": "CRS119",
       "course_name": "Bachelor of Science in Agriculture major in Agricultural Economics and Marketing",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSA",
       "parent_cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
       "course_description": "The Bachelor of Science in Agriculture major in Agricultural Economics and Marketing is a four-year undergraduate program that prepares students to apply economic principles and marketing strategies to agricultural production, agribusiness, and rural development. The program combines core agricultural sciences with economic theory, farm management, agricultural marketing, agricultural finance, agricultural policy, and development economics. Students develop competencies in analyzing agricultural markets, evaluating farm profitability, managing agricultural resources, developing marketing strategies for agricultural products, and making data-driven decisions for agricultural and rural development.",
       "obtainable_skills": [
@@ -19885,7 +19885,7 @@
     {
       "course_id": "CRS120",
       "course_name": "Bachelor of Science in Agriculture major in Agricultural Extension and Communication",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSA",
       "parent_cluster": "AGRICULTURE & ENVIRONMENTAL CLUSTER",
       "course_description": "The Bachelor of Science in Agriculture major in Agricultural Extension and Communication is a four-year undergraduate program that prepares students to facilitate the transfer of agricultural technologies, innovations, and research to farmers, cooperatives, local government units, and rural communities. The program combines agricultural sciences with communication, education, leadership, and community development to improve agricultural productivity and promote sustainable rural development. Students develop competencies in extension program planning, farmer education, agricultural communication, participatory rural development, technology transfer, and community capacity building to support agricultural modernization and food security.",
       "obtainable_skills": [
@@ -20730,7 +20730,7 @@
     {
       "course_id": "CRS125",
       "course_name": "Bachelor of Science in Architecture",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSArch",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "course_description": "No reliable information was found in the provided sources for this specific course description. The source documents do not contain a description for Bachelor of Science in Architecture. However, the program is recognized and regulated by CHED.",
       "obtainable_skills": [
@@ -20888,7 +20888,7 @@
     {
       "course_id": "CRS126",
       "course_name": "Bachelor of Science in Biological Engineering",
-      "course_abbreviation": "BSABE",
+      "course_abbreviation": "",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "course_description": "The Bachelor of Science in Agricultural and Biosystems Engineering (BSABE) is an engineering program that applies engineering science and design to agricultural, biological, environmental, and natural-resource systems. The Biological Engineering field applies engineering principles to biological systems, often overlapping with agricultural, environmental, chemical, or biomedical engineering. Students develop competencies in engineering design, biological systems analysis, and the application of engineering principles to biological problems.",
       "obtainable_skills": [
@@ -21841,7 +21841,7 @@
     {
       "course_id": "CRS132",
       "course_name": "Bachelor of Secondary Education major in Values Education With Emphasis in Christian Education",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSEd",
       "parent_cluster": "EDUCATION CLUSTER",
       "course_description": "The Bachelor of Secondary Education major in Values Education (BSEd Values Education) is a four-year undergraduate teacher education program that prepares students to teach Values Education at the secondary level. The program combines professional education with specialized studies in values education, philosophy, ethics, psychology, and community development. Students develop competencies in instructional planning, curriculum development, classroom management, assessment, and educational research while gaining extensive teaching experience through field study and practice teaching. The curriculum includes courses such as Foundation of Values Education, Philosophical and Ethical Foundations of Values Education, Psychological Theories of Values Development, and Teaching Approaches and Strategies in Values Education.",
       "obtainable_skills": [
@@ -22994,7 +22994,7 @@
     {
       "course_id": "CRS139",
       "course_name": "Bachelor of Culture and Arts Education",
-      "course_abbreviation": "",
+      "course_abbreviation": "BCAEd",
       "parent_cluster": "EDUCATION CLUSTER",
       "course_description": "The Bachelor of Culture and Arts Education (BCAEd) is a four-year undergraduate teacher education program designed to prepare future educators to teach Culture and Arts at the secondary level. The program combines professional education courses with specialized studies in arts, culture, humanities, and aesthetics. Students develop competencies in curriculum planning, instructional material development, arts instruction, classroom management, educational assessment, educational technology, and research to effectively promote cultural and arts education.",
       "obtainable_skills": [
@@ -23317,7 +23317,7 @@
     {
       "course_id": "CRS141",
       "course_name": "Bachelor of Elementary Education major in Pre-School",
-      "course_abbreviation": "",
+      "course_abbreviation": "BEEd",
       "parent_cluster": "EDUCATION CLUSTER",
       "course_description": "The Bachelor of Early Childhood Education (BECEd) is a four-year undergraduate teacher education program that focuses on developmentally appropriate education and care for young children. The program covers child development, pedagogy, curriculum development, assessment, and family/community involvement. Students develop competencies in child development knowledge, developmentally appropriate pedagogy, classroom management, observation and assessment, family and community engagement, inclusive education, and communication and interpersonal skills.",
       "obtainable_skills": [
@@ -24278,7 +24278,7 @@
     },
     {
       "course_id": "CRS147",
-      "course_name": "Bachelor of Science in Engineering Technology Management major in Engineering Technology Management",
+      "course_name": "Bachelor of Science in Engineering Technology Management",
       "course_abbreviation": "",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "course_description": "Engineering Technology Management combines engineering technology with management principles. Students learn to apply engineering technology concepts in the planning, operation, supervision, and improvement of industrial and technological systems. The program develops competencies in engineering technology application, industrial operations management, production planning and control, project management, quality assurance, and process improvement.",
@@ -27468,7 +27468,7 @@
     {
       "course_id": "CRS165",
       "course_name": "Bachelor of Science in Fine Arts",
-      "course_abbreviation": "BFA",
+      "course_abbreviation": "BSFA",
       "parent_cluster": "ARTS & MULTIMEDIA CLUSTER",
       "course_description": "The Bachelor of Fine Arts (BFA) is a four-year undergraduate program that prepares students for professional practice in the visual arts and design industries. The program develops artistic creativity, technical competence, critical thinking, and cultural awareness through studio-based learning and theoretical studies. Students gain knowledge in visual communication, drawing, painting, sculpture, printmaking, digital media, design processes, art history, and research while producing creative works that respond to artistic, social, and cultural contexts.",
       "obtainable_skills": [
@@ -27639,7 +27639,7 @@
     {
       "course_id": "CRS166",
       "course_name": "Bachelor of Arts in Fine Arts major in Fine Arts",
-      "course_abbreviation": "BFA",
+      "course_abbreviation": "",
       "parent_cluster": "ARTS & MULTIMEDIA CLUSTER",
       "course_description": "The Bachelor of Fine Arts (BFA) is a four-year undergraduate program that prepares students for professional practice in the visual arts and creative industries. The program emphasizes artistic creativity, technical proficiency, critical thinking, cultural awareness, and professional practice through intensive studio work, design projects, research, and exhibitions. Students develop competencies in drawing, painting, sculpture, printmaking, digital media, visual communication, art history, design theory, and creative research while producing original works that address artistic, cultural, and contemporary social issues.",
       "obtainable_skills": [
@@ -28869,7 +28869,7 @@
     {
       "course_id": "CRS173",
       "course_name": "Bachelor of Science in Geiodetic Engineering",
-      "course_abbreviation": "GNSS",
+      "course_abbreviation": "BSGE",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "course_description": "Geodetic Engineering is a professional engineering field concerned with the measurement, determination, analysis, and representation of positions and physical characteristics of points on and near the Earth's surface. The program prepares students to use surveying, mapping, positioning, geospatial, and measurement technologies to determine locations, boundaries, elevations, distances, and other spatial information. Students develop competencies involving conventional and modern surveying instruments, Global Navigation Satellite System (GNSS) technology, geographic and spatial data, photogrammetry, geodesy, land surveying, engineering surveys, and mapping.",
       "obtainable_skills": [
@@ -29418,7 +29418,7 @@
     {
       "course_id": "CRS176",
       "course_name": "Bachelor of Science in Industrial Engineering",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSIE",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "course_description": "Industrial Engineering is an engineering discipline concerned with designing, improving, and managing integrated systems involving people, materials, information, equipment, energy, and processes. The program prepares students to analyze how work and production systems operate and to improve their efficiency, productivity, quality, safety, cost-effectiveness, and overall performance. Students apply mathematics, engineering principles, statistics, operations research, systems analysis, human factors, and management concepts to solve problems in manufacturing, services, logistics, healthcare, business, and other organizational environments. Unlike engineering disciplines focused primarily on designing a particular physical structure or machine, Industrial Engineering focuses on optimizing systems and processes as a whole.",
       "obtainable_skills": [
@@ -30148,7 +30148,7 @@
     {
       "course_id": "CRS180",
       "course_name": "Bachelor of Science in Aviation Engineering Technology major in Aviation Engineering Technology",
-      "course_abbreviation": "",
+      "course_abbreviation": "BAET",
       "parent_cluster": "AVIATION & MARITIME CLUSTER",
       "course_description": "No reliable information was found in the provided sources for this specific course. The source documents cover general engineering and engineering technology requirements but do not contain a specific description for Bachelor of Science in Aviation Engineering Technology. Batangas State University-LIMA Campus offers Aviation Engineering Technology as one of its undergraduate programs .",
       "obtainable_skills": [
@@ -31128,7 +31128,7 @@
     {
       "course_id": "CRS186",
       "course_name": "Bachelor of Science in Mathematics major in Computer Information Technology",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSMath",
       "parent_cluster": "SCIENCE & MATHEMATICS CLUSTER",
       "course_description": "The Bachelor of Science in Mathematics is a four-year program that provides students with a deep understanding of mathematical theories, principles, and applications. It develops critical thinking, analytical reasoning, and problem-solving skills through the study of algebra, analysis, geometry, number theory, and other mathematical disciplines. A Computer Information Technology major prepares students to be Mathematics professionals and researchers who are proficient in designing and developing computing solutions . The program combines mathematical foundations with computing and information technology applications.",
       "obtainable_skills": [
@@ -31654,7 +31654,7 @@
     {
       "course_id": "CRS189",
       "course_name": "Bachelor of Technical-Vocational Teacher Education major in Automotive Technology",
-      "course_abbreviation": "",
+      "course_abbreviation": "BTVTEd",
       "parent_cluster": "EDUCATION CLUSTER",
       "course_description": "The Bachelor of Technical-Vocational Teacher Education (BTVTEd) major in Automotive Technology is a four-year undergraduate teacher education program that prepares students to teach technical-vocational courses in automotive technology at the secondary or post-secondary level. The program combines professional teacher education with specialized knowledge and practical competencies in automotive technology. Students develop the ability to understand, perform, demonstrate, and teach automotive technology skills while also learning instructional planning, assessment, classroom management, curriculum development, and other professional teaching competencies .",
       "obtainable_skills": [
@@ -34443,7 +34443,7 @@
     {
       "course_id": "CRS206",
       "course_name": "Bachelor of Industrial Technology (E-TEEAP) major in Garments, Fashion and Design Technology",
-      "course_abbreviation": "",
+      "course_abbreviation": "BIT",
       "parent_cluster": "ARTS & MULTIMEDIA CLUSTER",
       "course_description": "The Bachelor of Industrial Technology major in Garments, Fashion and Design Technology is an applied technology program focused on the technical, creative, and production aspects of garment, apparel, fashion, and textile industries. When pursued through E-TEEAP, the qualification is obtained through an assessment and accreditation process rather than necessarily through the conventional completion of a four-year classroom-based curriculum. The applicant's prior learning, professional experience, training, competencies, and other documented accomplishments are evaluated against the requirements of the academic qualification.",
       "obtainable_skills": [
@@ -34613,7 +34613,7 @@
     {
       "course_id": "CRS207",
       "course_name": "Bachelor of Elementary Education major in General",
-      "course_abbreviation": "",
+      "course_abbreviation": "BEEd",
       "parent_cluster": "EDUCATION CLUSTER",
       "course_description": "The Bachelor of Elementary Education (BEEd) is a four-year teacher education program designed to prepare students to teach learners at the elementary level. The program develops both pedagogical knowledge and multidisciplinary content knowledge needed to teach the major learning areas encountered in elementary education. The General/Generalist track provides broad preparation rather than limiting students to a single subject specialization. Students develop competencies in learner development, teaching strategies, curriculum planning, assessment, classroom management, inclusive education, educational technology, and elementary-level content areas such as language, mathematics, science, social studies, and values education.",
       "obtainable_skills": [
@@ -36194,7 +36194,7 @@
     {
       "course_id": "CRS216",
       "course_name": "Bachelor of Technical and Livelihood Education major in Home Economics (BTLed - Home Economics)",
-      "course_abbreviation": "",
+      "course_abbreviation": "BTLEd",
       "parent_cluster": "EDUCATION CLUSTER",
       "course_description": "The Bachelor of Technology and Livelihood Education major in Home Economics (BTLED - Home Economics) is an undergraduate teacher-education program that prepares students to teach technology and livelihood education, with specialized preparation in Home Economics. The program combines professional teacher education with specialized knowledge and practical competencies in Home Economics. Students develop the ability to understand, perform, demonstrate, and teach Home Economics-related skills while also learning instructional planning, assessment, classroom management, curriculum development, and other professional teaching competencies. The Home Economics specialization provides preparation in practical areas associated with household management, food and nutrition, clothing and textiles, family and consumer-related activities, livelihood development, entrepreneurship, and related applied skills.",
       "obtainable_skills": [
@@ -36377,7 +36377,7 @@
     {
       "course_id": "CRS217",
       "course_name": "Bachelor of Science in Hotel, Restaurant and Tourism Management",
-      "course_abbreviation": "BSHM",
+      "course_abbreviation": "BSHRTM",
       "parent_cluster": "HOSPITALITY & TOURISM CLUSTER",
       "course_description": "The Bachelor of Science in Hospitality Management (BSHM) is an undergraduate management program preparing students for professional work in the hospitality industry. It combines business and management principles with practical competencies in food and beverage operations, accommodation services, front-office operations, housekeeping, risk management, and other hospitality functions. The related Bachelor of Science in Tourism Management (BSTM) focuses more specifically on tourism operations, destinations, travel services, tourism products, and the management of organizations operating within the tourism industry. CMO No. 62 establishes common management courses for tourism and hospitality while also requiring professional and technical core courses appropriate to each program. Because the submitted BS Hotel, Restaurant and Tourism Management title is not an exact CMO title, the description above should be treated as describing the closest current CHED framework—particularly BSHM, rather than an independently verified current degree.",
       "obtainable_skills": [
@@ -38605,7 +38605,7 @@
     {
       "course_id": "CRS230",
       "course_name": "Bachelor of Information Technology major in Database System Management",
-      "course_abbreviation": "BSIT",
+      "course_abbreviation": "",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "course_description": "The Bachelor of Science in Information Technology (BSIT) is an undergraduate computing program focused on the application, implementation, integration, operation, and management of information technologies. The program develops students' ability to analyze user and organizational requirements and use computing technologies to design, implement, maintain, and manage computer-based solutions. Under the CHED PSG, BSIT particularly involves areas such as systems analysis and design, database, network and multimedia system operation, software integration and testing, systems management and administration, and related professional IT competencies. A Database System Management specialization, where formally offered by an institution, would place additional emphasis on database design, data organization, database management systems, querying, administration, security, and the use of databases in information systems. However, this specialization cannot be attributed directly to CMO No. 25 without an institution-specific source.",
       "obtainable_skills": [
@@ -41109,7 +41109,7 @@
     {
       "course_id": "CRS244",
       "course_name": "Bachelor of Science in Marine Engineering",
-      "course_abbreviation": "BSMT",
+      "course_abbreviation": "BSMarE",
       "parent_cluster": "AVIATION & MARITIME CLUSTER",
       "course_description": "CMO No. 67, Series of 2017 provides the Revised Policies, Standards and Guidelines for the Bachelor of Science in Marine Transportation (BSMT) and Bachelor of Science in Marine Engineering (BSMarE) Programs. CMO No. 14, Series of 2018 provides an Addendum to CMO No. 67, s. 2017. The BS Marine Engineering program is designed to produce marine engineers who are competent to operate, maintain, and repair marine machinery and systems on board merchant vessels. The program is aligned with the Standards of Training, Certification, and Watchkeeping for Seafarers (STCW) Convention 1978, as amended, and is subject to the regulatory oversight of the Maritime Industry Authority (MARINA) .",
       "obtainable_skills": [
@@ -41268,7 +41268,7 @@
     {
       "course_id": "CRS245",
       "course_name": "Bachelor of Science in Marine Engineering and Electro Technology",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSMEET",
       "parent_cluster": "AVIATION & MARITIME CLUSTER",
       "course_description": "CMO No. 86, Series of 2017 provides the Policies, Standards and Guidelines for Requirements Common to All Bachelor of Science in Engineering and Bachelor of Engineering Technology Programs. The Bachelor of Science in Marine Engineering and Electro Technology is a combined engineering program that falls under the coverage of this PSG. Maritime education PSGs (CMO No. 13, s. 2005 and CMO No. 51, s. 1997) provide supplementary maritime education standards. The program integrates marine engineering principles with electro-technology competencies, preparing graduates for roles that require both mechanical and electrical/electronic systems knowledge in maritime contexts.",
       "obtainable_skills": [
@@ -41425,7 +41425,7 @@
     {
       "course_id": "CRS246",
       "course_name": "Bachelor of Science in Marine Engineering major in Marine Engineering and Machine Shop",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSMarE",
       "parent_cluster": "AVIATION & MARITIME CLUSTER",
       "course_description": "The Bachelor of Science in Marine Engineering major in Marine Engineering and Machine Shop is governed by CMO No. 67, Series of 2017 and related issuances. The program is designed to produce marine engineers with specialized competencies in machine shop operations, in addition to the core marine engineering competencies. The program is aligned with the STCW Convention 1978, as amended, and is subject to MARINA oversight.",
       "obtainable_skills": [
@@ -41897,7 +41897,7 @@
     {
       "course_id": "CRS249",
       "course_name": "Bachelor of Science in Marine Transportation and Engineering",
-      "course_abbreviation": "BSMT",
+      "course_abbreviation": "",
       "parent_cluster": "AVIATION & MARITIME CLUSTER",
       "course_description": "The combined BS Marine Transportation and Engineering program is governed by the maritime PSGs for BSMT and BSMarE (CMO No. 67/70, s. 2017) and the common engineering requirements PSG (CMO No. 86, s. 2017). The program integrates navigation and deck operations (BSMT) with marine machinery and systems operations (BSMarE), preparing graduates for both deck and engine officer roles. The program is aligned with the STCW Convention 1978, as amended.",
       "obtainable_skills": [
@@ -42851,7 +42851,7 @@
     {
       "course_id": "CRS255",
       "course_name": "Bachelor of Science in Industrial Technology major in Mechanical",
-      "course_abbreviation": "BSME",
+      "course_abbreviation": "BS IndTech",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "course_description": "CMO No. 97, Series of 2017 provides the Policies, Standards and Guidelines for the Bachelor of Science in Mechanical Engineering (BSME) Program. The Bachelor of Science in Industrial Technology major in Mechanical is a closely related program that shares substantial mechanical content with the BSME program. CMO No. 86, s. 2017 provides the common engineering requirements PSG. The program prepares graduates for technical and supervisory roles in mechanical technology.",
       "obtainable_skills": [
@@ -44291,7 +44291,7 @@
     {
       "course_id": "CRS264",
       "course_name": "Bachelor of Music major in Music Education",
-      "course_abbreviation": "",
+      "course_abbreviation": "BM",
       "parent_cluster": "EDUCATION CLUSTER",
       "course_description": "CMO No. 52, Series of 2007 provides an Addendum for CMO No. 30, Series of 2004 entitled \"Revised Policies and Standards for Undergraduate Teacher Education Curriculum.\" CMO No. 30, Series of 2004 provides the Revised Policies and Standards for Undergraduate Teacher Education Curriculum. The Bachelor of Music major in Music Education is a teacher education program that prepares graduates for teaching music at various educational levels. The program combines music content knowledge with education pedagogy.",
       "obtainable_skills": [
@@ -44462,7 +44462,7 @@
     {
       "course_id": "CRS265",
       "course_name": "Bachelor of Music in Music Education",
-      "course_abbreviation": "",
+      "course_abbreviation": "BM",
       "parent_cluster": "EDUCATION CLUSTER",
       "course_description": "CMO No. 52, Series of 2007 provides an Addendum for CMO No. 30, Series of 2004 entitled \"Revised Policies and Standards for Undergraduate Teacher Education Curriculum.\" CMO No. 30, Series of 2004 provides the Revised Policies and Standards for Undergraduate Teacher Education Curriculum. The Bachelor of Music in Music Education is a teacher education program that prepares graduates for teaching music at various educational levels. The program combines music content knowledge with education pedagogy.",
       "obtainable_skills": [
@@ -45760,7 +45760,7 @@
     {
       "course_id": "CRS273",
       "course_name": "Bachelor of Arts in Philippine Studies - Language Culture Media",
-      "course_abbreviation": "HSC",
+      "course_abbreviation": "",
       "parent_cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
       "course_description": "CMO No. 44, Series of 1997 provides the Policies and Standards for Humanities, Social Sciences and Communication Education (HSC). The Bachelor of Arts in Philippine Studies - Language Culture Media is an interdisciplinary program that falls under the HSC PSG. The program combines language studies, cultural studies, and media studies within the Philippine context, preparing graduates for careers in cultural preservation, media, education, and related fields.",
       "obtainable_skills": [
@@ -45918,7 +45918,7 @@
     {
       "course_id": "CRS274",
       "course_name": "Bachelor of Science in Philosophy",
-      "course_abbreviation": "HSC",
+      "course_abbreviation": "",
       "parent_cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
       "course_description": "CMO No. 44, Series of 1997 provides the Policies and Standards for Humanities, Social Sciences and Communication Education (HSC). The Bachelor of Science in Philosophy is a humanities program that falls under the HSC PSG. The program covers philosophical principles, logic, ethics, metaphysics, and the history of philosophy, preparing graduates for careers in education, research, law, and related fields.",
       "obtainable_skills": [
@@ -46076,7 +46076,7 @@
     {
       "course_id": "CRS275",
       "course_name": "Bachelor of Science in Physical Education",
-      "course_abbreviation": "",
+      "course_abbreviation": "BPEd",
       "parent_cluster": "SPORTS & PHYSICAL EDUCATION CLUSTER",
       "course_description": "CMO No. 80, Series of 2017 provides the Policies, Standards and Guidelines for Bachelor of Physical Education (BPEd). CMO No. 23, Series of 2011 provides the Policies, Standards and Guidelines for Bachelor of Physical Education Major in School P.E. (BPE-SPE) and Major in Sports and Wellness Management (BPE-SWM). The Bachelor of Science in Physical Education is closely related to the BPEd program and shares substantial curriculum content in physical education, sports science, and wellness.",
       "obtainable_skills": [
@@ -47198,7 +47198,7 @@
     {
       "course_id": "CRS282",
       "course_name": "Bachelor of Science in Public Administration",
-      "course_abbreviation": "BPA",
+      "course_abbreviation": "BSPA",
       "parent_cluster": "LEGAL & PUBLIC SERVICE CLUSTER",
       "course_description": "CMO No. 06, Series of 2010 provides the Policies and Standards for Bachelor of Public Administration (BPA) Program . The Bachelor of Science in Public Administration is closely related to the BPA program and shares substantial curriculum content in public administration, governance, and public policy. The program prepares graduates for careers in government service, public management, and related fields.",
       "obtainable_skills": [
@@ -47356,7 +47356,7 @@
     {
       "course_id": "CRS283",
       "course_name": "Bachelor of Arts in Public Administration",
-      "course_abbreviation": "BPA",
+      "course_abbreviation": "",
       "parent_cluster": "LEGAL & PUBLIC SERVICE CLUSTER",
       "course_description": "CMO No. 06, Series of 2010 provides the Policies and Standards for Bachelor of Public Administration (BPA) Program . The Bachelor of Arts in Public Administration is closely related to the BPA program and shares substantial curriculum content in public administration, governance, and public policy. The program prepares graduates for careers in government service, public management, and related fields.",
       "obtainable_skills": [
@@ -48309,7 +48309,7 @@
     {
       "course_id": "CRS289",
       "course_name": "Bachelor in Science Education With Specialization in Physics",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSE",
       "parent_cluster": "EDUCATION CLUSTER",
       "course_description": "CMO No. 75, Series of 2017 provides the Policies, Standards and Guidelines for Bachelor of Secondary Education (BSEd). The Bachelor in Science Education With Specialization in Physics is a specialization within the secondary education program, preparing graduates to teach physics at the secondary level. CMO No. 13, s. 2024 provides the physics content standards.",
       "obtainable_skills": [
@@ -48480,7 +48480,7 @@
     {
       "course_id": "CRS290",
       "course_name": "Bachelor of Science in Secondary Education major in English",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSEd",
       "parent_cluster": "EDUCATION CLUSTER",
       "course_description": "CMO No. 75, Series of 2017 provides the Policies, Standards and Guidelines for Bachelor of Secondary Education (BSEd). The Bachelor of Science in Secondary Education major in English is a specialization within the secondary education program, preparing graduates to teach English at the secondary level. CMO No. 24, s. 2017 provides the English content standards.",
       "obtainable_skills": [
@@ -48796,7 +48796,7 @@
     {
       "course_id": "CRS292",
       "course_name": "Bachelor in Secondary Education major in English",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSEd",
       "parent_cluster": "EDUCATION CLUSTER",
       "course_description": "CMO No. 75, Series of 2017 provides the Policies, Standards and Guidelines for Bachelor of Secondary Education (BSEd). The Bachelor in Secondary Education major in English is a specialization within the secondary education program, preparing graduates to teach English at the secondary level. CMO No. 24, s. 2017 provides the English content standards.",
       "obtainable_skills": [
@@ -49111,7 +49111,7 @@
     {
       "course_id": "CRS294",
       "course_name": "Bachelor in Sign Language Interpretation",
-      "course_abbreviation": "HSC",
+      "course_abbreviation": "BSLI",
       "parent_cluster": "EDUCATION CLUSTER",
       "course_description": "CMO No. 44, Series of 1997 provides the Policies and Standards for Humanities, Social Sciences and Communication Education (HSC). The Bachelor in Sign Language Interpretation is a communication-related program that falls under the HSC PSG. The program prepares graduates for careers in sign language interpretation, including interpreting for deaf and hard-of-hearing individuals in various settings.",
       "obtainable_skills": [
@@ -49271,7 +49271,7 @@
     {
       "course_id": "CRS295",
       "course_name": "Bachelor of Arts major in Sign Language Interpreting",
-      "course_abbreviation": "HSC",
+      "course_abbreviation": "",
       "parent_cluster": "EDUCATION CLUSTER",
       "course_description": "CMO No. 44, Series of 1997 provides the Policies and Standards for Humanities, Social Sciences and Communication Education (HSC). The Bachelor of Arts major in Sign Language Interpreting is a communication-related program that falls under the HSC PSG. The program prepares graduates for careers in sign language interpreting, including interpreting for deaf and hard-of-hearing individuals in various settings.",
       "obtainable_skills": [
@@ -50082,7 +50082,7 @@
     {
       "course_id": "CRS300",
       "course_name": "Bachelor of Science in Special Needs Education",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSNEd",
       "parent_cluster": "EDUCATION CLUSTER",
       "course_description": "CMO No. 77, Series of 2017 provides the Policies, Standards and Guidelines for Bachelor of Special Needs Education (BSNEd). The Bachelor of Science in Special Needs Education is closely related to the BSNEd program and shares substantial curriculum content in special education, inclusive education, and related fields. The program prepares graduates for teaching learners with special needs in various educational settings.",
       "obtainable_skills": [
@@ -50240,7 +50240,7 @@
     {
       "course_id": "CRS301",
       "course_name": "Bachelor of Secondary Education Major in Special Prog. Sped",
-      "course_abbreviation": "",
+      "course_abbreviation": "BSEd",
       "parent_cluster": "EDUCATION CLUSTER",
       "course_description": "CMO No. 77, Series of 2017 provides the Policies, Standards and Guidelines for Bachelor of Special Needs Education (BSNEd). The Bachelor of Secondary Education Major in Special Needs Education is a specialization within the secondary education program, preparing graduates to teach learners with special needs at the secondary level.",
       "obtainable_skills": [
@@ -50398,7 +50398,7 @@
     {
       "course_id": "CRS302",
       "course_name": "Bachelor of Sports Science",
-      "course_abbreviation": "BSESS",
+      "course_abbreviation": "BSS",
       "parent_cluster": "SPORTS & PHYSICAL EDUCATION CLUSTER",
       "course_description": "CMO No. 81, Series of 2017 provides the Policies, Standards and Guidelines for Bachelor of Science in Exercise and Sports Sciences (BSESS). The Bachelor of Sports Science is closely related to the BSESS program and shares substantial curriculum content in exercise science, sports science, and related fields. The program provides knowledge about how the body moves and performs during physical activity, helps students learn how to improve health, fitness, and sports performance through exercise and training, and covers injury prevention and rehabilitation techniques . Graduates can work in areas like coaching, fitness training, health promotion, or continue into fields like physiotherapy .",
       "obtainable_skills": [
@@ -50733,7 +50733,7 @@
     {
       "course_id": "CRS304",
       "course_name": "Bachelor in Sports Science",
-      "course_abbreviation": "BSESS",
+      "course_abbreviation": "",
       "parent_cluster": "SPORTS & PHYSICAL EDUCATION CLUSTER",
       "course_description": "CMO No. 81, Series of 2017 provides the Policies, Standards and Guidelines for Bachelor of Science in Exercise and Sports Sciences (BSESS). The Bachelor in Sports Science is closely related to the BSESS program and shares substantial curriculum content in exercise science, sports science, and related fields. The program provides knowledge about how the body moves and performs during physical activity, helps students learn how to improve health, fitness, and sports performance through exercise and training, and covers injury prevention and rehabilitation techniques .",
       "obtainable_skills": [
@@ -51546,7 +51546,7 @@
     {
       "course_id": "CRS309",
       "course_name": "Bachelor of Technology & Livelihood Technology major in Home Economics",
-      "course_abbreviation": "",
+      "course_abbreviation": "BTLEd",
       "parent_cluster": "BUSINESS CLUSTER",
       "course_description": "CMO No. 78, Series of 2017 provides the Policies, Standards and Guidelines for Bachelor of Technology and Livelihood Education (BTLEd). The Bachelor of Technology & Livelihood Technology major in Home Economics is a teacher education program that prepares graduates for teaching technology and livelihood education with a home economics focus. CMO No. 44, s. 1997 provides historical HSC PSG.",
       "obtainable_skills": [
@@ -51702,7 +51702,7 @@
     {
       "course_id": "CRS310",
       "course_name": "Bachelor of Science in Technology Communication Management",
-      "course_abbreviation": "HSC",
+      "course_abbreviation": "",
       "parent_cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
       "course_description": "CMO No. 44, Series of 1997 provides the Policies and Standards for Humanities, Social Sciences and Communication Education (HSC). The Bachelor of Science in Technology Communication Management is a communication-related program that falls under the HSC PSG. The program prepares graduates for careers in technology communication, media management, and related fields.",
       "obtainable_skills": [
@@ -52213,7 +52213,7 @@
     {
       "course_id": "CRS313",
       "course_name": "Bachelor of Arts in Theology",
-      "course_abbreviation": "",
+      "course_abbreviation": "BATh",
       "parent_cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
       "course_description": "CMO No. 13, Series of 2007 provides the Policies and Standards for Doctor's Programs in Theology and Religious Education in Catholic Higher Education Institutions and Seminaries. CMO No. 12, Series of 2007 provides the Policies and Standards for Graduate Catholic Theological and Religious Education – Master's Programs. The Bachelor of Arts in Theology program is closely related to these theology and religious education programs and shares substantial curriculum content in theological studies and religious education.",
       "obtainable_skills": [
@@ -52384,7 +52384,7 @@
     {
       "course_id": "CRS314",
       "course_name": "Bachelor of Theology",
-      "course_abbreviation": "",
+      "course_abbreviation": "BTh",
       "parent_cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
       "course_description": "CMO No. 13, Series of 2007 provides the Policies and Standards for Doctor's Programs in Theology and Religious Education in Catholic Higher Education Institutions and Seminaries. CMO No. 12, Series of 2007 provides the Policies and Standards for Graduate Catholic Theological and Religious Education – Master's Programs. The Bachelor of Theology program is closely related to these theology and religious education programs and shares substantial curriculum content in theological studies and religious education.",
       "obtainable_skills": [
@@ -53521,7 +53521,7 @@
     {
       "course_id": "CRS321",
       "course_name": "Bachelor of Engineering Technology major in Avionics Maintenance Technology",
-      "course_abbreviation": "",
+      "course_abbreviation": "BET",
       "parent_cluster": "AVIATION & MARITIME CLUSTER",
       "course_description": "CMO No. 86, Series of 2017 provides the Policies, Standards and Guidelines for Requirements Common to All Bachelor of Science in Engineering and Bachelor of Engineering Technology Programs. The Bachelor of Engineering Technology major in Avionics Maintenance Technology is a four-year engineering technology degree program that falls under the coverage of this PSG. The program prepares graduates for technical and supervisory roles in avionics maintenance and aviation technology.",
       "obtainable_skills": [
@@ -53677,8 +53677,8 @@
     },
     {
       "course_id": "CRS322",
-      "course_name": "Bachelor of Arts in Behavioral Sciences major in Organizational and Social Systems Development and Bachelor of Science in Advertising Management Bachelor of Science in Advertising Management",
-      "course_abbreviation": "HSC",
+      "course_name": "Bachelor of Arts in Behavioral Sciences major in Organizational and Social Systems Development",
+      "course_abbreviation": "ABBHS",
       "parent_cluster": "HUMANITIES & SOCIAL SCIENCE CLUSTER",
       "course_description": "CMO No. 44, Series of 1997 provides the Policies and Standards for Humanities, Social Sciences and Communication Education (HSC) . The Bachelor of Arts in Behavioral Sciences and Bachelor of Science in Advertising Management are programs that fall under the coverage of this PSG. The Behavioral Sciences program focuses on the study of human behavior and social systems, while the Advertising Management program prepares graduates for careers in advertising and marketing communication.",
       "obtainable_skills": [
@@ -54640,7 +54640,7 @@
     {
       "course_id": "CRS328",
       "course_name": "Bachelor of Industrial Technology major in Computer",
-      "course_abbreviation": "BSCS",
+      "course_abbreviation": "BIT",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "course_description": "CMO No. 87, Series of 2017 provides the Policies, Standards and Guidelines for the Bachelor of Science in Computer Engineering (BSCpE) Program. CMO No. 25, Series of 2015 provides the Revised Policies, Standards and Guidelines for Bachelor of Science in Computer Science (BSCS), Bachelor of Science in Information Systems (BSIS), and Bachelor of Science in Information Technology (BSIT) Programs. The Bachelor of Industrial Technology major in Computer is closely related to these computing programs and shares substantial curriculum content in computer technology.",
       "obtainable_skills": [
@@ -54806,7 +54806,7 @@
     {
       "course_id": "CRS329",
       "course_name": "Bachelor of Science in Industrial Technology major in Computer Technology",
-      "course_abbreviation": "BSCS",
+      "course_abbreviation": "BS IndTech",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "course_description": "CMO No. 25, Series of 2015 provides the Revised Policies, Standards and Guidelines for Bachelor of Science in Computer Science (BSCS), Bachelor of Science in Information Systems (BSIS), and Bachelor of Science in Information Technology (BSIT) Programs. The Bachelor of Science in Industrial Technology major in Computer Technology is closely related to these computing programs and shares substantial curriculum content in computer technology.",
       "obtainable_skills": [
@@ -55974,7 +55974,7 @@
     {
       "course_id": "CRS336",
       "course_name": "Bachelor of Science in Industrial Technology major in Electrical",
-      "course_abbreviation": "BSEE",
+      "course_abbreviation": "BS IndTech",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "course_description": "CMO No. 88, Series of 2017 provides the Policies, Standards and Guidelines for the Bachelor of Science in Electrical Engineering (BSEE) Program. The Bachelor of Science in Industrial Technology major in Electrical is closely related to the BSEE program and shares substantial curriculum content in electrical engineering and technology.",
       "obtainable_skills": [
@@ -56141,7 +56141,7 @@
     {
       "course_id": "CRS337",
       "course_name": "Bachelor of Science in Industrial Technology major in Electronics",
-      "course_abbreviation": "BSECE",
+      "course_abbreviation": "BS IndTech",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "course_description": "CMO No. 101, Series of 2017 provides the Policies, Standards and Guidelines for the Bachelor of Science in Electronics Engineering (BSECE) Program. The Bachelor of Science in Industrial Technology major in Electronics is closely related to the BSECE program and shares substantial curriculum content in electronics engineering and technology.",
       "obtainable_skills": [
@@ -56308,7 +56308,7 @@
     {
       "course_id": "CRS338",
       "course_name": "Bachelor in Industrial Technology major in Electronics",
-      "course_abbreviation": "BSECE",
+      "course_abbreviation": "BIT",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "course_description": "CMO No. 101, Series of 2017 provides the Policies, Standards and Guidelines for the Bachelor of Science in Electronics Engineering (BSECE) Program. The Bachelor in Industrial Technology major in Electronics is closely related to the BSECE program and shares substantial curriculum content in electronics engineering and technology.",
       "obtainable_skills": [
@@ -56475,7 +56475,7 @@
     {
       "course_id": "CRS339",
       "course_name": "Bachelor of Science in Industrial Technology major in Electronics and Communication Technology",
-      "course_abbreviation": "HSC",
+      "course_abbreviation": "BSIndTech",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "course_description": "CMO No. 44, Series of 1997 provides the Policies and Standards for Humanities, Social Sciences and Communication Education (HSC). The Bachelor of Science in Industrial Technology major in Electronics and Communication Technology is a program that falls under the HSC PSG and is closely related to the BS Electronics Engineering program covered by CMO No. 101, s. 2017. The program prepares graduates for careers in electronics and communication technology.",
       "obtainable_skills": [
@@ -56643,7 +56643,7 @@
     {
       "course_id": "CRS340",
       "course_name": "Bachelor of Science in Industrial Technology major in Electronics & Communications Technology",
-      "course_abbreviation": "HSC",
+      "course_abbreviation": "BSIndTech",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "course_description": "CMO No. 44, Series of 1997 provides the Policies and Standards for Humanities, Social Sciences and Communication Education (HSC). The Bachelor of Science in Industrial Technology major in Electronics & Communications Technology is a program that falls under the HSC PSG and is closely related to the BS Electronics Engineering program covered by CMO No. 101, s. 2017. The program prepares graduates for careers in electronics and communications technology.",
       "obtainable_skills": [
@@ -56811,7 +56811,7 @@
     {
       "course_id": "CRS341",
       "course_name": "Bachelor in Industrial Technology major in Electronics and Communications Technology",
-      "course_abbreviation": "HSC",
+      "course_abbreviation": "BIndTech",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "course_description": "CMO No. 44, Series of 1997 provides the Policies and Standards for Humanities, Social Sciences and Communication Education (HSC). The Bachelor in Industrial Technology major in Electronics and Communications Technology is a program that falls under the HSC PSG and is closely related to the BS Electronics Engineering program covered by CMO No. 101, s. 2017. The program prepares graduates for careers in electronics and communications technology.",
       "obtainable_skills": [
@@ -56978,8 +56978,8 @@
     },
     {
       "course_id": "CRS342",
-      "course_name": "Bachelor of Science in Electronics and Computer Technology major in Communications Systems",
-      "course_abbreviation": "HSC",
+      "course_name": "Bachelor of Science in Electronics and Computer Technology Option in Communications Systems",
+      "course_abbreviation": "BSECT",
       "parent_cluster": "ENGINEERING / STEM CLUSTER",
       "course_description": "CMO No. 44, Series of 1997 provides the Policies and Standards for Humanities, Social Sciences and Communication Education (HSC). The Bachelor of Science in Electronics and Computer Technology major in Communications Systems is a program that falls under the HSC PSG and is closely related to the BS Electronics Engineering program covered by CMO No. 101, s. 2017 and the computing programs covered by CMO No. 25, s. 2015. The program prepares graduates for careers in electronics, computer technology, and communications systems.",
       "obtainable_skills": [

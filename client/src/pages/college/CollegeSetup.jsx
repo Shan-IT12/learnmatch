@@ -322,7 +322,6 @@ function CollegeSetup() {
                       {course.course_name}
                       {course.course_abbreviation && ` (${course.course_abbreviation})`}
                     </p>
-                    {course.cluster_category && <p className="text-xs text-orange-500 mt-0.5">{course.cluster_category}</p>}
                   </button>
                 ))}
               </div>
@@ -341,7 +340,6 @@ function CollegeSetup() {
                     {selectedCourse.course_name}
                     {selectedCourse.course_abbreviation && ` (${selectedCourse.course_abbreviation})`}
                   </p>
-                  {selectedCourse.cluster_category && <p className="text-xs text-orange-500 mt-0.5">{selectedCourse.cluster_category}</p>}
                 </div>
                 <button
                   type="button"

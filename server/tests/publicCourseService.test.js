@@ -15,13 +15,42 @@ const databaseWithActiveCodes = (...courseCodes) => ({
   },
 })
 
-test('loads the 304 active independent courses for discovery', () => {
-  assert.equal(getPublicCourseCount(), 304)
+test('loads the 303 active independent courses for discovery', () => {
+  assert.equal(getPublicCourseCount(), 303)
 })
 
 test('searches partial names and abbreviations case-insensitively', () => {
   assert.ok(searchPublicCourses('info').some((course) => course.course_name.includes('Information Technology')))
   assert.equal(searchPublicCourses('BSIT')[0].course_abbreviation, 'BSIT')
+})
+
+test('searches verified degree abbreviations without leaking stale unrelated mappings', () => {
+  const codesFor = (query) => new Set(searchPublicCourses(query).map(({ course_code }) => course_code))
+
+  assert.ok(codesFor('BSCS').has('CRS026'))
+  assert.ok(codesFor('bscs').has('CRS026'))
+  assert.ok(codesFor('BsCs').has('CRS026'))
+  assert.ok(codesFor('BSIT').has('CRS062'))
+  assert.ok(codesFor('BSIS').has('CRS228'))
+  assert.ok(codesFor('BSA').has('CRS343'))
+  assert.ok(codesFor('BSA').has('CRS008'))
+  assert.ok(searchPublicCourses('BSA').every(({ course_abbreviation }) => course_abbreviation === 'BSA'))
+  assert.ok(codesFor('BSBA').has('CRS344'))
+  assert.ok(codesFor('BSEd').has('CRS360'))
+  assert.ok(codesFor('BSCE').has('CRS021'))
+  assert.ok(codesFor('BSN').has('CRS083'))
+  assert.ok(codesFor('Computer Science').has('CRS026'))
+  assert.equal(getPublicCourse('CRS026').course_name, 'Bachelor of Science in Computer Science')
+  assert.deepEqual(searchPublicCourses('zzqv-invalid-abbreviation'), [])
+
+  assert.equal(codesFor('BSCS').has('CRS328'), false)
+  assert.equal(codesFor('BSCS').has('CRS329'), false)
+  assert.equal(codesFor('BSEE').has('CRS336'), false)
+  assert.equal(codesFor('BSECE').has('CRS337'), false)
+  assert.equal(codesFor('BSECE').has('CRS338'), false)
+  assert.equal(codesFor('HSC').has('CRS342'), false)
+  assert.equal(codesFor('BSCE').has('CRS020'), false)
+  assert.equal(codesFor('BAEL').has('CRS148'), false)
 })
 
 test('searches skills and career paths', () => {
@@ -57,10 +86,30 @@ test('returns public details by stable course code', () => {
   assert.equal(getPublicCourse('CRS999'), null)
 })
 
+test('uses the approved corrected titles without changing course identities', () => {
+  assert.equal(
+    getPublicCourse('CRS147').course_name,
+    'Bachelor of Science in Engineering Technology Management'
+  )
+  assert.equal(
+    getPublicCourse('CRS322').course_name,
+    'Bachelor of Arts in Behavioral Sciences major in Organizational and Social Systems Development'
+  )
+  assert.equal(
+    getPublicCourse('CRS342').course_name,
+    'Bachelor of Science in Electronics and Computer Technology Option in Communications Systems'
+  )
+  assert.ok(searchPublicCourses('CRS322').some(({ course_code }) => course_code === 'CRS322'))
+  assert.ok(searchPublicCourses('CRS342').some(({ course_code }) => course_code === 'CRS342'))
+  assert.equal(getPublicCourse('CRS230').course_name, 'Bachelor of Information Technology major in Database System Management')
+  assert.equal(getPublicCourse('CRS246').course_name, 'Bachelor of Science in Marine Engineering major in Marine Engineering and Machine Shop')
+})
+
 test('keeps deprecated stable IDs directly resolvable but out of public discovery', () => {
   assert.equal(getPublicCourse('CRS020').course_code, 'CRS020')
   assert.deepEqual(searchPublicCourses('CRS020'), [])
   assert.deepEqual(searchPublicCourses('CRS166'), [])
+  assert.deepEqual(searchPublicCourses('CRS312'), [])
 })
 
 test('keeps enrichment coverage intact across all 360 courses and 13 clusters', () => {

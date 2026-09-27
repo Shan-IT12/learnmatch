@@ -12,9 +12,9 @@ import {
 test('course identity registry preserves approved catalog counts', () => {
   assert.deepEqual(COURSE_IDENTITY_METADATA, {
     stored_records: 360,
-    active_independent_programs: 304,
+    active_independent_programs: 303,
     deprecated_non_independent: 54,
-    quarantined: 2,
+    quarantined: 3,
   })
 })
 
@@ -31,6 +31,10 @@ test('CRS249 retains its approved one-to-many successor relationship', () => {
 test('quarantined courses have no redirect and active courses resolve to themselves', () => {
   assert.equal(isCurrentIndependentCourse('CRS166'), false)
   assert.deepEqual(resolveCanonicalCourseIds('CRS166'), [])
+  assert.equal(isCurrentIndependentCourse('CRS312'), false)
+  assert.deepEqual(resolveCanonicalCourseIds('CRS312'), [])
+  assert.equal(isCurrentIndependentCourse('CRS322'), true)
+  assert.deepEqual(resolveCanonicalCourseIds('CRS322'), ['CRS322'])
   assert.equal(isCurrentIndependentCourse('CRS343'), true)
   assert.deepEqual(resolveCanonicalCourseIds('CRS343'), ['CRS343'])
 })

@@ -89,6 +89,19 @@ test('returns null for malformed or nonexistent course codes', async () => {
   assert.equal(await getSchoolsForCourse('CRS999', database({ courseRows: [] })), null)
 })
 
+test('resolves deprecated identities to one canonical course and hides quarantined identities', async () => {
+  const canonicalDb = database({
+    courseRows: [{ ...course, course_id: 21, course_code: 'CRS021' }],
+  })
+  const result = await getSchoolsForCourse('CRS020', canonicalDb)
+  assert.equal(result.course.course_code, 'CRS021')
+  assert.deepEqual(canonicalDb.calls[0].params, ['CRS021'])
+
+  const quarantinedDb = database()
+  assert.equal(await getSchoolsForCourse('CRS166', quarantinedDb), null)
+  assert.equal(quarantinedDb.calls.length, 0)
+})
+
 test('returns null for an inactive course because the query requires active status', async () => {
   const inactiveDb = database({ courseRows: [] })
   assert.equal(await getSchoolsForCourse('CRS062', inactiveDb), null)

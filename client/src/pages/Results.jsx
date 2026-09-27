@@ -227,7 +227,6 @@ function Results() {
                       {rec.course_name}
                       {rec.course_abbreviation && ` (${rec.course_abbreviation})`}
                     </h2>
-                    <p className="text-xs text-gray-400 mt-0.5">{rec.cluster_category}</p>
                   </div>
                   <div className="flex items-baseline gap-1 sm:block sm:text-right shrink-0">
                     <span className="text-2xl font-bold text-orange-500">{rec.match_score}%</span>

@@ -1,5 +1,6 @@
 import { generateMismatchExplanation } from './collegeMismatchExplanationService.js'
 import { getPublicCourse } from './publicCourseService.js'
+import { isCurrentIndependentCourse } from './courseIdentityService.js'
 
 export const CHECKIN_PHASES = ['Early', 'Mid', 'End']
 export const YEAR_LEVELS = ['1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year']
@@ -366,7 +367,7 @@ export async function createCollegeSetup(
       'SELECT course_id, course_code, course_name FROM COURSE WHERE course_id = ? AND is_active = 1',
       [normalizedCourseId]
     )
-    if (courses.length === 0) {
+    if (courses.length === 0 || !isCurrentIndependentCourse(courses[0].course_code)) {
       throw new CollegeTrackingError('The selected course is unavailable or inactive.', 'COURSE_UNAVAILABLE', 404)
     }
 

@@ -35,7 +35,7 @@ if (
   statusCounts.alternative_title !== 14 ||
   statusCounts.historical !== 6 ||
   statusCounts.malformed !== 4 ||
-  statusCounts.quarantine !== 2
+  statusCounts.quarantine !== 3
 ) {
   throw new Error('Course identity registry classification counts are invalid')
 }

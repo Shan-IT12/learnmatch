@@ -216,6 +216,24 @@ test('College retrieval is ordered, active-only, and does not invoke WSM', async
   assert.match(calls[1].sql, /ORDER BY ri\.rank_position ASC/)
 })
 
+test('College recommendation shortcuts hide deprecated and quarantined identities', async () => {
+  const database = {
+    query: async (sql) => {
+      if (!sql.includes('RECOMMENDATION_ITEM')) {
+        return [[{ recommendation_id: 99, assessment_id: 11, generated_at: new Date(0) }]]
+      }
+      return [[
+        savedRows[0],
+        { ...savedRows[1], course_code: 'CRS020' },
+        { ...savedRows[2], course_code: 'CRS166' },
+      ]]
+    },
+  }
+
+  const result = await getLatestSavedRecommendations(database, 7)
+  assert.deepEqual(result.recommendations.map(({ course_code }) => course_code), ['CRS001'])
+})
+
 test('Results refresh reuses the saved snapshot without rerunning WSM or writing', async () => {
   let generatorCalls = 0
   let explanationCalls = 0
