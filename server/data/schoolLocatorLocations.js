@@ -7,6 +7,7 @@ const SCHOOL_LOCATOR_LOCATIONS = Object.freeze({
   '03180': Object.freeze({ latitude: 14.8473224, longitude: 121.0489316 }),
   '03194': Object.freeze({ latitude: 14.81028, longitude: 121.06149 }),
   '03179': Object.freeze({ latitude: 14.8129242, longitude: 121.0717022 }),
+  '13228': Object.freeze({ latitude: 14.7788219, longitude: 121.0744668 }),
 })
 
 export default SCHOOL_LOCATOR_LOCATIONS

@@ -1,9 +1,9 @@
 {
   "metadata": {
     "stored_records": 360,
-    "active_independent_programs": 303,
+    "active_independent_programs": 304,
     "deprecated_non_independent": 54,
-    "quarantined": 3
+    "quarantined": 2
   },
   "records": [
     { "course_id": "CRS020", "status": "confirmed_duplicate", "canonical_course_id": "CRS021" },
@@ -65,7 +65,6 @@
     { "course_id": "CRS295", "status": "malformed", "canonical_course_id": "CRS294" },
 
     { "course_id": "CRS166", "status": "quarantine" },
-    { "course_id": "CRS281", "status": "quarantine" },
-    { "course_id": "CRS312", "status": "quarantine" }
+    { "course_id": "CRS281", "status": "quarantine" }
   ]
 }

@@ -38,6 +38,32 @@ const schoolOffering = (major = null, overrides = {}) => ({
   ...overrides,
 })
 
+const stiOffering = () => schoolOffering(null, {
+  school_id: 11,
+  uii: '13228',
+  school_name: 'STI College - San Jose del Monte',
+})
+
+for (const expected of [
+  { course_id: 345, course_code: 'CRS024', course_name: 'Bachelor of Science in Computer Engineering' },
+  { course_id: 347, course_code: 'CRS026', course_name: 'Bachelor of Computer Science' },
+  { course_id: 383, course_code: 'CRS062', course_name: 'Bachelor of Science in Information Technology' },
+  { course_id: 434, course_code: 'CRS113', course_name: 'Bachelor of Science in Tourism Management' },
+]) {
+  test(`${expected.course_code} resolves by canonical code and returns STI SJDM`, async () => {
+    const db = database({
+      courseRows: [{ ...expected, course_abbreviation: null }],
+      offeringRows: [stiOffering()],
+    })
+    const result = await getSchoolsForCourse(expected.course_code, db)
+
+    assert.equal(result.course.course_code, expected.course_code)
+    assert.equal(result.schools.some(({ uii }) => uii === '13228'), true)
+    assert.deepEqual(db.calls[0].params, [expected.course_code])
+    assert.deepEqual(db.calls[1].params, [expected.course_id])
+  })
+}
+
 test('returns mapped active course with public context', async () => {
   const result = await getSchoolsForCourse('CRS062', database({ offeringRows: [schoolOffering()] }))
   assert.equal(result.course.course_code, 'CRS062')
@@ -52,15 +78,15 @@ test('attaches exact reviewed coordinates by UII', async () => {
   assert.equal(result.schools[0].longitude, 121.06149)
 })
 
-test('returns null coordinates for a reviewed school without retained coordinates', async () => {
+test('attaches the verified STI SJDM coordinates by UII', async () => {
   const result = await getSchoolsForCourse('CRS062', database({
     offeringRows: [schoolOffering(null, {
       uii: '13228',
       school_name: 'STI College - San Jose del Monte',
     })],
   }))
-  assert.equal(result.schools[0].latitude, null)
-  assert.equal(result.schools[0].longitude, null)
+  assert.equal(result.schools[0].latitude, 14.7788219)
+  assert.equal(result.schools[0].longitude, 121.0744668)
 })
 
 test('returns null coordinates for an unknown UII without changing the school offering', async () => {

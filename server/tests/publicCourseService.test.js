@@ -15,8 +15,8 @@ const databaseWithActiveCodes = (...courseCodes) => ({
   },
 })
 
-test('loads the 303 active independent courses for discovery', () => {
-  assert.equal(getPublicCourseCount(), 303)
+test('loads the 304 active independent courses for discovery', () => {
+  assert.equal(getPublicCourseCount(), 304)
 })
 
 test('searches partial names and abbreviations case-insensitively', () => {
@@ -109,7 +109,7 @@ test('keeps deprecated stable IDs directly resolvable but out of public discover
   assert.equal(getPublicCourse('CRS020').course_code, 'CRS020')
   assert.deepEqual(searchPublicCourses('CRS020'), [])
   assert.deepEqual(searchPublicCourses('CRS166'), [])
-  assert.deepEqual(searchPublicCourses('CRS312'), [])
+  assert.ok(searchPublicCourses('CRS312').some(({ course_code }) => course_code === 'CRS312'))
 })
 
 test('keeps enrichment coverage intact across all 360 courses and 13 clusters', () => {
