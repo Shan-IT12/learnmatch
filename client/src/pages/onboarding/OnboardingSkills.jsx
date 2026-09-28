@@ -216,7 +216,6 @@ function OnboardingSkills() {
       return
     }
 
-    console.log('Quiz result:', data)
     setResults(data)
   } catch {
     setError('Cannot connect to server. Please try again.')

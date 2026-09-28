@@ -1,7 +1,6 @@
 ﻿node_modules/
 .env
 .env.local
-learnmatch_backup.sql
 dist/
 .postman/
 postman/

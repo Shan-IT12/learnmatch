@@ -28,7 +28,6 @@ import AdminRoute from './components/AdminRoute'
 import CourseSearch from './pages/CourseSearch'
 import PublicCourseDetails from './pages/PublicCourseDetails'
 import SchoolLocator from './pages/SchoolLocator'
-import './App.css'
 
 
 function App() {
