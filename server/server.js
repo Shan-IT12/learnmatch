@@ -5,7 +5,6 @@ import authRoutes from './routes/authRoutes.js'
 import profileRoutes from './routes/profileRoutes.js'
 import pool from './config/db.js'
 import authenticateToken from './middleware/authenticateToken.js'
-import nodemailer from 'nodemailer'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import authenticateAdmin from './middleware/authenticateAdmin.js'
@@ -38,13 +37,6 @@ import {
   submitCollegeCheckin,
 } from './services/collegeTrackingService.js'
 
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_APP_PASSWORD,
-  },
-})
 dotenv.config()
 
 const app = express()

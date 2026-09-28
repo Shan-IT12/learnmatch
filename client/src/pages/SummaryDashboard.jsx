@@ -368,7 +368,6 @@ function SummaryDashboard() {
           </section>
         )}
  
-        {/* MBTI placeholder removed — replaced with real section above */}
  
         {/* Action buttons */}
         <div className="mb-5">
