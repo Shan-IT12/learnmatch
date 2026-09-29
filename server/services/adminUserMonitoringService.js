@@ -247,13 +247,17 @@ export async function getAdminUserDetail(database, userId) {
       [normalizedUserId]
     ),
     database.query(
-      `SELECT term.term_id, term.academic_year, term.year_level, term.semester,
+      `SELECT cycle.status AS lifecycle_status, term.term_id, term.academic_year, term.year_level, term.calendar_type, term.term_code, term.semester,
               term.timing_mode, term.dates_source,
               course.course_id, course.course_code, course.course_name
-       FROM COLLEGE_TERM term
-       JOIN COURSE course ON course.course_id = term.course_id
-       WHERE term.user_id = ?
-       ORDER BY term.term_id DESC
+       FROM COLLEGE_TRACKING_CYCLE cycle
+       JOIN COURSE course ON course.course_id = cycle.course_id
+       LEFT JOIN COLLEGE_TERM term ON term.term_id = (
+         SELECT MAX(current_term.term_id) FROM COLLEGE_TERM current_term
+         WHERE current_term.tracking_cycle_id = cycle.tracking_cycle_id
+       )
+       WHERE cycle.user_id = ?
+       ORDER BY cycle.tracking_cycle_id DESC
        LIMIT 1`,
       [normalizedUserId]
     ),
@@ -362,6 +366,7 @@ export async function getAdminUserDetail(database, userId) {
     },
     tracking: {
       started: Boolean(tracking),
+      lifecycleStatus: tracking?.lifecycle_status || (tracking ? 'legacy' : null),
       course: tracking
         ? {
             courseId: Number(tracking.course_id),
@@ -372,6 +377,8 @@ export async function getAdminUserDetail(database, userId) {
       academicYear: tracking?.academic_year || null,
       yearLevel: tracking?.year_level || null,
       semester: tracking?.semester || null,
+      calendarType: tracking?.calendar_type || null,
+      termCode: tracking?.term_code || null,
       timingMode: tracking?.timing_mode || null,
       datesSource: tracking?.dates_source || null,
       completedCheckins: Number(alignment.completed_checkins || 0),

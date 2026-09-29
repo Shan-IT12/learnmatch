@@ -62,31 +62,48 @@ export function isSemesterComplete(records = []) {
   return CHECKIN_PHASES.every((phase) => records.some((record) => record.phase === phase))
 }
 
-export function getNextAcademicStage(yearLevel, semester, programDurationYears, semesterComplete) {
+export function getNextAcademicStage(yearLevel, semester, programDurationYears, semesterComplete, calendarType = 'semester', termCode = null, startOptionalTerm = false) {
   if (!semesterComplete) return null
 
   const currentYear = parseYearNumber(yearLevel)
   const duration = Number(programDurationYears)
   if (!currentYear || !Number.isInteger(duration) || currentYear > duration) return null
 
-  if (semester === '1st Semester') {
+  const resolvedCode = termCode || (semester === '1st Semester' ? 'SEM_1' : semester === '2nd Semester' ? 'SEM_2' : semester === 'Summer' || semester === 'Summer/Midyear' ? 'SUMMER_MIDYEAR' : null)
+  if (calendarType === 'semester' && resolvedCode === 'SEM_1') {
     return {
       programCompleted: false,
       yearLevel,
-      semester: '2nd Semester',
+      semester: '2nd Semester', calendarType: 'semester', termCode: 'SEM_2',
     }
   }
-  if (semester === '2nd Semester' && currentYear === duration) {
+  if (calendarType === 'semester' && resolvedCode === 'SEM_2' && startOptionalTerm) {
+    return { programCompleted: false, yearLevel, semester: 'Summer/Midyear', calendarType: 'semester', termCode: 'SUMMER_MIDYEAR' }
+  }
+  if (calendarType === 'semester' && resolvedCode === 'SEM_2' && currentYear === duration) {
     return { programCompleted: true, yearLevel: null, semester: null }
   }
-  if (semester === '2nd Semester') {
+  if (calendarType === 'semester' && resolvedCode === 'SUMMER_MIDYEAR' && currentYear === duration) {
+    return { programCompleted: true, yearLevel: null, semester: null }
+  }
+  if (calendarType === 'semester' && (resolvedCode === 'SEM_2' || resolvedCode === 'SUMMER_MIDYEAR')) {
     const nextYear = currentYear + 1
     const ordinal = nextYear === 1 ? 'st' : nextYear === 2 ? 'nd' : nextYear === 3 ? 'rd' : 'th'
     return {
       programCompleted: false,
       yearLevel: `${nextYear}${ordinal} Year`,
-      semester: '1st Semester',
+      semester: '1st Semester', calendarType: 'semester', termCode: 'SEM_1',
     }
+  }
+  if (calendarType === 'trimester' && resolvedCode !== 'TRI_3') {
+    const nextCode = resolvedCode === 'TRI_1' ? 'TRI_2' : 'TRI_3'
+    return { programCompleted: false, yearLevel, semester: nextCode === 'TRI_2' ? '2nd Trimester' : '3rd Trimester', calendarType: 'trimester', termCode: nextCode }
+  }
+  if (calendarType === 'trimester' && resolvedCode === 'TRI_3' && currentYear === duration) return { programCompleted: true, yearLevel: null, semester: null }
+  if (calendarType === 'trimester' && resolvedCode === 'TRI_3') {
+    const nextYear = currentYear + 1
+    const ordinal = nextYear === 1 ? 'st' : nextYear === 2 ? 'nd' : nextYear === 3 ? 'rd' : 'th'
+    return { programCompleted: false, yearLevel: `${nextYear}${ordinal} Year`, semester: '1st Trimester', calendarType: 'trimester', termCode: 'TRI_1' }
   }
   return null
 }

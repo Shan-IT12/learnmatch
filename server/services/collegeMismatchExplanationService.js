@@ -24,7 +24,7 @@ export function buildMismatchFallback({ status, alignmentPercent, answers, gwa }
   if (status === 'On Track') {
     return {
       feedback: `Your ${alignmentPercent}% alignment result suggests that your course experience is generally matching your interests, abilities, and goals.${gwaContext}`,
-      recommendation: 'Keep using the study habits and support systems that are working for you, and continue checking in honestly as the semester progresses.',
+      recommendation: 'Keep using the study habits and support systems that are working for you, and continue checking in honestly as the term progresses.',
     }
   }
   if (status === 'Monitor') {

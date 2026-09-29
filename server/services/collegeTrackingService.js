@@ -1,10 +1,11 @@
 import { generateMismatchExplanation } from './collegeMismatchExplanationService.js'
 import { getPublicCourse } from './publicCourseService.js'
 import { isCurrentIndependentCourse } from './courseIdentityService.js'
+import { ACADEMIC_CALENDARS, getTermDefinition, resolveCalendarTerm } from './academicCalendar.js'
 
 export const CHECKIN_PHASES = ['Early', 'Mid', 'End']
 export const YEAR_LEVELS = ['1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year']
-export const SEMESTERS = ['1st Semester', '2nd Semester', '3rd Semester', 'Summer']
+export const SEMESTERS = ['1st Semester', '2nd Semester', '3rd Semester', 'Summer', 'Summer/Midyear', '1st Trimester', '2nd Trimester', '3rd Trimester']
 export const TIMING_MODES = ['exact', 'approximate', 'phase_only', 'manual']
 export const MONTH_PARTS = ['early', 'middle', 'late']
 export const ALIGNMENT_RULES = Object.freeze({
@@ -26,6 +27,40 @@ export class CollegeTrackingError extends Error {
     this.code = code
     this.status = status
   }
+}
+
+async function getLatestCycle(database, userId, { forUpdate = false } = {}) {
+  const [rows] = await database.query(
+    `SELECT tracking_cycle_id, user_id, course_id, status, end_reason
+     FROM COLLEGE_TRACKING_CYCLE
+     WHERE user_id = ?
+     ORDER BY tracking_cycle_id DESC
+     LIMIT 1${forUpdate ? ' FOR UPDATE' : ''}`,
+    [userId]
+  )
+  return rows[0] || null
+}
+
+async function getActiveCycle(database, userId, { forUpdate = false } = {}) {
+  const [rows] = await database.query(
+    `SELECT tracking_cycle_id, user_id, course_id, status, end_reason
+     FROM COLLEGE_TRACKING_CYCLE
+     WHERE user_id = ? AND status = 'active'
+     LIMIT 1${forUpdate ? ' FOR UPDATE' : ''}`,
+    [userId]
+  )
+  return rows[0] || null
+}
+
+function normalizeTermWriteError(error) {
+  if (error?.code === 'ER_DUP_ENTRY') {
+    return new CollegeTrackingError(
+      'That academic term is already recorded in this tracking cycle. Select your actual current term.',
+      'TERM_ALREADY_EXISTS',
+      409
+    )
+  }
+  return error
 }
 
 function validateChoice(value, allowed, label) {
@@ -99,17 +134,27 @@ export function resolveTimingInput(input, academicYear, currentDate = new Date()
     if (!input.semesterStartDate || !input.semesterEndDate) {
       throw new CollegeTrackingError('Enter both semester dates.', 'INVALID_SEMESTER_DATES')
     }
-    const timing = calculateSemesterTiming(input.semesterStartDate, input.semesterEndDate, currentDate)
+    const normalizedStart = dateOnlyString(input.semesterStartDate)
+    const normalizedEnd = dateOnlyString(input.semesterEndDate)
+    const allowedYears = normalizeAcademicYear(academicYear).split('-')
+    if (!allowedYears.includes(normalizedStart.slice(0, 4)) || !allowedYears.includes(normalizedEnd.slice(0, 4))) {
+      throw new CollegeTrackingError(
+        'Term dates must fall within the selected academic year.',
+        'INVALID_SEMESTER_DATES'
+      )
+    }
+    const timing = calculateSemesterTiming(normalizedStart, normalizedEnd, currentDate)
     return {
       timingMode: inferredMode,
-      semesterStartDate: dateOnlyString(input.semesterStartDate),
-      semesterEndDate: dateOnlyString(input.semesterEndDate),
+      semesterStartDate: normalizedStart,
+      semesterEndDate: normalizedEnd,
       datesSource: 'student_confirmed',
       initialTrackingPhase: timing.expectedPhase,
     }
   }
 
   if (inferredMode === 'approximate') {
+    validateChoice(input.initialTrackingPhase, CHECKIN_PHASES, 'initial tracking phase')
     const semesterStartDate = normalizeApproximateDate(input.approximateStart, academicYear, 'semester start')
     const semesterEndDate = normalizeApproximateDate(input.approximateEnd, academicYear, 'semester end')
     const timing = calculateSemesterTiming(semesterStartDate, semesterEndDate, currentDate)
@@ -118,7 +163,7 @@ export function resolveTimingInput(input, academicYear, currentDate = new Date()
       semesterStartDate,
       semesterEndDate,
       datesSource: 'estimated',
-      initialTrackingPhase: timing.expectedPhase,
+      initialTrackingPhase: input.initialTrackingPhase,
     }
   }
 
@@ -157,7 +202,7 @@ export function calculateSemesterTiming(startDate, endDate, currentDate = new Da
   const end = parseDateOnly(dateOnlyString(endDate), 'semester end date')
   if (end <= start) {
     throw new CollegeTrackingError(
-      'Semester end date must be after the start date.',
+      'Term end date must be after the start date.',
       'INVALID_SEMESTER_DATES'
     )
   }
@@ -211,6 +256,15 @@ export function buildPhaseStates(
     if (index === expectedIndex) return { phase, state: 'available' }
     return { phase, state: 'upcoming' }
   })
+}
+
+export function timingForCheckinAvailability(timing, timingMode, initialTrackingPhase) {
+  if (timingMode !== 'approximate') return timing
+  return {
+    ...timing,
+    timingAvailable: false,
+    expectedPhase: initialTrackingPhase,
+  }
 }
 
 function requiredTrackingPhases(initialTrackingPhase) {
@@ -281,7 +335,7 @@ export function calculateAlignmentResult(answers, { phase, gwa = null } = {}) {
   }
 }
 
-export function calculateNextAcademicStage(yearLevel, semester, programDurationYears) {
+export function calculateNextAcademicStage(yearLevel, semester, programDurationYears, calendarType, termCode, { startOptionalTerm = false } = {}) {
   const yearMatch = String(yearLevel || '').match(/\d+/)
   const currentYear = yearMatch ? Number(yearMatch[0]) : NaN
   const duration = Number(programDurationYears)
@@ -289,27 +343,58 @@ export function calculateNextAcademicStage(yearLevel, semester, programDurationY
   if (!Number.isInteger(currentYear) || !Number.isInteger(duration) || currentYear < 1 || currentYear > duration) {
     throw new CollegeTrackingError('The current program stage is invalid.', 'INVALID_PROGRAM_STAGE')
   }
-  if (semester === '1st Semester') {
+  const resolved = resolveCalendarTerm({ calendarType, termCode, semester })
+  if (!resolved || resolved.calendarType === 'legacy') {
+    throw new CollegeTrackingError('The next academic stage requires confirmation.', 'UNSUPPORTED_TERM_PROGRESSION')
+  }
+  const { calendarType: resolvedCalendar, termCode: resolvedCode } = resolved
+  if (resolvedCalendar === 'semester' && resolvedCode === 'SEM_1') {
     return {
       programCompleted: false,
       yearLevel: `${currentYear}${currentYear === 1 ? 'st' : currentYear === 2 ? 'nd' : currentYear === 3 ? 'rd' : 'th'} Year`,
-      semester: '2nd Semester',
+      semester: '2nd Semester', calendarType: 'semester', termCode: 'SEM_2',
     }
   }
-  if (semester === '2nd Semester' && currentYear === duration) {
+  if (resolvedCalendar === 'semester' && resolvedCode === 'SEM_2' && startOptionalTerm) {
+    return { programCompleted: false, yearLevel, semester: 'Summer/Midyear', calendarType: 'semester', termCode: 'SUMMER_MIDYEAR' }
+  }
+  if (resolvedCalendar === 'semester' && resolvedCode === 'SEM_2' && currentYear === duration) {
     return { programCompleted: true, yearLevel: null, semester: null }
   }
-  if (semester === '2nd Semester') {
+  if (resolvedCalendar === 'semester' && resolvedCode === 'SUMMER_MIDYEAR' && currentYear === duration) {
+    return { programCompleted: true, yearLevel: null, semester: null, calendarType: 'semester', termCode: null }
+  }
+  if (resolvedCalendar === 'semester' && (resolvedCode === 'SEM_2' || resolvedCode === 'SUMMER_MIDYEAR')) {
     const nextYear = currentYear + 1
     return {
       programCompleted: false,
       yearLevel: `${nextYear}${nextYear === 1 ? 'st' : nextYear === 2 ? 'nd' : nextYear === 3 ? 'rd' : 'th'} Year`,
-      semester: '1st Semester',
+      semester: '1st Semester', calendarType: 'semester', termCode: 'SEM_1',
     }
   }
 
+  if (resolvedCalendar === 'trimester' && resolvedCode !== 'TRI_3') {
+    const nextCode = resolvedCode === 'TRI_1' ? 'TRI_2' : 'TRI_3'
+    const next = getTermDefinition('trimester', nextCode)
+    return { programCompleted: false, yearLevel, semester: next.label, calendarType: 'trimester', termCode: nextCode }
+  }
+  if (resolvedCalendar === 'trimester' && resolvedCode === 'TRI_3' && startOptionalTerm) {
+    return { programCompleted: false, yearLevel, semester: 'Summer/Midyear', calendarType: 'trimester', termCode: 'SUMMER_MIDYEAR' }
+  }
+  if (resolvedCalendar === 'trimester' && resolvedCode === 'TRI_3' && currentYear === duration) {
+    return { programCompleted: true, yearLevel: null, semester: null, calendarType: 'trimester', termCode: null }
+  }
+  if (resolvedCalendar === 'trimester' && (resolvedCode === 'TRI_3' || resolvedCode === 'SUMMER_MIDYEAR')) {
+    if (resolvedCode === 'SUMMER_MIDYEAR' && currentYear === duration) {
+      return { programCompleted: true, yearLevel: null, semester: null, calendarType: 'trimester', termCode: null }
+    }
+    const nextYear = currentYear + 1
+    const ordinal = nextYear === 1 ? 'st' : nextYear === 2 ? 'nd' : nextYear === 3 ? 'rd' : 'th'
+    return { programCompleted: false, yearLevel: `${nextYear}${ordinal} Year`, semester: '1st Trimester', calendarType: 'trimester', termCode: 'TRI_1' }
+  }
+
   throw new CollegeTrackingError(
-    'Semester progression is available only for the 1st and 2nd semesters.',
+    'Term progression is unavailable for this academic stage.',
     'UNSUPPORTED_SEMESTER_PROGRESSION'
   )
 }
@@ -336,6 +421,8 @@ export async function createCollegeSetup(
     academicYear,
     yearLevel,
     semester,
+    calendarType,
+    termCode,
     semesterStartDate,
     semesterEndDate,
     timingMode,
@@ -349,7 +436,11 @@ export async function createCollegeSetup(
   if (!Number.isInteger(normalizedCourseId) || normalizedCourseId <= 0) {
     throw new CollegeTrackingError('Please select a valid active course.', 'INVALID_COURSE')
   }
-  validateChoice(semester, SEMESTERS, 'semester')
+  const calendarTerm = resolveCalendarTerm({ calendarType, termCode, semester })
+  if (!calendarTerm || calendarTerm.calendarType === 'legacy') {
+    throw new CollegeTrackingError('Select a valid term for the academic calendar.', 'INVALID_TERM')
+  }
+  semester = calendarTerm.termLabel
   const normalizedAcademicYear = normalizeAcademicYear(academicYear)
   const timing = resolveTimingInput({
     timingMode,
@@ -373,25 +464,47 @@ export async function createCollegeSetup(
 
     validateYearWithinProgram(yearLevel, courses[0].course_code, resolveCourse)
 
+    let cycle = await getActiveCycle(connection, userId, { forUpdate: true })
+    if (cycle && Number(cycle.course_id) !== normalizedCourseId) {
+      throw new CollegeTrackingError(
+        'Use Change Program to start tracking a different course.',
+        'PROGRAM_CHANGE_REQUIRED',
+        409
+      )
+    }
+    if (!cycle) {
+      const latestCycle = await getLatestCycle(connection, userId, { forUpdate: true })
+      if (latestCycle?.status === 'paused') {
+        throw new CollegeTrackingError('Resume your paused tracking instead.', 'TRACKING_PAUSED', 409)
+      }
+      const [cycleResult] = await connection.query(
+        `INSERT INTO COLLEGE_TRACKING_CYCLE (user_id, course_id, status)
+         VALUES (?, ?, 'active')`,
+        [userId, normalizedCourseId]
+      )
+      cycle = { tracking_cycle_id: cycleResult.insertId, course_id: normalizedCourseId, status: 'active' }
+    }
+
     const [existing] = await connection.query(
       `SELECT term_id, timing_mode
        FROM COLLEGE_TERM
-       WHERE user_id = ? AND course_id = ? AND academic_year = ? AND year_level = ? AND semester = ?
+       WHERE user_id = ? AND tracking_cycle_id = ? AND course_id = ? AND academic_year = ? AND year_level = ? AND term_code = ?
        LIMIT 1
        FOR UPDATE`,
-      [userId, normalizedCourseId, normalizedAcademicYear, yearLevel, semester]
+      [userId, cycle.tracking_cycle_id, normalizedCourseId, normalizedAcademicYear, yearLevel, calendarTerm.termCode]
     )
     if (existing.length > 0) {
       if (timing.timingMode === 'exact' || timing.timingMode === 'approximate') {
         await connection.query(
           `UPDATE COLLEGE_TERM
-           SET semester_start_date = ?, semester_end_date = ?, dates_source = ?, timing_mode = ?
+           SET semester_start_date = ?, semester_end_date = ?, dates_source = ?, timing_mode = ?, initial_tracking_phase = ?
            WHERE term_id = ?`,
           [
             timing.semesterStartDate,
             timing.semesterEndDate,
             timing.datesSource,
             timing.timingMode,
+            timing.initialTrackingPhase,
             existing[0].term_id,
           ]
         )
@@ -402,19 +515,25 @@ export async function createCollegeSetup(
         timingUpdated: timing.timingMode === 'exact' || timing.timingMode === 'approximate',
         termId: existing[0].term_id,
         course: courses[0],
+        calendarType: calendarTerm.calendarType,
+        termCode: calendarTerm.termCode,
+        semester,
       }
     }
 
     const [result] = await connection.query(
       `INSERT INTO COLLEGE_TERM
-        (user_id, course_id, academic_year, year_level, semester,
+        (user_id, tracking_cycle_id, course_id, academic_year, year_level, calendar_type, term_code, semester,
          semester_start_date, semester_end_date, dates_source, timing_mode, initial_tracking_phase)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         userId,
+        cycle.tracking_cycle_id,
         normalizedCourseId,
         normalizedAcademicYear,
         yearLevel,
+        calendarTerm.calendarType,
+        calendarTerm.termCode,
         semester,
         timing.semesterStartDate,
         timing.semesterEndDate,
@@ -424,10 +543,180 @@ export async function createCollegeSetup(
       ]
     )
     await connection.commit()
-    return { created: true, termId: result.insertId, course: courses[0] }
+    return {
+      created: true,
+      termId: result.insertId,
+      course: courses[0],
+      calendarType: calendarTerm.calendarType,
+      termCode: calendarTerm.termCode,
+      semester,
+    }
   } catch (error) {
     await connection.rollback()
-    throw error
+    throw normalizeTermWriteError(error)
+  } finally {
+    connection.release()
+  }
+}
+
+async function insertLifecycleTerm(connection, userId, cycleId, course, input, resolveCourse) {
+  const calendarTerm = resolveCalendarTerm(input)
+  if (!calendarTerm || calendarTerm.calendarType === 'legacy') {
+    throw new CollegeTrackingError('Select a valid term for the academic calendar.', 'INVALID_TERM')
+  }
+  const academicYear = normalizeAcademicYear(input.academicYear)
+  validateYearWithinProgram(input.yearLevel, course.course_code, resolveCourse)
+  const timing = resolveTimingInput(input, academicYear)
+  const [existing] = await connection.query(
+    `SELECT term_id FROM COLLEGE_TERM
+     WHERE tracking_cycle_id = ? AND academic_year = ? AND year_level = ? AND term_code = ?
+     LIMIT 1 FOR UPDATE`,
+    [cycleId, academicYear, input.yearLevel, calendarTerm.termCode]
+  )
+  if (existing.length > 0) {
+    throw new CollegeTrackingError(
+      'That academic term is already recorded in this tracking cycle. Select your actual current term.',
+      'TERM_ALREADY_EXISTS',
+      409
+    )
+  }
+  const [result] = await connection.query(
+    `INSERT INTO COLLEGE_TERM
+      (user_id, tracking_cycle_id, course_id, academic_year, year_level, calendar_type, term_code, semester,
+       semester_start_date, semester_end_date, dates_source, timing_mode, initial_tracking_phase)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [
+      userId, cycleId, course.course_id, academicYear, input.yearLevel,
+      calendarTerm.calendarType, calendarTerm.termCode, calendarTerm.termLabel,
+      timing.semesterStartDate, timing.semesterEndDate, timing.datesSource,
+      timing.timingMode, timing.initialTrackingPhase,
+    ]
+  )
+  return { termId: result.insertId, calendarType: calendarTerm.calendarType, termCode: calendarTerm.termCode }
+}
+
+export async function pauseCollegeTracking(pool, userId) {
+  const connection = await pool.getConnection()
+  try {
+    await connection.beginTransaction()
+    const cycle = await getActiveCycle(connection, userId, { forUpdate: true })
+    if (!cycle) throw new CollegeTrackingError('No active college tracking cycle found.', 'NO_ACTIVE_TRACKING', 409)
+    await connection.query(
+      `UPDATE COLLEGE_TRACKING_CYCLE
+       SET status = 'paused', paused_at = CURRENT_TIMESTAMP, end_reason = NULL
+       WHERE tracking_cycle_id = ?`,
+      [cycle.tracking_cycle_id]
+    )
+    await connection.commit()
+    return { trackingCycleId: cycle.tracking_cycle_id, lifecycleStatus: 'paused' }
+  } catch (error) {
+    await connection.rollback()
+    throw normalizeTermWriteError(error)
+  } finally {
+    connection.release()
+  }
+}
+
+export async function endCollegeTracking(pool, userId, reason = 'student_ended') {
+  const connection = await pool.getConnection()
+  try {
+    await connection.beginTransaction()
+    const cycle = await getActiveCycle(connection, userId, { forUpdate: true })
+    if (!cycle) throw new CollegeTrackingError('No active college tracking cycle found.', 'NO_ACTIVE_TRACKING', 409)
+    await connection.query(
+      `UPDATE COLLEGE_TRACKING_CYCLE
+       SET status = 'ended', ended_at = CURRENT_TIMESTAMP, paused_at = NULL, end_reason = ?
+       WHERE tracking_cycle_id = ?`,
+      [String(reason || 'student_ended').slice(0, 32), cycle.tracking_cycle_id]
+    )
+    await connection.commit()
+    return { trackingCycleId: cycle.tracking_cycle_id, lifecycleStatus: 'ended' }
+  } catch (error) {
+    await connection.rollback()
+    throw normalizeTermWriteError(error)
+  } finally {
+    connection.release()
+  }
+}
+
+export async function resumeCollegeTracking(pool, userId, termInput, resolveCourse = getPublicCourse) {
+  const connection = await pool.getConnection()
+  try {
+    await connection.beginTransaction()
+    const cycle = await getLatestCycle(connection, userId, { forUpdate: true })
+    if (!cycle || cycle.status !== 'paused') {
+      throw new CollegeTrackingError('Only paused college tracking can be resumed.', 'TRACKING_NOT_PAUSED', 409)
+    }
+    const [courses] = await connection.query(
+      'SELECT course_id, course_code, course_name FROM COURSE WHERE course_id = ? AND is_active = 1',
+      [cycle.course_id]
+    )
+    if (courses.length === 0 || !isCurrentIndependentCourse(courses[0].course_code)) {
+      throw new CollegeTrackingError('The enrolled course is unavailable or inactive.', 'COURSE_UNAVAILABLE', 404)
+    }
+    const term = await insertLifecycleTerm(
+      connection, userId, cycle.tracking_cycle_id, courses[0], termInput, resolveCourse
+    )
+    await connection.query(
+      `UPDATE COLLEGE_TRACKING_CYCLE
+       SET status = 'active', paused_at = NULL, ended_at = NULL, end_reason = NULL
+       WHERE tracking_cycle_id = ?`,
+      [cycle.tracking_cycle_id]
+    )
+    await connection.commit()
+    return { ...term, trackingCycleId: cycle.tracking_cycle_id, lifecycleStatus: 'active' }
+  } catch (error) {
+    await connection.rollback()
+    throw normalizeTermWriteError(error)
+  } finally {
+    connection.release()
+  }
+}
+
+export async function changeCollegeProgram(pool, userId, termInput, resolveCourse = getPublicCourse) {
+  const courseId = Number(termInput.courseId)
+  if (!Number.isInteger(courseId) || courseId <= 0) {
+    throw new CollegeTrackingError('Please select a valid active course.', 'INVALID_COURSE')
+  }
+  const connection = await pool.getConnection()
+  try {
+    await connection.beginTransaction()
+    const active = await getActiveCycle(connection, userId, { forUpdate: true })
+    if (!active) throw new CollegeTrackingError('No active college tracking cycle found.', 'NO_ACTIVE_TRACKING', 409)
+    if (Number(active.course_id) === courseId) {
+      throw new CollegeTrackingError('Select a different program.', 'SAME_PROGRAM', 409)
+    }
+    const [courses] = await connection.query(
+      'SELECT course_id, course_code, course_name FROM COURSE WHERE course_id = ? AND is_active = 1',
+      [courseId]
+    )
+    if (courses.length === 0 || !isCurrentIndependentCourse(courses[0].course_code)) {
+      throw new CollegeTrackingError('The selected course is unavailable or inactive.', 'COURSE_UNAVAILABLE', 404)
+    }
+    await connection.query(
+      `UPDATE COLLEGE_TRACKING_CYCLE
+       SET status = 'ended', ended_at = CURRENT_TIMESTAMP, end_reason = 'program_change'
+       WHERE tracking_cycle_id = ?`,
+      [active.tracking_cycle_id]
+    )
+    const [cycleResult] = await connection.query(
+      `INSERT INTO COLLEGE_TRACKING_CYCLE (user_id, course_id, status)
+       VALUES (?, ?, 'active')`,
+      [userId, courseId]
+    )
+    const term = await insertLifecycleTerm(
+      connection, userId, cycleResult.insertId, courses[0], termInput, resolveCourse
+    )
+    await connection.commit()
+    return {
+      ...term,
+      trackingCycleId: cycleResult.insertId,
+      lifecycleStatus: 'active',
+      course: courses[0],
+    }
+  } catch (error) {
+    await connection.rollback()
+    throw normalizeTermWriteError(error)
   } finally {
     connection.release()
   }
@@ -435,24 +724,35 @@ export async function createCollegeSetup(
 
 export async function getCollegeStatus(database, userId, currentDate = new Date()) {
   const [termRows] = await database.query(
-    `SELECT term.term_id, term.academic_year, term.year_level, term.semester,
+    `SELECT cycle.tracking_cycle_id, cycle.status AS lifecycle_status, cycle.end_reason,
+            term.term_id, term.academic_year, term.year_level, term.calendar_type, term.term_code, term.semester,
             term.semester_start_date, term.semester_end_date, term.dates_source,
             term.timing_mode, term.initial_tracking_phase,
             c.course_id, c.course_code, c.course_name,
             (SELECT previous.gwa
              FROM SEMESTER_CHECKIN previous
-             WHERE previous.user_id = term.user_id AND previous.gwa IS NOT NULL
+             JOIN COLLEGE_TERM previous_term ON previous_term.term_id = previous.term_id
+             WHERE previous.user_id = cycle.user_id
+               AND previous_term.tracking_cycle_id = cycle.tracking_cycle_id
+               AND previous.gwa IS NOT NULL
              ORDER BY previous.checkin_id DESC LIMIT 1) AS latest_gwa
-     FROM COLLEGE_TERM term
-     JOIN COURSE c ON c.course_id = term.course_id
-     WHERE term.user_id = ?
-     ORDER BY term.term_id DESC
+     FROM COLLEGE_TRACKING_CYCLE cycle
+     JOIN COURSE c ON c.course_id = cycle.course_id
+     LEFT JOIN COLLEGE_TERM term ON term.term_id = (
+       SELECT MAX(current_term.term_id) FROM COLLEGE_TERM current_term
+       WHERE current_term.tracking_cycle_id = cycle.tracking_cycle_id
+     )
+     WHERE cycle.user_id = ?
+     ORDER BY cycle.tracking_cycle_id DESC
      LIMIT 1`,
     [userId]
   )
   if (termRows.length > 0) {
     const row = termRows[0]
     return {
+      trackingCycleId: row.tracking_cycle_id,
+      lifecycleStatus: row.lifecycle_status,
+      endReason: row.end_reason,
       termId: row.term_id,
       courseId: row.course_id,
       courseCode: row.course_code,
@@ -460,6 +760,9 @@ export async function getCollegeStatus(database, userId, currentDate = new Date(
       academicYear: row.academic_year,
       yearLevel: row.year_level,
       semester: row.semester,
+      calendarType: row.calendar_type || resolveCalendarTerm({ semester: row.semester })?.calendarType || 'legacy',
+      termCode: row.term_code || resolveCalendarTerm({ semester: row.semester })?.termCode || null,
+      termLabel: row.semester,
       semesterStartDate: row.semester_start_date,
       semesterEndDate: row.semester_end_date,
       datesSource: row.dates_source,
@@ -511,12 +814,11 @@ export async function getPendingCheckin(database, userId) {
      FROM SEMESTER_CHECKIN sc
      JOIN COURSE c ON c.course_id = sc.course_id
      WHERE sc.user_id = ?
-       AND (
-         sc.term_id = (SELECT MAX(term_id) FROM COLLEGE_TERM WHERE user_id = ?)
-         OR (
-           sc.term_id IS NULL AND
-           NOT EXISTS (SELECT 1 FROM COLLEGE_TERM WHERE user_id = ?)
-         )
+       AND sc.term_id = (
+         SELECT MAX(term.term_id)
+         FROM COLLEGE_TERM term
+         JOIN COLLEGE_TRACKING_CYCLE cycle ON cycle.tracking_cycle_id = term.tracking_cycle_id
+         WHERE cycle.user_id = ? AND cycle.status = 'active'
        )
        AND NOT EXISTS (
          SELECT 1 FROM CHECKIN_ALIGNMENT_RESPONSE response
@@ -524,7 +826,7 @@ export async function getPendingCheckin(database, userId) {
        )
      ORDER BY sc.checkin_id DESC
      LIMIT 1`,
-    [userId, userId, userId]
+    [userId, userId]
   )
   return rows[0] || null
 }
@@ -544,7 +846,14 @@ export async function submitCollegeCheckin(
     `SELECT sc.checkin_id, sc.phase, c.course_name
      FROM SEMESTER_CHECKIN sc
      JOIN COURSE c ON c.course_id = sc.course_id
-     WHERE sc.checkin_id = ? AND sc.user_id = ?`,
+     LEFT JOIN COLLEGE_TERM term ON term.term_id = sc.term_id
+     LEFT JOIN COLLEGE_TRACKING_CYCLE cycle ON cycle.tracking_cycle_id = term.tracking_cycle_id
+     WHERE sc.checkin_id = ? AND sc.user_id = ?
+       AND (cycle.status = 'active' OR (
+         sc.term_id IS NULL AND NOT EXISTS (
+           SELECT 1 FROM COLLEGE_TRACKING_CYCLE owned_cycle WHERE owned_cycle.user_id = sc.user_id
+         )
+       ))`,
     [normalizedCheckinId, userId]
   )
   if (ownedRows.length === 0) {
@@ -616,9 +925,9 @@ export async function submitCollegeCheckin(
 export async function getCheckinHistory(database, userId, limit = 10) {
   const safeLimit = Math.max(1, Math.min(Number(limit) || 10, 50))
   const [rows] = await database.query(
-    `SELECT sc.checkin_id, sc.term_id, sc.phase, sc.year_level, sc.semester, sc.gwa,
+    `SELECT sc.checkin_id, sc.term_id, term.tracking_cycle_id, sc.phase, sc.year_level, sc.semester, sc.gwa,
             sc.alignment_score, sc.checkin_date, c.course_code, c.course_name,
-            term.academic_year,
+            term.academic_year, term.calendar_type, term.term_code,
             analysis.mismatch_score, analysis.status, analysis.ai_feedback, analysis.recommendation
      FROM SEMESTER_CHECKIN sc
      JOIN COURSE c ON c.course_id = sc.course_id
@@ -635,8 +944,12 @@ export async function getCheckinHistory(database, userId, limit = 10) {
   return rows.map((row) => ({
     checkinId: row.checkin_id,
     termId: row.term_id,
+    trackingCycleId: row.tracking_cycle_id || null,
     phase: row.phase,
     academicYear: row.academic_year,
+    calendarType: row.calendar_type || null,
+    termCode: row.term_code || null,
+    termLabel: row.semester,
     yearLevel: row.year_level,
     semester: row.semester,
     gwa: row.gwa === null ? null : Number(row.gwa),
@@ -654,11 +967,25 @@ export async function getCheckinHistory(database, userId, limit = 10) {
 
 export async function getCheckinStatus(database, userId, currentDate = new Date()) {
   const pending = await getPendingCheckin(database, userId)
-  const history = await getCheckinHistory(database, userId, 1)
-  const latestResult = history[0] || null
+  const history = await getCheckinHistory(database, userId, 50)
 
   const college = await getCollegeStatus(database, userId, currentDate)
+  const latestResult = college?.trackingCycleId
+    ? history.find(({ trackingCycleId }) => Number(trackingCycleId) === Number(college.trackingCycleId)) || null
+    : history[0] || null
   if (!college) return { state: 'complete', latestResult, phaseStates: [] }
+  if (college.lifecycleStatus && college.lifecycleStatus !== 'active') {
+    return {
+      state: college.lifecycleStatus,
+      lifecycleStatus: college.lifecycleStatus,
+      latestResult,
+      completedPhases: [],
+      availablePhases: [],
+      upcomingPhases: [],
+      phaseStates: [],
+      progressionEligible: false,
+    }
+  }
 
   let completedPhases = []
   if (college.termId) {
@@ -688,7 +1015,12 @@ export async function getCheckinStatus(database, userId, currentDate = new Date(
     completedPhases = completedRows.map(({ phase }) => phase)
   }
 
-  const phaseStates = buildPhaseStates(completedPhases, college, {
+  const availabilityTiming = timingForCheckinAvailability(
+    college,
+    college.timingMode,
+    college.initialTrackingPhase
+  )
+  const phaseStates = buildPhaseStates(completedPhases, availabilityTiming, {
     legacyCurrentPhase: college.currentPhase,
     initialTrackingPhase: college.initialTrackingPhase,
   })
@@ -704,7 +1036,9 @@ export async function getCheckinStatus(database, userId, currentDate = new Date(
     state: allCheckinsCompleted ? 'complete' : pending ? 'pending' : availablePhases.length ? 'due' : 'not_due',
     checkinId: pending?.checkin_id || null,
     phase: pending?.phase || null,
-    currentPhase: college.expectedPhase || college.currentPhase,
+    currentPhase: college.timingMode === 'approximate'
+      ? college.initialTrackingPhase
+      : college.expectedPhase || college.currentPhase,
     expectedPhase: college.expectedPhase,
     courseName: college.courseName,
     latestResult,
@@ -736,7 +1070,8 @@ export async function startNextCheckin(pool, userId, { phase: requestedPhase, cu
               term.semester_start_date, term.semester_end_date,
               term.initial_tracking_phase, term.timing_mode
        FROM COLLEGE_TERM term
-       WHERE term.user_id = ?
+       JOIN COLLEGE_TRACKING_CYCLE cycle ON cycle.tracking_cycle_id = term.tracking_cycle_id
+       WHERE term.user_id = ? AND cycle.status = 'active'
        ORDER BY term.term_id DESC LIMIT 1 FOR UPDATE`,
       [userId]
     )
@@ -757,7 +1092,12 @@ export async function startNextCheckin(pool, userId, { phase: requestedPhase, cu
            )`,
         [userId, term.term_id]
       )
-      const phaseStates = buildPhaseStates(completedRows.map(({ phase }) => phase), timing, {
+      const availabilityTiming = timingForCheckinAvailability(
+        timing,
+        term.timing_mode,
+        term.initial_tracking_phase
+      )
+      const phaseStates = buildPhaseStates(completedRows.map(({ phase }) => phase), availabilityTiming, {
         initialTrackingPhase: term.initial_tracking_phase,
       })
       const available = phaseStates
@@ -836,9 +1176,9 @@ export async function startNextCheckin(pool, userId, { phase: requestedPhase, cu
   }
 }
 
-function nextAcademicYear(academicYear, semester) {
+function nextAcademicYear(academicYear, currentYearLevel, nextYearLevel) {
   const normalized = normalizeAcademicYear(academicYear)
-  if (semester === '1st Semester') return normalized
+  if (currentYearLevel === nextYearLevel) return normalized
   const [start, end] = normalized.split('-').map(Number)
   return `${start + 1}-${end + 1}`
 }
@@ -848,13 +1188,14 @@ export async function startNextSemester(pool, userId, termInput = {}, resolveCou
   try {
     await connection.beginTransaction()
     let [latestRows] = await connection.query(
-      `SELECT term.term_id, term.course_id, term.academic_year, term.year_level,
-              term.semester, term.semester_start_date, term.semester_end_date,
+      `SELECT term.term_id, term.tracking_cycle_id, term.course_id, term.academic_year, term.year_level,
+              term.calendar_type, term.term_code, term.semester, term.semester_start_date, term.semester_end_date,
               term.initial_tracking_phase, term.timing_mode,
               c.course_code, c.is_active
        FROM COLLEGE_TERM term
+       JOIN COLLEGE_TRACKING_CYCLE cycle ON cycle.tracking_cycle_id = term.tracking_cycle_id
        JOIN COURSE c ON c.course_id = term.course_id
-       WHERE term.user_id = ?
+       WHERE term.user_id = ? AND cycle.status = 'active'
        ORDER BY term.term_id DESC LIMIT 1 FOR UPDATE`,
       [userId]
     )
@@ -862,6 +1203,7 @@ export async function startNextSemester(pool, userId, termInput = {}, resolveCou
     if (latestRows.length === 0) {
       ;[latestRows] = await connection.query(
         `SELECT NULL AS term_id, sc.course_id, NULL AS academic_year, sc.year_level,
+                NULL AS calendar_type, NULL AS term_code,
                 sc.semester, NULL AS semester_start_date, NULL AS semester_end_date,
                 c.course_code, c.is_active
          FROM SEMESTER_CHECKIN sc
@@ -902,7 +1244,7 @@ export async function startNextSemester(pool, userId, termInput = {}, resolveCou
       .every((phase) => completedPhases.includes(phase))
     if (!completedCurrentSemester || (!legacy && timing.timingAvailable && !timing.semesterEnded)) {
       throw new CollegeTrackingError(
-        'Complete all check-ins and wait until the semester has ended before starting the next semester.',
+        'Complete all check-ins and wait until the term has ended before starting the next term.',
         'SEMESTER_NOT_COMPLETE',
         409
       )
@@ -912,10 +1254,22 @@ export async function startNextSemester(pool, userId, termInput = {}, resolveCou
     if (!course?.program_duration_years) {
       throw new CollegeTrackingError('The program roadmap is unavailable.', 'ROADMAP_UNAVAILABLE', 409)
     }
-    const institutionDependentProgression = latest.semester === '3rd Semester' || latest.semester === 'Summer'
+    const latestCalendarTerm = resolveCalendarTerm({
+      calendarType: latest.calendar_type,
+      termCode: latest.term_code,
+      semester: latest.semester,
+    })
+    const institutionDependentProgression = !latestCalendarTerm || latestCalendarTerm.calendarType === 'legacy'
     let nextStage
     if (institutionDependentProgression) {
-      validateChoice(termInput.nextSemester, SEMESTERS, 'semester')
+      const confirmedTerm = resolveCalendarTerm({
+        calendarType: termInput.calendarType,
+        termCode: termInput.termCode,
+        semester: termInput.nextSemester,
+      })
+      if (!confirmedTerm || confirmedTerm.calendarType === 'legacy') {
+        throw new CollegeTrackingError('Select a valid next term.', 'INVALID_TERM')
+      }
       validateYearWithinProgram(termInput.nextYearLevel, latest.course_code, resolveCourse)
       if (termInput.nextYearLevel === latest.year_level && termInput.nextSemester === latest.semester) {
         throw new CollegeTrackingError(
@@ -926,13 +1280,18 @@ export async function startNextSemester(pool, userId, termInput = {}, resolveCou
       nextStage = {
         programCompleted: false,
         yearLevel: termInput.nextYearLevel,
-        semester: termInput.nextSemester,
+        semester: confirmedTerm.termLabel,
+        calendarType: confirmedTerm.calendarType,
+        termCode: confirmedTerm.termCode,
       }
     } else {
       nextStage = calculateNextAcademicStage(
         latest.year_level,
         latest.semester,
-        course.program_duration_years
+        course.program_duration_years,
+        latestCalendarTerm.calendarType,
+        latestCalendarTerm.termCode,
+        { startOptionalTerm: termInput.startOptionalTerm === true }
       )
     }
     if (nextStage.programCompleted) {
@@ -942,7 +1301,7 @@ export async function startNextSemester(pool, userId, termInput = {}, resolveCou
 
     const academicYear = legacy || institutionDependentProgression
       ? normalizeAcademicYear(termInput.academicYear)
-      : nextAcademicYear(latest.academic_year, latest.semester)
+      : nextAcademicYear(latest.academic_year, latest.year_level, nextStage.yearLevel)
     const normalizedInputYear = normalizeAcademicYear(termInput.academicYear)
     if (!legacy && !institutionDependentProgression && normalizedInputYear !== academicYear) {
       throw new CollegeTrackingError(`The next academic year must be ${academicYear}.`, 'INVALID_ACADEMIC_YEAR')
@@ -951,9 +1310,9 @@ export async function startNextSemester(pool, userId, termInput = {}, resolveCou
 
     const [existing] = await connection.query(
       `SELECT term_id FROM COLLEGE_TERM
-       WHERE user_id = ? AND course_id = ? AND academic_year = ?
-         AND year_level = ? AND semester = ? LIMIT 1`,
-      [userId, latest.course_id, academicYear, nextStage.yearLevel, nextStage.semester]
+       WHERE user_id = ? AND tracking_cycle_id = ? AND course_id = ? AND academic_year = ?
+         AND year_level = ? AND calendar_type = ? AND term_code = ? LIMIT 1`,
+      [userId, latest.tracking_cycle_id, latest.course_id, academicYear, nextStage.yearLevel, nextStage.calendarType, nextStage.termCode]
     )
     if (existing.length > 0) {
       await connection.commit()
@@ -963,19 +1322,24 @@ export async function startNextSemester(pool, userId, termInput = {}, resolveCou
         termId: existing[0].term_id,
         yearLevel: nextStage.yearLevel,
         semester: nextStage.semester,
+        calendarType: nextStage.calendarType,
+        termCode: nextStage.termCode,
       }
     }
 
     const [result] = await connection.query(
       `INSERT INTO COLLEGE_TERM
-        (user_id, course_id, academic_year, year_level, semester,
+        (user_id, tracking_cycle_id, course_id, academic_year, year_level, calendar_type, term_code, semester,
          semester_start_date, semester_end_date, dates_source, timing_mode, initial_tracking_phase)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         userId,
+        latest.tracking_cycle_id,
         latest.course_id,
         academicYear,
         nextStage.yearLevel,
+        nextStage.calendarType,
+        nextStage.termCode,
         nextStage.semester,
         newTiming.semesterStartDate,
         newTiming.semesterEndDate,
@@ -992,10 +1356,12 @@ export async function startNextSemester(pool, userId, termInput = {}, resolveCou
       academicYear,
       yearLevel: nextStage.yearLevel,
       semester: nextStage.semester,
+      calendarType: nextStage.calendarType,
+      termCode: nextStage.termCode,
     }
   } catch (error) {
     await connection.rollback()
-    throw error
+    throw normalizeTermWriteError(error)
   } finally {
     connection.release()
   }

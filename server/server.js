@@ -39,11 +39,15 @@ import {
 } from './services/recommendationPersistenceService.js'
 import {
   CollegeTrackingError,
+  changeCollegeProgram,
   createCollegeSetup,
+  endCollegeTracking,
   getCheckinHistory,
   getCheckinStatus,
   getCollegeStatus,
   getPendingCheckin,
+  pauseCollegeTracking,
+  resumeCollegeTracking,
   startNextCheckin,
   startNextSemester,
   submitCollegeCheckin,
@@ -268,6 +272,9 @@ app.post('/api/college/setup', authenticateToken, async (req, res) => {
           : 'College phase already set up',
       termId: result.termId,
       course: result.course,
+      calendarType: result.calendarType,
+      termCode: result.termCode,
+      semester: result.semester,
     })
   } catch (error) {
     if (error instanceof CollegeTrackingError) {
@@ -740,6 +747,25 @@ app.post('/api/college/semester/advance', authenticateToken, async (req, res) =>
     res.status(500).json({ message: 'Server error starting the next semester' })
   }
 })
+
+const lifecycleRoute = (handler) => async (req, res) => {
+  try {
+    res.json(await handler(pool, req.user.userId, req.body || {}))
+  } catch (error) {
+    if (error instanceof CollegeTrackingError) {
+      return res.status(error.status).json({ message: error.message, code: error.code })
+    }
+    console.error('College lifecycle error:', error)
+    res.status(500).json({ message: 'Server error updating college tracking' })
+  }
+}
+
+app.post('/api/college/tracking/pause', authenticateToken, lifecycleRoute(pauseCollegeTracking))
+app.post('/api/college/tracking/resume', authenticateToken, lifecycleRoute(resumeCollegeTracking))
+app.post('/api/college/tracking/change-program', authenticateToken, lifecycleRoute(changeCollegeProgram))
+app.post('/api/college/tracking/end', authenticateToken, lifecycleRoute(
+  (database, userId) => endCollegeTracking(database, userId)
+))
 
 app.get('/api/college/checkin/history', authenticateToken, async (req, res) => {
   try {

@@ -1,6 +1,72 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { IconLoader2 } from '@tabler/icons-react'
 import FeedbackPopup from '../components/FeedbackPopup'
+
+const RECOMMENDATIONS_TIMEOUT_MS = 30000
+
+function RecommendationCardSkeleton({ index }) {
+  return (
+    <div
+      className="overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm"
+      aria-hidden="true"
+    >
+      <div className="p-5 sm:p-6">
+        <div className="mb-5 flex items-start justify-between gap-4">
+          <div className="min-w-0 flex-1">
+            <div className="h-3 w-20 animate-pulse rounded-full bg-orange-100" />
+            <div className={`mt-3 h-6 animate-pulse rounded-lg bg-gray-200 ${index === 0 ? 'max-w-md' : 'max-w-sm'}`} />
+          </div>
+          <div className="h-8 w-16 shrink-0 animate-pulse rounded-lg bg-orange-100" />
+        </div>
+        <div className="mb-5 h-2 w-full animate-pulse rounded-full bg-gray-100">
+          <div className={`h-2 rounded-full bg-orange-200 ${index === 0 ? 'w-4/5' : index === 1 ? 'w-3/4' : 'w-2/3'}`} />
+        </div>
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_17rem]">
+          <div className="rounded-2xl border border-orange-100 bg-orange-50/60 p-4 sm:p-5">
+            <div className="h-3 w-32 animate-pulse rounded-full bg-orange-200/80" />
+            <div className="mt-3 space-y-2.5">
+              <div className="h-3 w-full animate-pulse rounded-full bg-orange-100" />
+              <div className="h-3 w-11/12 animate-pulse rounded-full bg-orange-100" />
+              <div className="h-3 w-3/4 animate-pulse rounded-full bg-orange-100" />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            {[0, 1, 2, 3].map((item) => (
+              <div key={item} className="rounded-xl border border-gray-100 bg-gray-50 px-3 py-3">
+                <div className="h-2.5 w-12 animate-pulse rounded-full bg-gray-200" />
+                <div className="mt-2 h-4 w-9 animate-pulse rounded-full bg-gray-200" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+      <div className="flex gap-5 border-t border-gray-100 bg-gray-50/60 px-5 py-4 sm:px-6">
+        <div className="h-3 w-28 animate-pulse rounded-full bg-gray-200" />
+        <div className="h-3 w-32 animate-pulse rounded-full bg-gray-200" />
+      </div>
+    </div>
+  )
+}
+
+function RecommendationsLoadingState() {
+  return (
+    <section aria-live="polite" aria-busy="true" aria-label="Generating course recommendations">
+      <div className="mb-6 flex flex-col gap-3 rounded-2xl border border-orange-100 bg-gradient-to-r from-orange-50 to-amber-50 px-5 py-4 sm:flex-row sm:items-center sm:px-6">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-orange-500 shadow-sm">
+          <IconLoader2 className="animate-spin" size={21} stroke={2.2} />
+        </span>
+        <div>
+          <p className="font-semibold text-gray-900">Generating your course recommendations...</p>
+          <p className="mt-0.5 text-sm leading-relaxed text-gray-500">We’re comparing your assessment results with courses that fit you best.</p>
+        </div>
+      </div>
+      <div className="space-y-5">
+        {[0, 1, 2].map((index) => <RecommendationCardSkeleton key={index} index={index} />)}
+      </div>
+    </section>
+  )
+}
 
 const personalFactorLabels = {
   factor_physical: 'Physical / Mobility',
@@ -31,6 +97,11 @@ function Results() {
     const loadRecommendations = async () => {
       setLoading(true)
       setError('')
+      let requestTimedOut = false
+      const timeoutId = window.setTimeout(() => {
+        requestTimedOut = true
+        controller.abort()
+      }, RECOMMENDATIONS_TIMEOUT_MS)
 
       try {
         const response = await fetch(`${import.meta.env.VITE_API_URL}/api/results`, {
@@ -40,6 +111,7 @@ function Results() {
           signal: controller.signal,
         })
         const data = await response.json().catch(() => ({}))
+        window.clearTimeout(timeoutId)
 
         if (response.status === 401 || response.status === 403) {
           navigate('/login', { replace: true })
@@ -61,32 +133,41 @@ function Results() {
         }
 
         setRecommendations(Array.isArray(data.recommendations) ? data.recommendations : [])
+        setLoading(false)
 
         const headers = { Authorization: `Bearer ${token}` }
         const userId = localStorage.getItem('userId')
         const assessmentResponses = await Promise.allSettled([
-          fetch(`${import.meta.env.VITE_API_URL}/api/interests`, { headers }).then((res) => res.json()),
-          fetch(`${import.meta.env.VITE_API_URL}/api/quiz/results`, { headers }).then((res) => res.json()),
-          fetch(`${import.meta.env.VITE_API_URL}/api/mbti`, { headers }).then((res) => res.json()),
-          fetch(`${import.meta.env.VITE_API_URL}/api/profile?userId=${userId}`, { headers }).then((res) => res.json()),
+          fetch(`${import.meta.env.VITE_API_URL}/api/interests`, { headers, signal: controller.signal }).then((res) => res.json()),
+          fetch(`${import.meta.env.VITE_API_URL}/api/quiz/results`, { headers, signal: controller.signal }).then((res) => res.json()),
+          fetch(`${import.meta.env.VITE_API_URL}/api/mbti`, { headers, signal: controller.signal }).then((res) => res.json()),
+          fetch(`${import.meta.env.VITE_API_URL}/api/profile?userId=${userId}`, { headers, signal: controller.signal }).then((res) => res.json()),
         ])
 
         const valueAt = (index) => assessmentResponses[index].status === 'fulfilled'
           ? assessmentResponses[index].value
           : {}
-        setAssessment({
-          interests: valueAt(0).interests || [],
-          domainScores: valueAt(1).domainScores || {},
-          mbti: valueAt(2).mbtiType || null,
-          profile: valueAt(3).profile || null,
-        })
+        if (!controller.signal.aborted) {
+          setAssessment({
+            interests: valueAt(0).interests || [],
+            domainScores: valueAt(1).domainScores || {},
+            mbti: valueAt(2).mbtiType || null,
+            profile: valueAt(3).profile || null,
+          })
+        }
       } catch (requestError) {
-        if (requestError.name !== 'AbortError') {
+        if (requestTimedOut) {
+          setError('The request took too long. Please try again.')
+          setRecommendations([])
+        } else if (requestError.name !== 'AbortError') {
           setError('Could not connect to the server. Please try again.')
           setRecommendations([])
         }
       } finally {
+        window.clearTimeout(timeoutId)
         if (!controller.signal.aborted) {
+          setLoading(false)
+        } else if (requestTimedOut) {
           setLoading(false)
         }
       }
@@ -143,9 +224,7 @@ function Results() {
         </p>
 
         {loading ? (
-          <div className="text-center text-gray-500 text-sm py-12">
-            Generating your course recommendations...
-          </div>
+          <RecommendationsLoadingState />
         ) : error ? (
           <div className="bg-red-50 text-red-600 px-4 py-3 rounded-xl text-sm mb-6">
             <p>{error}</p>

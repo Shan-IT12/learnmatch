@@ -153,7 +153,7 @@ function detailDatabase({
       if (sql.includes('FROM PERSONALITY_ASSESSMENT')) return [personalityRows]
       if (sql.includes('latest_skill_assessment')) return [skillRows]
       if (sql.includes('FROM RECOMMENDATION recommendation')) return [recommendationRows]
-      if (sql.includes('FROM COLLEGE_TERM term')) return [termRows]
+      if (sql.includes('FROM COLLEGE_TRACKING_CYCLE cycle')) return [termRows]
       if (sql.includes('WITH completed AS')) return [alignmentRows]
       if (sql.includes('sc.term_id IS NULL')) return [legacyRows]
       throw new Error(`Unexpected SQL: ${sql}`)

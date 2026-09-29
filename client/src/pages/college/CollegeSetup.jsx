@@ -1,6 +1,15 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { IconCalendarEvent, IconSchool, IconSearch, IconX } from '@tabler/icons-react'
+import {
+  approximateScheduleValue,
+  buildCollegeSetupPayload,
+  calculateDisplayedSemesterPhase,
+  getAcademicYearOptions,
+  getCurrentAcademicYear,
+  isApproximateEndAfterStart,
+} from '../../utils/collegeSchedule'
+import { ACADEMIC_CALENDARS, getCalendarTerms } from '../../constants/academicCalendars'
 
 const MONTHS = [
   'January', 'February', 'March', 'April', 'May', 'June',
@@ -13,23 +22,95 @@ const MONTH_PARTS = [
 ]
 const POSITION_OPTIONS = [
   { value: 'Early', label: 'Classes recently started' },
-  { value: 'Mid', label: "We're around the middle of the semester" },
-  { value: 'End', label: "We're approaching final exams / the end of the semester" },
-  { value: '', label: "I'm not sure" },
+  { value: 'Mid', label: "We're around the middle of the term" },
+  { value: 'End', label: "We're approaching final exams / the end of the term" },
 ]
+
+function SemesterPhaseSelector({ value, onChange }) {
+  return (
+    <fieldset>
+      <legend className="text-sm font-medium text-gray-700 mb-3">Where are you currently in this term?</legend>
+      <div className="space-y-2">
+        {POSITION_OPTIONS.map((option) => (
+          <label key={option.value} className={`flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 transition duration-150 ${value === option.value ? 'border-orange-300 bg-orange-50/80 shadow-sm' : 'border-gray-200 bg-white hover:border-orange-200 hover:bg-orange-50/30'}`}>
+            <input type="radio" name="semester-position" value={option.value} checked={value === option.value} onChange={() => onChange(option.value)} className="accent-orange-500" />
+            <span className="text-sm text-gray-700">{option.label}</span>
+          </label>
+        ))}
+      </div>
+    </fieldset>
+  )
+}
+
+export function ApproximateScheduleFields({ academicYears, approximateStart, approximateEnd, setApproximateStart, setApproximateEnd }) {
+  return (
+    <div className="space-y-5">
+      {[
+        ['Around when did your term start?', approximateStart, setApproximateStart, false],
+        ['Around when will your term end?', approximateEnd, setApproximateEnd, true],
+      ].map(([label, value, setter, isEnd]) => (
+        <fieldset key={label}>
+          <legend className="text-sm font-medium text-gray-700 mb-2">{label}</legend>
+          <div className="grid sm:grid-cols-3 gap-2">
+            <select aria-label={`${label} month`} value={value.month} onChange={(event) => setter({ ...value, month: event.target.value })} className="rounded-xl border border-gray-200 bg-white px-3 py-3 text-sm outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100/80">
+              <option value="">Month</option>
+              {MONTHS.map((month, index) => {
+                const monthValue = String(index + 1)
+                const disabled = isEnd && value.year === approximateStart.year && Number(monthValue) < Number(approximateStart.month)
+                return <option key={month} value={monthValue} disabled={disabled}>{month}</option>
+              })}
+            </select>
+            <select aria-label={`${label} year`} value={value.year} onChange={(event) => setter({ ...value, year: event.target.value })} className="rounded-xl border border-gray-200 bg-white px-3 py-3 text-sm outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100/80">
+              <option value="">Year</option>
+              {academicYears.map((year) => (
+                <option key={year} value={year} disabled={isEnd && Number(year) < Number(approximateStart.year)}>{year}</option>
+              ))}
+            </select>
+            <select aria-label={`${label} part of month`} value={value.part} onChange={(event) => setter({ ...value, part: event.target.value })} className="rounded-xl border border-gray-200 bg-white px-3 py-3 text-sm outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100/80">
+              <option value="">Part of month</option>
+              {MONTH_PARTS.map((part) => {
+                const candidate = { ...value, part: part.value }
+                const disabled = isEnd && value.year === approximateStart.year && value.month === approximateStart.month && approximateScheduleValue(candidate) <= approximateScheduleValue(approximateStart)
+                return <option key={part.value} value={part.value} disabled={disabled}>{part.label}</option>
+              })}
+            </select>
+          </div>
+        </fieldset>
+      ))}
+    </div>
+  )
+}
+
+export function ResumeProgramCard({ course, loading = false }) {
+  return (
+    <div aria-label="Current Program" className="rounded-2xl border border-orange-200 bg-orange-50 px-4 py-4">
+      <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-orange-600">Current Program</p>
+      <p className="mt-2 text-base font-semibold text-gray-900">
+        {loading ? 'Loading your existing program...' : course?.course_name || 'Program unavailable'}
+      </p>
+      {!loading && <p className="mt-1 text-sm text-gray-600">You’re resuming tracking for your existing program.</p>}
+    </div>
+  )
+}
 
 function CollegeSetup() {
   const navigate = useNavigate()
+  const location = useLocation()
   const token = localStorage.getItem('token')
+  const lifecycleAction = new URLSearchParams(location.search).get('action') || 'setup'
+  const isResume = lifecycleAction === 'resume'
+  const fixedCourse = lifecycleAction === 'restart' ? location.state?.course || null : null
 
   const [courses, setCourses] = useState([])
   const [savedRecommendations, setSavedRecommendations] = useState([])
   const [search, setSearch] = useState('')
   const [searchStatus, setSearchStatus] = useState('idle')
-  const [selectedCourse, setSelectedCourse] = useState(null)
-  const [academicYear, setAcademicYear] = useState('')
+  const [selectedCourse, setSelectedCourse] = useState(fixedCourse)
+  const [academicYear, setAcademicYear] = useState(getCurrentAcademicYear)
   const [yearLevel, setYearLevel] = useState('')
   const [semester, setSemester] = useState('')
+  const [calendarType, setCalendarType] = useState('semester')
+  const [termCode, setTermCode] = useState('')
   const [semesterStartDate, setSemesterStartDate] = useState('')
   const [semesterEndDate, setSemesterEndDate] = useState('')
   const [timingChoice, setTimingChoice] = useState('exact')
@@ -38,6 +119,7 @@ function CollegeSetup() {
   const [semesterPosition, setSemesterPosition] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [resumeProgramLoading, setResumeProgramLoading] = useState(isResume)
 
   useEffect(() => {
     if (!token) navigate('/login')
@@ -45,6 +127,8 @@ function CollegeSetup() {
 
   useEffect(() => {
     if (!token) return undefined
+
+    if (isResume) return undefined
 
     const controller = new AbortController()
     const loadSavedRecommendations = async () => {
@@ -68,9 +152,38 @@ function CollegeSetup() {
 
     loadSavedRecommendations()
     return () => controller.abort()
-  }, [token, navigate])
+  }, [token, navigate, isResume])
 
   useEffect(() => {
+    if (!token || !isResume) return undefined
+    const controller = new AbortController()
+    const loadPausedProgram = async () => {
+      try {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/college/status`, {
+          headers: { Authorization: `Bearer ${token}` },
+          signal: controller.signal,
+        })
+        if (response.status === 401 || response.status === 403) {
+          navigate('/login', { replace: true })
+          return
+        }
+        const data = await response.json()
+        if (!response.ok || data.lifecycleStatus !== 'paused') {
+          throw new Error(data.message || 'Paused tracking could not be loaded.')
+        }
+        setSelectedCourse({ course_id: data.courseId, course_name: data.courseName, course_code: data.courseCode })
+      } catch (requestError) {
+        if (requestError.name !== 'AbortError') setError(requestError.message || 'Paused tracking could not be loaded.')
+      } finally {
+        if (!controller.signal.aborted) setResumeProgramLoading(false)
+      }
+    }
+    loadPausedProgram()
+    return () => controller.abort()
+  }, [token, navigate, isResume])
+
+  useEffect(() => {
+    if (isResume) return undefined
     const query = search.trim().replace(/\s+/g, ' ')
     if (selectedCourse || query.length < 2) return undefined
 
@@ -98,18 +211,19 @@ function CollegeSetup() {
       clearTimeout(timer)
       controller.abort()
     }
-  }, [search, selectedCourse])
+  }, [search, selectedCourse, isResume])
 
-  const academicYearMatch = academicYear.trim().match(/^(\d{4})\s*[-â€“]\s*(\d{4})$/)
-  const academicYears = academicYearMatch ? [academicYearMatch[1], academicYearMatch[2]] : []
+  const academicYears = getAcademicYearOptions(academicYear)
+  const academicDateMin = academicYears.length === 2 ? `${academicYears[0]}-01-01` : undefined
+  const academicDateMax = academicYears.length === 2 ? `${academicYears[1]}-12-31` : undefined
+  const detectedExactPhase = calculateDisplayedSemesterPhase(semesterStartDate, semesterEndDate)
 
   const handleAcademicYearChange = (event) => {
     const value = event.target.value
     setAcademicYear(value)
-    const match = value.trim().match(/^(\d{4})\s*[-â€“]\s*(\d{4})$/)
-    if (!match) return
-    const suggestedYears = [match[1], match[2]]
-    const semesterYear = semester === '1st Semester' ? suggestedYears[0] : suggestedYears[1]
+    const suggestedYears = getAcademicYearOptions(value)
+    if (suggestedYears.length === 0) return
+    const semesterYear = termCode === 'SEM_1' || termCode === 'TRI_1' ? suggestedYears[0] : suggestedYears[1]
     setApproximateStart((current) => ({
       ...current,
       year: suggestedYears.includes(current.year) ? current.year : semesterYear,
@@ -118,12 +232,15 @@ function CollegeSetup() {
       ...current,
       year: suggestedYears.includes(current.year) ? current.year : semesterYear,
     }))
+    setSemesterStartDate((current) => current && (current < `${suggestedYears[0]}-01-01` || current > `${suggestedYears[1]}-12-31`) ? '' : current)
+    setSemesterEndDate((current) => current && (current < `${suggestedYears[0]}-01-01` || current > `${suggestedYears[1]}-12-31`) ? '' : current)
   }
 
-  const handleSemesterChoice = (value) => {
-    setSemester(value)
+  const handleSemesterChoice = (term) => {
+    setSemester(term.label)
+    setTermCode(term.code)
     if (academicYears.length !== 2) return
-    const suggestedYear = value === '1st Semester' ? academicYears[0] : academicYears[1]
+    const suggestedYear = term.code === 'SEM_1' || term.code === 'TRI_1' ? academicYears[0] : academicYears[1]
     setApproximateStart((current) => ({ ...current, year: suggestedYear }))
     setApproximateEnd((current) => ({ ...current, year: suggestedYear }))
   }
@@ -148,6 +265,15 @@ function CollegeSetup() {
     setSearchStatus('idle')
   }
 
+  const handleApproximateStartChange = (nextStart) => {
+    setApproximateStart(nextStart)
+    setApproximateEnd((current) => (
+      approximateScheduleValue(current) !== null && !isApproximateEndAfterStart(nextStart, current)
+        ? { month: '', year: '', part: '' }
+        : current
+    ))
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
@@ -165,11 +291,18 @@ function CollegeSetup() {
       return
     }
     if (!semester) {
-      setError('Please select your current semester.')
+      setError('Please select your current term.')
       return
     }
     if (timingChoice === 'exact' && (!semesterStartDate || !semesterEndDate || semesterEndDate <= semesterStartDate)) {
-      setError('Enter valid semester dates with the end date after the start date.')
+      setError('Enter valid term dates with the end date after the start date.')
+      return
+    }
+    if (timingChoice === 'exact' && (
+      !academicYears.includes(semesterStartDate.slice(0, 4)) ||
+      !academicYears.includes(semesterEndDate.slice(0, 4))
+    )) {
+      setError('Term dates must fall within the selected academic year.')
       return
     }
     if (timingChoice === 'approximate' && (
@@ -179,28 +312,41 @@ function CollegeSetup() {
       setError('Complete the approximate start and end schedule.')
       return
     }
+    if (timingChoice === 'approximate' && !isApproximateEndAfterStart(approximateStart, approximateEnd)) {
+      setError('Choose an approximate end after the term start.')
+      return
+    }
+    if ((timingChoice === 'approximate' || timingChoice === 'unknown') && !semesterPosition) {
+      setError('Select where you currently are in the term.')
+      return
+    }
 
     setLoading(true)
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/college/setup`, {
+      const lifecycleEndpoints = {
+        resume: '/api/college/tracking/resume',
+        change: '/api/college/tracking/change-program',
+      }
+      const endpoint = lifecycleEndpoints[lifecycleAction] || '/api/college/setup'
+      const response = await fetch(`${import.meta.env.VITE_API_URL}${endpoint}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          courseId: selectedCourse.course_id,
-          courseName: selectedCourse.course_name,
+        body: JSON.stringify(buildCollegeSetupPayload(lifecycleAction, selectedCourse, {
           academicYear,
           yearLevel,
           semester,
-          timingMode: timingChoice === 'unknown' ? (semesterPosition ? 'phase_only' : 'manual') : timingChoice,
+          calendarType,
+          termCode,
+          timingMode: timingChoice === 'unknown' ? 'phase_only' : timingChoice,
           semesterStartDate: timingChoice === 'exact' ? semesterStartDate : undefined,
           semesterEndDate: timingChoice === 'exact' ? semesterEndDate : undefined,
           approximateStart: timingChoice === 'approximate' ? approximateStart : undefined,
           approximateEnd: timingChoice === 'approximate' ? approximateEnd : undefined,
-          initialTrackingPhase: timingChoice === 'unknown' && semesterPosition ? semesterPosition : undefined,
-        }),
+          initialTrackingPhase: timingChoice !== 'exact' ? semesterPosition : undefined,
+        })),
       })
 
       const data = await response.json()
@@ -237,10 +383,14 @@ function CollegeSetup() {
         <div className="mx-auto mb-9 max-w-2xl text-center">
         <p className="mb-3 text-xs font-bold uppercase tracking-[0.18em] text-orange-600">College Phase</p>
         <h1 className="text-3xl font-bold tracking-[-0.03em] text-gray-950 sm:text-4xl">
-          Set up your College Phase
+          {lifecycleAction === 'resume' ? 'Resume College Tracking' : lifecycleAction === 'change' ? 'Change your College Program' : 'Set up your College Phase'}
         </h1>
         <p className="mt-3 text-sm leading-relaxed text-gray-500 sm:text-base">
-          Tell us about your current enrollment so we can track your academic alignment.
+          {lifecycleAction === 'change'
+            ? 'Select the program you are actually enrolled in and provide its current academic context.'
+            : isResume
+              ? 'Provide your fresh academic term and schedule details to continue tracking.'
+              : 'Tell us about your current enrollment so we can track your academic alignment.'}
         </p>
         </div>
 
@@ -262,7 +412,13 @@ function CollegeSetup() {
             </div>
             <div className="space-y-6">
 
+          {isResume ? (
+            <ResumeProgramCard course={selectedCourse} loading={resumeProgramLoading} />
+          ) : <>
           <p className="text-sm font-semibold text-gray-800">What course are you enrolled in?</p>
+          {lifecycleAction === 'change' && (
+            <p className="mt-1 text-xs leading-relaxed text-amber-700">This records your actual enrollment. It is not a new LearnMatch recommendation. Your previous program history will remain unchanged.</p>
+          )}
 
           {savedRecommendations.length > 0 && (
             <section>
@@ -309,6 +465,7 @@ function CollegeSetup() {
               {search && !selectedCourse && (
                 <button
                   type="button"
+                  disabled={['resume', 'restart'].includes(lifecycleAction)}
                   onClick={clearSearch}
                   aria-label="Clear course search"
                   className="absolute right-1 top-1/2 -translate-y-1/2 w-10 h-10 inline-flex items-center justify-center rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-400"
@@ -360,13 +517,14 @@ function CollegeSetup() {
                     setSelectedCourse(null)
                     clearSearch()
                   }}
-                  className="text-xs text-gray-400 hover:text-gray-600"
+                  className="text-xs text-gray-400 hover:text-gray-600 disabled:hidden"
                 >
                   Change
                 </button>
               </div>
             )}
           </div>
+          </>}
 
           {/* Year level */}
           <div>
@@ -406,24 +564,40 @@ function CollegeSetup() {
             </div>
           </div>
 
-          {/* Semester */}
+          {/* Academic calendar */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              What semester are you currently in?
+              Academic calendar type
             </label>
             <div className="grid grid-cols-2 gap-2">
-              {['1st Semester', '2nd Semester', '3rd Semester', 'Summer'].map((sem) => (
+              {Object.entries(ACADEMIC_CALENDARS).map(([value, calendar]) => (
                 <button
-                  key={sem}
+                  key={value}
                   type="button"
-                  onClick={() => handleSemesterChoice(sem)}
+                  onClick={() => {
+                    setCalendarType(value)
+                    setSemester('')
+                    setTermCode('')
+                  }}
                   className={`rounded-xl border py-3 text-sm font-medium transition duration-150 ${
-                    semester === sem
+                    calendarType === value
                       ? 'border-orange-400 bg-orange-50 text-orange-700 shadow-sm ring-1 ring-orange-200'
                       : 'border-gray-200 bg-white text-gray-600 hover:border-orange-300 hover:bg-orange-50/40'
                   }`}
                 >
-                  {sem}
+                  {calendar.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Current term */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Current term</label>
+            <div className="grid grid-cols-2 gap-2">
+              {getCalendarTerms(calendarType).map((term) => (
+                <button key={term.code} type="button" onClick={() => handleSemesterChoice(term)} className={`rounded-xl border px-2 py-3 text-sm font-medium transition duration-150 ${semester === term.label ? 'border-orange-400 bg-orange-50 text-orange-700 shadow-sm ring-1 ring-orange-200' : 'border-gray-200 bg-white text-gray-600 hover:border-orange-300 hover:bg-orange-50/40'}`}>
+                  {term.label}{term.optional ? ' (Optional)' : ''}
                 </button>
               ))}
             </div>
@@ -436,17 +610,17 @@ function CollegeSetup() {
             <div className="flex items-start gap-3">
               <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-orange-100 text-orange-600"><IconCalendarEvent size={22} stroke={1.7} /></span>
               <div>
-              <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-orange-600">Semester tracking</p>
+              <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-orange-600">Term tracking</p>
               <h2 className="mt-1 text-lg font-bold tracking-tight text-gray-900">Plan your check-ins</h2>
-              <p className="text-sm text-gray-500 mt-1">Help LearnMatch determine when your Early, Mid, and End check-ins should happen.</p>
+              <p className="text-sm text-gray-500 mt-1">Help LearnMatch determine when your Early, Mid, and End term check-ins should happen.</p>
               </div>
             </div>
 
             <div className="space-y-2">
               {[
-                ['exact', 'I know my exact semester dates'],
+                ['exact', 'I know my exact term dates'],
                 ['approximate', 'I only know the approximate schedule'],
-                ['unknown', "I don't know my semester schedule"],
+                ['unknown', "I don't know my term schedule"],
               ].map(([value, label]) => (
                 <label key={value} className={`flex cursor-pointer items-center gap-3 rounded-2xl border px-4 py-3.5 transition duration-150 ${timingChoice === value ? 'border-orange-300 bg-orange-50/80 shadow-sm' : 'border-gray-200 bg-white hover:border-orange-200 hover:bg-orange-50/30'}`}>
                   <input type="radio" name="timing-choice" value={value} checked={timingChoice === value} onChange={() => setTimingChoice(value)} className="h-4 w-4 accent-orange-500" />
@@ -458,65 +632,52 @@ function CollegeSetup() {
             {timingChoice === 'exact' && (
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="semester-start" className="block text-sm font-medium text-gray-700 mb-2">Semester start</label>
-                  <input id="semester-start" type="date" value={semesterStartDate} onChange={(event) => setSemesterStartDate(event.target.value)} className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100/80" />
+                  <label htmlFor="semester-start" className="block text-sm font-medium text-gray-700 mb-2">Term start</label>
+                  <input id="semester-start" type="date" min={academicDateMin} max={academicDateMax} value={semesterStartDate} onChange={(event) => {
+                    const nextStart = event.target.value
+                    setSemesterStartDate(nextStart)
+                    if (semesterEndDate && semesterEndDate <= nextStart) setSemesterEndDate('')
+                  }} className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100/80" />
                 </div>
                 <div>
-                  <label htmlFor="semester-end" className="block text-sm font-medium text-gray-700 mb-2">Semester end</label>
-                  <input id="semester-end" type="date" min={semesterStartDate || undefined} value={semesterEndDate} onChange={(event) => setSemesterEndDate(event.target.value)} className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100/80" />
+                  <label htmlFor="semester-end" className="block text-sm font-medium text-gray-700 mb-2">Term end</label>
+                  <input id="semester-end" type="date" min={semesterStartDate || academicDateMin} max={academicDateMax} value={semesterEndDate} onChange={(event) => setSemesterEndDate(event.target.value)} className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100/80" />
                 </div>
+                {detectedExactPhase && (
+                  <div className="rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 sm:col-span-2">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">Detected current phase</p>
+                    <p className="mt-1 text-sm text-emerald-900"><strong>{detectedExactPhase}</strong> — calculated from today and your exact term dates.</p>
+                  </div>
+                )}
               </div>
             )}
 
             {timingChoice === 'approximate' && (
-              <div className="space-y-5">
-                {[
-                  ['Around when did your semester start?', approximateStart, setApproximateStart],
-                  ['Around when will your semester end?', approximateEnd, setApproximateEnd],
-                ].map(([label, value, setter]) => (
-                  <fieldset key={label}>
-                    <legend className="text-sm font-medium text-gray-700 mb-2">{label}</legend>
-                    <div className="grid sm:grid-cols-3 gap-2">
-                      <select aria-label={`${label} month`} value={value.month} onChange={(event) => setter({ ...value, month: event.target.value })} className="rounded-xl border border-gray-200 bg-white px-3 py-3 text-sm outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100/80">
-                        <option value="">Month</option>
-                        {MONTHS.map((month, index) => <option key={month} value={String(index + 1)}>{month}</option>)}
-                      </select>
-                      <select aria-label={`${label} year`} value={value.year} onChange={(event) => setter({ ...value, year: event.target.value })} className="rounded-xl border border-gray-200 bg-white px-3 py-3 text-sm outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100/80">
-                        <option value="">Year</option>
-                        {academicYears.map((year) => <option key={year} value={year}>{year}</option>)}
-                      </select>
-                      <select aria-label={`${label} part of month`} value={value.part} onChange={(event) => setter({ ...value, part: event.target.value })} className="rounded-xl border border-gray-200 bg-white px-3 py-3 text-sm outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100/80">
-                        <option value="">Part of month</option>
-                        {MONTH_PARTS.map((part) => <option key={part.value} value={part.value}>{part.label}</option>)}
-                      </select>
-                    </div>
-                  </fieldset>
-                ))}
-              </div>
+              <ApproximateScheduleFields
+                academicYears={academicYears}
+                approximateStart={approximateStart}
+                approximateEnd={approximateEnd}
+                setApproximateStart={handleApproximateStartChange}
+                setApproximateEnd={setApproximateEnd}
+              />
+            )}
+
+            {timingChoice === 'approximate' && (
+              <SemesterPhaseSelector value={semesterPosition} onChange={setSemesterPosition} />
             )}
 
             {timingChoice === 'unknown' && (
-              <fieldset>
-                <legend className="text-sm font-medium text-gray-700 mb-3">How far along are you in your current semester?</legend>
-                <div className="space-y-2">
-                  {POSITION_OPTIONS.map((option) => (
-                    <label key={option.label} className={`flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 transition duration-150 ${semesterPosition === option.value ? 'border-orange-300 bg-orange-50/80 shadow-sm' : 'border-gray-200 bg-white hover:border-orange-200 hover:bg-orange-50/30'}`}>
-                      <input type="radio" name="semester-position" value={option.value || 'unsure'} checked={semesterPosition === option.value} onChange={() => setSemesterPosition(option.value)} className="accent-orange-500" />
-                      <span className="text-sm text-gray-700">{option.label}</span>
-                    </label>
-                  ))}
-                </div>
-              </fieldset>
+              <SemesterPhaseSelector value={semesterPosition} onChange={setSemesterPosition} />
             )}
           </section>
 
           <div className="flex justify-center lg:col-span-2">
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || resumeProgramLoading || (isResume && !selectedCourse)}
             className="inline-flex w-full max-w-md items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-orange-500 to-orange-600 px-7 py-3.5 text-sm font-semibold text-white shadow-[0_12px_28px_-12px_rgba(234,88,12,.8)] transition duration-150 hover:-translate-y-0.5 hover:shadow-[0_16px_32px_-12px_rgba(234,88,12,.72)] active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {loading ? 'Setting up...' : 'Continue to College Phase →'}
+            {loading ? 'Saving...' : lifecycleAction === 'resume' ? 'Resume Tracking' : lifecycleAction === 'change' ? 'Confirm Program Change' : 'Continue to College Phase →'}
           </button>
           </div>
         </form>

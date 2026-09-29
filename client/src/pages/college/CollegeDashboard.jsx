@@ -23,6 +23,7 @@ import {
   parseYearNumber,
   summarizeRoadmapOverview,
 } from '../../utils/collegeTrackingView'
+import { getCalendarTerms, resolveCalendarTerm } from '../../constants/academicCalendars'
 
 const STATUS_STYLES = {
   'On Track': 'bg-emerald-50 text-emerald-700 border-emerald-200',
@@ -110,6 +111,8 @@ function CollegeDashboard() {
   const [nextSemesterAcademicYear, setNextSemesterAcademicYear] = useState('')
   const [confirmedNextYearLevel, setConfirmedNextYearLevel] = useState('')
   const [confirmedNextSemester, setConfirmedNextSemester] = useState('')
+  const [startOptionalTerm, setStartOptionalTerm] = useState(false)
+  const [lifecyclePending, setLifecyclePending] = useState(false)
 
   useEffect(() => {
     if (!token) {
@@ -179,6 +182,9 @@ function CollegeDashboard() {
     () => getPreviousSemesterRecords(history, collegeInfo || {}),
     [history, collegeInfo]
   )
+  const displayedHistory = collegeInfo?.lifecycleStatus && collegeInfo.lifecycleStatus !== 'active'
+    ? history
+    : previousSemesterRecords
   const trend = getAlignmentTrend(currentSemesterRecords)
   const nextCheckinPhase = getNextCheckinPhase(checkinStatus)
   const latestResult = checkinStatus?.latestResult
@@ -187,19 +193,23 @@ function CollegeDashboard() {
   const roadmapYears = courseRoadmap?.year_levels || []
   const currentRoadmapYear = roadmapYears.find(({ year }) => Number(year) === currentYearNumber)
   const checkinCardIsActionable = (checkinStatus?.availablePhases?.length || 0) > 0 || checkinStatus?.state === 'pending'
+  const currentCalendarTerm = resolveCalendarTerm(collegeInfo || {})
   const nextAcademicStage = getNextAcademicStage(
     collegeInfo?.yearLevel,
     collegeInfo?.semester,
     courseRoadmap?.program_duration_years,
-    checkinStatus?.progressionEligible
+    checkinStatus?.progressionEligible,
+    currentCalendarTerm?.calendarType,
+    currentCalendarTerm?.termCode,
+    startOptionalTerm
   )
-  const institutionDependentTerm = collegeInfo?.semester === '3rd Semester' || collegeInfo?.semester === 'Summer'
+  const institutionDependentTerm = !currentCalendarTerm
   const nextAcademicYear = useMemo(() => {
     const match = String(collegeInfo?.academicYear || '').match(/^(\d{4})-(\d{4})$/)
     if (!match) return ''
-    if (collegeInfo?.semester === '1st Semester') return collegeInfo.academicYear
+    if (nextAcademicStage?.yearLevel === collegeInfo?.yearLevel) return collegeInfo.academicYear
     return `${Number(match[1]) + 1}-${Number(match[2]) + 1}`
-  }, [collegeInfo])
+  }, [collegeInfo, nextAcademicStage])
   const displayedTrackingPhase = collegeInfo?.expectedPhase || collegeInfo?.initialTrackingPhase
   const timingHeading = collegeInfo?.timingEstimated
     ? 'Estimated Semester Progress'
@@ -211,6 +221,31 @@ function CollegeDashboard() {
   const timingValue = collegeInfo?.timingAvailable
     ? `${collegeInfo.semesterProgress}%`
     : displayedTrackingPhase || 'Not set'
+  const lifecycleStatus = collegeInfo?.lifecycleStatus || 'active'
+
+  const updateLifecycle = async (action) => {
+    const prompts = {
+      pause: 'Pause college tracking? No new terms or check-ins will be expected until you resume.',
+      end: 'End college tracking? Your history will be preserved and you can start a new cycle later.',
+    }
+    if (prompts[action] && !window.confirm(prompts[action])) return
+    setLifecyclePending(true)
+    setError('')
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/college/tracking/${action}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: '{}',
+      })
+      const payload = await response.json()
+      if (!response.ok) throw new Error(payload.message || 'Unable to update college tracking.')
+      navigate(0)
+    } catch (requestError) {
+      setError(requestError.message)
+    } finally {
+      setLifecyclePending(false)
+    }
+  }
 
   const handleStartCheckin = async (phase = null) => {
     if (checkinStatus?.state === 'pending' && (!phase || phase === checkinStatus.phase)) {
@@ -257,6 +292,9 @@ function CollegeDashboard() {
           semesterEndDate: nextSemesterEndDate,
           nextYearLevel: institutionDependentTerm ? confirmedNextYearLevel : undefined,
           nextSemester: institutionDependentTerm ? confirmedNextSemester : undefined,
+          calendarType: institutionDependentTerm ? 'semester' : nextAcademicStage?.calendarType,
+          termCode: institutionDependentTerm ? undefined : nextAcademicStage?.termCode,
+          startOptionalTerm,
         }),
       })
       const payload = await response.json()
@@ -323,7 +361,7 @@ function CollegeDashboard() {
               </p>
               {collegeInfo?.academicYear && <p className="mt-1 text-sm text-slate-300">AY {collegeInfo.academicYear.replace('-', '–')}</p>}
               <p className="mt-5 max-w-2xl text-sm leading-relaxed text-slate-400">
-                See where you are in your course roadmap and how your alignment develops through each semester check-in.
+                See where you are in your course roadmap and how your alignment develops through each term check-in.
               </p>
             </div>
             <div className="grid gap-4 sm:grid-cols-2 sm:gap-6 lg:border-l lg:border-slate-700 lg:pl-8">
@@ -357,6 +395,33 @@ function CollegeDashboard() {
           )}
         </section>
 
+        {lifecycleStatus !== 'active' ? (
+          <section className="rounded-[20px] border border-orange-200 bg-orange-50 p-6 sm:p-8">
+            <h2 className="text-xl font-bold text-gray-900">College tracking is {lifecycleStatus}</h2>
+            <p className="mt-2 text-sm text-gray-600">Your completed terms and Career Alignment history remain available. No check-ins are currently due.</p>
+            <button
+              type="button"
+              onClick={() => navigate(lifecycleStatus === 'paused' ? '/college/setup?action=resume' : '/college/setup?action=restart', { state: { course: { course_id: collegeInfo.courseId, course_name: collegeInfo.courseName } } })}
+              className="mt-5 rounded-xl bg-orange-500 px-5 py-3 text-sm font-semibold text-white hover:bg-orange-600"
+            >
+              {lifecycleStatus === 'paused' ? 'Resume Tracking' : 'Start a New Tracking Cycle'}
+            </button>
+          </section>
+        ) : (
+          <section className="flex flex-wrap gap-2 rounded-[20px] border border-gray-100 bg-white p-4 shadow-sm">
+            <button type="button" disabled={!checkinStatus?.progressionEligible} onClick={() => setShowNextSemesterForm(true)} className="rounded-xl bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40">Continue Next Term</button>
+            {checkinStatus?.progressionEligible && ['SEM_2', 'TRI_3'].includes(currentCalendarTerm?.termCode) && (
+              <button type="button" onClick={() => { setStartOptionalTerm(true); setShowNextSemesterForm(true) }} className="rounded-xl border border-orange-200 bg-orange-50 px-4 py-2.5 text-sm font-semibold text-orange-700">Start Summer/Midyear</button>
+            )}
+            <button type="button" disabled={lifecyclePending} onClick={() => updateLifecycle('pause')} className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-700 disabled:opacity-50">Pause Tracking</button>
+            <button type="button" onClick={() => {
+              if (window.confirm('Change programs? Your previous program history will remain unchanged, and this will not create a LearnMatch recommendation.')) navigate('/college/setup?action=change')
+            }} className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-700">Change Program</button>
+            <button type="button" disabled={lifecyclePending} onClick={() => updateLifecycle('end')} className="rounded-xl border border-red-200 px-4 py-2.5 text-sm font-semibold text-red-700 disabled:opacity-50">End Tracking</button>
+          </section>
+        )}
+
+        {lifecycleStatus === 'active' && <>
         <section className="bg-white rounded-[20px] shadow-sm p-5 sm:p-8">
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-6">
             <div>
@@ -412,7 +477,7 @@ function CollegeDashboard() {
                             <p className="text-sm font-semibold text-gray-800">{collegeInfo?.semester}</p>
                             {collegeInfo?.timingAvailable && (
                               <div className="mt-3">
-                                <div className="flex justify-between text-xs text-gray-500"><span>{collegeInfo.timingEstimated ? 'Estimated semester progress' : 'Semester progress'}</span><span>{collegeInfo.semesterProgress}%</span></div>
+                                <div className="flex justify-between text-xs text-gray-500"><span>{collegeInfo.timingEstimated ? 'Estimated term progress' : 'Term progress'}</span><span>{collegeInfo.semesterProgress}%</span></div>
                                 <div className="h-2 rounded-full bg-gray-100 mt-1 overflow-hidden"><div className="h-full bg-orange-500" style={{ width: `${collegeInfo.semesterProgress}%` }} /></div>
                               </div>
                             )}
@@ -431,13 +496,20 @@ function CollegeDashboard() {
                             {checkinStatus?.progressionEligible && (
                               <div className="mt-3 pt-3 border-t border-gray-100">
                                 <p className="text-sm font-semibold text-emerald-700">
-                                  {checkinStatus.semesterTrackingCompleted ? 'Semester tracking completed' : 'All alignment check-ins completed'}
+                                  {checkinStatus.semesterTrackingCompleted ? 'Term tracking completed' : 'All alignment check-ins completed'}
                                 </p>
                                 {collegeInfo?.semester === '2nd Semester' && (
                                   <p className="text-sm font-semibold text-gray-900 mt-1">{collegeInfo.yearLevel} completed</p>
                                 )}
                                 {nextAcademicStage?.programCompleted ? (
-                                  <p className="text-sm text-gray-700 mt-1">Program roadmap completed</p>
+                                  <div>
+                                    <p className="text-sm text-gray-700 mt-1">Program roadmap completed</p>
+                                    {['SEM_2', 'TRI_3'].includes(currentCalendarTerm?.termCode) && (
+                                      <button type="button" onClick={() => { setStartOptionalTerm(true); setShowNextSemesterForm(true) }} className="mt-3 w-full border border-orange-200 bg-orange-50 px-3 py-2 rounded-lg text-sm font-semibold text-orange-700 hover:bg-orange-100">
+                                        Start optional Summer/Midyear
+                                      </button>
+                                    )}
+                                  </div>
                                 ) : nextAcademicStage || institutionDependentTerm ? (
                                   <>
                                     <p className="text-sm text-gray-500 mt-2">Next:</p>
@@ -451,11 +523,17 @@ function CollegeDashboard() {
                                       onClick={() => setShowNextSemesterForm((visible) => !visible)}
                                       className="mt-3 w-full bg-orange-500 text-white px-3 py-2 rounded-lg text-sm font-semibold hover:bg-orange-600 disabled:opacity-50"
                                     >
-                                      Start Next Semester
+                                      Start Next Term
                                     </button>
                                     {showNextSemesterForm && (
                                       <div className="mt-3 space-y-2">
-                                        <p className="text-xs text-gray-500">Confirm the new semester and its student-provided dates.</p>
+                                        <p className="text-xs text-gray-500">Confirm the new term and its student-provided dates.</p>
+                                        {['SEM_2', 'TRI_3'].includes(currentCalendarTerm?.termCode) && (
+                                          <label className="flex items-center gap-2 rounded-lg bg-orange-50 px-3 py-2 text-xs text-orange-800">
+                                            <input type="checkbox" checked={startOptionalTerm} onChange={(event) => setStartOptionalTerm(event.target.checked)} className="accent-orange-500" />
+                                            Start an optional Summer/Midyear term instead of advancing the year level
+                                          </label>
+                                        )}
                                         {institutionDependentTerm && (
                                           <>
                                             <p className="text-xs text-orange-700">LearnMatch cannot assume what follows a Third Semester or Summer term. Select the next academic stage explicitly.</p>
@@ -465,7 +543,7 @@ function CollegeDashboard() {
                                             </select>
                                             <select value={confirmedNextSemester} onChange={(event) => setConfirmedNextSemester(event.target.value)} className="w-full border border-gray-200 rounded-lg px-2 py-2 text-xs">
                                               <option value="">Next semester</option>
-                                              {['1st Semester', '2nd Semester', '3rd Semester', 'Summer'].map((semester) => <option key={semester} value={semester}>{semester}</option>)}
+                                              {getCalendarTerms('semester').map((term) => <option key={term.code} value={term.label}>{term.label}</option>)}
                                             </select>
                                           </>
                                         )}
@@ -598,7 +676,7 @@ function CollegeDashboard() {
             <div className="mt-6 rounded-2xl bg-orange-50 border border-orange-100 p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
                 <p className="font-semibold text-gray-900">Start your alignment journey</p>
-                <p className="text-sm text-gray-600 mt-1">Your first completed check-in will establish the starting point for this semester.</p>
+                <p className="text-sm text-gray-600 mt-1">Your first completed check-in will establish the starting point for this term.</p>
               </div>
               {checkinCardIsActionable && (
                 <button onClick={() => handleStartCheckin(nextCheckinPhase)} disabled={startingCheckin} className="inline-flex items-center justify-center gap-2 bg-orange-500 text-white px-5 py-3 rounded-xl text-sm font-semibold hover:bg-orange-600 transition disabled:opacity-50">
@@ -636,7 +714,7 @@ function CollegeDashboard() {
               {checkinStatus?.state === 'pending' && `Your ${nextCheckinPhase} check-in is ready`}
               {checkinStatus?.state === 'due' && `Your ${nextCheckinPhase} check-in is ready`}
               {checkinStatus?.state === 'not_due' && `Next up: ${nextCheckinPhase} check-in`}
-              {checkinStatus?.state === 'complete' && 'All check-ins completed this semester'}
+              {checkinStatus?.state === 'complete' && 'All check-ins completed this term'}
             </p>
             <p className="text-sm text-gray-500 leading-relaxed mt-2">
               {checkinCardIsActionable ? 'Take about a minute to record how your course experience feels right now.' : 'Your completed results remain available in your alignment history.'}
@@ -649,21 +727,23 @@ function CollegeDashboard() {
           </section>
         </div>
 
+        </>}
+
         <section className="bg-white rounded-[20px] shadow-sm p-5 sm:p-7">
           <div className="flex items-center gap-2 text-gray-500 mb-2">
             <IconCalendar size={18} stroke={1.8} />
-            <h2 className="text-lg font-bold text-gray-900">Previous Semester History</h2>
+            <h2 className="text-lg font-bold text-gray-900">Previous Term History</h2>
           </div>
           <p className="text-sm text-gray-500 mb-5">Earlier records are preserved so you can review your progress over time.</p>
-          {previousSemesterRecords.length === 0 ? (
-            <p className="text-sm text-gray-400 rounded-2xl bg-gray-50 px-5 py-6">No previous semester check-ins yet.</p>
+          {displayedHistory.length === 0 ? (
+            <p className="text-sm text-gray-400 rounded-2xl bg-gray-50 px-5 py-6">No previous term check-ins yet.</p>
           ) : (
             <div className="space-y-3">
-              {previousSemesterRecords.map((record) => (
+              {displayedHistory.map((record) => (
                 <article key={record.checkinId} className="border border-gray-100 rounded-2xl px-4 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                   <div>
                     <div className="flex flex-wrap items-center gap-2">
-                      <p className="text-sm font-semibold text-gray-900">{record.yearLevel} · {record.semester} · {record.phase}</p>
+                      <p className="text-sm font-semibold text-gray-900">{record.courseName} · {record.yearLevel} · {record.semester} · {record.phase}</p>
                       <span className={`inline-flex border rounded-full px-2 py-0.5 text-[9px] font-bold ${statusStyle(record.status)}`}>{record.status}</span>
                     </div>
                     <p className="text-xs text-gray-400 mt-1">{formatCheckinDate(record.checkinDate) || 'Date unavailable'}</p>

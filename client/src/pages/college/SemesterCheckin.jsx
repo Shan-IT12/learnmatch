@@ -1,6 +1,128 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { IconArrowRight, IconCircleCheck } from '@tabler/icons-react'
 import { checkinQuestions, checkinScale } from '../../data/checkinQuestions'
+
+const RESULT_STYLES = {
+  'On Track': 'border-emerald-200 bg-emerald-50 text-emerald-700',
+  Monitor: 'border-amber-200 bg-amber-50 text-amber-700',
+  'Needs Attention': 'border-red-200 bg-red-50 text-red-700',
+}
+
+export function CheckinResult({ result, courseName, termLabel, phase, onBack = () => {} }) {
+  const statusStyle = RESULT_STYLES[result.status] || 'border-gray-200 bg-gray-50 text-gray-700'
+  return (
+    <div className="min-h-screen bg-slate-50">
+      <nav className="border-b border-gray-100 bg-white px-4 py-4 sm:px-8 sm:py-5">
+        <span className="text-lg font-bold">Learn<span className="text-orange-500">Match</span></span>
+      </nav>
+      <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
+        <header className="mb-6 text-center">
+          <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 text-emerald-600"><IconCircleCheck size={27} stroke={2} /></span>
+          <p className="mt-4 text-xs font-bold uppercase tracking-[0.18em] text-orange-600">Term Check-in</p>
+          <h1 className="mt-1 text-3xl font-bold tracking-tight text-gray-950 sm:text-4xl">Check-in Complete</h1>
+          <p className="mt-2 text-base font-semibold text-gray-800">{courseName}</p>
+          <div className="mt-2 flex flex-wrap items-center justify-center gap-2 text-sm text-gray-500">
+            {termLabel && <span>{termLabel}</span>}
+            {termLabel && <span aria-hidden="true">•</span>}
+            <span>{phase} Phase</span>
+          </div>
+        </header>
+
+        <section className="overflow-hidden rounded-[24px] border border-gray-100 bg-white shadow-[0_22px_55px_-38px_rgba(15,23,42,.45)]">
+          <div className="grid gap-5 border-b border-gray-100 p-5 sm:grid-cols-[1fr_auto] sm:items-center sm:p-7">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-gray-400">Career Alignment Result</p>
+              <span className={`mt-3 inline-flex rounded-full border px-3 py-1.5 text-sm font-bold ${statusStyle}`}>{result.status}</span>
+            </div>
+            <div className="sm:text-right">
+              <p className="text-4xl font-bold tracking-tight text-gray-950 sm:text-5xl">{result.alignmentPercent}%</p>
+              <p className="mt-1 text-sm font-medium text-gray-500">aligned</p>
+            </div>
+          </div>
+
+          <div className="grid gap-6 p-5 sm:p-7 lg:grid-cols-2">
+            <article className="rounded-2xl border border-gray-100 bg-slate-50 p-5">
+              <h2 className="text-sm font-bold text-gray-900">What your result means</h2>
+              <p className="mt-3 text-sm leading-7 text-gray-600">{result.feedback}</p>
+            </article>
+            <article className="rounded-2xl border border-orange-100 bg-orange-50/60 p-5">
+              <h2 className="text-sm font-bold text-gray-900">What you can do next</h2>
+              <p className="mt-3 text-sm leading-7 text-gray-600">{result.recommendation}</p>
+            </article>
+          </div>
+        </section>
+
+        <div className="mt-6 flex justify-center">
+          <button type="button" onClick={onBack} className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-orange-500 px-7 text-sm font-semibold text-white shadow-sm transition hover:bg-orange-600 focus:outline-none focus:ring-4 focus:ring-orange-200 sm:w-auto">
+            Back to College Dashboard <IconArrowRight size={17} />
+          </button>
+        </div>
+      </main>
+    </div>
+  )
+}
+
+export function AnsweredProgress({ answeredCount }) {
+  return (
+    <div className="mt-6" aria-label={`${answeredCount} of 5 answered`}>
+      <div className="mb-2 flex items-center justify-between text-xs font-semibold">
+        <span className="text-slate-300">Your progress</span>
+        <span className="text-orange-300">{answeredCount} of 5 answered</span>
+      </div>
+      <div className="h-2 overflow-hidden rounded-full bg-slate-800">
+        <div className="h-full rounded-full bg-gradient-to-r from-orange-500 to-amber-400 transition-[width] duration-300" style={{ width: `${answeredCount * 20}%` }} />
+      </div>
+    </div>
+  )
+}
+
+export function CheckinHeader({ courseName, termLabel, phase, answeredCount }) {
+  return (
+    <header className="mb-6 overflow-hidden rounded-[24px] border border-slate-800 bg-slate-950 px-5 py-6 text-white shadow-[0_22px_55px_-36px_rgba(15,23,42,.85)] sm:px-7 sm:py-7">
+      <p className="text-xs font-bold uppercase tracking-[0.18em] text-orange-400">Term Check-in</p>
+      <div className="mt-3 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div><h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{courseName}</h1><div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-slate-300">{termLabel && <span>{termLabel}</span>}{termLabel && <span aria-hidden="true">•</span>}<span className="rounded-full border border-orange-400/40 bg-orange-400/10 px-2.5 py-1 font-semibold text-orange-200">{phase} Phase</span></div></div>
+        <p className="max-w-md text-sm leading-relaxed text-slate-400">Answer based on your current experience in this term. Choose the response that feels most accurate for you right now.</p>
+      </div>
+      <AnsweredProgress answeredCount={answeredCount} />
+    </header>
+  )
+}
+
+export function CheckinQuestionCard({ question, selectedValue, onSelect = () => {} }) {
+  return (
+    <fieldset className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm sm:p-5">
+      <legend className="w-full px-0">
+        <span className="flex items-start gap-3">
+          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-orange-50 text-xs font-bold text-orange-600">{question.number}</span>
+          <span className="pt-0.5 text-sm font-semibold leading-relaxed text-gray-900 sm:text-base">{question.text}</span>
+        </span>
+      </legend>
+      <div className="mt-4 grid grid-cols-5 gap-2" role="radiogroup" aria-label={`Question ${question.number} response`}>
+        {checkinScale.map((choice) => (
+          <label key={choice.value} className={`group flex min-h-12 cursor-pointer items-center justify-center rounded-xl border text-sm font-bold transition focus-within:ring-4 focus-within:ring-orange-100 ${selectedValue === choice.value ? 'border-orange-500 bg-orange-500 text-white shadow-sm' : 'border-gray-200 bg-white text-gray-600 hover:border-orange-300 hover:bg-orange-50'}`} title={choice.label}>
+            <input className="sr-only" type="radio" name={`question-${question.number}`} value={choice.value} checked={selectedValue === choice.value} onChange={() => onSelect(question.number, choice.value)} required />
+            {choice.value}<span className="sr-only"> — {choice.label}</span>
+          </label>
+        ))}
+      </div>
+      <div className="mt-2 grid grid-cols-3 gap-2 text-[10px] leading-tight text-gray-400 sm:text-xs">
+        <span>{checkinScale[0].label}</span><span className="text-center">{checkinScale[2].label}</span><span className="text-right">{checkinScale[4].label}</span>
+      </div>
+    </fieldset>
+  )
+}
+
+export function EndPhaseGwaField({ value = '', onChange = () => {} }) {
+  return (
+    <section className="rounded-2xl border border-orange-100 bg-orange-50/60 p-4 sm:p-5">
+      <label htmlFor="term-gwa" className="block text-sm font-semibold text-gray-900">Your GWA this term <span className="font-normal text-gray-500">(optional)</span></label>
+      <p className="mb-3 mt-1 text-xs text-gray-500">Percentage scale, 75 = passing. This helps us give more specific feedback.</p>
+      <input id="term-gwa" type="number" min="0" max="100" step="0.01" value={value} onChange={onChange} placeholder="e.g. 87.5" className="w-full rounded-xl border border-orange-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100 sm:max-w-xs" />
+    </section>
+  )
+}
 
 function SemesterCheckin() {
   const navigate = useNavigate()
@@ -10,6 +132,7 @@ function SemesterCheckin() {
   const [checkinId, setCheckinId] = useState(null)
   const [phase, setPhase] = useState(null)
   const [courseName, setCourseName] = useState('')
+  const [termLabel, setTermLabel] = useState('')
   const [answers, setAnswers] = useState({})
   const [gwa, setGwa] = useState('')
   const [submitting, setSubmitting] = useState(false)
@@ -24,9 +147,11 @@ function SemesterCheckin() {
 
     const fetchPending = async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/college/checkin/pending`, {
-          headers: { Authorization: `Bearer ${token}` },
-        })
+        const headers = { Authorization: `Bearer ${token}` }
+        const [res, statusRes] = await Promise.all([
+          fetch(`${import.meta.env.VITE_API_URL}/api/college/checkin/pending`, { headers }),
+          fetch(`${import.meta.env.VITE_API_URL}/api/college/status`, { headers }).catch(() => null),
+        ])
         const data = await res.json()
 
         if (!data.checkinId) {
@@ -37,6 +162,10 @@ function SemesterCheckin() {
         setCheckinId(data.checkinId)
         setPhase(data.phase)
         setCourseName(data.courseName)
+        if (statusRes?.ok) {
+          const status = await statusRes.json()
+          setTermLabel(status.termLabel || status.semester || '')
+        }
         setLoading(false)
       } catch {
         setError('Could not load your check-in. Please try again.')
@@ -106,39 +235,12 @@ function SemesterCheckin() {
   }
 
   if (result) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <nav className="bg-white border-b border-gray-100 px-8 py-5 flex justify-between items-center">
-          <span className="text-lg font-bold">
-            Learn<span className="text-orange-500">Match</span>
-          </span>
-        </nav>
-        <div className="max-w-xl mx-auto px-6 py-12">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Check-in Complete</h1>
-          <p className="text-gray-500 text-sm mb-8">Here's how things are looking.</p>
-
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6">
-            <p className="text-xs font-semibold text-orange-500 uppercase tracking-widest mb-2">
-              {result.status}
-            </p>
-            <p className="text-3xl font-bold text-gray-900 mb-4">{result.alignmentPercent}% aligned</p>
-            <p className="text-sm text-gray-600 leading-relaxed mb-3">{result.feedback}</p>
-            <p className="text-sm text-gray-600 leading-relaxed">{result.recommendation}</p>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => navigate('/college')}
-            className="w-full bg-orange-500 text-white py-3 rounded-xl font-medium hover:bg-orange-600 transition text-sm"
-          >
-            Back to College Dashboard →
-          </button>
-        </div>
-      </div>
-    )
+    return <CheckinResult result={result} courseName={courseName} termLabel={termLabel} phase={phase} onBack={() => navigate('/college')} />
   }
 
   const questions = checkinQuestions[phase]
+  const answeredCount = questions.filter(({ number }) => answers[number] !== undefined).length
+  const allAnswered = answeredCount === questions.length
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -154,72 +256,35 @@ function SemesterCheckin() {
         </button>
       </nav>
 
-      <div className="max-w-xl mx-auto px-6 py-12">
-        <h1 className="text-2xl font-bold text-gray-900 mb-1">Semester Check-in</h1>
-        <p className="text-gray-500 text-sm mb-8">
-          {courseName} · {phase} phase — answer honestly, this only takes a minute.
-        </p>
+      <main className="mx-auto max-w-5xl px-4 py-7 sm:px-6 sm:py-10 lg:px-8 lg:py-12">
+        <CheckinHeader courseName={courseName} termLabel={termLabel} phase={phase} answeredCount={answeredCount} />
 
         {error && (
-          <div className="bg-red-50 text-red-600 px-4 py-3 rounded-xl text-sm mb-6">
+          <div role="alert" className="mb-5 rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-600">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {questions.map((q) => (
-            <div key={q.number} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-              <p className="text-sm font-medium text-gray-900 mb-4">{q.text}</p>
-              <div className="space-y-2">
-                {checkinScale.map((choice) => (
-                  <button
-                    key={choice.value}
-                    type="button"
-                    onClick={() => handleSelect(q.number, choice.value)}
-                    className={`w-full text-left px-4 py-2.5 rounded-xl border text-sm transition ${
-                      answers[q.number] === choice.value
-                        ? 'bg-orange-500 text-white border-orange-500'
-                        : 'bg-white text-gray-700 border-gray-200 hover:border-orange-300'
-                    }`}
-                  >
-                    <span className="font-medium mr-2">{choice.value}.</span>
-                    {choice.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-          ))}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {questions.map((question) => <CheckinQuestionCard key={question.number} question={question} selectedValue={answers[question.number]} onSelect={handleSelect} />)}
 
-          {phase === 'End' && (
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-              <label className="block text-sm font-medium text-gray-900 mb-1">
-                Your GWA this semester <span className="text-gray-400 font-normal text-xs">(optional)</span>
-              </label>
-              <p className="text-xs text-gray-500 mb-3">
-                Percentage scale, 75 = passing. This helps us give more specific feedback.
-              </p>
-              <input
-                type="number"
-                min="0"
-                max="100"
-                step="0.01"
-                value={gwa}
-                onChange={(e) => setGwa(e.target.value)}
-                placeholder="e.g. 87.5"
-                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
-              />
-            </div>
-          )}
+          {phase === 'End' && <EndPhaseGwaField value={gwa} onChange={(event) => setGwa(event.target.value)} />}
 
-          <button
-            type="submit"
-            disabled={submitting}
-            className="w-full bg-orange-500 text-white py-3 rounded-xl font-medium hover:bg-orange-600 transition text-sm disabled:opacity-50"
-          >
-            {submitting ? 'Submitting...' : 'Submit Check-in'}
-          </button>
+          <div className="sticky bottom-3 flex flex-col gap-3 rounded-2xl border border-gray-200 bg-white/95 p-4 shadow-[0_16px_40px_-20px_rgba(15,23,42,.45)] backdrop-blur sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-sm font-semibold text-gray-900">{answeredCount} of 5 answered</p>
+              <p className="text-xs text-gray-500">Complete all questions before submitting.</p>
+            </div>
+            <button
+              type="submit"
+              disabled={submitting || !allAnswered}
+              className="inline-flex min-h-12 items-center justify-center rounded-xl bg-orange-500 px-7 text-sm font-semibold text-white transition hover:bg-orange-600 focus:outline-none focus:ring-4 focus:ring-orange-200 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-500"
+            >
+              {submitting ? 'Submitting...' : 'Submit Check-in'}
+            </button>
+          </div>
         </form>
-      </div>
+      </main>
     </div>
   )
 }

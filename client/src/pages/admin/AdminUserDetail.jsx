@@ -195,9 +195,10 @@ function AdminUserDetail() {
                     </span>
                   </div>
                   <dl className="grid grid-cols-2 gap-5 md:grid-cols-4">
+                    <DetailItem label="Tracking status">{readableValue(user.tracking.lifecycleStatus)}</DetailItem>
                     <DetailItem label="Academic year">{user.tracking.academicYear || 'Legacy tracking'}</DetailItem>
                     <DetailItem label="Year level">{user.tracking.yearLevel}</DetailItem>
-                    <DetailItem label="Semester">{user.tracking.semester}</DetailItem>
+                    <DetailItem label="Current term">{user.tracking.semester}</DetailItem>
                     <DetailItem label="Timing mode">{readableValue(user.tracking.timingMode)}</DetailItem>
                     <DetailItem label="Timing source">{readableValue(user.tracking.datesSource)}</DetailItem>
                     <DetailItem label="Completed check-ins">{user.tracking.completedCheckins}</DetailItem>

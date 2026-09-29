@@ -10,7 +10,7 @@ import {
   IconUserCircle,
 } from '@tabler/icons-react'
 import { STUDENT_ACTIVE_INDEPENDENT_COURSE_COUNT } from '../constants/courseCatalog'
-import landingPathwayIllustration from '../assets/landing-pathway-illustration.png'
+import landingCoursePathway from '../assets/landing-course-pathway.png'
 
 const journeySteps = [
   {
@@ -36,15 +36,19 @@ const journeySteps = [
 function PathwayVisual() {
   return (
     <div className="relative isolate flex min-h-[330px] items-center justify-center overflow-hidden sm:min-h-[430px] lg:min-h-[560px]">
-      <div className="pointer-events-none absolute inset-x-[5%] bottom-[4%] top-[7%] rounded-[46%_54%_42%_58%/48%_39%_61%_52%] bg-gradient-to-br from-orange-100 via-orange-200/75 to-orange-300/60" />
-      <div className="pointer-events-none absolute right-[4%] top-[8%] h-[74%] w-[74%] rounded-full border border-orange-200/70" />
-      <div className="pointer-events-none absolute bottom-[9%] left-[4%] h-24 w-24 rounded-full bg-white/60 blur-2xl sm:h-36 sm:w-36" />
-      <div className="pointer-events-none absolute inset-0 opacity-25 [background-image:radial-gradient(rgba(194,65,12,.5)_1px,transparent_1px)] [background-size:18px_18px] [mask-image:linear-gradient(to_bottom_left,black,transparent_52%)]" />
-      <img
-        src={landingPathwayIllustration}
-        alt="Student exploring education and career pathways"
-        className="relative z-10 h-auto max-h-[340px] w-auto max-w-[98%] object-contain drop-shadow-[0_24px_28px_rgba(124,45,18,.16)] transition duration-200 motion-safe:hover:-translate-y-1 sm:max-h-[440px] lg:max-h-[570px]"
-      />
+      <div className="pointer-events-none absolute inset-x-[3%] bottom-[4%] top-[7%] rounded-[46%_54%_42%_58%/48%_39%_61%_52%] bg-gradient-to-br from-orange-100 via-orange-200/70 to-amber-100" />
+      <div className="pointer-events-none absolute right-[3%] top-[10%] h-[72%] w-[72%] rounded-full border border-orange-200/70" />
+      <div className="hero-orbit hero-orbit-delayed pointer-events-none absolute right-[8%] top-[17%] h-3 w-3 rounded-full bg-teal-500 shadow-[0_0_0_8px_rgba(20,184,166,.10)]" />
+      <div className="hero-orbit pointer-events-none absolute bottom-[20%] left-[7%] h-3.5 w-3.5 rounded-full bg-orange-500 shadow-[0_0_0_9px_rgba(249,115,22,.11)]" />
+      <div className="pointer-events-none absolute bottom-[9%] left-[4%] h-24 w-24 rounded-full bg-white/70 blur-2xl sm:h-36 sm:w-36" />
+      <div className="pointer-events-none absolute inset-0 opacity-20 [background-image:radial-gradient(rgba(194,65,12,.5)_1px,transparent_1px)] [background-size:18px_18px] [mask-image:linear-gradient(to_bottom_left,black,transparent_52%)]" />
+      <div className="hero-people-float relative z-10 flex items-center justify-center">
+        <img
+          src={landingCoursePathway}
+          alt="Education and career pathways represented by a laptop, books, and course icons"
+          className="h-auto max-h-[335px] w-auto max-w-[99%] object-contain drop-shadow-[0_26px_30px_rgba(124,45,18,.18)] sm:max-h-[445px] lg:max-h-[565px]"
+        />
+      </div>
     </div>
   )
 }

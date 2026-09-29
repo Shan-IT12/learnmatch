@@ -11,17 +11,17 @@ export const checkinQuestions = {
     { number: 5, dimension: 'Overall Satisfaction', text: "If I'm being honest, I'm glad I picked this course so far." },
   ],
   Mid: [
-    { number: 1, dimension: 'Interest-Major Fit', text: "At this point in the semester, this course still feels like a good fit for me." },
+    { number: 1, dimension: 'Interest-Major Fit', text: "At this point in the term, this course still feels like a good fit for me." },
     { number: 2, dimension: 'Demands-Abilities Fit', text: "I'm keeping up okay with how hard the coursework has gotten." },
     { number: 3, dimension: 'Needs-Supplies Fit', text: "I'm getting enough support (profs, resources, classmates) to keep going." },
     { number: 4, dimension: 'Career / Forward-Looking Fit', text: "The more I learn, the more I can see myself doing this as a career." },
-    { number: 5, dimension: 'Overall Satisfaction', text: "Looking back at the semester so far, I don't regret choosing this course." },
+    { number: 5, dimension: 'Overall Satisfaction', text: "Looking back at the term so far, I don't regret choosing this course." },
   ],
   End: [
-    { number: 1, dimension: 'Interest-Major Fit', text: "Looking back at this whole semester, this course really fit what I enjoy." },
-    { number: 2, dimension: 'Demands-Abilities Fit', text: "I was able to handle the workload and difficulty by the end of the semester." },
-    { number: 3, dimension: 'Needs-Supplies Fit', text: "I felt supported (resources, teachers, classmates) throughout the semester." },
-    { number: 4, dimension: 'Career / Forward-Looking Fit', text: "This semester made me more confident this leads to the career I want." },
+    { number: 1, dimension: 'Interest-Major Fit', text: "Looking back at this whole term, this course really fit what I enjoy." },
+    { number: 2, dimension: 'Demands-Abilities Fit', text: "I was able to handle the workload and difficulty by the end of the term." },
+    { number: 3, dimension: 'Needs-Supplies Fit', text: "I felt supported (resources, teachers, classmates) throughout the term." },
+    { number: 4, dimension: 'Career / Forward-Looking Fit', text: "This term made me more confident this leads to the career I want." },
     { number: 5, dimension: 'Overall Satisfaction', text: "If I could go back, I'd choose this course again." },
   ],
 }

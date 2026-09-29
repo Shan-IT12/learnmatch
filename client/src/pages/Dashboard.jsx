@@ -171,7 +171,7 @@ function Dashboard() {
             <div>
               <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center"><IconSchool size={21} stroke={1.75} className="text-gray-600" /></div>
               <p className="font-semibold text-base mt-3 mb-1 text-gray-900">Already enrolled in college?</p>
-              <p className="text-xs text-gray-500 max-w-[420px] leading-relaxed">Track your academic alignment, semester progress, and career roadmap.</p>
+              <p className="text-xs text-gray-500 max-w-[420px] leading-relaxed">Track your academic alignment, term progress, and career roadmap.</p>
             </div>
             <button onClick={() => navigate('/college/setup')} className="inline-flex items-center justify-center gap-1.5 bg-gray-900 text-white px-5 py-3 rounded-xl text-sm font-medium hover:bg-gray-800 transition shrink-0 w-full sm:w-auto md:w-full xl:w-auto">I'm in college <IconArrowRight size={16} stroke={2} /></button>
           </section>
