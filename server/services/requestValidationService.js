@@ -1,3 +1,5 @@
+import { PARENT_CLUSTERS } from '../config/recommendationConfig.js'
+
 export const FEEDBACK_CATEGORIES = new Set([
   'Bug Report',
   'Suggestion',
@@ -96,9 +98,9 @@ export function validateCourse(body) {
   }
   const limits = {
     course_name: [true, 255],
-    program_type: [false, 100],
-    cluster_category: [true, 150],
-    psced_group: [false, 255],
+    program_type: [false, 50],
+    cluster_category: [true, 100],
+    psced_group: [false, 150],
     description: [false, 5000],
     obtainable_skills: [false, 5000],
   }
@@ -107,6 +109,9 @@ export function validateCourse(body) {
     const normalized = text(body[field], { required, max })
     if (normalized === null) return { valid: false, message: `Invalid ${field}.` }
     value[field] = normalized || null
+  }
+  if (!PARENT_CLUSTERS.includes(value.cluster_category)) {
+    return { valid: false, message: 'Select a supported cluster category.' }
   }
   return { valid: true, value }
 }

@@ -15,12 +15,17 @@ import {
 import publicCourseRoutes from './routes/publicCourseRoutes.js'
 import { validateInterestSubmission } from './services/interestSubmissionService.js'
 import { validatePersonalitySubmission } from './services/personalitySubmissionService.js'
-import { getAdminCourses, setCourseActiveStatus } from './services/adminCourseService.js'
+import {
+  getAdminCourses,
+  getCourseRecommendationReadiness,
+  setCourseActiveStatus,
+} from './services/adminCourseService.js'
 import { getAdminDashboard } from './services/adminDashboardService.js'
 import { getAdminAnalytics } from './services/adminAnalyticsService.js'
 import { getAdminFeedback, getAdminFeedbackDetail } from './services/adminFeedbackService.js'
 import { getAdminUserDetail, getAdminUsers } from './services/adminUserMonitoringService.js'
 import { normalizeCourseSearchQuery, searchActiveCollegeCourses } from './services/collegeCourseSearchService.js'
+import { getPublicCourse } from './services/publicCourseService.js'
 import {
   positiveInteger,
   validateCareer,
@@ -665,8 +670,17 @@ app.get('/api/admin/courses/:id', authenticateAdmin, async (req, res) => {
       'SELECT * FROM CAREER_OPPORTUNITY WHERE course_id = ? ORDER BY opportunity_id ASC',
       [req.params.id]
     )
+    const readiness = await getCourseRecommendationReadiness(pool, req.params.id)
+    const canonicalCourse = courseRows[0].course_code
+      ? getPublicCourse(courseRows[0].course_code)
+      : null
 
-    res.json({ course: courseRows[0], careers: careerRows })
+    res.json({
+      course: courseRows[0],
+      careers: careerRows,
+      canonicalCareers: canonicalCourse?.career_opportunities || [],
+      recommendationReadiness: readiness,
+    })
   } catch (error) {
     console.error('Admin course detail fetch error:', error)
     res.status(500).json({ message: 'Server error fetching course' })
@@ -682,10 +696,15 @@ app.post('/api/admin/courses', authenticateAdmin, async (req, res) => {
   try {
     const [result] = await pool.query(
       `INSERT INTO COURSE (course_name, program_type, cluster_category, psced_group, description, obtainable_skills, is_active)
-       VALUES (?, ?, ?, ?, ?, ?, 1)`,
+       VALUES (?, ?, ?, ?, ?, ?, 0)`,
       [course_name, program_type || null, cluster_category, psced_group || null, description || null, obtainable_skills || null]
     )
-    res.status(201).json({ message: 'Course created successfully', courseId: result.insertId })
+    const readiness = await getCourseRecommendationReadiness(pool, result.insertId)
+    res.status(201).json({
+      message: 'Course created successfully as inactive',
+      courseId: result.insertId,
+      recommendationReadiness: readiness,
+    })
   } catch (error) {
     console.error('Admin course create error:', error)
     res.status(500).json({ message: 'Server error creating course' })
@@ -698,17 +717,23 @@ app.put('/api/admin/courses/:id', authenticateAdmin, async (req, res) => {
   const validation = validateCourse(req.body)
   if (!courseId || !validation.valid) return res.status(400).json({ message: validation.message || 'Invalid course ID.' })
   const { course_name, program_type, cluster_category, psced_group, description, obtainable_skills } = validation.value
+  const hasProgramType = Object.hasOwn(req.body, 'program_type')
+  const hasPscedGroup = Object.hasOwn(req.body, 'psced_group')
 
   try {
     await pool.query(
       `UPDATE COURSE
-       SET course_name = ?, program_type = ?, cluster_category = ?, psced_group = ?,
+       SET course_name = ?,
+           program_type = CASE WHEN ? THEN ? ELSE program_type END,
+           cluster_category = ?,
+           psced_group = CASE WHEN ? THEN ? ELSE psced_group END,
            description = ?, obtainable_skills = ?
        WHERE course_id = ?`,
-      [course_name, program_type || null, cluster_category, psced_group || null,
+      [course_name, hasProgramType, program_type || null, cluster_category, hasPscedGroup, psced_group || null,
        description || null, obtainable_skills || null, courseId]
     )
-    res.json({ message: 'Course updated successfully' })
+    const readiness = await getCourseRecommendationReadiness(pool, courseId)
+    res.json({ message: 'Course updated successfully', recommendationReadiness: readiness })
   } catch (error) {
     console.error('Admin course update error:', error)
     res.status(500).json({ message: 'Server error updating course' })
@@ -720,6 +745,17 @@ app.patch('/api/admin/courses/:id/status', authenticateAdmin, async (req, res) =
   const courseId = positiveInteger(req.params.id)
   if (!courseId) return res.status(400).json({ message: 'Invalid course ID.' })
   try {
+    if (req.body.is_active === true) {
+      const readiness = await getCourseRecommendationReadiness(pool, courseId)
+      if (!readiness) return res.status(404).json({ message: 'Course not found' })
+      if (!readiness.ready) {
+        return res.status(422).json({
+          message: 'Course is not recommendation-ready and cannot be activated.',
+          reasons: readiness.reasons,
+          recommendationReadiness: readiness,
+        })
+      }
+    }
     const updated = await setCourseActiveStatus(pool, courseId, req.body.is_active)
     if (!updated) return res.status(404).json({ message: 'Course not found' })
 

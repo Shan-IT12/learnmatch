@@ -5,14 +5,26 @@ import AdminHeader from '../../components/AdminHeader'
 
 const emptyCourseForm = {
   course_name: '',
-  program_type: '',
   cluster_category: '',
-  psced_group: '',
   description: '',
   obtainable_skills: '',
 }
 
-const emptyCareerForm = { job_title: '', salary_range: '', description: '' }
+const clusterOptions = [
+  ['HEALTHCARE SCIENCE CLUSTER', 'Healthcare Science'],
+  ['HUMANITIES & SOCIAL SCIENCE CLUSTER', 'Humanities & Social Science'],
+  ['BUSINESS CLUSTER', 'Business'],
+  ['HOSPITALITY & TOURISM CLUSTER', 'Hospitality & Tourism'],
+  ['AVIATION & MARITIME CLUSTER', 'Aviation & Maritime'],
+  ['LEGAL & PUBLIC SERVICE CLUSTER', 'Legal & Public Service'],
+  ['EDUCATION CLUSTER', 'Education'],
+  ['ARTS & MULTIMEDIA CLUSTER', 'Arts & Multimedia'],
+  ['CRIMINOLOGY CLUSTER', 'Criminology'],
+  ['AGRICULTURE & ENVIRONMENTAL CLUSTER', 'Agriculture & Environmental'],
+  ['SCIENCE & MATHEMATICS CLUSTER', 'Science & Mathematics'],
+  ['SPORTS & PHYSICAL EDUCATION CLUSTER', 'Sports & Physical Education'],
+  ['ENGINEERING / STEM CLUSTER', 'Engineering / STEM'],
+]
 
 function handleUnauthorized(response, navigate) {
   if (response.status !== 401 && response.status !== 403) return false
@@ -26,63 +38,110 @@ function isCourseActive(course) {
   return course.is_active === true || Number(course.is_active) === 1
 }
 
+function CourseStatus({ active }) {
+  return (
+    <span className={`inline-flex items-center whitespace-nowrap rounded-full border px-2.5 py-1 text-xs font-medium ${
+      active
+        ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+        : 'border-gray-200 bg-gray-100 text-gray-600'
+    }`}>
+      {active ? 'Active' : 'Inactive'}
+    </span>
+  )
+}
+
+function CourseActions({ course, active, openEditCourseForm, handleStatusChange, updatingStatusId }) {
+  return (
+    <div className="flex items-center justify-end gap-2">
+      <button
+        type="button"
+        onClick={() => openEditCourseForm(course.course_id)}
+        className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-gray-500 transition hover:bg-orange-50 hover:text-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500"
+        aria-label={`Edit ${course.course_name}`}
+      >
+        <IconEdit size={16} stroke={1.75} />
+      </button>
+      <button
+        type="button"
+        onClick={() => handleStatusChange(course)}
+        disabled={updatingStatusId === course.course_id}
+        aria-label={`${active ? 'Deactivate' : 'Reactivate'} ${course.course_name}`}
+        className={`min-w-24 whitespace-nowrap rounded-lg px-3 py-2 text-xs font-medium transition focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:opacity-50 ${
+          active ? 'text-red-600 hover:bg-red-50' : 'text-emerald-700 hover:bg-emerald-50'
+        }`}
+      >
+        {updatingStatusId === course.course_id
+          ? 'Updating...'
+          : active ? 'Deactivate' : 'Reactivate'}
+      </button>
+    </div>
+  )
+}
+
 function CourseTable({ courses, openEditCourseForm, handleStatusChange, updatingStatusId }) {
   return (
-    <div className="bg-white border border-orange-100 rounded-2xl overflow-x-auto shadow-sm">
-      <table className="w-full min-w-[680px] text-sm">
-        <thead>
-          <tr className="border-b border-gray-100 bg-orange-50/40 text-left text-gray-500 text-xs uppercase tracking-wide">
-            <th className="px-6 py-3 font-medium">Course</th>
-            <th className="px-6 py-3 font-medium">Status</th>
-            <th className="px-6 py-3 font-medium text-right">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {courses.map((course) => {
-            const active = isCourseActive(course)
-            const courseIdentifiers = [course.course_code, course.course_abbreviation].filter(Boolean).join(' · ')
+    <div className="overflow-hidden rounded-2xl border border-orange-100 bg-white shadow-sm">
+      <div className="hidden md:block">
+        <table className="w-full table-fixed text-sm">
+          <colgroup>
+            <col className="w-[58%]" />
+            <col className="w-[16%]" />
+            <col className="w-[26%]" />
+          </colgroup>
+          <thead>
+            <tr className="border-b border-gray-100 bg-orange-50/50 text-left text-xs uppercase tracking-wide text-gray-500">
+              <th scope="col" className="px-6 py-3.5 font-semibold">Course</th>
+              <th scope="col" className="px-5 py-3.5 font-semibold">Status</th>
+              <th scope="col" className="px-6 py-3.5 text-right font-semibold">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-100">
+            {courses.map((course) => {
+              const active = isCourseActive(course)
+              const courseIdentifiers = [course.course_code, course.course_abbreviation].filter(Boolean).join(' · ')
 
-            return (
-              <tr key={course.course_id} className="border-b border-gray-100 last:border-0 hover:bg-orange-50/30 transition">
-                <td className="px-6 py-4">
-                  <p className="text-gray-900 font-medium">{course.course_name}</p>
-                  {courseIdentifiers && <p className="text-xs text-gray-400 mt-1">{courseIdentifiers}</p>}
-                </td>
-                <td className="px-6 py-4">
-                  <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${
-                    active ? 'bg-green-500/10 text-green-400' : 'bg-gray-100 text-gray-500'
-                  }`}>
-                    {active ? 'Active' : 'Inactive'}
-                  </span>
-                </td>
-                <td className="px-6 py-4">
-                  <div className="flex justify-end gap-2">
-                    <button
-                      onClick={() => openEditCourseForm(course.course_id)}
-                      className="text-gray-400 hover:text-orange-600 hover:bg-orange-50 transition p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                      aria-label={`Edit ${course.course_name}`}
-                    >
-                      <IconEdit size={16} stroke={1.75} />
-                    </button>
-                    <button
-                      onClick={() => handleStatusChange(course)}
-                      disabled={updatingStatusId === course.course_id}
-                      aria-label={`${active ? 'Deactivate' : 'Reactivate'} ${course.course_name}`}
-                      className={`px-3 py-2 rounded-lg text-xs font-medium transition focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:opacity-50 ${
-                        active ? 'text-red-600 hover:bg-red-50' : 'text-green-700 hover:bg-green-50'
-                      }`}
-                    >
-                      {updatingStatusId === course.course_id
-                        ? 'Updating...'
-                        : active ? 'Deactivate' : 'Reactivate'}
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            )
-          })}
-        </tbody>
-      </table>
+              return (
+                <tr key={course.course_id} className="transition hover:bg-orange-50/30">
+                  <td className="px-6 py-4 align-middle">
+                    <p className="break-words font-medium leading-5 text-gray-900">{course.course_name}</p>
+                    {courseIdentifiers && <p className="mt-1 break-words text-xs text-gray-500">{courseIdentifiers}</p>}
+                  </td>
+                  <td className="px-5 py-4 align-middle">
+                    <CourseStatus active={active} />
+                  </td>
+                  <td className="px-6 py-4 align-middle">
+                    <CourseActions course={course} active={active} openEditCourseForm={openEditCourseForm} handleStatusChange={handleStatusChange} updatingStatusId={updatingStatusId} />
+                  </td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="divide-y divide-gray-100 md:hidden">
+        {courses.map((course) => {
+          const active = isCourseActive(course)
+          const courseIdentifiers = [course.course_code, course.course_abbreviation].filter(Boolean).join(' · ')
+
+          return (
+            <article key={course.course_id} className="px-4 py-4 sm:px-5">
+              <p className="break-words text-sm font-medium leading-5 text-gray-900">{course.course_name}</p>
+              {courseIdentifiers && <p className="mt-1 break-words text-xs text-gray-500">{courseIdentifiers}</p>}
+              <div className="mt-4 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-4">
+                <div>
+                  <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-gray-400">Status</p>
+                  <CourseStatus active={active} />
+                </div>
+                <div>
+                  <p className="mb-1.5 text-right text-[11px] font-semibold uppercase tracking-wide text-gray-400">Actions</p>
+                  <CourseActions course={course} active={active} openEditCourseForm={openEditCourseForm} handleStatusChange={handleStatusChange} updatingStatusId={updatingStatusId} />
+                </div>
+              </div>
+            </article>
+          )
+        })}
+      </div>
     </div>
   )
 }
@@ -96,9 +155,7 @@ function ManageCourses() {
   const [view, setView] = useState('list')
   const [editingCourseId, setEditingCourseId] = useState(null)
   const [courseForm, setCourseForm] = useState(emptyCourseForm)
-  const [careers, setCareers] = useState([])
-  const [careerForm, setCareerForm] = useState(emptyCareerForm)
-  const [showCareerForm, setShowCareerForm] = useState(false)
+  const [canonicalCareers, setCanonicalCareers] = useState([])
   const [error, setError] = useState('')
   const [saving, setSaving] = useState(false)
   const [updatingStatusId, setUpdatingStatusId] = useState(null)
@@ -107,7 +164,7 @@ function ManageCourses() {
   const [statusFilter, setStatusFilter] = useState('all')
   const [sortBy, setSortBy] = useState('name-asc')
 
-  const clusterOptions = useMemo(() => (
+  const availableClusterOptions = useMemo(() => (
     [...new Set(courses.map(({ cluster_category }) => cluster_category).filter(Boolean))]
       .sort((first, second) => first.localeCompare(second))
   ), [courses])
@@ -214,7 +271,7 @@ function ManageCourses() {
   const openNewCourseForm = () => {
     setEditingCourseId(null)
     setCourseForm(emptyCourseForm)
-    setCareers([])
+    setCanonicalCareers([])
     setView('form')
   }
 
@@ -230,13 +287,11 @@ function ManageCourses() {
       setEditingCourseId(courseId)
       setCourseForm({
         course_name: data.course.course_name || '',
-        program_type: data.course.program_type || '',
         cluster_category: data.course.cluster_category || '',
-        psced_group: data.course.psced_group || '',
         description: data.course.description || '',
         obtainable_skills: data.course.obtainable_skills || '',
       })
-      setCareers(data.careers || [])
+      setCanonicalCareers(data.canonicalCareers || [])
       setView('form')
     } catch {
       setError('Could not load course details.')
@@ -286,9 +341,7 @@ function ManageCourses() {
         return
       }
 
-      if (!editingCourseId) {
-        setEditingCourseId(data.courseId)
-      }
+      if (!editingCourseId) setEditingCourseId(data.courseId)
 
       await fetchCourses()
       setSaving(false)
@@ -316,7 +369,10 @@ function ManageCourses() {
       if (handleUnauthorized(response, navigate)) return
       const data = await response.json()
       if (!response.ok) {
-        setError(data.message || 'Could not update course status.')
+        const reasons = Array.isArray(data.reasons)
+          ? data.reasons.map((reason) => reason.message).join(' · ')
+          : ''
+        setError([data.message || 'Could not update course status.', reasons].filter(Boolean).join(' '))
         return
       }
       setCourses((current) => current.map((item) =>
@@ -326,46 +382,6 @@ function ManageCourses() {
       setError('Could not update course status.')
     } finally {
       setUpdatingStatusId(null)
-    }
-  }
-
-  const handleAddCareer = async (e) => {
-    e.preventDefault()
-    if (!careerForm.job_title) return
-
-    try {
-      const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/admin/courses/${editingCourseId}/careers`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${adminToken}`,
-          },
-          body: JSON.stringify(careerForm),
-        }
-      )
-      if (handleUnauthorized(res, navigate)) return
-      const data = await res.json()
-
-      setCareers([...careers, { opportunity_id: data.opportunityId, ...careerForm }])
-      setCareerForm(emptyCareerForm)
-      setShowCareerForm(false)
-    } catch {
-      setError('Could not add career opportunity.')
-    }
-  }
-
-  const handleDeleteCareer = async (opportunityId) => {
-    try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/careers/${opportunityId}`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${adminToken}` },
-      })
-      if (handleUnauthorized(response, navigate)) return
-      setCareers(careers.filter((c) => c.opportunity_id !== opportunityId))
-    } catch {
-      setError('Could not delete career opportunity.')
     }
   }
 
@@ -434,7 +450,7 @@ function ManageCourses() {
                       className="w-full bg-white border border-gray-200 rounded-xl px-3 py-3 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-500"
                     >
                       <option value="all">All Clusters</option>
-                      {clusterOptions.map((cluster) => <option key={cluster} value={cluster}>{cluster}</option>)}
+                      {availableClusterOptions.map((cluster) => <option key={cluster} value={cluster}>{cluster}</option>)}
                     </select>
                     <select
                       value={statusFilter}
@@ -490,11 +506,11 @@ function ManageCourses() {
                   </button>
                 </div>
               ) : clusterFilter === 'all' ? (
-                <div className="space-y-6">
+                <div className="space-y-8">
                   {groupedCourses.map(([cluster, clusterCourses]) => (
                     <section key={cluster} aria-labelledby={`cluster-${cluster}`}>
-                      <div className="flex items-baseline justify-between gap-4 mb-3 px-1">
-                        <h2 id={`cluster-${cluster}`} className="text-base font-semibold text-gray-900">{cluster}</h2>
+                      <div className="mb-3 flex items-start justify-between gap-4 px-1 sm:items-baseline">
+                        <h2 id={`cluster-${cluster}`} className="min-w-0 break-words text-base font-semibold text-gray-900">{cluster}</h2>
                         <p className="text-xs text-gray-500 shrink-0">{clusterCourses.length} {clusterCourses.length === 1 ? 'course' : 'courses'}</p>
                       </div>
                       <CourseTable
@@ -561,45 +577,25 @@ function ManageCourses() {
             />
           </div>
 
-          <div className="grid sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-medium text-gray-400 mb-2 uppercase tracking-wide">
-                Cluster Category *
-              </label>
-              <input
-                type="text"
-                name="cluster_category"
-                value={courseForm.cluster_category}
-                onChange={handleCourseFormChange}
-                className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-gray-400 mb-2 uppercase tracking-wide">
-                Program Type
-              </label>
-              <input
-                type="text"
-                name="program_type"
-                value={courseForm.program_type}
-                onChange={handleCourseFormChange}
-                className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500"
-              />
-            </div>
-          </div>
-
           <div>
             <label className="block text-xs font-medium text-gray-400 mb-2 uppercase tracking-wide">
-              PSCED Group
+              Cluster Category *
             </label>
-            <input
-              type="text"
-              name="psced_group"
-              value={courseForm.psced_group}
+            <select
+              name="cluster_category"
+              value={courseForm.cluster_category}
               onChange={handleCourseFormChange}
               className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500"
-            />
+              required
+            >
+              <option value="" disabled>Select a cluster</option>
+              {clusterOptions.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+            </select>
+            {editingCourseId && (
+              <p className="mt-2 text-xs leading-5 text-amber-700">
+                Changing the cluster affects future recommendation behavior. Review the course matching profile after reclustering.
+              </p>
+            )}
           </div>
 
           <div>
@@ -640,75 +636,32 @@ function ManageCourses() {
 
         {editingCourseId && (
           <div className="bg-white border border-orange-100 rounded-2xl p-5 sm:p-7 shadow-sm">
-            <div className="flex justify-between items-center mb-4">
+            <div className="mb-4">
               <h2 className="text-sm font-semibold text-gray-900 uppercase tracking-wide">
                 Career Opportunities
               </h2>
-              <button
-                onClick={() => setShowCareerForm(!showCareerForm)}
-                className="text-xs text-orange-600 hover:text-orange-700 transition font-medium inline-flex items-center gap-1"
-              >
-                <IconPlus size={14} stroke={2} /> Add
-              </button>
+              <p className="mt-2 text-xs leading-5 text-gray-500">
+                Read-only information from the canonical course enrichment catalog. Career data is not managed from this form.
+              </p>
             </div>
 
-            {showCareerForm && (
-              <div className="bg-orange-50/40 border border-orange-100 rounded-xl p-5 mb-4">
-                <div className="space-y-3">
-                  <input
-                    type="text"
-                    placeholder="Job title"
-                    value={careerForm.job_title}
-                    onChange={(e) => setCareerForm({ ...careerForm, job_title: e.target.value })}
-                    className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Salary range, e.g. ₱25,000 - ₱40,000/month"
-                    value={careerForm.salary_range}
-                    onChange={(e) => setCareerForm({ ...careerForm, salary_range: e.target.value })}
-                    className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                  />
-                  <textarea
-                    placeholder="Short description (optional)"
-                    value={careerForm.description}
-                    onChange={(e) => setCareerForm({ ...careerForm, description: e.target.value })}
-                    rows={2}
-                    className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none"
-                  />
-                  <button
-                    onClick={handleAddCareer}
-                    className="bg-orange-500 text-white px-4 py-2 rounded-lg text-xs font-medium hover:bg-orange-600 transition"
-                  >
-                    Add Career
-                  </button>
-                </div>
-              </div>
-            )}
-
-            <div className="space-y-2">
-              {careers.length > 0 ? (
-                careers.map((career) => (
-                  <div
-                    key={career.opportunity_id}
-                    className="bg-white border border-gray-100 rounded-xl px-4 py-3 flex justify-between items-center"
-                  >
-                    <div>
-                      <p className="text-sm text-gray-900 font-medium">{career.job_title}</p>
-                      {career.salary_range && (
-                        <p className="text-xs text-gray-500 mt-0.5">{career.salary_range}</p>
-                      )}
-                    </div>
-                    <button
-                      onClick={() => handleDeleteCareer(career.opportunity_id)}
-                      className="text-gray-500 hover:text-red-400 transition p-1"
-                    >
-                      <IconX size={16} stroke={1.75} />
-                    </button>
-                  </div>
+            <div className="space-y-3">
+              {canonicalCareers.length > 0 ? (
+                canonicalCareers.map((career) => (
+                  <article key={career.career_id || career.career_title} className="rounded-xl border border-gray-100 px-4 py-3">
+                    <p className="text-sm font-medium text-gray-900">{career.career_title}</p>
+                    {career.estimated_monthly_salary_php?.display && (
+                      <p className="mt-1 text-xs font-medium text-orange-600">{career.estimated_monthly_salary_php.display}</p>
+                    )}
+                    {career.philippines_description && (
+                      <p className="mt-2 text-xs leading-5 text-gray-500">{career.philippines_description}</p>
+                    )}
+                  </article>
                 ))
               ) : (
-                <p className="text-sm text-gray-500">No career opportunities added yet.</p>
+                <p className="rounded-xl bg-gray-50 px-4 py-3 text-sm text-gray-500">
+                  No canonical career information is available for this course.
+                </p>
               )}
             </div>
           </div>

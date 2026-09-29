@@ -35,10 +35,13 @@ test('profile validation enforces required text, booleans, and physical ranges',
 })
 
 test('admin course and career validation trims values and caps text', () => {
-  const course = validateCourse({ course_name: ' BS IT ', cluster_category: 'Technology' })
+  const course = validateCourse({ course_name: ' BS IT ', cluster_category: 'ENGINEERING / STEM CLUSTER' })
   assert.equal(course.valid, true)
   assert.equal(course.value.course_name, 'BS IT')
-  assert.equal(validateCourse({ course_name: 'x'.repeat(256), cluster_category: 'Technology' }).valid, false)
+  assert.equal(validateCourse({ course_name: 'BS IT', cluster_category: 'Technology' }).valid, false)
+  assert.equal(validateCourse({ course_name: 'x'.repeat(256), cluster_category: 'ENGINEERING / STEM CLUSTER' }).valid, false)
+  assert.equal(validateCourse({ course_name: 'BS IT', cluster_category: 'BUSINESS CLUSTER', program_type: 'x'.repeat(51) }).valid, false)
+  assert.equal(validateCourse({ course_name: 'BS IT', cluster_category: 'BUSINESS CLUSTER', psced_group: 'x'.repeat(151) }).valid, false)
   assert.equal(validateCareer({ job_title: 'Developer', salary_range: 'PHP 20k-40k' }).valid, true)
   assert.equal(validateCareer({ job_title: '', salary_range: 'PHP 20k-40k' }).valid, false)
 })
