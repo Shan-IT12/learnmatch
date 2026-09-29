@@ -43,6 +43,10 @@ import {
   getOrCreateSavedRecommendations,
 } from './services/recommendationPersistenceService.js'
 import {
+  getAssessmentHistory,
+  getAssessmentHistoryDetail,
+} from './services/assessmentHistoryService.js'
+import {
   CollegeTrackingError,
   changeCollegeProgram,
   createCollegeSetup,
@@ -263,6 +267,31 @@ app.get('/api/recommendations/latest', authenticateToken, async (req, res) => {
   } catch (error) {
     console.error('Latest recommendation fetch error:', error)
     res.status(500).json({ message: 'Server error fetching saved recommendations' })
+  }
+})
+
+app.get('/api/assessment-history', authenticateToken, async (req, res) => {
+  try {
+    const history = await getAssessmentHistory(pool, req.user.userId)
+    res.json({ history })
+  } catch (error) {
+    console.error('Assessment history fetch error:', error)
+    res.status(500).json({ message: 'Server error fetching assessment history' })
+  }
+})
+
+app.get('/api/assessment-history/:recommendationId', authenticateToken, async (req, res) => {
+  try {
+    const result = await getAssessmentHistoryDetail(
+      pool,
+      req.user.userId,
+      req.params.recommendationId
+    )
+    if (!result) return res.status(404).json({ message: 'Assessment result not found' })
+    res.json({ result })
+  } catch (error) {
+    console.error('Assessment history detail fetch error:', error)
+    res.status(500).json({ message: 'Server error fetching assessment result' })
   }
 })
 

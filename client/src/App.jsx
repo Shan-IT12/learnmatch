@@ -10,6 +10,8 @@ import OnboardingInterests from './pages/onboarding/OnboardingInterests'
 import OnboardingSkills from './pages/onboarding/OnboardingSkills'
 import OnboardingPersonality from './pages/onboarding/OnboardingPersonality'
 import Results from './pages/Results'
+import AssessmentHistory from './pages/AssessmentHistory'
+import AssessmentHistoryResult from './pages/AssessmentHistoryResult'
 import CollegeSetup from './pages/college/CollegeSetup' 
 import CollegeDashboard from './pages/college/CollegeDashboard'
 import SemesterCheckin from './pages/college/SemesterCheckin'
@@ -50,6 +52,8 @@ function App() {
       <Route path="/college" element={<CollegeDashboard />} />
       <Route path="/college/checkin" element={<SemesterCheckin />} />
       <Route path="/results" element={<Results />} />
+      <Route path="/assessment-history" element={<AssessmentHistory />} />
+      <Route path="/assessment-history/:recommendationId" element={<AssessmentHistoryResult />} />
       <Route path="/dashboard/summary" element={<SummaryDashboard />} />
       <Route path="/results/career-path" element={<CareerPath />} />
       <Route path="/results/career-path/:courseCode" element={<CareerPath />} />

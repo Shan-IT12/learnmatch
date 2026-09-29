@@ -388,8 +388,8 @@ function SummaryDashboard() {
             <IconSchool size={16} stroke={2} /> Go to College Phase
           </button>
           <button
-            disabled
-            className="flex cursor-not-allowed items-center justify-center gap-2 rounded-xl border border-gray-200 bg-gray-100 px-5 py-3 text-sm font-medium text-gray-400"
+            onClick={() => navigate('/assessment-history')}
+            className="flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-5 py-3 text-sm font-semibold text-gray-700 shadow-sm transition duration-150 hover:border-orange-200 hover:bg-orange-50 hover:text-orange-700"
           >
             <IconHistory size={16} stroke={2} /> Assessment History
           </button>
