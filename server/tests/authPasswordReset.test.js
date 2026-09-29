@@ -5,6 +5,11 @@ import jwt from 'jsonwebtoken'
 import pool from '../config/db.js'
 import authenticateToken from '../middleware/authenticateToken.js'
 import {
+  RESET_JWT_AUDIENCE,
+  USER_JWT_AUDIENCE,
+  jwtSignOptions,
+} from '../config/security.js'
+import {
   forgotPassword,
   resetPassword,
   verifyPasswordResetOtp,
@@ -96,12 +101,19 @@ test('forgot-password cleans up only its new OTP if Resend fails and keeps a gen
 
 test('OTP verification issues a short-lived purpose-scoped reset token for an active account', async () => {
   process.env.JWT_SECRET = 'password-reset-test-secret'
-  pool.query = async () => [[{
-    otp_id: 19,
-    user_id: 7,
-    otp_code: '123456',
-    expires_at: new Date(Date.now() + 60_000),
-  }]]
+  pool.getConnection = async () => ({
+    beginTransaction: async () => {},
+    commit: async () => {},
+    rollback: async () => {},
+    release: () => {},
+    query: async () => [[{
+      otp_id: 19,
+      user_id: 7,
+      otp_code: '123456',
+      failed_attempts: 0,
+      expires_at: new Date(Date.now() + 60_000),
+    }]],
+  })
 
   const result = await invoke(verifyPasswordResetOtp, {
     email: 'student@example.com',
@@ -118,12 +130,19 @@ test('OTP verification issues a short-lived purpose-scoped reset token for an ac
 
 test('OTP verification rejects incorrect and expired codes without issuing a token', async () => {
   process.env.JWT_SECRET = 'password-reset-test-secret'
-  pool.query = async () => [[{
-    otp_id: 19,
-    user_id: 7,
-    otp_code: '123456',
-    expires_at: new Date(Date.now() - 1_000),
-  }]]
+  pool.getConnection = async () => ({
+    beginTransaction: async () => {},
+    commit: async () => {},
+    rollback: async () => {},
+    release: () => {},
+    query: async () => [[{
+      otp_id: 19,
+      user_id: 7,
+      otp_code: '123456',
+      failed_attempts: 0,
+      expires_at: new Date(Date.now() - 1_000),
+    }]],
+  })
 
   const expired = await invoke(verifyPasswordResetOtp, { email: 'student@example.com', otpCode: '123456' })
   const incorrect = await invoke(verifyPasswordResetOtp, { email: 'student@example.com', otpCode: '654321' })
@@ -136,7 +155,11 @@ test('OTP verification rejects incorrect and expired codes without issuing a tok
 
 test('reset rejects a normal login JWT and mismatched passwords before accessing the database', async () => {
   process.env.JWT_SECRET = 'password-reset-test-secret'
-  const loginToken = jwt.sign({ userId: 7, username: 'student' }, process.env.JWT_SECRET)
+  const loginToken = jwt.sign(
+    { userId: 7, username: 'student' },
+    process.env.JWT_SECRET,
+    jwtSignOptions(USER_JWT_AUDIENCE, '10m')
+  )
   pool.getConnection = async () => { throw new Error('database should not be accessed') }
 
   const wrongPurpose = await invoke(resetPassword, {
@@ -160,7 +183,7 @@ test('normal authentication middleware rejects password-reset JWTs', async () =>
   const resetToken = jwt.sign(
     { userId: 7, otpId: 19, purpose: 'password-reset' },
     process.env.JWT_SECRET,
-    { expiresIn: '10m' }
+    jwtSignOptions(RESET_JWT_AUDIENCE, '10m')
   )
   let nextCalled = false
   const result = await new Promise((resolve) => {
@@ -179,7 +202,12 @@ test('normal authentication middleware rejects password-reset JWTs', async () =>
   assert.equal(result.status, 403)
   assert.equal(nextCalled, false)
 
-  const loginToken = jwt.sign({ userId: 7, username: 'student' }, process.env.JWT_SECRET)
+  pool.query = async () => [[{ user_id: 7 }]]
+  const loginToken = jwt.sign(
+    { userId: 7, username: 'student' },
+    process.env.JWT_SECRET,
+    jwtSignOptions(USER_JWT_AUDIENCE, '10m')
+  )
   const loginResult = await new Promise((resolve) => {
     const request = { headers: { authorization: `Bearer ${loginToken}` } }
     const response = {
@@ -198,7 +226,7 @@ test('reset atomically hashes the password and consumes the referenced OTP once'
   const resetToken = jwt.sign(
     { userId: 7, otpId: 19, purpose: 'password-reset' },
     process.env.JWT_SECRET,
-    { expiresIn: '10m' }
+    jwtSignOptions(RESET_JWT_AUDIENCE, '10m')
   )
   let otpAvailable = true
   let savedHash = null

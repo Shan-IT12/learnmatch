@@ -6,6 +6,7 @@ import {
   normalizePersonalFactorText,
   parseStoredPersonalFactorCategories,
 } from '../services/personalFactorClassificationService.js'
+import { validateProfile } from '../services/requestValidationService.js'
 
 export const saveProfileWithDependencies = async (
   req,
@@ -17,6 +18,9 @@ export const saveProfileWithDependencies = async (
   } = {}
 ) => {
   const userId = req.user.userId
+  const validation = validateProfile(req.body)
+  if (!validation.valid) return res.status(400).json({ message: validation.message })
+  req.body = validation.value
   const {
     full_name,
     height_cm,

@@ -13,8 +13,10 @@
 //   })
 
 import jwt from 'jsonwebtoken'
+import pool from '../config/db.js'
+import { USER_JWT_AUDIENCE, jwtVerifyOptions } from '../config/security.js'
 
-function authenticateToken(req, res, next) {
+async function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization']
   const token = authHeader && authHeader.split(' ')[1] // expects "Bearer <token>"
 
@@ -22,16 +24,30 @@ function authenticateToken(req, res, next) {
     return res.status(401).json({ message: 'No token provided. Please log in.' })
   }
 
-  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-    if (err) {
-      return res.status(403).json({ message: 'Invalid or expired token. Please log in again.' })
-    }
+  try {
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET,
+      jwtVerifyOptions(USER_JWT_AUDIENCE)
+    )
     if (decoded.purpose === 'password-reset') {
       return res.status(403).json({ message: 'Invalid or expired token. Please log in again.' })
     }
+    if (!Number.isInteger(decoded.userId)) {
+      return res.status(403).json({ message: 'Invalid or expired token. Please log in again.' })
+    }
+    const [users] = await pool.query(
+      'SELECT user_id FROM USER_ACCOUNT WHERE user_id = ? AND is_active = 1 LIMIT 1',
+      [decoded.userId]
+    )
+    if (users.length !== 1) {
+      return res.status(403).json({ message: 'Account is inactive or unavailable. Please log in again.' })
+    }
     req.user = decoded // { userId: 1, username: '...', iat: ..., exp: ... }
-    next()
-  })
+    return next()
+  } catch {
+    return res.status(403).json({ message: 'Invalid or expired token. Please log in again.' })
+  }
 }
 
 export default authenticateToken

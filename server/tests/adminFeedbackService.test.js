@@ -2,6 +2,8 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import fs from 'node:fs'
 import jwt from 'jsonwebtoken'
+import { ADMIN_JWT_AUDIENCE, USER_JWT_AUDIENCE, jwtSignOptions } from '../config/security.js'
+import pool from '../config/db.js'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import authenticateAdmin from '../middleware/authenticateAdmin.js'
@@ -162,16 +164,19 @@ function runMiddleware(headers) {
 
 test('feedback admin routes enforce admin authentication and preserve student submission', async () => {
   const originalSecret = process.env.JWT_SECRET
+  const originalQuery = pool.query
   process.env.JWT_SECRET = 'admin-feedback-test-secret'
+  pool.query = async () => [[{ admin_id: 1 }]]
   try {
     assert.equal((await runMiddleware({})).status, 401)
-    const studentToken = jwt.sign({ userId: 7 }, process.env.JWT_SECRET)
+    const studentToken = jwt.sign({ userId: 7 }, process.env.JWT_SECRET, jwtSignOptions(USER_JWT_AUDIENCE, '10m'))
     assert.equal((await runMiddleware({ authorization: `Bearer ${studentToken}` })).status, 403)
-    const adminToken = jwt.sign({ adminId: 1, role: 'admin' }, process.env.JWT_SECRET)
+    const adminToken = jwt.sign({ adminId: 1, role: 'admin' }, process.env.JWT_SECRET, jwtSignOptions(ADMIN_JWT_AUDIENCE, '10m'))
     assert.equal((await runMiddleware({ authorization: `Bearer ${adminToken}` })).status, 200)
   } finally {
     if (originalSecret === undefined) delete process.env.JWT_SECRET
     else process.env.JWT_SECRET = originalSecret
+    pool.query = originalQuery
   }
 
   const testsDirectory = path.dirname(fileURLToPath(import.meta.url))

@@ -8,15 +8,62 @@ import {
   verifyOtp,
   verifyPasswordResetOtp,
 } from '../controllers/authController.js'
+import {
+  otpIpRateLimiter,
+  passwordResetOtpIdentityRateLimiter,
+  registrationOtpIdentityRateLimiter,
+} from '../middleware/otpRateLimiters.js'
+import {
+  userLoginIdentityRateLimiter,
+  userLoginIpRateLimiter,
+} from '../middleware/loginRateLimiters.js'
+import {
+  forgotPasswordEmailIdentityRateLimiter,
+  forgotPasswordEmailIpRateLimiter,
+  registrationEmailIdentityRateLimiter,
+  registrationEmailIpRateLimiter,
+  resendEmailIdentityRateLimiter,
+  resendEmailIpRateLimiter,
+} from '../middleware/emailRateLimiters.js'
 
 const router = express.Router()
 
-router.post('/register', registerUser)
-router.post('/login', loginUser)
-router.post('/verify-otp', verifyOtp)
-router.post('/resend-otp', resendOtp)
-router.post('/forgot-password', forgotPassword)
-router.post('/forgot-password/verify', verifyPasswordResetOtp)
+router.post(
+  '/register',
+  registrationEmailIpRateLimiter,
+  registrationEmailIdentityRateLimiter,
+  registerUser
+)
+router.post(
+  '/login',
+  userLoginIpRateLimiter,
+  userLoginIdentityRateLimiter,
+  loginUser
+)
+router.post(
+  '/verify-otp',
+  otpIpRateLimiter,
+  registrationOtpIdentityRateLimiter,
+  verifyOtp
+)
+router.post(
+  '/resend-otp',
+  resendEmailIpRateLimiter,
+  resendEmailIdentityRateLimiter,
+  resendOtp
+)
+router.post(
+  '/forgot-password',
+  forgotPasswordEmailIpRateLimiter,
+  forgotPasswordEmailIdentityRateLimiter,
+  forgotPassword
+)
+router.post(
+  '/forgot-password/verify',
+  otpIpRateLimiter,
+  passwordResetOtpIdentityRateLimiter,
+  verifyPasswordResetOtp
+)
 router.post('/forgot-password/reset', resetPassword)
 
 export default router

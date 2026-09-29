@@ -1,13 +1,17 @@
 import express from 'express'
 import cors from 'cors'
+import helmet from 'helmet'
 import dotenv from 'dotenv'
 import authRoutes from './routes/authRoutes.js'
 import profileRoutes from './routes/profileRoutes.js'
 import pool from './config/db.js'
 import authenticateToken from './middleware/authenticateToken.js'
-import bcrypt from 'bcrypt'
-import jwt from 'jsonwebtoken'
 import authenticateAdmin from './middleware/authenticateAdmin.js'
+import { loginAdmin } from './controllers/adminAuthController.js'
+import {
+  adminLoginIdentityRateLimiter,
+  adminLoginIpRateLimiter,
+} from './middleware/loginRateLimiters.js'
 import publicCourseRoutes from './routes/publicCourseRoutes.js'
 import { validateInterestSubmission } from './services/interestSubmissionService.js'
 import { validatePersonalitySubmission } from './services/personalitySubmissionService.js'
@@ -17,6 +21,14 @@ import { getAdminAnalytics } from './services/adminAnalyticsService.js'
 import { getAdminFeedback, getAdminFeedbackDetail } from './services/adminFeedbackService.js'
 import { getAdminUserDetail, getAdminUsers } from './services/adminUserMonitoringService.js'
 import { normalizeCourseSearchQuery, searchActiveCollegeCourses } from './services/collegeCourseSearchService.js'
+import {
+  positiveInteger,
+  validateCareer,
+  validateCourse,
+  validateFeedback,
+  validateSkillQuiz,
+} from './services/requestValidationService.js'
+import { corsOptions } from './config/security.js'
 import {
   RecommendationDataError,
   RecommendationInputError,
@@ -42,8 +54,27 @@ dotenv.config()
 const app = express()
 const PORT = process.env.PORT || 5000
 
-app.use(cors())
-app.use(express.json())
+// Railway terminates public connections at one trusted reverse-proxy hop.
+// This lets IP-based security controls use the nearest proxy-provided address
+// without trusting an arbitrary client-supplied forwarding chain.
+app.set('trust proxy', 1)
+app.disable('x-powered-by')
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      baseUri: ["'self'"],
+      connectSrc: ["'self'"],
+      frameAncestors: ["'none'"],
+      imgSrc: ["'self'", 'data:', 'https://tile.openstreetmap.org'],
+      objectSrc: ["'none'"],
+      scriptSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+    },
+  },
+}))
+app.use(cors(corsOptions()))
+app.use(express.json({ limit: '100kb' }))
 
 app.use('/api/auth', authRoutes)
 app.use('/api/profile', profileRoutes)
@@ -138,12 +169,10 @@ app.get('/api/quiz', async (req, res) => {
 })
 
 app.post('/api/quiz', authenticateToken, async (req, res) => {
-  const { answers } = req.body
+  const validation = validateSkillQuiz(req.body?.answers)
+  if (!validation.valid) return res.status(400).json({ message: validation.message })
+  const answers = validation.answers
   const userId = req.user.userId
-
-  if (!Array.isArray(answers) || answers.length === 0) {
-    return res.status(400).json({ message: 'Missing answers' })
-  }
 
   try {
     const questionIds = answers.map((a) => a.question_id)
@@ -153,6 +182,10 @@ app.post('/api/quiz', authenticateToken, async (req, res) => {
       `SELECT question_id, correct_answer, dimension FROM QUESTION WHERE question_id IN (${placeholders})`,
       questionIds
     )
+
+    if (questions.length !== answers.length) {
+      return res.status(400).json({ message: 'One or more question IDs are invalid.' })
+    }
 
     const questionMap = {}
     questions.forEach((q) => {
@@ -510,12 +543,10 @@ app.get('/api/mbti', authenticateToken, async (req, res) => {
 })
 
 app.post('/api/feedback', authenticateToken, async (req, res) => {
-  const { rating, category, comment } = req.body
+  const validation = validateFeedback(req.body)
+  if (!validation.valid) return res.status(400).json({ message: validation.message })
+  const { rating, category, comment } = validation.value
   const userId = req.user.userId
-
-  if (!rating || !category) {
-    return res.status(400).json({ message: 'Rating and category are required' })
-  }
 
   try {
     await pool.query(
@@ -529,42 +560,12 @@ app.post('/api/feedback', authenticateToken, async (req, res) => {
   }
 })
 
-app.post('/api/admin/login', async (req, res) => {
-  const { username, password } = req.body
-
-  try {
-    const [rows] = await pool.query(
-      'SELECT * FROM ADMIN WHERE username = ?',
-      [username]
-    )
-
-    if (rows.length === 0) {
-      return res.status(400).json({ message: 'Invalid username or password' })
-    }
-
-    const admin = rows[0]
-    const passwordMatch = await bcrypt.compare(password, admin.password_hash)
-
-    if (!passwordMatch) {
-      return res.status(400).json({ message: 'Invalid username or password' })
-    }
-
-    const token = jwt.sign(
-      { adminId: admin.admin_id, username: admin.username, role: 'admin' },
-      process.env.JWT_SECRET,
-      { expiresIn: '7d' }
-    )
-
-    res.json({
-      message: 'Login successful',
-      token,
-      username: admin.username,
-    })
-  } catch (error) {
-    console.error('Admin login error:', error)
-    res.status(500).json({ message: 'Server error during admin login' })
-  }
-})
+app.post(
+  '/api/admin/login',
+  adminLoginIpRateLimiter,
+  adminLoginIdentityRateLimiter,
+  loginAdmin
+)
 
 // ============ ADMIN: COURSE MANAGEMENT ============
 
@@ -667,11 +668,9 @@ app.get('/api/admin/courses/:id', authenticateAdmin, async (req, res) => {
 
 // Create a new course
 app.post('/api/admin/courses', authenticateAdmin, async (req, res) => {
-  const { course_name, program_type, cluster_category, psced_group, description, obtainable_skills } = req.body
-
-  if (!course_name || !cluster_category) {
-    return res.status(400).json({ message: 'Course name and cluster category are required' })
-  }
+  const validation = validateCourse(req.body)
+  if (!validation.valid) return res.status(400).json({ message: validation.message })
+  const { course_name, program_type, cluster_category, psced_group, description, obtainable_skills } = validation.value
 
   try {
     const [result] = await pool.query(
@@ -688,7 +687,10 @@ app.post('/api/admin/courses', authenticateAdmin, async (req, res) => {
 
 // Update an existing course
 app.put('/api/admin/courses/:id', authenticateAdmin, async (req, res) => {
-  const { course_name, program_type, cluster_category, psced_group, description, obtainable_skills } = req.body
+  const courseId = positiveInteger(req.params.id)
+  const validation = validateCourse(req.body)
+  if (!courseId || !validation.valid) return res.status(400).json({ message: validation.message || 'Invalid course ID.' })
+  const { course_name, program_type, cluster_category, psced_group, description, obtainable_skills } = validation.value
 
   try {
     await pool.query(
@@ -697,7 +699,7 @@ app.put('/api/admin/courses/:id', authenticateAdmin, async (req, res) => {
            description = ?, obtainable_skills = ?
        WHERE course_id = ?`,
       [course_name, program_type || null, cluster_category, psced_group || null,
-       description || null, obtainable_skills || null, req.params.id]
+       description || null, obtainable_skills || null, courseId]
     )
     res.json({ message: 'Course updated successfully' })
   } catch (error) {
@@ -708,8 +710,10 @@ app.put('/api/admin/courses/:id', authenticateAdmin, async (req, res) => {
 
 // Activate or deactivate a course without deleting its catalog row
 app.patch('/api/admin/courses/:id/status', authenticateAdmin, async (req, res) => {
+  const courseId = positiveInteger(req.params.id)
+  if (!courseId) return res.status(400).json({ message: 'Invalid course ID.' })
   try {
-    const updated = await setCourseActiveStatus(pool, req.params.id, req.body.is_active)
+    const updated = await setCourseActiveStatus(pool, courseId, req.body.is_active)
     if (!updated) return res.status(404).json({ message: 'Course not found' })
 
     res.json({
@@ -755,17 +759,16 @@ app.delete('/api/admin/courses/:id', authenticateAdmin, (req, res) => {
 // ============ ADMIN: CAREER OPPORTUNITIES (per course) ============
 
 app.post('/api/admin/courses/:id/careers', authenticateAdmin, async (req, res) => {
-  const { job_title, salary_range, description } = req.body
-
-  if (!job_title) {
-    return res.status(400).json({ message: 'Job title is required' })
-  }
+  const courseId = positiveInteger(req.params.id)
+  const validation = validateCareer(req.body)
+  if (!courseId || !validation.valid) return res.status(400).json({ message: validation.message || 'Invalid course ID.' })
+  const { job_title, salary_range, description } = validation.value
 
   try {
     const [result] = await pool.query(
       `INSERT INTO CAREER_OPPORTUNITY (course_id, job_title, salary_range, description)
        VALUES (?, ?, ?, ?)`,
-      [req.params.id, job_title, salary_range || null, description || null]
+      [courseId, job_title, salary_range, description]
     )
     res.status(201).json({ message: 'Career opportunity added', opportunityId: result.insertId })
   } catch (error) {
@@ -775,12 +778,15 @@ app.post('/api/admin/courses/:id/careers', authenticateAdmin, async (req, res) =
 })
 
 app.put('/api/admin/careers/:careerId', authenticateAdmin, async (req, res) => {
-  const { job_title, salary_range, description } = req.body
+  const careerId = positiveInteger(req.params.careerId)
+  const validation = validateCareer(req.body)
+  if (!careerId || !validation.valid) return res.status(400).json({ message: validation.message || 'Invalid career ID.' })
+  const { job_title, salary_range, description } = validation.value
 
   try {
     await pool.query(
       `UPDATE CAREER_OPPORTUNITY SET job_title = ?, salary_range = ?, description = ? WHERE opportunity_id = ?`,
-      [job_title, salary_range || null, description || null, req.params.careerId]
+      [job_title, salary_range, description, careerId]
     )
     res.json({ message: 'Career opportunity updated' })
   } catch (error) {
@@ -790,8 +796,10 @@ app.put('/api/admin/careers/:careerId', authenticateAdmin, async (req, res) => {
 })
 
 app.delete('/api/admin/careers/:careerId', authenticateAdmin, async (req, res) => {
+  const careerId = positiveInteger(req.params.careerId)
+  if (!careerId) return res.status(400).json({ message: 'Invalid career ID.' })
   try {
-    await pool.query('DELETE FROM CAREER_OPPORTUNITY WHERE opportunity_id = ?', [req.params.careerId])
+    await pool.query('DELETE FROM CAREER_OPPORTUNITY WHERE opportunity_id = ?', [careerId])
     res.json({ message: 'Career opportunity deleted' })
   } catch (error) {
     console.error('Admin career delete error:', error)

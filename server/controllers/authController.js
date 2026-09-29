@@ -2,6 +2,12 @@ import pool from '../config/db.js'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import { randomInt } from 'node:crypto'
+import {
+  RESET_JWT_AUDIENCE,
+  USER_JWT_AUDIENCE,
+  jwtSignOptions,
+  jwtVerifyOptions,
+} from '../config/security.js'
 
 const sendResendMail = async ({ to, subject, html }) => {
   if (!process.env.RESEND_API_KEY) {
@@ -27,19 +33,23 @@ const sendResendMail = async ({ to, subject, html }) => {
   })
 
   if (!response.ok) {
-    const errorBody = await response.text()
-
-    throw new Error(
-      `Resend failed: ${response.status} ${errorBody}`
-    )
+    await response.text()
+    const error = new Error(`Email provider request failed with status ${response.status}`)
+    error.code = 'EMAIL_PROVIDER_ERROR'
+    error.status = response.status
+    throw error
   }
 
   return response.json()
 }
 
-const generateOtp = () => {
-  return Math.floor(100000 + Math.random() * 900000).toString()
-}
+export const MAX_OTP_FAILED_ATTEMPTS = 5
+
+export const generateOtp = () => randomInt(100000, 1000000).toString()
+
+const invalidOtpResponse = (res) => res.status(400).json({
+  message: 'Invalid or expired verification code. Please request a new code if needed.',
+})
 
 const isValidEmail = (email) => {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
@@ -128,8 +138,8 @@ export const registerUser = async (req, res) => {
     await pool.query(
       `
       INSERT INTO OTP_VERIFICATION
-      (user_id, otp_code, expires_at)
-      VALUES (?, ?, ?)
+      (user_id, otp_code, failed_attempts, expires_at)
+      VALUES (?, ?, 0, ?)
       `,
       [userId, otpCode, expiresAt]
     )
@@ -199,88 +209,101 @@ export const verifyOtp = async (req, res) => {
     })
   }
 
+  const normalizedUserId = Number(userId)
+  const normalizedOtpCode = String(otpCode).trim()
+  if (!Number.isInteger(normalizedUserId) || normalizedUserId <= 0 || !/^\d{6}$/.test(normalizedOtpCode)) {
+    return invalidOtpResponse(res)
+  }
+
+  let connection
   try {
-    const [users] = await pool.query(
+    connection = await pool.getConnection()
+    await connection.beginTransaction()
+
+    const [users] = await connection.query(
       `
       SELECT user_id, is_active
       FROM USER_ACCOUNT
       WHERE user_id = ?
+      FOR UPDATE
       `,
-      [userId]
+      [normalizedUserId]
     )
 
-    if (users.length === 0) {
-      return res.status(404).json({
-        message: 'Account not found',
-      })
+    if (users.length === 0 || users[0].is_active) {
+      await connection.commit()
+      return invalidOtpResponse(res)
     }
 
-    if (users[0].is_active) {
-      return res.status(400).json({
-        message: 'This account is already verified.',
-      })
-    }
-
-    const [rows] = await pool.query(
+    const [rows] = await connection.query(
       `
-      SELECT *
+      SELECT otp_id, otp_code, failed_attempts, expires_at
       FROM OTP_VERIFICATION
       WHERE user_id = ?
       ORDER BY otp_id DESC
       LIMIT 1
+      FOR UPDATE
       `,
-      [userId]
+      [normalizedUserId]
     )
 
     if (rows.length === 0) {
-      return res.status(400).json({
-        message:
-          'No verification code found. Please request a new one.',
-      })
+      await connection.commit()
+      return invalidOtpResponse(res)
     }
 
     const otpRecord = rows[0]
 
-    if (new Date() > new Date(otpRecord.expires_at)) {
-      return res.status(400).json({
-        message:
-          'This code has expired. Please request a new one.',
-      })
+    if (
+      new Date() > new Date(otpRecord.expires_at)
+      || Number(otpRecord.failed_attempts) >= MAX_OTP_FAILED_ATTEMPTS
+    ) {
+      await connection.commit()
+      return invalidOtpResponse(res)
     }
 
-    if (otpRecord.otp_code !== String(otpCode).trim()) {
-      return res.status(400).json({
-        message: 'Incorrect code. Please try again.',
-      })
+    if (otpRecord.otp_code !== normalizedOtpCode) {
+      await connection.query(
+        `UPDATE OTP_VERIFICATION
+         SET failed_attempts = LEAST(failed_attempts + 1, ?)
+         WHERE otp_id = ? AND user_id = ?`,
+        [MAX_OTP_FAILED_ATTEMPTS, otpRecord.otp_id, normalizedUserId]
+      )
+      await connection.commit()
+      return invalidOtpResponse(res)
     }
 
-    await pool.query(
+    await connection.query(
       `
       UPDATE USER_ACCOUNT
       SET is_active = 1
       WHERE user_id = ?
       `,
-      [userId]
+      [normalizedUserId]
     )
 
-    await pool.query(
+    await connection.query(
       `
       DELETE FROM OTP_VERIFICATION
-      WHERE user_id = ?
+      WHERE otp_id = ? AND user_id = ?
       `,
-      [userId]
+      [otpRecord.otp_id, normalizedUserId]
     )
+    await connection.commit()
 
     return res.json({
       message:
         'Account verified successfully! You can now log in.',
     })
   } catch (error) {
+    if (connection) await connection.rollback()
     console.error('OTP verify error:', error)
 
     return res.status(500).json({
       message: 'Server error verifying code',
     })
+  } finally {
+    if (connection) connection.release()
   }
 }
 
@@ -303,17 +326,8 @@ export const resendOtp = async (req, res) => {
       [userId]
     )
 
-    if (users.length === 0) {
-      return res.status(404).json({
-        message: 'Account not found',
-      })
-    }
-
-    if (users[0].is_active) {
-      return res.status(400).json({
-        message: 'This account is already verified.',
-      })
-    }
+    const genericResponse = { message: 'If the account is eligible, a new code has been sent.' }
+    if (users.length === 0 || users[0].is_active) return res.json(genericResponse)
 
     const email = users[0].email
 
@@ -331,8 +345,8 @@ export const resendOtp = async (req, res) => {
     await pool.query(
       `
       INSERT INTO OTP_VERIFICATION
-      (user_id, otp_code, expires_at)
-      VALUES (?, ?, ?)
+      (user_id, otp_code, failed_attempts, expires_at)
+      VALUES (?, ?, 0, ?)
       `,
       [userId, otpCode, expiresAt]
     )
@@ -376,9 +390,7 @@ export const resendOtp = async (req, res) => {
       })
     }
 
-    return res.json({
-      message: 'A new code has been sent to your email.',
-    })
+    return res.json(genericResponse)
   } catch (error) {
     console.error('Resend OTP error:', error)
 
@@ -441,9 +453,7 @@ export const loginUser = async (req, res) => {
         username: user.username,
       },
       process.env.JWT_SECRET,
-      {
-        expiresIn: '7d',
-      }
+      jwtSignOptions(USER_JWT_AUDIENCE, '7d')
     )
 
     return res.json({
@@ -490,7 +500,7 @@ export const forgotPassword = async (req, res) => {
 
     await pool.query('DELETE FROM OTP_VERIFICATION WHERE user_id = ?', [user.user_id])
     const [otpResult] = await pool.query(
-      'INSERT INTO OTP_VERIFICATION (user_id, otp_code, expires_at) VALUES (?, ?, ?)',
+      'INSERT INTO OTP_VERIFICATION (user_id, otp_code, failed_attempts, expires_at) VALUES (?, ?, 0, ?)',
       [user.user_id, otpCode, expiresAt]
     )
 
@@ -530,34 +540,60 @@ export const verifyPasswordResetOtp = async (req, res) => {
     return res.status(400).json({ message: 'Invalid or expired verification code.' })
   }
 
+  let connection
   try {
-    const [rows] = await pool.query(
+    connection = await pool.getConnection()
+    await connection.beginTransaction()
+
+    const [rows] = await connection.query(
       `
-      SELECT otp.otp_id, otp.user_id, otp.otp_code, otp.expires_at
+      SELECT otp.otp_id, otp.user_id, otp.otp_code, otp.failed_attempts, otp.expires_at
       FROM OTP_VERIFICATION otp
       INNER JOIN USER_ACCOUNT user ON user.user_id = otp.user_id
       WHERE LOWER(user.email) = ? AND user.is_active = 1
       ORDER BY otp.otp_id DESC
       LIMIT 1
+      FOR UPDATE
       `,
       [email]
     )
 
     const otp = rows[0]
-    if (!otp || new Date() > new Date(otp.expires_at) || otp.otp_code !== otpCode) {
-      return res.status(400).json({ message: 'Invalid or expired verification code.' })
+    if (
+      !otp
+      || new Date() > new Date(otp.expires_at)
+      || Number(otp.failed_attempts) >= MAX_OTP_FAILED_ATTEMPTS
+    ) {
+      await connection.commit()
+      return invalidOtpResponse(res)
     }
+
+    if (otp.otp_code !== otpCode) {
+      await connection.query(
+        `UPDATE OTP_VERIFICATION
+         SET failed_attempts = LEAST(failed_attempts + 1, ?)
+         WHERE otp_id = ? AND user_id = ?`,
+        [MAX_OTP_FAILED_ATTEMPTS, otp.otp_id, otp.user_id]
+      )
+      await connection.commit()
+      return invalidOtpResponse(res)
+    }
+
+    await connection.commit()
 
     const resetToken = jwt.sign(
       { userId: otp.user_id, otpId: otp.otp_id, purpose: 'password-reset' },
       process.env.JWT_SECRET,
-      { expiresIn: '10m' }
+      jwtSignOptions(RESET_JWT_AUDIENCE, '10m')
     )
 
     return res.json({ message: 'Code verified.', resetToken })
   } catch (error) {
+    if (connection) await connection.rollback()
     console.error('Password reset OTP verification error:', error)
     return res.status(500).json({ message: 'Unable to verify the code. Please try again.' })
+  } finally {
+    if (connection) connection.release()
   }
 }
 
@@ -579,7 +615,11 @@ export const resetPassword = async (req, res) => {
 
   let decoded
   try {
-    decoded = jwt.verify(resetToken, process.env.JWT_SECRET)
+    decoded = jwt.verify(
+      resetToken,
+      process.env.JWT_SECRET,
+      jwtVerifyOptions(RESET_JWT_AUDIENCE)
+    )
   } catch {
     return res.status(401).json({ message: 'Invalid or expired password reset authorization.' })
   }
