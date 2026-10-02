@@ -49,13 +49,22 @@ function SchoolLocator() {
     return () => controller.abort()
   }, [courseCode, retryCount])
 
-  const backNavigation = getSchoolLocatorBackNavigation(location.state?.source, isAuthenticated)
+  const backNavigation = getSchoolLocatorBackNavigation(
+    location.state?.source === 'course-overview'
+      ? {
+          name: location.state.source,
+          returnTo: location.state.returnTo,
+          returnState: location.state.returnState,
+        }
+      : location.state?.source,
+    isAuthenticated
+  )
 
   return (
     <div className="min-h-screen bg-[#fcfaf7] text-gray-900">
       <PublicHeader />
       <main className="max-w-6xl mx-auto px-5 sm:px-8 lg:px-10 py-8 sm:py-12">
-        <Link to={backNavigation.path} className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-orange-600 transition">
+        <Link to={backNavigation.path} state={backNavigation.state} className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-orange-600 transition">
           <IconArrowLeft size={17} stroke={2} /> {backNavigation.label}
         </Link>
 
@@ -108,22 +117,18 @@ function SchoolLocator() {
                 <h2 className="text-xl sm:text-2xl font-bold mt-5">No school match is currently available for this course.</h2>
                 <p className="text-sm text-gray-500 leading-6 mt-3 max-w-2xl mx-auto">This does not necessarily mean the course is unavailable in San Jose del Monte. Some school program information may not yet be available in LearnMatch.</p>
                 <div className="flex flex-col sm:flex-row justify-center gap-3 mt-7">
-                  <Link to={backNavigation.path} className="bg-gray-900 text-white px-5 py-3 rounded-xl text-sm font-semibold hover:bg-gray-800 transition">{backNavigation.label}</Link>
+                  <Link to={backNavigation.path} state={backNavigation.state} className="bg-gray-900 text-white px-5 py-3 rounded-xl text-sm font-semibold hover:bg-gray-800 transition">{backNavigation.label}</Link>
                   <Link to="/courses/search" className="border border-orange-200 bg-orange-50 text-orange-700 px-5 py-3 rounded-xl text-sm font-semibold hover:bg-orange-100 transition">Explore other courses</Link>
                 </div>
               </section>
             ) : (
               <section className="mt-8">
-                <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2 mb-5">
+                <div className="mb-5">
                   <div><p className="text-xs font-semibold uppercase tracking-[0.16em] text-orange-600">Available matches</p><h2 className="text-xl sm:text-2xl font-bold mt-1">{result.schools.length} {result.schools.length === 1 ? 'school' : 'schools'} available</h2></div>
-                  <p className="text-xs text-gray-400">Academic year {result.academic_year}</p>
                 </div>
                 <SchoolLocatorMap schools={result.schools} selectedSchoolId={selectedSchoolId} />
                 <div className="grid md:grid-cols-2 gap-5">
-                  {result.schools.map((school) => {
-                    const majors = school.offerings.map((offering) => offering.major).filter(Boolean)
-                    const hasGeneralOffering = school.offerings.some((offering) => !offering.major)
-                    return (
+                  {result.schools.map((school) => (
                       <article key={school.school_id} className="bg-white border border-gray-100 rounded-2xl p-6 sm:p-7 shadow-sm hover:shadow-md hover:border-orange-100 transition">
                         <div className="flex items-start gap-4">
                           <div className="w-11 h-11 rounded-2xl bg-orange-50 text-orange-600 flex items-center justify-center shrink-0"><IconSchool size={23} stroke={1.7} /></div>
@@ -139,18 +144,8 @@ function SchoolLocator() {
                             <IconMapPin size={17} stroke={1.8} /> Show on map
                           </button>
                         )}
-                        {(hasGeneralOffering || majors.length > 0) && (
-                          <div className="mt-5 pt-5 border-t border-gray-100">
-                            <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-2.5">Offering variants</p>
-                            <div className="flex flex-wrap gap-2">
-                              {hasGeneralOffering && <span className="text-xs font-medium text-gray-700 bg-gray-100 px-3 py-1.5 rounded-full">General program</span>}
-                              {majors.map((major) => <span key={major} className="text-xs font-medium text-orange-700 bg-orange-50 px-3 py-1.5 rounded-full">{major}</span>)}
-                            </div>
-                          </div>
-                        )}
                       </article>
-                    )
-                  })}
+                  ))}
                 </div>
               </section>
             )}

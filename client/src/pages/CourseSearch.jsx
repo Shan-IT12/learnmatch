@@ -9,6 +9,10 @@ function CourseSearch() {
   const navigate = useNavigate()
   const location = useLocation()
   const fromDashboard = location.state?.entryContext === 'dashboard'
+  const courseDetailsState = {
+    entryContext: fromDashboard ? 'dashboard' : 'public-search',
+    returnTo: `${location.pathname}${location.search}`,
+  }
   const [searchParams, setSearchParams] = useSearchParams()
   const query = searchParams.get('q')?.trim() || ''
   const [input, setInput] = useState(query)
@@ -95,10 +99,14 @@ function CourseSearch() {
     <div className="min-h-screen bg-gray-50">
       <PublicHeader />
       <main className="max-w-5xl mx-auto px-5 sm:px-10 py-10 sm:py-14">
-        {fromDashboard && (
+        {fromDashboard ? (
           <button onClick={() => navigate('/dashboard')} className="text-sm font-medium text-orange-600 hover:text-orange-700 mb-6">
             ← Back to Dashboard
           </button>
+        ) : (
+          <Link to="/" className="inline-block text-sm font-medium text-orange-600 hover:text-orange-700 mb-6">
+            ← Back to Landing Page
+          </Link>
         )}
         <p className="text-xs font-semibold text-orange-500 uppercase tracking-widest mb-3">Course explorer</p>
         <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-3">Find a course</h1>
@@ -146,7 +154,7 @@ function CourseSearch() {
                       aria-selected="false"
                       key={course.course_code}
                       onMouseDown={(event) => event.preventDefault()}
-                      onClick={() => navigate(`/courses/${course.course_code}`, fromDashboard ? { state: { entryContext: 'dashboard' } } : undefined)}
+                      onClick={() => navigate(`/courses/${course.course_code}`, { state: courseDetailsState })}
                       className="block w-full text-left px-5 py-3 border-t border-gray-50 hover:bg-orange-50 transition group"
                     >
                       <p className="text-sm font-medium text-gray-800 group-hover:text-orange-600 transition">
@@ -177,7 +185,7 @@ function CourseSearch() {
               <p className="text-sm text-gray-500 mb-4">{courses.length} {courses.length === 1 ? 'course' : 'courses'} found for “{query}”</p>
               <div className="grid gap-4">
                 {courses.map((course) => (
-                  <Link key={course.course_code} to={`/courses/${course.course_code}`} state={fromDashboard ? { entryContext: 'dashboard' } : undefined} className="block bg-white border border-gray-100 rounded-2xl p-5 sm:p-6 shadow-sm hover:shadow-md hover:border-orange-200 transition group">
+                  <Link key={course.course_code} to={`/courses/${course.course_code}`} state={courseDetailsState} className="block bg-white border border-gray-100 rounded-2xl p-5 sm:p-6 shadow-sm hover:shadow-md hover:border-orange-200 transition group">
                     <div className="flex flex-wrap items-center gap-2 mb-2">
                       {course.course_abbreviation && <span className="text-xs font-bold text-orange-600 bg-orange-50 px-2.5 py-1 rounded-full">{course.course_abbreviation}</span>}
                     </div>

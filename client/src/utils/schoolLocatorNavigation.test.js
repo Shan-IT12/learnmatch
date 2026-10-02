@@ -24,8 +24,30 @@ test('guest public search returns to Course Search', () => {
   })
 })
 
+test('Course Overview source returns to the exact course and preserves its origin state', () => {
+  const returnState = {
+    entryContext: 'public-search',
+    returnTo: '/courses/search?q=BSIT',
+  }
+  assert.deepEqual(getSchoolLocatorBackNavigation({
+    name: 'course-overview',
+    returnTo: '/courses/CRS024',
+    returnState,
+  }, false), {
+    path: '/courses/CRS024',
+    label: 'Back to Course Overview',
+    state: returnState,
+  })
+})
+
+test('an invalid Course Overview return path uses the existing safe fallback', () => {
+  assert.equal(getSchoolLocatorBackNavigation({
+    name: 'course-overview',
+    returnTo: '/dashboard',
+  }, false).path, '/courses/search')
+})
+
 test('unknown origins use safe authenticated and guest fallbacks', () => {
   assert.equal(getSchoolLocatorBackNavigation(undefined, true).path, '/dashboard')
   assert.equal(getSchoolLocatorBackNavigation(undefined, false).path, '/courses/search')
 })
-

@@ -5,9 +5,16 @@ const navigationBySource = Object.freeze({
 })
 
 export function getSchoolLocatorBackNavigation(source, isAuthenticated) {
+  if (source?.name === 'course-overview' && /^\/courses\/[^/?#]+(?:[?#].*)?$/.test(source.returnTo || '')) {
+    return {
+      path: source.returnTo,
+      label: 'Back to Course Overview',
+      state: source.returnState || undefined,
+    }
+  }
+
   return navigationBySource[source]
     || (isAuthenticated
       ? navigationBySource.explorer
       : navigationBySource['public-search'])
 }
-

@@ -159,7 +159,11 @@ function Landing() {
                         <button
                           type="button"
                           key={course.course_code || index}
-                          onClick={() => navigate(`/courses/${course.course_code}`)}
+                          onClick={() => navigate(`/courses/${course.course_code}`, {
+                            state: {
+                              entryContext: 'landing',
+                            },
+                          })}
                           className="block w-full border-t border-orange-50 px-5 py-3 text-left transition duration-150 hover:bg-orange-50"
                         >
                           <span className="text-sm font-medium text-gray-800">{course.course_name}{course.course_abbreviation ? ` (${course.course_abbreviation})` : ''}</span>
@@ -175,7 +179,7 @@ function Landing() {
               {[
                 ['13', 'Schools'],
                 [String(STUDENT_ACTIVE_INDEPENDENT_COURSE_COUNT), 'Active courses'],
-                ['1', 'City'],
+                ['4', 'Assessments'],
               ].map(([value, label], index) => (
                 <div key={label} className={`px-3 py-3.5 sm:px-4 ${index ? 'border-l border-orange-100/80' : ''}`}>
                   <dt className="text-lg font-bold text-gray-950 sm:text-xl">{value}</dt>

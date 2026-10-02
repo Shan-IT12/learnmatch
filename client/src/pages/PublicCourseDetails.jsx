@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useParams } from 'react-router-dom'
 import PublicHeader from '../components/PublicHeader'
+import { getCourseOverviewBackNavigation } from '../utils/courseOverviewNavigation'
 
 const apiUrl = import.meta.env.VITE_API_URL || ''
 
@@ -18,12 +19,7 @@ function PublicCourseDetails() {
   const { courseCode } = useParams()
   const location = useLocation()
   const isAuthenticated = Boolean(localStorage.getItem('token'))
-  const fromDashboard = location.state?.entryContext === 'dashboard'
-  const schoolLocatorSource = fromDashboard
-    ? 'explorer'
-    : isAuthenticated
-      ? undefined
-      : 'public-search'
+  const backNavigation = getCourseOverviewBackNavigation(location.state)
   const [course, setCourse] = useState(null)
   const [status, setStatus] = useState('loading')
   const [resolvedCourseCode, setResolvedCourseCode] = useState(null)
@@ -71,12 +67,12 @@ function PublicCourseDetails() {
           <div className="bg-white border border-gray-100 rounded-2xl p-8 text-center">
             <h1 className="text-2xl font-bold text-gray-900">Course not found</h1>
             <p className="text-gray-500 mt-2 mb-5">The course code may be invalid or unavailable.</p>
-            <Link to="/courses/search" state={fromDashboard ? { entryContext: 'dashboard' } : undefined} className="text-orange-600 font-medium hover:text-orange-700">Explore courses</Link>
+            <Link to={backNavigation.path} state={backNavigation.state} className="text-orange-600 font-medium hover:text-orange-700">{backNavigation.label}</Link>
           </div>
         )}
         {displayStatus === 'success' && course && (
           <article>
-            <Link to="/courses/search" state={fromDashboard ? { entryContext: 'dashboard' } : undefined} className="text-sm text-orange-600 hover:text-orange-700">← Back to course search</Link>
+            <Link to={backNavigation.path} state={backNavigation.state} className="text-sm text-orange-600 hover:text-orange-700">← {backNavigation.label}</Link>
             <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-6 sm:p-9 mt-5">
               <div className="flex flex-wrap items-center gap-2 mb-4">
                 {course.course_abbreviation && <span className="text-xs font-bold text-orange-600 bg-orange-50 px-3 py-1.5 rounded-full">{course.course_abbreviation}</span>}
@@ -84,7 +80,15 @@ function PublicCourseDetails() {
               <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 leading-tight">{course.course_name}</h1>
               {course.description && <p className="text-gray-600 leading-7 whitespace-pre-line mt-6">{course.description}</p>}
 
-              <Link to={`/schools/${encodeURIComponent(course.course_code)}`} state={schoolLocatorSource ? { source: schoolLocatorSource } : undefined} className="inline-flex mt-6 bg-orange-500 text-white px-5 py-3 rounded-xl text-sm font-semibold hover:bg-orange-600 transition">
+              <Link
+                to={`/schools/${encodeURIComponent(course.course_code)}`}
+                state={{
+                  source: 'course-overview',
+                  returnTo: `${location.pathname}${location.search}`,
+                  returnState: location.state || null,
+                }}
+                className="inline-flex mt-6 bg-orange-500 text-white px-5 py-3 rounded-xl text-sm font-semibold hover:bg-orange-600 transition"
+              >
                 Find Schools in SJDM
               </Link>
 
