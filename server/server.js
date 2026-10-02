@@ -13,6 +13,7 @@ import {
   adminLoginIpRateLimiter,
 } from './middleware/loginRateLimiters.js'
 import publicCourseRoutes from './routes/publicCourseRoutes.js'
+import directionsRoutes from './routes/directionsRoutes.js'
 import { validateInterestSubmission } from './services/interestSubmissionService.js'
 import { validatePersonalitySubmission } from './services/personalitySubmissionService.js'
 import {
@@ -92,6 +93,7 @@ app.use(express.json({ limit: '100kb' }))
 app.use('/api/auth', authRoutes)
 app.use('/api/profile', profileRoutes)
 app.use('/api/public/courses', publicCourseRoutes)
+app.use('/api/public/directions', directionsRoutes)
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`)

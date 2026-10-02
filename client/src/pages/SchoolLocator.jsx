@@ -1,9 +1,16 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useParams } from 'react-router-dom'
-import { IconAlertCircle, IconArrowLeft, IconBook2, IconMapPin, IconSchool } from '@tabler/icons-react'
+import { IconAlertCircle, IconArrowLeft, IconBook2, IconMapPin, IconRoute, IconSchool } from '@tabler/icons-react'
 import PublicHeader from '../components/PublicHeader'
 import SchoolLocatorMap from '../components/SchoolLocatorMap'
 import { getSchoolLocatorBackNavigation } from '../utils/schoolLocatorNavigation'
+import {
+  directionsErrorMessage,
+  getCurrentLocation,
+  hasValidCoordinates,
+  routeDistanceLabel,
+} from '../utils/schoolDirections'
+import { getSchoolOwnershipLabel } from '../utils/schoolOwnership'
 
 const apiUrl = import.meta.env.VITE_API_URL || ''
 
@@ -16,6 +23,8 @@ function SchoolLocator() {
   const [retryCount, setRetryCount] = useState(0)
   const [resolvedCourseCode, setResolvedCourseCode] = useState(null)
   const [selectedSchoolId, setSelectedSchoolId] = useState(null)
+  const [directions, setDirections] = useState({ status: 'idle' })
+  const [coverageResetKey, setCoverageResetKey] = useState(0)
   const displayStatus = resolvedCourseCode === courseCode ? status : 'loading'
 
   useEffect(() => {
@@ -35,6 +44,7 @@ function SchoolLocator() {
         }
         setResult(data)
         setSelectedSchoolId(null)
+        setDirections({ status: 'idle' })
         setStatus('success')
         setResolvedCourseCode(courseCode)
         document.title = `Schools for ${data.course.course_abbreviation || data.course.course_name} | LearnMatch`
@@ -59,6 +69,52 @@ function SchoolLocator() {
       : location.state?.source,
     isAuthenticated
   )
+
+  const showSchoolOnMap = (schoolId) => {
+    setSelectedSchoolId(schoolId)
+    setDirections({ status: 'idle' })
+  }
+
+  const getDirections = async (school) => {
+    setSelectedSchoolId(school.school_id)
+    if (!hasValidCoordinates(school)) {
+      setDirections({
+        status: 'error',
+        schoolId: school.school_id,
+        message: 'Directions are unavailable because this school does not have reviewed map coordinates.',
+      })
+      return
+    }
+
+    setDirections({ status: 'loading', schoolId: school.school_id })
+    try {
+      const userLocation = await getCurrentLocation()
+      const response = await fetch(`${apiUrl}/api/public/directions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          origin: userLocation,
+          destination: { latitude: school.latitude, longitude: school.longitude },
+        }),
+      })
+      const data = await response.json().catch(() => ({}))
+      if (!response.ok) throw new Error(data.code || 'DIRECTIONS_UNAVAILABLE')
+
+      setDirections({
+        status: 'success',
+        schoolId: school.school_id,
+        schoolName: school.school_name,
+        userLocation,
+        route: data,
+      })
+    } catch (error) {
+      setDirections({
+        status: 'error',
+        schoolId: school.school_id,
+        message: directionsErrorMessage(error.message),
+      })
+    }
+  }
 
   return (
     <div className="min-h-screen bg-[#fcfaf7] text-gray-900">
@@ -126,26 +182,66 @@ function SchoolLocator() {
                 <div className="mb-5">
                   <div><p className="text-xs font-semibold uppercase tracking-[0.16em] text-orange-600">Available matches</p><h2 className="text-xl sm:text-2xl font-bold mt-1">{result.schools.length} {result.schools.length === 1 ? 'school' : 'schools'} available</h2></div>
                 </div>
-                <SchoolLocatorMap schools={result.schools} selectedSchoolId={selectedSchoolId} />
+                <SchoolLocatorMap
+                  schools={result.schools}
+                  selectedSchoolId={selectedSchoolId}
+                  route={directions.status === 'success' ? directions.route : null}
+                  userLocation={directions.status === 'success' ? directions.userLocation : null}
+                  coverageResetKey={coverageResetKey}
+                  onRecenterCoverage={() => setCoverageResetKey((key) => key + 1)}
+                />
+                <div className="min-h-0" aria-live="polite">
+                  {directions.status === 'loading' && (
+                    <div className="mt-4 rounded-2xl border border-blue-100 bg-blue-50 px-5 py-4 text-sm text-blue-800">
+                      Requesting your location and calculating a driving route...
+                    </div>
+                  )}
+                  {directions.status === 'error' && (
+                    <div className="mt-4 rounded-2xl border border-red-100 bg-red-50 px-5 py-4 text-sm text-red-700">
+                      {directions.message}
+                    </div>
+                  )}
+                  {directions.status === 'success' && (
+                    <div className="mt-4 rounded-2xl border border-blue-100 bg-white px-5 py-4 shadow-sm">
+                      <p className="text-sm font-semibold text-gray-900">Driving route to {directions.schoolName}</p>
+                      <p className="mt-2 text-sm text-gray-600">Route distance: <strong className="text-gray-900">{routeDistanceLabel(directions.route.distanceMeters)}</strong></p>
+                    </div>
+                  )}
+                </div>
                 <div className="grid md:grid-cols-2 gap-5">
-                  {result.schools.map((school) => (
+                  {result.schools.map((school) => {
+                    const ownershipLabel = getSchoolOwnershipLabel(school.hei_type)
+                    return (
                       <article key={school.school_id} className="bg-white border border-gray-100 rounded-2xl p-6 sm:p-7 shadow-sm hover:shadow-md hover:border-orange-100 transition">
                         <div className="flex items-start gap-4">
                           <div className="w-11 h-11 rounded-2xl bg-orange-50 text-orange-600 flex items-center justify-center shrink-0"><IconSchool size={23} stroke={1.7} /></div>
-                          <div className="min-w-0"><h3 className="font-bold text-lg leading-snug text-gray-900">{school.school_name}</h3>{(school.hei_type || school.hei_type2) && <p className="text-xs text-gray-500 mt-1">{[school.hei_type, school.hei_type2].filter(Boolean).join(' · ')}</p>}</div>
+                          <div className="min-w-0"><h3 className="font-bold text-lg leading-snug text-gray-900">{school.school_name}</h3>{ownershipLabel && <p className="text-xs text-gray-500 mt-1">{ownershipLabel}</p>}</div>
                         </div>
                         {school.address && <p className="flex items-start gap-2 text-sm text-gray-600 leading-6 mt-5"><IconMapPin size={18} stroke={1.7} className="text-orange-500 shrink-0 mt-0.5" /><span>{school.address}</span></p>}
-                        {Number.isFinite(school.latitude) && Number.isFinite(school.longitude) && (
-                          <button
-                            type="button"
-                            onClick={() => setSelectedSchoolId(school.school_id)}
-                            className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-orange-700 hover:text-orange-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500"
-                          >
-                            <IconMapPin size={17} stroke={1.8} /> Show on map
-                          </button>
+                        {hasValidCoordinates(school) ? (
+                          <div className="mt-4 flex flex-wrap items-center gap-3">
+                            <button
+                              type="button"
+                              onClick={() => showSchoolOnMap(school.school_id)}
+                              className="inline-flex items-center gap-1.5 text-sm font-semibold text-orange-700 hover:text-orange-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500"
+                            >
+                              <IconMapPin size={17} stroke={1.8} /> Show on map
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => getDirections(school)}
+                              disabled={directions.status === 'loading' && directions.schoolId === school.school_id}
+                              className="inline-flex items-center gap-1.5 rounded-xl bg-orange-500 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-600 disabled:cursor-wait disabled:opacity-60 transition"
+                            >
+                              <IconRoute size={17} stroke={1.8} /> {directions.status === 'loading' && directions.schoolId === school.school_id ? 'Calculating...' : 'Get Directions'}
+                            </button>
+                          </div>
+                        ) : (
+                          <p className="mt-4 text-xs text-gray-400">Directions unavailable: reviewed map coordinates are not available.</p>
                         )}
                       </article>
-                  ))}
+                    )
+                  })}
                 </div>
               </section>
             )}
