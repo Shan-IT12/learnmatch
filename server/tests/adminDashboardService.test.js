@@ -2,86 +2,82 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import fs from 'node:fs'
 import jwt from 'jsonwebtoken'
-import { ADMIN_JWT_AUDIENCE, USER_JWT_AUDIENCE, jwtSignOptions } from '../config/security.js'
-import pool from '../config/db.js'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
+import { ADMIN_JWT_AUDIENCE, USER_JWT_AUDIENCE, jwtSignOptions } from '../config/security.js'
+import pool from '../config/db.js'
 import authenticateAdmin from '../middleware/authenticateAdmin.js'
 import { getAdminDashboard } from '../services/adminDashboardService.js'
 
 function dashboardDatabase({
-  summary = {},
-  registrations = [],
-  alignment = [],
-  clusters = [],
-  activity = [],
+  summary = {}, registrations = [], courses = [], recentUsers = [],
 } = {}) {
   const calls = []
   return {
     calls,
     query: async (sql, values) => {
       calls.push({ sql, values })
-      if (sql.includes('AS total_users')) return [[summary]]
+      if (sql.includes('AS registered_students')) return [[summary]]
       if (sql.includes("DATE_FORMAT(created_at, '%Y-%m')")) return [registrations]
-      if (sql.includes('GROUP BY status')) return [alignment]
-      if (sql.includes('FROM RECOMMENDATION_ITEM')) return [clusters]
-      if (sql.includes('activity_type')) return [activity]
+      if (sql.includes('WITH ranked_recommendations')) return [courses]
+      if (sql.includes('ORDER BY created_at DESC, user_id DESC')) return [recentUsers]
       throw new Error(`Unexpected SQL: ${sql}`)
     },
   }
 }
 
-test('dashboard summary returns actual counts and counts flagged students once from their latest completed status', async () => {
+test('summary uses student accounts and the existing complete-assessment definition', async () => {
   const database = dashboardDatabase({
     summary: {
-      total_users: '18',
-      active_courses: '312',
-      tracking_students: '7',
-      flagged_students: '3',
-      total_feedback: '9',
+      registered_students: '18', completed_assessments: '9',
+      completed_with_personal_factors: '7',
     },
   })
 
-  const result = await getAdminDashboard(database, { now: new Date('2026-09-20T00:00:00Z') })
+  const result = await getAdminDashboard(database)
   assert.deepEqual(result.summary, {
-    totalUsers: 18,
-    activeCourses: 312,
-    trackingStudents: 7,
-    flaggedStudents: 3,
-    totalFeedback: 9,
+    registeredStudents: 18,
+    completedAssessments: 9,
+    consideredPersonalFactors: 7,
+    assessmentCompletionRate: 50,
   })
 
-  const summarySql = database.calls.find(({ sql }) => sql.includes('AS total_users')).sql
-  assert.match(summarySql, /SELECT user_id FROM COLLEGE_TERM\s+UNION\s+SELECT user_id FROM SEMESTER_CHECKIN/)
-  assert.match(summarySql, /ROW_NUMBER\(\) OVER \(\s+PARTITION BY sc\.user_id/)
-  assert.match(summarySql, /latest_rank = 1 AND status IN \('Monitor', 'Needs Attention'\)/)
+  const summarySql = database.calls.find(({ sql }) => sql.includes('AS registered_students')).sql
+  assert.match(summarySql, /FROM USER_ACCOUNT account/)
+  assert.doesNotMatch(summarySql, /FROM ADMIN|JOIN ADMIN/)
+  assert.match(summarySql, /COALESCE\(profile_stats\.profile_count, 0\) >= 1/)
+  assert.match(summarySql, /COALESCE\(interest_stats\.interest_count, 0\) >= 3/)
+  assert.match(summarySql, /COALESCE\(skill_stats\.skill_count, 0\) >= 30/)
+  assert.match(summarySql, /COALESCE\(personality_stats\.personality_count, 0\) >= 1/)
   assert.doesNotMatch(summarySql, /INSERT|UPDATE|DELETE|ALTER/i)
 })
 
-test('alignment distribution uses one latest completed check-in per student and safely includes zero statuses', async () => {
-  const database = dashboardDatabase({
-    alignment: [
-      { status: 'On Track', student_count: '4' },
-      { status: 'Needs Attention', student_count: '1' },
-    ],
-  })
+test('personal-factor count is limited to completed assessments and effective scoring categories', async () => {
+  const database = dashboardDatabase()
+  await getAdminDashboard(database)
+  const sql = database.calls.find(({ sql: query }) => query.includes('AS registered_students')).sql
 
-  const result = await getAdminDashboard(database)
-  assert.deepEqual(result.alignmentDistribution, [
-    { status: 'On Track', count: 4 },
-    { status: 'Monitor', count: 0 },
-    { status: 'Needs Attention', count: 1 },
-  ])
-
-  const alignmentSql = database.calls.find(({ sql }) => sql.includes('GROUP BY status')).sql
-  assert.match(alignmentSql, /JOIN AI_MISMATCH_ANALYSIS/)
-  assert.match(alignmentSql, /latest_rank = 1/)
-
-  const empty = await getAdminDashboard(dashboardDatabase())
-  assert.equal(empty.alignmentDistribution.reduce((sum, item) => sum + item.count, 0), 0)
+  assert.match(sql, /state\.status = 'Completed' AND COALESCE\(factors\.has_personal_factors, 0\) = 1/)
+  for (const factor of ['physical', 'health', 'financial', 'family', 'working_student']) {
+    assert.match(sql, new RegExp(`factor_${factor}`))
+  }
+  assert.match(sql, /factor_others_classification_status = 'MATCHED'/)
+  assert.match(sql, /GROUP BY user_id/)
+  assert.doesNotMatch(sql, /factor_distance/)
 })
 
-test('registration trend is chronological, includes all six months, and fills missing months with zero', async () => {
+test('assessment completion rate is rounded and safely handles no registered students', async () => {
+  const partial = await getAdminDashboard(dashboardDatabase({
+    summary: { registered_students: '6', completed_assessments: '2' },
+  }))
+  assert.equal(partial.summary.assessmentCompletionRate, 33.3)
+
+  const empty = await getAdminDashboard(dashboardDatabase())
+  assert.equal(empty.summary.assessmentCompletionRate, 0)
+  assert.equal(empty.summary.registeredStudents, 0)
+})
+
+test('registration trend is chronological, student-only, and fills missing months with zero', async () => {
   const database = dashboardDatabase({
     registrations: [
       { month_key: '2026-05', registration_count: '2' },
@@ -95,28 +91,59 @@ test('registration trend is chronological, includes all six months, and fills mi
   ])
   assert.deepEqual(result.registrationTrend.map(({ count }) => count), [0, 2, 0, 0, 0, 5])
   const registrationCall = database.calls.find(({ sql }) => sql.includes('DATE_FORMAT'))
+  assert.match(registrationCall.sql, /FROM USER_ACCOUNT/)
+  assert.doesNotMatch(registrationCall.sql, /ADMIN/)
   assert.deepEqual(registrationCall.values, ['2026-04-01 00:00:00', '2026-10-01 00:00:00'])
 })
 
-test('recommended cluster appearances use canonical course clusters, descending Top N, and handle empty data', async () => {
+test('course metrics use individual courses from each student latest saved Top 3', async () => {
   const database = dashboardDatabase({
-    clusters: [
-      { cluster_category: 'Education Cluster', appearance_count: '4' },
-      { cluster_category: 'Business Cluster', appearance_count: '9' },
-      { cluster_category: 'Engineering/STEM Cluster', appearance_count: '7' },
+    courses: [
+      { course_id: '2', course_code: 'BSIT', course_name: 'Information Technology', appearance_count: '9' },
+      { course_id: '3', course_code: 'BSCS', course_name: 'Computer Science', appearance_count: '6' },
+      { course_id: '4', course_code: 'BSA', course_name: 'Accountancy', appearance_count: '3' },
     ],
   })
-  const result = await getAdminDashboard(database, { clusterLimit: 2 })
-  assert.deepEqual(result.recommendedClusters, [
-    { cluster: 'Business Cluster', count: 9 },
-    { cluster: 'Engineering/STEM Cluster', count: 7 },
-  ])
-  const clusterSql = database.calls.find(({ sql }) => sql.includes('FROM RECOMMENDATION_ITEM')).sql
-  assert.match(clusterSql, /JOIN COURSE c ON c\.course_id = item\.course_id/)
-  assert.match(clusterSql, /GROUP BY c\.cluster_category/)
+  const result = await getAdminDashboard(database, { courseLimit: 2 })
 
-  const empty = await getAdminDashboard(dashboardDatabase())
-  assert.deepEqual(empty.recommendedClusters, [])
+  assert.deepEqual(result.coursePopularity, [
+    { courseId: 2, courseCode: 'BSIT', courseName: 'Information Technology', count: 9 },
+    { courseId: 3, courseCode: 'BSCS', courseName: 'Computer Science', count: 6 },
+    { courseId: 4, courseCode: 'BSA', courseName: 'Accountancy', count: 3 },
+  ])
+  assert.deepEqual(result.topRecommendedCourses, result.coursePopularity)
+  const courseCall = database.calls.find(({ sql }) => sql.includes('WITH ranked_recommendations'))
+  assert.match(courseCall.sql, /PARTITION BY user_id/)
+  assert.match(courseCall.sql, /snapshot_rank = 1/)
+  assert.match(courseCall.sql, /rank_position BETWEEN 1 AND 3/)
+  assert.match(courseCall.sql, /GROUP BY course\.course_id, course\.course_code, course\.course_name/)
+  assert.doesNotMatch(courseCall.sql, /cluster_category/)
+  assert.deepEqual(courseCall.values, [2])
+})
+
+test('recent users are student accounts in newest-first order without activity events', async () => {
+  const database = dashboardDatabase({
+    recentUsers: [
+      { user_id: '8', username: 'new_student', created_at: '2026-09-18T03:00:00.000Z' },
+    ],
+  })
+  const result = await getAdminDashboard(database, { recentUserLimit: 4 })
+
+  assert.deepEqual(result.recentlyRegisteredUsers, [{
+    userId: 8, username: 'new_student', registeredAt: '2026-09-18T03:00:00.000Z',
+  }])
+  const call = database.calls.find(({ sql }) => sql.includes('ORDER BY created_at DESC, user_id DESC'))
+  assert.match(call.sql, /FROM USER_ACCOUNT/)
+  assert.doesNotMatch(call.sql, /FEEDBACK|CHECKIN|ADMIN/)
+  assert.deepEqual(call.values, [4])
+})
+
+test('empty dashboard data returns stable empty collections', async () => {
+  const result = await getAdminDashboard(dashboardDatabase())
+  assert.deepEqual(result.coursePopularity, [])
+  assert.deepEqual(result.topRecommendedCourses, [])
+  assert.deepEqual(result.recentlyRegisteredUsers, [])
+  assert.equal(result.registrationTrend.length, 6)
 })
 
 function runMiddleware(headers) {
@@ -130,7 +157,7 @@ function runMiddleware(headers) {
   })
 }
 
-test('dashboard route requires admin authentication; missing and student tokens are rejected', async () => {
+test('dashboard route remains admin-only', async () => {
   const originalSecret = process.env.JWT_SECRET
   const originalQuery = pool.query
   process.env.JWT_SECRET = 'admin-dashboard-test-secret'
