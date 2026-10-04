@@ -1,19 +1,23 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 
-import { saveProfileWithDependencies } from '../controllers/profileController.js'
+import {
+  getProfileWithDependencies,
+  saveProfileWithDependencies,
+} from '../controllers/profileController.js'
 
 const baseBody = Object.freeze({
-  full_name: 'Student Name',
-  height_cm: '',
-  weight_kg: '',
-  factor_physical: false,
-  factor_health: false,
-  factor_financial: false,
-  factor_family: false,
-  factor_distance: false,
-  factor_working_student: false,
-  factor_others: '',
+  username: 'student9',
+  physical_accessibility_areas: ['seeing', 'walking_climbing'],
+  physical_accessibility_difficulties: {
+    seeing: 'some_difficulty',
+    walking_climbing: 'a_lot_of_difficulty',
+  },
+  factor_physical_impact: 2,
+  factor_health_impact: 1,
+  factor_financial_impact: 3,
+  factor_family_impact: 4,
+  factor_work_impact: 2,
 })
 
 function response() {
@@ -25,196 +29,181 @@ function response() {
   }
 }
 
-function database(existing = []) {
+function database({
+  accountUsername = 'student9',
+  existingProfile = [],
+  duplicateUsers = [],
+} = {}) {
   const calls = []
   return {
     calls,
     async query(sql, params) {
       calls.push({ sql, params })
-      if (sql.includes('SELECT profile_id')) return [existing]
+      if (sql.includes('SELECT username FROM USER_ACCOUNT')) {
+        return [accountUsername === null ? [] : [{ username: accountUsername }]]
+      }
+      if (sql.includes('SELECT user_id FROM USER_ACCOUNT WHERE username')) return [duplicateUsers]
+      if (sql.includes('SELECT profile_id FROM PROFILE')) return [existingProfile]
+      if (sql.includes('SELECT * FROM PROFILE')) return [existingProfile]
       return [{ affectedRows: 1 }]
     },
   }
 }
 
-async function save(body, { existing = [], classify } = {}) {
-  const db = database(existing)
+async function save(body = {}, options = {}) {
+  const db = database(options)
   const res = response()
   await saveProfileWithDependencies(
-    { user: { userId: 9 }, body: { ...baseBody, ...body } },
+    { user: { userId: 9, username: 'token-name' }, body: { ...baseBody, ...body } },
     res,
-    { database: db, classify: classify || (async () => ({ status: 'UNAVAILABLE', categories: [] })) }
+    { database: db }
   )
-  return { db, res, write: db.calls[1] }
+  const profileWrite = db.calls.find(({ sql }) => /(?:INSERT INTO|UPDATE) PROFILE/.test(sql))
+  return { db, res, profileWrite }
 }
 
-test('classifies trimmed custom text while preserving manual booleans', async () => {
-  let classifiedText
-  const { res, write } = await save({
-    factor_family: false,
-    factor_working_student: true,
-    factor_others: '  I care for my younger siblings.  ',
-  }, {
-    classify: async (text) => {
-      classifiedText = text
-      return { status: 'MATCHED', categories: ['factor_family'] }
-    },
+test('loads the current account username with an existing Profile', async () => {
+  const db = database({
+    accountUsername: 'current_student',
+    existingProfile: [{ profile_id: 14, factor_health_impact: 2 }],
   })
-
-  assert.equal(res.statusCode, 201)
-  assert.equal(classifiedText, 'I care for my younger siblings.')
-  assert.equal(write.params[7], false)
-  assert.equal(write.params[9], true)
-  assert.equal(write.params[10], 'I care for my younger siblings.')
-  assert.equal(write.params[11], 'MATCHED')
-  assert.equal(write.params[12], '["factor_family"]')
-})
-
-test('classification failure still saves the original normalized text', async () => {
-  const { res, write } = await save({ factor_others: '  A private circumstance  ' })
-  assert.equal(res.statusCode, 201)
-  assert.equal(write.params[10], 'A private circumstance')
-  assert.equal(write.params[11], 'UNAVAILABLE')
-  assert.equal(write.params[12], '[]')
-})
-
-test('whitespace-only or removed text clears both classification fields', async () => {
-  let classificationCalls = 0
-  const { write } = await save({ factor_others: '   ', factor_family: true }, {
-    existing: [{
-      profile_id: 1,
-      factor_others: 'Old text',
-      factor_others_classification_status: 'MATCHED',
-      factor_others_classification: '["factor_family"]',
-    }],
-    classify: async () => { classificationCalls += 1 },
-  })
-  assert.equal(classificationCalls, 0)
-  assert.equal(write.params[6], true)
-  assert.equal(write.params[8], null)
-  assert.equal(write.params[9], null)
-  assert.equal(write.params[10], null)
-})
-
-test('editing custom text replaces the stored classification', async () => {
-  const { write } = await save({ factor_others: 'I work evenings.' }, {
-    existing: [{
-      profile_id: 1,
-      factor_others: 'I care for my siblings.',
-      factor_others_classification_status: 'MATCHED',
-      factor_others_classification: '["factor_family"]',
-    }],
-    classify: async () => ({
-      status: 'MATCHED',
-      categories: ['factor_working_student', 'factor_financial'],
-    }),
-  })
-  assert.equal(write.params[8], 'I work evenings.')
-  assert.equal(write.params[9], 'MATCHED')
-  assert.equal(write.params[10], '["factor_working_student","factor_financial"]')
-})
-
-test('unchanged matched, ambiguous, and unmatched results avoid another AI call', async () => {
-  for (const stored of [
-    { status: 'MATCHED', categories: ['factor_working_student', 'factor_financial'] },
-    { status: 'AMBIGUOUS', categories: [] },
-    { status: 'UNMATCHED', categories: [] },
-  ]) {
-    let classificationCalls = 0
-    const { write } = await save({ factor_others: 'I work evenings.' }, {
-      existing: [{
-        profile_id: 1,
-        factor_others: 'I work evenings.',
-        factor_others_classification_status: stored.status,
-        factor_others_classification: JSON.stringify(stored.categories),
-      }],
-      classify: async () => { classificationCalls += 1 },
-    })
-    assert.equal(classificationCalls, 0)
-    assert.equal(write.params[9], stored.status)
-    assert.equal(write.params[10], JSON.stringify(stored.categories))
-  }
-})
-
-test('reused classification is reported without exposing profile data', async () => {
-  const events = []
-  const db = database([{
-    profile_id: 1,
-    factor_others: 'Private custom text',
-    factor_others_classification_status: 'MATCHED',
-    factor_others_classification: '["factor_family"]',
-  }])
   const res = response()
-  await saveProfileWithDependencies(
-    {
-      user: { userId: 9 },
-      body: { ...baseBody, full_name: 'Student Name', factor_others: 'Private custom text' },
-    },
+
+  await getProfileWithDependencies(
+    { user: { userId: 9, username: 'stale-token-name' } },
     res,
-    {
-      database: db,
-      classify: async () => { throw new Error('classification should not run') },
-      logClassification: (result, options) => events.push({ result, options }),
-    }
+    { database: db }
   )
-  assert.deepEqual(events, [{
-    result: { status: 'MATCHED', categories: ['factor_family'] },
-    options: { reused: true },
-  }])
-  assert.doesNotMatch(JSON.stringify(events), /Private custom text|Student Name|"userId":9/)
-})
 
-test('unchanged unavailable result triggers one new classification attempt', async () => {
-  let classificationCalls = 0
-  const { write } = await save({ factor_others: 'I work evenings.' }, {
-    existing: [{
-      profile_id: 1,
-      factor_others: 'I work evenings.',
-      factor_others_classification_status: 'UNAVAILABLE',
-      factor_others_classification: null,
-    }],
-    classify: async () => {
-      classificationCalls += 1
-      return { status: 'MATCHED', categories: ['factor_working_student'] }
-    },
-  })
-  assert.equal(classificationCalls, 1)
-  assert.equal(write.params[9], 'MATCHED')
-  assert.equal(write.params[10], '["factor_working_student"]')
-})
-
-test('failed retry of unchanged unavailable result still saves unavailable and empty categories', async () => {
-  let classificationCalls = 0
-  const { res, write } = await save({ factor_others: 'I work evenings.' }, {
-    existing: [{
-      profile_id: 1,
-      factor_others: 'I work evenings.',
-      factor_others_classification_status: 'UNAVAILABLE',
-      factor_others_classification: null,
-    }],
-    classify: async () => {
-      classificationCalls += 1
-      return { status: 'UNAVAILABLE', categories: [] }
-    },
-  })
-  assert.equal(classificationCalls, 1)
   assert.equal(res.statusCode, 200)
-  assert.equal(write.params[9], 'UNAVAILABLE')
-  assert.equal(write.params[10], '[]')
+  assert.equal(res.body.username, 'current_student')
+  assert.equal(res.body.profile.profile_id, 14)
+  assert.deepEqual(db.calls[0].params, [9])
 })
 
-test('rejects non-string and over-limit custom input without writing', async () => {
-  for (const factor_others of [{ private: true }, 'x'.repeat(501)]) {
-    const { db, res } = await save({ factor_others })
+test('loads the current account username before a Profile has been created', async () => {
+  const db = database({ accountUsername: 'new_student' })
+  const res = response()
+
+  await getProfileWithDependencies(
+    { user: { userId: 9, username: 'new_student' } },
+    res,
+    { database: db }
+  )
+
+  assert.equal(res.statusCode, 200)
+  assert.equal(res.body.username, 'new_student')
+  assert.equal(res.body.profile, null)
+})
+
+test('an unchanged username is preserved without a duplicate check or account update', async () => {
+  const { db, res, profileWrite } = await save({}, {
+    accountUsername: 'student9',
+    existingProfile: [{ profile_id: 1 }],
+  })
+
+  assert.equal(res.statusCode, 200)
+  assert.equal(res.body.username, 'student9')
+  assert.equal(db.calls.some(({ sql }) => sql.includes('user_id <>')), false)
+  assert.equal(db.calls.some(({ sql }) => sql.startsWith('UPDATE USER_ACCOUNT')), false)
+  assert.ok(profileWrite)
+})
+
+test('a username owned by another account returns an inline field conflict without writing', async () => {
+  const { db, res, profileWrite } = await save({ username: 'already_used' }, {
+    duplicateUsers: [{ user_id: 22 }],
+    existingProfile: [{ profile_id: 1 }],
+  })
+
+  assert.equal(res.statusCode, 409)
+  assert.deepEqual(res.body, {
+    field: 'username',
+    message: 'Username is already taken.',
+  })
+  assert.equal(profileWrite, undefined)
+  assert.equal(db.calls.some(({ sql }) => sql.startsWith('UPDATE USER_ACCOUNT')), false)
+})
+
+test('a unique edited username updates the account and existing Profile successfully', async () => {
+  const { db, res, profileWrite } = await save({ username: 'new_student' }, {
+    existingProfile: [{ profile_id: 1 }],
+  })
+
+  assert.equal(res.statusCode, 200)
+  assert.equal(res.body.username, 'new_student')
+  const accountUpdate = db.calls.find(({ sql }) => sql.startsWith('UPDATE USER_ACCOUNT'))
+  assert.deepEqual(accountUpdate.params, ['new_student', 9])
+  assert.ok(profileWrite)
+  assert.doesNotMatch(profileWrite.sql, /full_name\s*=/)
+})
+
+test('new profiles persist structured responses without creating a profile-only name', async () => {
+  const { res, profileWrite } = await save({})
+
+  assert.equal(res.statusCode, 201)
+  assert.match(profileWrite.sql, /physical_accessibility_areas/)
+  assert.match(profileWrite.sql, /factor_work_impact/)
+  assert.deepEqual(profileWrite.params.slice(13), [
+    '["seeing","walking_climbing"]',
+    '{"seeing":"some_difficulty","walking_climbing":"a_lot_of_difficulty"}',
+    2, 1, 3, 4, 2,
+  ])
+  assert.equal(profileWrite.params[1], null)
+})
+
+test('profile save ignores deprecated Other Context and legacy body measurements', async () => {
+  const { res, profileWrite } = await save({
+    factor_others: 'Private context',
+    height_cm: 170,
+    weight_kg: 70,
+  })
+
+  assert.equal(res.statusCode, 201)
+  assert.equal(profileWrite.params[2], null)
+  assert.equal(profileWrite.params[3], null)
+  assert.equal(profileWrite.params[10], null)
+  assert.equal(profileWrite.params[11], null)
+  assert.equal(profileWrite.params[12], null)
+})
+
+test('updates write only structured Profile fields and leave every legacy field untouched', async () => {
+  const { res, profileWrite } = await save({
+    physical_accessibility_areas: [],
+    physical_accessibility_difficulties: {},
+    factor_physical_impact: 1,
+  }, { existingProfile: [{ profile_id: 1 }] })
+
+  assert.equal(res.statusCode, 200)
+  assert.doesNotMatch(profileWrite.sql, /full_name\s*=/)
+  assert.doesNotMatch(profileWrite.sql, /factor_physical\s*=/)
+  assert.doesNotMatch(profileWrite.sql, /factor_distance\s*=/)
+  assert.doesNotMatch(profileWrite.sql, /factor_others/)
+  assert.doesNotMatch(profileWrite.sql, /height_cm\s*=/)
+  assert.doesNotMatch(profileWrite.sql, /weight_kg\s*=/)
+  assert.deepEqual(profileWrite.params, ['[]', '{}', 1, 1, 3, 4, 2, 9])
+})
+
+test('an invalid username returns a field-specific error and does not access the database', async () => {
+  const { db, res } = await save({ username: 'invalid-name' })
+
+  assert.equal(res.statusCode, 400)
+  assert.equal(res.body.field, 'username')
+  assert.match(res.body.message, /letters, numbers, and underscores/i)
+  assert.equal(db.calls.length, 0)
+})
+
+test('invalid or incomplete responses are rejected before database access', async () => {
+  for (const body of [
+    { factor_health_impact: 0 },
+    { factor_work_impact: 5 },
+    { physical_accessibility_areas: [] },
+    {
+      physical_accessibility_areas: ['seeing'],
+      physical_accessibility_difficulties: {},
+    },
+  ]) {
+    const { db, res } = await save(body)
     assert.equal(res.statusCode, 400)
     assert.equal(db.calls.length, 0)
   }
-})
-
-test('updates leave the historical distance field untouched', async () => {
-  const { write } = await save({ factor_distance: true, factor_family: true }, {
-    existing: [{ profile_id: 1, factor_others: null }],
-  })
-  assert.doesNotMatch(write.sql, /factor_distance\s*=\s*\?/)
-  assert.equal(write.params[6], true)
 })

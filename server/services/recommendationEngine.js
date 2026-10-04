@@ -2,7 +2,7 @@ import {
   CLUSTER_RIASEC_CODES,
   CLUSTER_WSM_WEIGHTS,
   MBTI_TO_RIASEC,
-  PERSONAL_FACTOR_EFFECTS,
+  PERSONAL_FACTOR_RELEVANCE,
   RIASEC_DIMENSIONS,
   SCORED_PERSONAL_FACTORS,
   SKILL_DOMAINS,
@@ -119,28 +119,35 @@ export function calculatePersonalityScore(mbtiType, parentCluster) {
   return studentCodes.some((code) => clusterCodes.includes(code)) ? 1 : 0
 }
 
-export function calculatePersonalFactorScore(selectedFactors, parentCluster) {
+export function normalizePersonalFactorImpact(response) {
+  const value = Number(response)
+  if (!Number.isInteger(value) || value < 1 || value > 4) {
+    throw new RangeError('Personal Factor impact response must be an integer from 1 to 4')
+  }
+  return (value - 1) / 3
+}
+
+export function getClusterPersonalFactorRelevance(parentCluster) {
+  requireCluster(parentCluster)
+  return { ...PERSONAL_FACTOR_RELEVANCE[parentCluster] }
+}
+
+export function calculatePersonalFactorScore(responses, parentCluster) {
   requireCluster(parentCluster)
 
-  if (!selectedFactors || typeof selectedFactors !== 'object') {
-    throw new TypeError('selectedFactors must be an object')
+  // Legacy profiles have no structured impact responses. Their old booleans
+  // do not establish likelihood or severity, so recalculation stays neutral.
+  if (responses === null || responses === undefined) return 0.5
+  if (typeof responses !== 'object' || Array.isArray(responses)) {
+    throw new TypeError('Personal Factor responses must be an object')
   }
 
-  const activeFactors = SCORED_PERSONAL_FACTORS.filter((factor) => (
-    selectedFactors[factor] === true || selectedFactors[factor] === 1
-  ))
-
-  if (activeFactors.length === 0) {
-    return 0.5
-  }
-
-  const totalEffect = activeFactors.reduce(
-    (sum, factor) => sum + PERSONAL_FACTOR_EFFECTS[factor][parentCluster],
+  const relevance = PERSONAL_FACTOR_RELEVANCE[parentCluster]
+  const applicableBarrierSum = SCORED_PERSONAL_FACTORS.reduce(
+    (sum, factor) => sum + relevance[factor] * normalizePersonalFactorImpact(responses[factor]),
     0
   )
-  const averageEffect = totalEffect / activeFactors.length
-
-  return (averageEffect + 1) / 2
+  return Math.min(0.5, Math.max(0, 0.5 - 0.1 * applicableBarrierSum))
 }
 
 export function calculateClusterScore(

@@ -24,7 +24,7 @@ function OnboardingProfile() {
         }
         const data = await res.json()
 
-        if (data.profile && data.profile.full_name) {
+        if (data.profile) {
           navigate('/onboarding/interests', { replace: true })
         } else {
           setChecking(false)

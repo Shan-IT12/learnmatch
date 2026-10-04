@@ -1,159 +1,172 @@
 import pool from '../config/db.js'
-import {
-  classifyPersonalFactorText,
-  isReusablePersonalFactorClassification,
-  logPersonalFactorClassification,
-  normalizePersonalFactorText,
-  parseStoredPersonalFactorCategories,
-} from '../services/personalFactorClassificationService.js'
 import { validateProfile } from '../services/requestValidationService.js'
 
 export const saveProfileWithDependencies = async (
   req,
   res,
-  {
-    database = pool,
-    classify = classifyPersonalFactorText,
-    logClassification = logPersonalFactorClassification,
-  } = {}
+  { database = pool } = {}
 ) => {
   const userId = req.user.userId
   const validation = validateProfile(req.body)
-  if (!validation.valid) return res.status(400).json({ message: validation.message })
+  if (!validation.valid) {
+    return res.status(400).json({
+      ...(validation.field ? { field: validation.field } : {}),
+      message: validation.message,
+    })
+  }
   req.body = validation.value
   const {
-    full_name,
-    height_cm,
-    weight_kg,
-    factor_physical,
-    factor_health,
-    factor_financial,
-    factor_family,
-    factor_working_student,
-    factor_others
+    username,
+    physical_accessibility_areas,
+    physical_accessibility_difficulties,
+    factor_physical_impact,
+    factor_health_impact,
+    factor_financial_impact,
+    factor_family_impact,
+    factor_work_impact,
   } = req.body
 
-  const normalizedHeight =
-    height_cm === '' || height_cm === undefined || height_cm === null
-      ? null
-      : Number(height_cm)
-  const normalizedWeight =
-    weight_kg === '' || weight_kg === undefined || weight_kg === null
-      ? null
-      : Number(weight_kg)
-
-  if (normalizedHeight !== null && !Number.isFinite(normalizedHeight)) {
-    return res.status(400).json({ message: 'Height must be a valid number.' })
-  }
-
-  if (normalizedWeight !== null && !Number.isFinite(normalizedWeight)) {
-    return res.status(400).json({ message: 'Weight must be a valid number.' })
-  }
-
-  let normalizedOther
+  let connection = database
+  let transactionStarted = false
   try {
-    normalizedOther = normalizePersonalFactorText(factor_others)
-  } catch (error) {
-    return res.status(400).json({ message: error.message })
-  }
+    if (typeof database.getConnection === 'function') connection = await database.getConnection()
+    if (typeof connection.beginTransaction === 'function') {
+      await connection.beginTransaction()
+      transactionStarted = true
+    }
 
-  try {
-    // Check if profile already exists
-    const [existing] = await database.query(
-      `SELECT profile_id, factor_others,
-              factor_others_classification_status,
-              factor_others_classification
-       FROM PROFILE WHERE user_id = ?`,
+    const [accounts] = await connection.query(
+      'SELECT username FROM USER_ACCOUNT WHERE user_id = ? LIMIT 1',
+      [userId]
+    )
+    if (accounts.length !== 1) {
+      if (transactionStarted) {
+        await connection.rollback()
+        transactionStarted = false
+      }
+      return res.status(404).json({ message: 'Account not found.' })
+    }
+
+    if (accounts[0].username !== username) {
+      const [duplicates] = await connection.query(
+        'SELECT user_id FROM USER_ACCOUNT WHERE username = ? AND user_id <> ? LIMIT 1',
+        [username, userId]
+      )
+      if (duplicates.length > 0) {
+        if (transactionStarted) {
+          await connection.rollback()
+          transactionStarted = false
+        }
+        return res.status(409).json({
+          field: 'username',
+          message: 'Username is already taken.',
+        })
+      }
+      await connection.query(
+        'UPDATE USER_ACCOUNT SET username = ? WHERE user_id = ?',
+        [username, userId]
+      )
+    }
+
+    const [existing] = await connection.query(
+      'SELECT profile_id FROM PROFILE WHERE user_id = ?',
       [userId]
     )
 
-    let classificationStatus = null
-    let classification = null
-    if (normalizedOther) {
-      const existingProfile = existing[0]
-      const existingText = existingProfile?.factor_others == null
-        ? null
-        : String(existingProfile.factor_others).trim()
-      const canReuse = existingText === normalizedOther
-        && isReusablePersonalFactorClassification(
-          existingProfile?.factor_others_classification_status,
-          existingProfile?.factor_others_classification
-        )
-      const result = canReuse
-        ? {
-            status: existingProfile.factor_others_classification_status,
-            categories: parseStoredPersonalFactorCategories(
-              existingProfile.factor_others_classification
-            ),
-          }
-        : await classify(normalizedOther)
-      if (canReuse) logClassification(result, { reused: true })
-      classificationStatus = result.status
-      classification = JSON.stringify(result.categories)
-    }
-
     if (existing.length > 0) {
-      // Update existing profile
-      await database.query(
+      await connection.query(
         `UPDATE PROFILE SET 
-          full_name = ?, height_cm = ?, weight_kg = ?,
-          factor_physical = ?, factor_health = ?, factor_financial = ?,
-          factor_family = ?, factor_working_student = ?,
-          factor_others = ?, factor_others_classification_status = ?,
-          factor_others_classification = ?
+          physical_accessibility_areas = ?, physical_accessibility_difficulties = ?,
+          factor_physical_impact = ?, factor_health_impact = ?, factor_financial_impact = ?,
+          factor_family_impact = ?, factor_work_impact = ?
         WHERE user_id = ?`,
         [
-          full_name, normalizedHeight, normalizedWeight,
-          factor_physical, factor_health, factor_financial,
-          factor_family, factor_working_student,
-          normalizedOther, classificationStatus, classification, userId
+          JSON.stringify(physical_accessibility_areas),
+          JSON.stringify(physical_accessibility_difficulties),
+          factor_physical_impact, factor_health_impact, factor_financial_impact,
+          factor_family_impact, factor_work_impact, userId,
         ]
       )
-      return res.json({ message: 'Profile updated successfully' })
+      if (transactionStarted) {
+        await connection.commit()
+        transactionStarted = false
+      }
+      return res.json({ message: 'Profile updated successfully', username })
     }
 
-    // Insert new profile
-    await database.query(
+    await connection.query(
       `INSERT INTO PROFILE 
         (user_id, full_name, height_cm, weight_kg, factor_physical, factor_health, 
          factor_financial, factor_family, factor_distance, factor_working_student, factor_others,
-         factor_others_classification_status, factor_others_classification)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+         factor_others_classification_status, factor_others_classification,
+         physical_accessibility_areas, physical_accessibility_difficulties,
+         factor_physical_impact, factor_health_impact, factor_financial_impact,
+         factor_family_impact, factor_work_impact)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
-        userId, full_name, normalizedHeight, normalizedWeight,
-        factor_physical, factor_health, factor_financial,
-        factor_family, false, factor_working_student,
-        normalizedOther, classificationStatus, classification
+        userId, null, null, null,
+        false, false, false, false, false, false,
+        null, null, null,
+        JSON.stringify(physical_accessibility_areas),
+        JSON.stringify(physical_accessibility_difficulties),
+        factor_physical_impact, factor_health_impact, factor_financial_impact,
+        factor_family_impact, factor_work_impact,
       ]
     )
+    if (transactionStarted) {
+      await connection.commit()
+      transactionStarted = false
+    }
 
-    res.status(201).json({ message: 'Profile saved successfully' })
+    res.status(201).json({ message: 'Profile saved successfully', username })
 
   } catch (error) {
+    if (transactionStarted) {
+      try { await connection.rollback() } catch { /* preserve the original database error */ }
+      transactionStarted = false
+    }
+    if (error?.code === 'ER_DUP_ENTRY') {
+      return res.status(409).json({
+        field: 'username',
+        message: 'Username is already taken.',
+      })
+    }
     console.error('Profile save error:', error)
     res.status(500).json({ message: 'Server error saving profile' })
+  } finally {
+    if (connection !== database && typeof connection.release === 'function') connection.release()
   }
 }
 
 export const saveProfile = (req, res) => saveProfileWithDependencies(req, res)
 
-export const getProfile = async (req, res) => {
+export const getProfileWithDependencies = async (
+  req,
+  res,
+  { database = pool } = {}
+) => {
   const userId = req.user.userId
 
   try {
-    const [rows] = await pool.query(
+    const [accounts] = await database.query(
+      'SELECT username FROM USER_ACCOUNT WHERE user_id = ? LIMIT 1',
+      [userId]
+    )
+    if (accounts.length !== 1) {
+      return res.status(404).json({ message: 'Account not found.' })
+    }
+
+    const [rows] = await database.query(
       'SELECT * FROM PROFILE WHERE user_id = ?',
       [userId]
     )
 
-    if (rows.length === 0) {
-      return res.json({ profile: null })
-    }
-
-    res.json({ profile: rows[0] })
+    res.json({ username: accounts[0].username, profile: rows[0] || null })
 
   } catch (error) {
     console.error('Profile fetch error:', error)
     res.status(500).json({ message: 'Server error fetching profile' })
   }
 }
+
+export const getProfile = (req, res) => getProfileWithDependencies(req, res)

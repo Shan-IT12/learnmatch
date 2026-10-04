@@ -202,89 +202,30 @@ export const CLUSTER_RIASEC_CODES = Object.freeze({
 })
 
 export const SCORED_PERSONAL_FACTORS = Object.freeze([
-  'factor_physical',
-  'factor_health',
-  'factor_financial',
-  'factor_family',
-  'factor_working_student',
+  'physical',
+  'health',
+  'financial',
+  'family',
+  'work',
 ])
 
-export const PERSONAL_FACTOR_EFFECTS = Object.freeze({
-  factor_physical: Object.freeze({
-    'HEALTHCARE SCIENCE CLUSTER': -1,
-    'HUMANITIES & SOCIAL SCIENCE CLUSTER': 0,
-    'BUSINESS CLUSTER': 0,
-    'HOSPITALITY & TOURISM CLUSTER': -1,
-    'AVIATION & MARITIME CLUSTER': -1,
-    'LEGAL & PUBLIC SERVICE CLUSTER': 0,
-    'EDUCATION CLUSTER': -1,
-    'ARTS & MULTIMEDIA CLUSTER': 0,
-    'CRIMINOLOGY CLUSTER': -1,
-    'AGRICULTURE & ENVIRONMENTAL CLUSTER': -1,
-    'SCIENCE & MATHEMATICS CLUSTER': 0,
-    'SPORTS & PHYSICAL EDUCATION CLUSTER': -1,
-    'ENGINEERING / STEM CLUSTER': 0,
-  }),
-  factor_health: Object.freeze({
-    'HEALTHCARE SCIENCE CLUSTER': -1,
-    'HUMANITIES & SOCIAL SCIENCE CLUSTER': 0,
-    'BUSINESS CLUSTER': 0,
-    'HOSPITALITY & TOURISM CLUSTER': 0,
-    'AVIATION & MARITIME CLUSTER': -1,
-    'LEGAL & PUBLIC SERVICE CLUSTER': 0,
-    'EDUCATION CLUSTER': -1,
-    'ARTS & MULTIMEDIA CLUSTER': 0,
-    'CRIMINOLOGY CLUSTER': -1,
-    'AGRICULTURE & ENVIRONMENTAL CLUSTER': -1,
-    'SCIENCE & MATHEMATICS CLUSTER': 0,
-    'SPORTS & PHYSICAL EDUCATION CLUSTER': -1,
-    'ENGINEERING / STEM CLUSTER': 0,
-  }),
-  factor_financial: Object.freeze({
-    'HEALTHCARE SCIENCE CLUSTER': -1,
-    'HUMANITIES & SOCIAL SCIENCE CLUSTER': 0,
-    'BUSINESS CLUSTER': 0,
-    'HOSPITALITY & TOURISM CLUSTER': 0,
-    'AVIATION & MARITIME CLUSTER': -1,
-    'LEGAL & PUBLIC SERVICE CLUSTER': -1,
-    'EDUCATION CLUSTER': 0,
-    'ARTS & MULTIMEDIA CLUSTER': -1,
-    'CRIMINOLOGY CLUSTER': 0,
-    'AGRICULTURE & ENVIRONMENTAL CLUSTER': 0,
-    'SCIENCE & MATHEMATICS CLUSTER': 0,
-    'SPORTS & PHYSICAL EDUCATION CLUSTER': -1,
-    'ENGINEERING / STEM CLUSTER': -1,
-  }),
-  factor_family: Object.freeze({
-    'HEALTHCARE SCIENCE CLUSTER': -1,
-    'HUMANITIES & SOCIAL SCIENCE CLUSTER': 0,
-    'BUSINESS CLUSTER': 0,
-    'HOSPITALITY & TOURISM CLUSTER': -1,
-    'AVIATION & MARITIME CLUSTER': -1,
-    'LEGAL & PUBLIC SERVICE CLUSTER': -1,
-    'EDUCATION CLUSTER': 0,
-    'ARTS & MULTIMEDIA CLUSTER': 0,
-    'CRIMINOLOGY CLUSTER': -1,
-    'AGRICULTURE & ENVIRONMENTAL CLUSTER': 0,
-    'SCIENCE & MATHEMATICS CLUSTER': 0,
-    'SPORTS & PHYSICAL EDUCATION CLUSTER': 0,
-    'ENGINEERING / STEM CLUSTER': 0,
-  }),
-  factor_working_student: Object.freeze({
-    'HEALTHCARE SCIENCE CLUSTER': -1,
-    'HUMANITIES & SOCIAL SCIENCE CLUSTER': 0,
-    'BUSINESS CLUSTER': 0,
-    'HOSPITALITY & TOURISM CLUSTER': -1,
-    'AVIATION & MARITIME CLUSTER': -1,
-    'LEGAL & PUBLIC SERVICE CLUSTER': 0,
-    'EDUCATION CLUSTER': 0,
-    'ARTS & MULTIMEDIA CLUSTER': 0,
-    'CRIMINOLOGY CLUSTER': -1,
-    'AGRICULTURE & ENVIRONMENTAL CLUSTER': -1,
-    'SCIENCE & MATHEMATICS CLUSTER': 0,
-    'SPORTS & PHYSICAL EDUCATION CLUSTER': -1,
-    'ENGINEERING / STEM CLUSTER': -1,
-  }),
+// Documentary relevance only: 1 means a sufficiently common cluster-level
+// characteristic makes the factor contextually applicable. It is never an
+// eligibility rule and must not be used to hard-filter a course.
+export const PERSONAL_FACTOR_RELEVANCE = Object.freeze({
+  'HEALTHCARE SCIENCE CLUSTER': Object.freeze({ physical: 1, health: 1, financial: 1, family: 1, work: 1 }),
+  'HUMANITIES & SOCIAL SCIENCE CLUSTER': Object.freeze({ physical: 0, health: 0, financial: 0, family: 1, work: 1 }),
+  'BUSINESS CLUSTER': Object.freeze({ physical: 0, health: 0, financial: 0, family: 1, work: 1 }),
+  'HOSPITALITY & TOURISM CLUSTER': Object.freeze({ physical: 1, health: 0, financial: 0, family: 1, work: 1 }),
+  'AVIATION & MARITIME CLUSTER': Object.freeze({ physical: 1, health: 1, financial: 0, family: 1, work: 1 }),
+  'LEGAL & PUBLIC SERVICE CLUSTER': Object.freeze({ physical: 0, health: 0, financial: 0, family: 1, work: 1 }),
+  'EDUCATION CLUSTER': Object.freeze({ physical: 0, health: 0, financial: 0, family: 1, work: 1 }),
+  'ARTS & MULTIMEDIA CLUSTER': Object.freeze({ physical: 1, health: 0, financial: 0, family: 1, work: 1 }),
+  'CRIMINOLOGY CLUSTER': Object.freeze({ physical: 1, health: 1, financial: 1, family: 1, work: 1 }),
+  'AGRICULTURE & ENVIRONMENTAL CLUSTER': Object.freeze({ physical: 1, health: 0, financial: 0, family: 1, work: 1 }),
+  'SCIENCE & MATHEMATICS CLUSTER': Object.freeze({ physical: 0, health: 0, financial: 0, family: 0, work: 0 }),
+  'SPORTS & PHYSICAL EDUCATION CLUSTER': Object.freeze({ physical: 1, health: 1, financial: 0, family: 1, work: 1 }),
+  'ENGINEERING / STEM CLUSTER': Object.freeze({ physical: 1, health: 0, financial: 0, family: 1, work: 1 }),
 })
 
 const WEIGHT_SUM_TOLERANCE = 1e-12
@@ -314,9 +255,11 @@ export function validateRecommendationConfig() {
       throw new Error(`Invalid skill domain configured for cluster: ${cluster}`)
     }
 
+    const relevance = PERSONAL_FACTOR_RELEVANCE[cluster]
+    if (!relevance) throw new Error(`Missing Personal Factor relevance for cluster: ${cluster}`)
     for (const factor of SCORED_PERSONAL_FACTORS) {
-      if (PERSONAL_FACTOR_EFFECTS[factor]?.[cluster] === undefined) {
-        throw new Error(`Missing ${factor} effect for cluster: ${cluster}`)
+      if (![0, 1].includes(relevance[factor])) {
+        throw new Error(`Invalid ${factor} relevance for cluster: ${cluster}`)
       }
     }
   }

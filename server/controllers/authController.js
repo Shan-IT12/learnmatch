@@ -8,6 +8,7 @@ import {
   jwtSignOptions,
   jwtVerifyOptions,
 } from '../config/security.js'
+import { validateUsername } from '../services/usernameValidationService.js'
 
 const sendResendMail = async ({ to, subject, html }) => {
   if (!process.env.RESEND_API_KEY) {
@@ -86,6 +87,12 @@ export const registerUser = async (req, res) => {
     })
   }
 
+  const usernameValidation = validateUsername(username)
+  if (!usernameValidation.valid) {
+    return res.status(400).json({ message: usernameValidation.message })
+  }
+  const normalizedUsername = usernameValidation.value
+
   const passwordError = isValidPassword(password)
 
   if (passwordError) {
@@ -110,7 +117,7 @@ export const registerUser = async (req, res) => {
 
     const [existingUsername] = await pool.query(
       'SELECT user_id FROM USER_ACCOUNT WHERE username = ?',
-      [username]
+      [normalizedUsername]
     )
 
     if (existingUsername.length > 0) {
@@ -127,7 +134,7 @@ export const registerUser = async (req, res) => {
       (email, username, password, is_active)
       VALUES (?, ?, ?, 0)
       `,
-      [email, username, hashedPassword]
+      [email, normalizedUsername, hashedPassword]
     )
 
     userId = result.insertId

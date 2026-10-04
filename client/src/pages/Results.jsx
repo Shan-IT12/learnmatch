@@ -69,11 +69,36 @@ function RecommendationsLoadingState() {
 }
 
 const personalFactorLabels = {
-  factor_physical: 'Physical / Mobility',
-  factor_health: 'Health',
-  factor_financial: 'Financial',
-  factor_family: 'Family Responsibilities',
-  factor_working_student: 'Working Student',
+  factor_physical_impact: 'Physical / accessibility',
+  factor_health_impact: 'Health-related needs',
+  factor_financial_impact: 'Financial circumstances',
+  factor_family_impact: 'Family responsibilities',
+  factor_work_impact: 'Work responsibilities',
+}
+
+const physicalRelevanceClusters = new Set([
+  'HEALTHCARE SCIENCE CLUSTER',
+  'HOSPITALITY & TOURISM CLUSTER',
+  'AVIATION & MARITIME CLUSTER',
+  'ARTS & MULTIMEDIA CLUSTER',
+  'CRIMINOLOGY CLUSTER',
+  'AGRICULTURE & ENVIRONMENTAL CLUSTER',
+  'SPORTS & PHYSICAL EDUCATION CLUSTER',
+  'ENGINEERING / STEM CLUSTER',
+])
+
+const healthRelevanceClusters = new Set([
+  'HEALTHCARE SCIENCE CLUSTER',
+  'AVIATION & MARITIME CLUSTER',
+  'CRIMINOLOGY CLUSTER',
+  'SPORTS & PHYSICAL EDUCATION CLUSTER',
+])
+
+function shouldShowRequirementsNote(profile, cluster) {
+  return Boolean(
+    (Number(profile?.factor_physical_impact) > 1 && physicalRelevanceClusters.has(cluster))
+    || (Number(profile?.factor_health_impact) > 1 && healthRelevanceClusters.has(cluster))
+  )
 }
 
 function Results() {
@@ -183,7 +208,7 @@ function Results() {
     skill_match: 'Skills',
     interest_match: 'Interests',
     personality_match: 'Personality',
-    personal_factor_match: 'Personal Factors',
+    personal_factor_match: 'Personal Factors Adjustment',
   }
 
   const skillTotals = Object.values(assessment.domainScores).reduce(
@@ -193,10 +218,9 @@ function Results() {
   const skillPercent = skillTotals.total ? Math.round((skillTotals.correct / skillTotals.total) * 100) : null
   const selectedFactors = assessment.profile
     ? Object.entries(personalFactorLabels)
-        .filter(([key]) => assessment.profile[key])
-        .map(([, label]) => label)
+        .filter(([key]) => Number(assessment.profile[key]) > 1)
+        .map(([key, label]) => `${label}: ${assessment.profile[key]}/4`)
     : []
-  if (assessment.profile?.factor_others) selectedFactors.push('Other stated factor')
   const personalFactorsConsidered = selectedFactors.length > 0
 
   return (
@@ -272,10 +296,10 @@ function Results() {
                 <p className="text-xs font-semibold text-gray-400">Personal factors</p>
                 <div className="mt-2 flex items-center gap-2">
                   <span className={`h-2.5 w-2.5 rounded-full ${personalFactorsConsidered ? 'bg-emerald-500' : 'bg-gray-300'}`} />
-                  <p className="font-bold text-gray-900">{personalFactorsConsidered ? 'Considered' : 'None selected'}</p>
+                  <p className="font-bold text-gray-900">{personalFactorsConsidered ? 'Adjusted' : 'Neutral'}</p>
                 </div>
                 <p className="mt-1 text-xs leading-relaxed text-gray-500">
-                  {personalFactorsConsidered ? selectedFactors.join(' · ') : 'No personal constraints were included.'}
+                  {personalFactorsConsidered ? selectedFactors.join(' · ') : 'All scored responses indicate no current impact.'}
                 </p>
               </div>
             </div>
@@ -338,6 +362,11 @@ function Results() {
                     </div>
                   )}
                 </div>
+                {shouldShowRequirementsNote(assessment.profile, rec.cluster_category) && (
+                  <p className="mt-4 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-xs leading-relaxed text-blue-800">
+                    This program may include activities that require specific accessibility, laboratory, fieldwork, clinical, practicum, or placement arrangements. Requirements and available accommodations may vary by institution.
+                  </p>
+                )}
                 </div>
                 <div className="flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-gray-100 bg-gray-50/60 px-5 py-3.5 sm:px-6">
                 <button

@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { IconArrowRight, IconCircleCheck } from '@tabler/icons-react'
 import { checkinQuestions, checkinScale } from '../../data/checkinQuestions'
+import { FieldError, RequiredMark } from '../../components/FormValidation'
+import { scrollToFirstInvalidField } from '../../utils/formValidation'
 
 const RESULT_STYLES = {
   'On Track': 'border-emerald-200 bg-emerald-50 text-emerald-700',
@@ -90,13 +92,15 @@ export function CheckinHeader({ courseName, termLabel, phase, answeredCount }) {
   )
 }
 
-export function CheckinQuestionCard({ question, selectedValue, onSelect = () => {} }) {
+export function CheckinQuestionCard({ question, selectedValue, onSelect = () => {}, error = '' }) {
+  const fieldName = `checkin_${question.number}`
+  const errorId = `${fieldName}-error`
   return (
-    <fieldset className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm sm:p-5">
+    <fieldset data-validation-field={fieldName} className={`rounded-2xl border bg-white p-4 shadow-sm sm:p-5 ${error ? 'border-red-300' : 'border-gray-100'}`} aria-invalid={error ? 'true' : undefined} aria-describedby={error ? errorId : undefined}>
       <legend className="w-full px-0">
         <span className="flex items-start gap-3">
           <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-orange-50 text-xs font-bold text-orange-600">{question.number}</span>
-          <span className="pt-0.5 text-sm font-semibold leading-relaxed text-gray-900 sm:text-base">{question.text}</span>
+          <span className="pt-0.5 text-sm font-semibold leading-relaxed text-gray-900 sm:text-base">{question.text} <RequiredMark /></span>
         </span>
       </legend>
       <div className="mt-4 grid grid-cols-5 gap-2" role="radiogroup" aria-label={`Question ${question.number} response`}>
@@ -107,6 +111,7 @@ export function CheckinQuestionCard({ question, selectedValue, onSelect = () => 
           </label>
         ))}
       </div>
+      <FieldError id={errorId}>{error}</FieldError>
       <div className="mt-2 grid grid-cols-3 gap-2 text-[10px] leading-tight text-gray-400 sm:text-xs">
         <span>{checkinScale[0].label}</span><span className="text-center">{checkinScale[2].label}</span><span className="text-right">{checkinScale[4].label}</span>
       </div>
@@ -138,6 +143,7 @@ function SemesterCheckin() {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [result, setResult] = useState(null)
+  const [fieldErrors, setFieldErrors] = useState({})
 
   useEffect(() => {
     if (!token) {
@@ -178,6 +184,7 @@ function SemesterCheckin() {
 
   const handleSelect = (questionNumber, score) => {
     setAnswers((prev) => ({ ...prev, [questionNumber]: score }))
+    setFieldErrors((current) => ({ ...current, [questionNumber]: undefined }))
   }
 
   const handleSubmit = async (e) => {
@@ -185,10 +192,9 @@ function SemesterCheckin() {
     setError('')
 
     const questions = checkinQuestions[phase]
-    if (Object.keys(answers).length < questions.length) {
-      setError('Please answer all 5 questions before submitting.')
-      return
-    }
+    const nextErrors = Object.fromEntries(questions.filter((question) => answers[question.number] === undefined).map((question) => [question.number, 'Please select a response.']))
+    if (Object.keys(nextErrors).length) { setFieldErrors(nextErrors); scrollToFirstInvalidField([`checkin_${Object.keys(nextErrors)[0]}`]); return }
+    setFieldErrors({})
 
     setSubmitting(true)
 
@@ -240,8 +246,6 @@ function SemesterCheckin() {
 
   const questions = checkinQuestions[phase]
   const answeredCount = questions.filter(({ number }) => answers[number] !== undefined).length
-  const allAnswered = answeredCount === questions.length
-
   return (
     <div className="min-h-screen bg-gray-50">
       <nav className="bg-white border-b border-gray-100 px-8 py-5 flex justify-between items-center">
@@ -265,8 +269,8 @@ function SemesterCheckin() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {questions.map((question) => <CheckinQuestionCard key={question.number} question={question} selectedValue={answers[question.number]} onSelect={handleSelect} />)}
+        <form onSubmit={handleSubmit} noValidate className="space-y-4">
+          {questions.map((question) => <CheckinQuestionCard key={question.number} question={question} selectedValue={answers[question.number]} onSelect={handleSelect} error={fieldErrors[question.number]} />)}
 
           {phase === 'End' && <EndPhaseGwaField value={gwa} onChange={(event) => setGwa(event.target.value)} />}
 
@@ -277,7 +281,7 @@ function SemesterCheckin() {
             </div>
             <button
               type="submit"
-              disabled={submitting || !allAnswered}
+              disabled={submitting}
               className="inline-flex min-h-12 items-center justify-center rounded-xl bg-orange-500 px-7 text-sm font-semibold text-white transition hover:bg-orange-600 focus:outline-none focus:ring-4 focus:ring-orange-200 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-500"
             >
               {submitting ? 'Submitting...' : 'Submit Check-in'}

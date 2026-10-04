@@ -3,11 +3,11 @@ import { useNavigate } from 'react-router-dom'
 import { IconArrowRight, IconRefresh, IconSchool, IconHistory, IconUser, IconHeart, IconBrain, IconShieldCheck, IconStar } from '@tabler/icons-react'
 
 const personalFactorLabels = {
-  factor_physical: 'Physical / Mobility',
-  factor_health: 'Health',
-  factor_financial: 'Financial',
-  factor_family: 'Family Responsibilities',
-  factor_working_student: 'Working Student',
+  factor_physical_impact: 'Physical / accessibility',
+  factor_health_impact: 'Health-related needs',
+  factor_financial_impact: 'Financial circumstances',
+  factor_family_impact: 'Family responsibilities',
+  factor_work_impact: 'Work responsibilities',
 }
 
 const apiUrl = import.meta.env.VITE_API_URL || ''
@@ -60,7 +60,8 @@ function SummaryDashboard() {
  
         setInterests(interestsData.interests || [])
         setDomainScores(quizData.domainScores || {})
-        setProfile(profileData.profile || null)
+        if (profileData.username) localStorage.setItem('username', profileData.username)
+        setProfile(profileData.profile ? { ...profileData.profile, username: profileData.username } : null)
         setMbti(mbtiData.mbtiType ? mbtiData : null)
       } catch (error) {
         console.error('Summary fetch error:', error)
@@ -90,26 +91,11 @@ function SummaryDashboard() {
     )
   }
  
-  // Compute BMI for the profile summary card, if height/weight are set
-  let bmi = null
-  let bmiLabel = ''
-  if (profile?.height_cm && profile?.weight_kg) {
-    const heightInMeters = profile.height_cm / 100
-    bmi = (profile.weight_kg / (heightInMeters * heightInMeters)).toFixed(1)
-    if (bmi < 18.5) bmiLabel = 'Underweight'
-    else if (bmi < 25) bmiLabel = 'Normal'
-    else if (bmi < 30) bmiLabel = 'Overweight'
-    else bmiLabel = 'Obese'
-  }
- 
   const checkedFactors = profile
     ? Object.entries(personalFactorLabels)
-        .filter(([key]) => profile[key])
-        .map(([, label]) => label)
+        .filter(([key]) => Number(profile[key]) > 1)
+        .map(([key, label]) => `${label}: ${profile[key]}/4`)
     : []
-  if (profile?.factor_others) {
-    checkedFactors.push(`Other: ${profile.factor_others}`)
-  }
 
   const skillTotals = Object.values(domainScores).reduce(
     (totals, score) => ({ correct: totals.correct + score.correct, total: totals.total + score.total }),
@@ -206,12 +192,7 @@ function SummaryDashboard() {
             </div>
             {profile ? (
               <div className="space-y-1.5">
-                <p className="text-sm text-gray-900 font-medium">{profile.full_name}</p>
-                {bmi && (
-                  <p className="text-xs text-gray-500">
-                    BMI: {bmi} ({bmiLabel})
-                  </p>
-                )}
+                <p className="text-sm text-gray-900 font-medium">{profile.username}</p>
               </div>
             ) : (
               <p className="text-sm text-gray-400">No profile info yet.</p>
@@ -221,7 +202,7 @@ function SummaryDashboard() {
           <section className="rounded-2xl border border-white/90 bg-white/78 p-5 shadow-[0_18px_48px_-40px_rgba(120,53,15,.5)] sm:p-6">
             <div className="flex items-center justify-between gap-3 mb-4">
               <div className="flex items-center gap-3"><span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600"><IconShieldCheck size={20} stroke={1.8} /></span><div><p className="text-[11px] font-semibold uppercase tracking-wide text-gray-400">Personal Factors</p><p className="text-sm font-bold text-gray-900">Recommendation considerations</p></div></div>
-              <span className={`rounded-full px-2.5 py-1 text-[11px] font-bold ${checkedFactors.length ? 'bg-emerald-50 text-emerald-700' : 'bg-gray-100 text-gray-500'}`}>{checkedFactors.length ? 'Considered' : 'None selected'}</span>
+              <span className={`rounded-full px-2.5 py-1 text-[11px] font-bold ${checkedFactors.length ? 'bg-emerald-50 text-emerald-700' : 'bg-gray-100 text-gray-500'}`}>{checkedFactors.length ? 'Adjusted' : 'Neutral'}</span>
             </div>
             <div className="flex flex-wrap gap-2">
               {checkedFactors.length > 0 ? (
@@ -234,7 +215,7 @@ function SummaryDashboard() {
                   </span>
                 ))
               ) : (
-                <p className="text-sm text-gray-400">No personal factors selected.</p>
+                <p className="text-sm text-gray-400">All scored responses indicate no current impact.</p>
               )}
             </div>
           </section>

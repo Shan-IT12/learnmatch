@@ -23,6 +23,8 @@ import {
   parseYearNumber,
   summarizeRoadmapOverview,
 } from '../../utils/collegeTrackingView'
+import { FieldError, RequiredMark } from '../../components/FormValidation'
+import { scrollToFirstInvalidField } from '../../utils/formValidation'
 import { getCalendarTerms, resolveCalendarTerm } from '../../constants/academicCalendars'
 
 const STATUS_STYLES = {
@@ -113,6 +115,7 @@ function CollegeDashboard() {
   const [confirmedNextSemester, setConfirmedNextSemester] = useState('')
   const [startOptionalTerm, setStartOptionalTerm] = useState(false)
   const [lifecyclePending, setLifecyclePending] = useState(false)
+  const [nextTermErrors, setNextTermErrors] = useState({})
 
   useEffect(() => {
     if (!token) {
@@ -273,16 +276,18 @@ function CollegeDashboard() {
     setAdvancingSemester(true)
     setError('')
     try {
-      if (!nextSemesterStartDate || !nextSemesterEndDate || nextSemesterEndDate <= nextSemesterStartDate) {
-        setError('Enter valid dates for the next semester.')
+      const fieldErrors = {}
+      if (institutionDependentTerm && !confirmedNextYearLevel) fieldErrors.nextYearLevel = 'Please select the next year level.'
+      if (institutionDependentTerm && !confirmedNextSemester) fieldErrors.nextSemester = 'Please select the next semester.'
+      if (!nextSemesterStartDate) fieldErrors.nextStartDate = 'Please select the next term start date.'
+      if (!nextSemesterEndDate || nextSemesterEndDate <= nextSemesterStartDate) fieldErrors.nextEndDate = 'Select an end date after the start date.'
+      if (Object.keys(fieldErrors).length) {
+        setNextTermErrors(fieldErrors)
         setAdvancingSemester(false)
+        scrollToFirstInvalidField(Object.keys(fieldErrors))
         return
       }
-      if (institutionDependentTerm && (!confirmedNextYearLevel || !confirmedNextSemester)) {
-        setError('Confirm the next year level and semester for this institution-dependent term.')
-        setAdvancingSemester(false)
-        return
-      }
+      setNextTermErrors({})
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/college/semester/advance`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
@@ -537,27 +542,27 @@ function CollegeDashboard() {
                                         {institutionDependentTerm && (
                                           <>
                                             <p className="text-xs text-orange-700">LearnMatch cannot assume what follows a Third Semester or Summer term. Select the next academic stage explicitly.</p>
-                                            <select value={confirmedNextYearLevel} onChange={(event) => setConfirmedNextYearLevel(event.target.value)} className="w-full border border-gray-200 rounded-lg px-2 py-2 text-xs">
+                                            <label data-validation-field="nextYearLevel" className="block text-xs font-medium text-gray-700">Next year level <RequiredMark /><select value={confirmedNextYearLevel} onChange={(event) => { setConfirmedNextYearLevel(event.target.value); setNextTermErrors((current) => ({ ...current, nextYearLevel: undefined })) }} aria-invalid={nextTermErrors.nextYearLevel ? 'true' : undefined} aria-describedby={nextTermErrors.nextYearLevel ? 'next-year-level-error' : undefined} className="mt-1 w-full border border-gray-200 rounded-lg px-2 py-2 text-xs">
                                               <option value="">Next year level</option>
                                               {['1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year'].map((year) => <option key={year} value={year}>{year}</option>)}
-                                            </select>
-                                            <select value={confirmedNextSemester} onChange={(event) => setConfirmedNextSemester(event.target.value)} className="w-full border border-gray-200 rounded-lg px-2 py-2 text-xs">
+                                            </select><FieldError id="next-year-level-error">{nextTermErrors.nextYearLevel}</FieldError></label>
+                                            <label data-validation-field="nextSemester" className="block text-xs font-medium text-gray-700">Next semester <RequiredMark /><select value={confirmedNextSemester} onChange={(event) => { setConfirmedNextSemester(event.target.value); setNextTermErrors((current) => ({ ...current, nextSemester: undefined })) }} aria-invalid={nextTermErrors.nextSemester ? 'true' : undefined} aria-describedby={nextTermErrors.nextSemester ? 'next-semester-error' : undefined} className="mt-1 w-full border border-gray-200 rounded-lg px-2 py-2 text-xs">
                                               <option value="">Next semester</option>
                                               {getCalendarTerms('semester').map((term) => <option key={term.code} value={term.label}>{term.label}</option>)}
-                                            </select>
+                                            </select><FieldError id="next-semester-error">{nextTermErrors.nextSemester}</FieldError></label>
                                           </>
                                         )}
-                                        <input
+                                        <label className="block text-xs font-medium text-gray-700">Academic year <RequiredMark /><input
                                           type="text"
                                           aria-label="Next academic year"
                                           placeholder="2026-2027"
                                           value={nextSemesterAcademicYear || nextAcademicYear}
                                           readOnly={Boolean(nextAcademicYear)}
                                           onChange={(event) => setNextSemesterAcademicYear(event.target.value)}
-                                          className="w-full border border-gray-200 rounded-lg px-2 py-2 text-xs read-only:bg-gray-50"
-                                        />
-                                        <input type="date" value={nextSemesterStartDate} onChange={(event) => setNextSemesterStartDate(event.target.value)} className="w-full border border-gray-200 rounded-lg px-2 py-2 text-xs" />
-                                        <input type="date" min={nextSemesterStartDate || undefined} value={nextSemesterEndDate} onChange={(event) => setNextSemesterEndDate(event.target.value)} className="w-full border border-gray-200 rounded-lg px-2 py-2 text-xs" />
+                                          className="mt-1 w-full border border-gray-200 rounded-lg px-2 py-2 text-xs read-only:bg-gray-50"
+                                        /></label>
+                                        <label data-validation-field="nextStartDate" className="block text-xs font-medium text-gray-700">Term start <RequiredMark /><input type="date" value={nextSemesterStartDate} onChange={(event) => { setNextSemesterStartDate(event.target.value); setNextTermErrors((current) => ({ ...current, nextStartDate: undefined })) }} aria-invalid={nextTermErrors.nextStartDate ? 'true' : undefined} aria-describedby={nextTermErrors.nextStartDate ? 'next-start-error' : undefined} className="mt-1 w-full border border-gray-200 rounded-lg px-2 py-2 text-xs" /><FieldError id="next-start-error">{nextTermErrors.nextStartDate}</FieldError></label>
+                                        <label data-validation-field="nextEndDate" className="block text-xs font-medium text-gray-700">Term end <RequiredMark /><input type="date" min={nextSemesterStartDate || undefined} value={nextSemesterEndDate} onChange={(event) => { setNextSemesterEndDate(event.target.value); setNextTermErrors((current) => ({ ...current, nextEndDate: undefined })) }} aria-invalid={nextTermErrors.nextEndDate ? 'true' : undefined} aria-describedby={nextTermErrors.nextEndDate ? 'next-end-error' : undefined} className="mt-1 w-full border border-gray-200 rounded-lg px-2 py-2 text-xs" /><FieldError id="next-end-error">{nextTermErrors.nextEndDate}</FieldError></label>
                                         <button type="button" onClick={handleStartNextSemester} disabled={advancingSemester} className="w-full bg-gray-950 text-white px-3 py-2 rounded-lg text-xs font-semibold disabled:opacity-50">{advancingSemester ? 'Starting...' : 'Confirm and start'}</button>
                                       </div>
                                     )}

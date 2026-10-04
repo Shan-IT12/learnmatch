@@ -21,42 +21,19 @@ import {
   rankCourses,
 } from './recommendationEngine.js'
 import { isCurrentIndependentCourse } from './courseIdentityService.js'
-import {
-  PERSONAL_FACTOR_CATEGORIES,
-  parseStoredPersonalFactorCategories,
-  validatePersonalFactorClassification,
-} from './personalFactorClassificationService.js'
-
-const personalFactorCategorySet = new Set(PERSONAL_FACTOR_CATEGORIES)
-
-export function buildEffectivePersonalFactors(profile = {}) {
-  const effectiveFactors = {
-    factor_physical: profile.factor_physical,
-    factor_health: profile.factor_health,
-    factor_financial: profile.factor_financial,
-    factor_family: profile.factor_family,
-    factor_working_student: profile.factor_working_student,
+export function buildPersonalFactorResponses(profile = {}) {
+  const responses = {
+    physical: Number(profile.factor_physical_impact),
+    health: Number(profile.factor_health_impact),
+    financial: Number(profile.factor_financial_impact),
+    family: Number(profile.factor_family_impact),
+    work: Number(profile.factor_work_impact),
   }
-
-  const storedCategories = parseStoredPersonalFactorCategories(
-    profile.factor_others_classification
-  )
-  // Historical classifications may contain the retired distance category.
-  // Ignore unsupported entries while retaining any supported categories.
-  const categories = Array.isArray(storedCategories)
-    ? storedCategories.filter((category) => personalFactorCategorySet.has(category))
-    : storedCategories
-  const classification = validatePersonalFactorClassification({
-    status: profile.factor_others_classification_status,
-    categories,
-  })
-  if (classification.status === 'MATCHED') {
-    for (const category of classification.categories) {
-      if (personalFactorCategorySet.has(category)) effectiveFactors[category] = true
-    }
-  }
-
-  return effectiveFactors
+  // Never fabricate likelihood responses from legacy booleans or AI-derived
+  // categories. Incomplete legacy rows recalculate at the neutral PF baseline.
+  return Object.values(responses).every((value) => Number.isInteger(value) && value >= 1 && value <= 4)
+    ? responses
+    : null
 }
 
 export class RecommendationInputError extends Error {
@@ -214,13 +191,13 @@ export function scoreAndRankClusters({
   studentDomainScores,
   studentRiasecVector,
   mbtiType,
-  profileFactors,
+  personalFactorResponses,
 }) {
   const clusterScores = PARENT_CLUSTERS.map((parentCluster) => {
     const skillScore = calculateClusterSkillScore(studentDomainScores, parentCluster)
     const interestScore = calculateClusterInterestScore(studentRiasecVector, parentCluster)
     const personalityScore = calculatePersonalityScore(mbtiType, parentCluster)
-    const personalFactorScore = calculatePersonalFactorScore(profileFactors, parentCluster)
+    const personalFactorScore = calculatePersonalFactorScore(personalFactorResponses, parentCluster)
     const clusterScore = calculateClusterScore(
       { skillScore, interestScore, personalityScore, personalFactorScore },
       parentCluster
@@ -406,10 +383,8 @@ export async function getTopCourseRecommendations(pool, userId) {
       [userId]
     ),
     pool.query(
-      `SELECT factor_physical, factor_health, factor_financial,
-              factor_family, factor_distance, factor_working_student,
-              factor_others, factor_others_classification_status,
-              factor_others_classification
+      `SELECT factor_physical_impact, factor_health_impact, factor_financial_impact,
+              factor_family_impact, factor_work_impact
        FROM PROFILE
        WHERE user_id = ?
        LIMIT 1`,
@@ -451,7 +426,7 @@ export async function getTopCourseRecommendations(pool, userId) {
       'A student profile is required to generate recommendations.'
     )
   }
-  const profileFactors = buildEffectivePersonalFactors(profileRows[0])
+  const personalFactorResponses = buildPersonalFactorResponses(profileRows[0])
 
   const knownClusters = new Set(PARENT_CLUSTERS)
   const eligibleCourses = filterCurrentIndependentCourses(courseRows)
@@ -465,7 +440,7 @@ export async function getTopCourseRecommendations(pool, userId) {
     studentDomainScores,
     studentRiasecVector,
     mbtiType,
-    profileFactors,
+    personalFactorResponses,
   })
   const candidateClusters = selectTopClusters(clusterRanking)
   const candidateCourses = filterCoursesByCandidateClusters(

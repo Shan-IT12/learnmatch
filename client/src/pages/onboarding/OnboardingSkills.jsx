@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import OnboardingLayout from '../../components/OnboardingLayout'
+import { FieldError, RequiredMark } from '../../components/FormValidation'
+import { scrollToFirstInvalidField } from '../../utils/formValidation'
 
 function getQuestionGuide(question) {
   const text = question.question_text
@@ -151,6 +153,7 @@ function OnboardingSkills() {
   const [error, setError] = useState('')
   const [results, setResults] = useState(null)
   const [showExplanation, setShowExplanation] = useState(false)
+  const [questionError, setQuestionError] = useState('')
 
   // Fetch 30 questions once when the page loads
   useEffect(() => {
@@ -168,9 +171,15 @@ function OnboardingSkills() {
 
   const handleSelect = (questionId, choice) => {
     setAnswers((prev) => ({ ...prev, [questionId]: choice }))
+    setQuestionError('')
   }
 
   const handleNext = () => {
+    if (!answers[questions[currentIndex]?.question_id]) {
+      setQuestionError('Please select an answer.')
+      scrollToFirstInvalidField(['skillQuestion'])
+      return
+    }
     if (currentIndex < questions.length - 1) {
       setCurrentIndex(currentIndex + 1)
       setShowExplanation(false)
@@ -186,7 +195,10 @@ function OnboardingSkills() {
 
   const handleSubmit = async () => {
   if (Object.keys(answers).length < questions.length) {
-    setError('Please answer all questions before submitting.')
+    const firstMissingIndex = questions.findIndex((question) => !answers[question.question_id])
+    setCurrentIndex(firstMissingIndex)
+    setQuestionError('Please select an answer.')
+    scrollToFirstInvalidField(['skillQuestion'])
     return
   }
 
@@ -338,7 +350,7 @@ function OnboardingSkills() {
           </div>
         )}
 
-        <div className="rounded-3xl border border-gray-200 bg-white p-5 sm:p-7 shadow-[0_18px_45px_-34px_rgba(15,23,42,0.45)] mb-7">
+        <div data-validation-field="skillQuestion" className="rounded-3xl border border-gray-200 bg-white p-5 sm:p-7 shadow-[0_18px_45px_-34px_rgba(15,23,42,0.45)] mb-7" aria-invalid={questionError ? 'true' : undefined} aria-describedby={questionError ? 'skill-question-error' : undefined}>
           {/* Question figure, if this item has one */}
           {currentQuestion.image_url && (
             <div className="mb-5 overflow-hidden rounded-2xl border border-gray-100 bg-gray-50 p-3">
@@ -353,7 +365,7 @@ function OnboardingSkills() {
           <div className="mb-5 border-l-4 border-orange-500 pl-4">
             <p className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-gray-400">Select the best answer</p>
             <p className="text-base sm:text-lg font-semibold leading-relaxed text-gray-900">
-              {currentQuestion.question_text}
+              {currentQuestion.question_text} <RequiredMark />
             </p>
           </div>
 
@@ -411,6 +423,7 @@ function OnboardingSkills() {
               </button>
             ))}
           </div>
+          <FieldError id="skill-question-error">{questionError}</FieldError>
         </div>
 
         {/* Navigation */}
@@ -437,7 +450,6 @@ function OnboardingSkills() {
             <button
               type="button"
               onClick={handleNext}
-              disabled={!selectedChoice}
               className="px-5 sm:px-7 py-3 rounded-xl text-sm font-medium bg-slate-900 text-white hover:bg-slate-800 disabled:opacity-50 transition shadow-sm"
             >
               Next →

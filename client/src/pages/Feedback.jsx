@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { FieldError, RequiredMark } from '../components/FormValidation'
+import { scrollToFirstInvalidField } from '../utils/formValidation'
 import {
   IconAlertTriangle,
   IconArrowLeft,
@@ -47,19 +49,17 @@ function Feedback() {
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const [fieldErrors, setFieldErrors] = useState({})
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
 
-    if (rating === 0) {
-      setError('Please select a rating.')
-      return
-    }
-    if (!category) {
-      setError('Please select a category.')
-      return
-    }
+    const nextErrors = {}
+    if (rating === 0) nextErrors.rating = 'Please select a rating.'
+    if (!category) nextErrors.category = 'Please select a category.'
+    if (Object.keys(nextErrors).length) { setFieldErrors(nextErrors); scrollToFirstInvalidField(Object.keys(nextErrors)); return }
+    setFieldErrors({})
 
     setSubmitting(true)
 
@@ -153,9 +153,9 @@ function Feedback() {
 
         <form onSubmit={handleSubmit} className="space-y-8 rounded-3xl border border-white/80 bg-white/85 p-5 shadow-[0_12px_40px_rgba(15,23,42,0.06)] backdrop-blur-md sm:p-8 lg:p-10">
 
-          <fieldset>
+          <fieldset data-validation-field="rating" aria-invalid={fieldErrors.rating ? 'true' : undefined} aria-describedby={fieldErrors.rating ? 'feedback-rating-error' : undefined}>
             <legend className="text-base font-semibold text-gray-900">
-              How would you rate your experience?
+              How would you rate your experience? <RequiredMark />
             </legend>
             <p className="mt-1 text-sm text-gray-500">Choose the rating that best matches your experience.</p>
             <div className="mt-4 flex flex-wrap items-center gap-3">
@@ -166,7 +166,7 @@ function Feedback() {
                   type="button"
                   aria-label={`${star} out of 5 — ${ratingLabels[star]}`}
                   aria-pressed={rating === star}
-                  onClick={() => setRating(star)}
+                  onClick={() => { setRating(star); setFieldErrors((current) => ({ ...current, rating: undefined })) }}
                   onMouseEnter={() => setHoverRating(star)}
                   onMouseLeave={() => setHoverRating(0)}
                   className="rounded-xl p-1.5 text-orange-400 transition hover:scale-110 hover:bg-white focus:outline-none focus:ring-2 focus:ring-orange-300"
@@ -181,11 +181,12 @@ function Feedback() {
               </div>
               {rating > 0 && <span className="rounded-full bg-orange-50 px-3 py-1.5 text-xs font-bold text-orange-700">{ratingLabels[rating]}</span>}
             </div>
+            <FieldError id="feedback-rating-error">{fieldErrors.rating}</FieldError>
           </fieldset>
 
-          <fieldset>
+          <fieldset data-validation-field="category" aria-invalid={fieldErrors.category ? 'true' : undefined} aria-describedby={fieldErrors.category ? 'feedback-category-error' : undefined}>
             <legend className="text-base font-semibold text-gray-900">
-              What's this about?
+              What's this about? <RequiredMark />
             </legend>
             <p className="mt-1 text-sm text-gray-500">Select the category that fits best.</p>
             <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -201,7 +202,7 @@ function Feedback() {
                       : 'border-gray-200 bg-white hover:border-orange-200 hover:bg-orange-50/30'
                   }`}
                 >
-                  <input type="radio" name="feedback-category" value={cat.value} checked={selected} onChange={() => setCategory(cat.value)} className="sr-only" />
+                  <input type="radio" name="feedback-category" value={cat.value} checked={selected} onChange={() => { setCategory(cat.value); setFieldErrors((current) => ({ ...current, category: undefined })) }} required aria-required="true" className="sr-only" />
                   <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${cat.iconClass}`}><CategoryIcon size={19} stroke={1.8} /></span>
                   <span className="pr-5 text-sm font-semibold leading-snug text-gray-700">{cat.label}</span>
                   <span className={`absolute right-3 top-3 flex h-5 w-5 items-center justify-center rounded-full border transition ${selected ? 'border-orange-500 bg-orange-500 text-white' : 'border-gray-300 bg-white text-transparent'}`}><IconCheck size={13} stroke={2.5} /></span>
@@ -209,6 +210,7 @@ function Feedback() {
                 )
               })}
             </div>
+            <FieldError id="feedback-category-error">{fieldErrors.category}</FieldError>
           </fieldset>
 
           <div>

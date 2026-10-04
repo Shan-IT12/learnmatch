@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { IconEye, IconEyeOff } from '@tabler/icons-react'
 import AuthJourneyPanel from '../components/AuthJourneyPanel'
+import { FieldError, RequiredMark } from '../components/FormValidation'
+import { scrollToFirstInvalidField } from '../utils/formValidation'
 
 
 function Login() {
@@ -9,15 +11,22 @@ function Login() {
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
+  const [fieldErrors, setFieldErrors] = useState({})
   const navigate = useNavigate()
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
+    setFieldErrors((current) => ({ ...current, [e.target.name]: undefined }))
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
+    const nextErrors = {}
+    if (!formData.identifier.trim()) nextErrors.identifier = 'Please enter your email or username.'
+    if (!formData.password) nextErrors.password = 'Please enter your password.'
+    if (Object.keys(nextErrors).length) { setFieldErrors(nextErrors); scrollToFirstInvalidField(Object.keys(nextErrors)); return }
+    setFieldErrors({})
     setSubmitting(true)
 
     try {
@@ -90,10 +99,10 @@ function Login() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="group/field">
+          <form onSubmit={handleSubmit} noValidate className="space-y-4">
+            <div className="group/field" data-validation-field="identifier">
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Email or Username
+                Email or Username <RequiredMark />
               </label>
               <input
                 type="text"
@@ -102,13 +111,17 @@ function Login() {
                 onChange={handleChange}
                 className="w-full rounded-2xl border border-stone-200/90 bg-white/85 px-4 py-3.5 text-sm shadow-[inset_0_1px_0_rgba(255,255,255,.8)] outline-none transition duration-150 hover:border-orange-200 focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100/80"
                 required
+                aria-required="true"
+                aria-invalid={fieldErrors.identifier ? 'true' : undefined}
+                aria-describedby={fieldErrors.identifier ? 'login-identifier-error' : undefined}
               />
+              <FieldError id="login-identifier-error">{fieldErrors.identifier}</FieldError>
             </div>
 
-             <div>
+             <div data-validation-field="password">
               <div className="flex items-center justify-between mb-2">
                 <label className="block text-sm font-medium text-gray-700">
-                  Password
+                  Password <RequiredMark />
                 </label>
                 <Link to="/forgot-password" className="text-sm text-orange-500 font-medium hover:underline">
                   Forgot password?
@@ -123,6 +136,9 @@ function Login() {
                   className="w-full rounded-2xl border border-stone-200/90 bg-white/85 px-4 py-3.5 pr-11 text-sm shadow-[inset_0_1px_0_rgba(255,255,255,.8)] outline-none transition duration-150 hover:border-orange-200 focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100/80"
                   required
                   minLength={8}
+                  aria-required="true"
+                  aria-invalid={fieldErrors.password ? 'true' : undefined}
+                  aria-describedby={fieldErrors.password ? 'login-password-error' : undefined}
                 />
                 <button
                   type="button"
@@ -133,6 +149,7 @@ function Login() {
                   {showPassword ? <IconEyeOff size={18} stroke={1.75} /> : <IconEye size={18} stroke={1.75} />}
                 </button>
               </div>
+              <FieldError id="login-password-error">{fieldErrors.password}</FieldError>
             </div>
 
             <button

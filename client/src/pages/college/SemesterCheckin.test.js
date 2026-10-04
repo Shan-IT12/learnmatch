@@ -38,6 +38,14 @@ test('Term Check-in renders compact numeric radios, progress, term context, and 
     assert.match(question, /Neutral \/ Not sure/)
     assert.match(question, /Completely true for me/)
 
+    const invalidQuestion = renderToStaticMarkup(React.createElement(CheckinQuestionCard, {
+      question: checkinQuestions.Mid[0],
+      error: 'Please select a response.',
+    }))
+    assert.match(invalidQuestion, /aria-invalid="true"/)
+    assert.match(invalidQuestion, /Please select a response\./)
+    assert.match(invalidQuestion, /text-red-500/)
+
     const progress = renderToStaticMarkup(React.createElement(AnsweredProgress, { answeredCount: 4 }))
     assert.match(progress, /4 of 5 answered/)
     assert.match(progress, /width:80%/)

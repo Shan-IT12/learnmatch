@@ -2,6 +2,13 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { IconEye, IconEyeOff } from '@tabler/icons-react'
 import AuthJourneyPanel from '../components/AuthJourneyPanel'
+import { FieldError, RequiredMark } from '../components/FormValidation'
+import { scrollToFirstInvalidField } from '../utils/formValidation'
+import {
+  USERNAME_MAX_LENGTH,
+  USERNAME_MIN_LENGTH,
+  validateUsername,
+} from '../utils/usernameValidation'
 
 const isValidEmail = (email) => {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
@@ -26,6 +33,7 @@ function Register() {
   const [submitting, setSubmitting] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [fieldErrors, setFieldErrors] = useState({})
 
   const [step, setStep] = useState('register')
   const [userId, setUserId] = useState(null)
@@ -37,27 +45,25 @@ function Register() {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
+    setFieldErrors((current) => ({ ...current, [e.target.name]: undefined }))
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
 
-    if (!isValidEmail(formData.email)) {
-      setError('Please enter a valid email address')
-      return
-    }
-
+    const nextErrors = {}
+    if (!formData.email.trim()) nextErrors.email = 'Please enter your email address.'
+    else if (!isValidEmail(formData.email)) nextErrors.email = 'Please enter a valid email address.'
+    const usernameError = validateUsername(formData.username)
+    if (usernameError) nextErrors.username = usernameError
     const passwordError = isValidPassword(formData.password)
-    if (passwordError) {
-      setError(passwordError)
-      return
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match')
-      return
-    }
+    if (!formData.password) nextErrors.password = 'Please enter a password.'
+    else if (passwordError) nextErrors.password = passwordError
+    if (!formData.confirmPassword) nextErrors.confirmPassword = 'Please confirm your password.'
+    else if (formData.password !== formData.confirmPassword) nextErrors.confirmPassword = 'Passwords do not match.'
+    if (Object.keys(nextErrors).length) { setFieldErrors(nextErrors); scrollToFirstInvalidField(Object.keys(nextErrors)); return }
+    setFieldErrors({})
 
     setSubmitting(true)
 
@@ -91,6 +97,7 @@ function Register() {
 
     if (otpCode.length !== 6) {
       setOtpError('Please enter the 6-digit code')
+      scrollToFirstInvalidField(['otpCode'])
       return
     }
 
@@ -201,9 +208,9 @@ function Register() {
                 </div>
               )}
 
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+              <form onSubmit={handleSubmit} noValidate className="space-y-4">
+                <div data-validation-field="email">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Email <RequiredMark /></label>
                   <input
                     type="email"
                     name="email"
@@ -211,23 +218,29 @@ function Register() {
                     onChange={handleChange}
                     className="w-full rounded-2xl border border-stone-200/90 bg-white/85 px-4 py-3.5 text-sm outline-none transition duration-150 hover:border-orange-200 focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100/80"
                     required
+                    aria-required="true" aria-invalid={fieldErrors.email ? 'true' : undefined} aria-describedby={fieldErrors.email ? 'register-email-error' : undefined}
                   />
+                  <FieldError id="register-email-error">{fieldErrors.email}</FieldError>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Username</label>
+                <div data-validation-field="username">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Username <RequiredMark /></label>
                   <input
                     type="text"
                     name="username"
                     value={formData.username}
                     onChange={handleChange}
+                    minLength={USERNAME_MIN_LENGTH}
+                    maxLength={USERNAME_MAX_LENGTH}
                     className="w-full rounded-2xl border border-stone-200/90 bg-white/85 px-4 py-3.5 text-sm outline-none transition duration-150 hover:border-orange-200 focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100/80"
                     required
+                    aria-required="true" aria-invalid={fieldErrors.username ? 'true' : undefined} aria-describedby={fieldErrors.username ? 'register-username-error' : undefined}
                   />
+                  <FieldError id="register-username-error">{fieldErrors.username}</FieldError>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                <div data-validation-field="password">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Password <RequiredMark /></label>
                   <div className="relative">
                     <input
                       type={showPassword ? 'text' : 'password'}
@@ -237,6 +250,7 @@ function Register() {
                       className="w-full rounded-2xl border border-stone-200/90 bg-white/85 px-4 py-3.5 pr-11 text-sm outline-none transition duration-150 hover:border-orange-200 focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100/80"
                       required
                       minLength={8}
+                      aria-required="true" aria-invalid={fieldErrors.password ? 'true' : undefined} aria-describedby={fieldErrors.password ? 'register-password-error' : undefined}
                     />
                     <button
                       type="button"
@@ -247,13 +261,14 @@ function Register() {
                       {showPassword ? <IconEyeOff size={18} stroke={1.75} /> : <IconEye size={18} stroke={1.75} />}
                     </button>
                   </div>
+                  <FieldError id="register-password-error">{fieldErrors.password}</FieldError>
                   <p className="text-xs text-gray-400 mt-1.5">
                     At least 8 characters, with 1 uppercase letter and 1 number
                   </p>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
+                <div data-validation-field="confirmPassword">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Confirm Password <RequiredMark /></label>
                   <div className="relative">
                     <input
                       type={showConfirmPassword ? 'text' : 'password'}
@@ -263,6 +278,7 @@ function Register() {
                       className="w-full rounded-2xl border border-stone-200/90 bg-white/85 px-4 py-3.5 pr-11 text-sm outline-none transition duration-150 hover:border-orange-200 focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100/80"
                       required
                       minLength={8}
+                      aria-required="true" aria-invalid={fieldErrors.confirmPassword ? 'true' : undefined} aria-describedby={fieldErrors.confirmPassword ? 'register-confirm-error' : undefined}
                     />
                     <button
                       type="button"
@@ -273,6 +289,7 @@ function Register() {
                       {showConfirmPassword ? <IconEyeOff size={18} stroke={1.75} /> : <IconEye size={18} stroke={1.75} />}
                     </button>
                   </div>
+                  <FieldError id="register-confirm-error">{fieldErrors.confirmPassword}</FieldError>
                 </div>
 
                 <button
@@ -326,19 +343,21 @@ function Register() {
                 </div>
               )}
 
-              <form onSubmit={handleVerifyOtp} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Verification Code</label>
+              <form onSubmit={handleVerifyOtp} noValidate className="space-y-4">
+                <div data-validation-field="otpCode">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Verification Code <RequiredMark /></label>
                   <input
                     type="text"
                     inputMode="numeric"
                     maxLength={6}
                     value={otpCode}
-                    onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
+                    onChange={(e) => { setOtpCode(e.target.value.replace(/\D/g, '')); setOtpError('') }}
                     placeholder="000000"
                     className="w-full rounded-2xl border border-stone-200/90 bg-white/85 px-3 py-3.5 text-center text-xl font-bold tracking-[0.3em] outline-none transition duration-150 hover:border-orange-200 focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100/80 sm:px-4 sm:text-2xl sm:tracking-[0.5em]"
                     autoFocus
+                    required aria-required="true" aria-invalid={otpError ? 'true' : undefined} aria-describedby={otpError ? 'register-otp-error' : undefined}
                   />
+                  <FieldError id="register-otp-error">{otpError}</FieldError>
                 </div>
 
                 <button

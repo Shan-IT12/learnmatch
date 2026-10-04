@@ -3,6 +3,7 @@ import assert from 'node:assert/strict'
 
 import {
   CLUSTER_WSM_WEIGHTS,
+  PERSONAL_FACTOR_RELEVANCE,
   PARENT_CLUSTERS,
   validateRecommendationConfig,
 } from '../config/recommendationConfig.js'
@@ -14,6 +15,7 @@ import {
   calculatePersonalityScore,
   calculateRiasecCosineSimilarity,
   getMbtiRiasecPair,
+  normalizePersonalFactorImpact,
   rankCourses,
 } from '../services/recommendationEngine.js'
 
@@ -89,46 +91,76 @@ test('personality score is 0 when no MBTI RIASEC code overlaps the cluster', () 
   assert.equal(calculatePersonalityScore('ISTJ', 'EDUCATION CLUSTER'), 0)
 })
 
-test('one selected hindering personal factor produces a score of 0', () => {
-  const score = calculatePersonalFactorScore(
-    { factor_physical: true },
-    'HEALTHCARE SCIENCE CLUSTER'
-  )
-
-  assert.equal(score, 0)
+const noImpactResponses = Object.freeze({
+  physical: 1,
+  health: 1,
+  financial: 1,
+  family: 1,
+  work: 1,
 })
 
-test('multiple selected personal factors are averaged before normalization', () => {
-  const score = calculatePersonalFactorScore(
-    { factor_physical: true, factor_health: true, factor_financial: true },
-    'EDUCATION CLUSTER'
-  )
-
-  assert.ok(Math.abs(score - 1 / 6) < 1e-12)
+test('Personal Factor impact responses normalize from 1-4 to 0-1', () => {
+  assert.equal(normalizePersonalFactorImpact(1), 0)
+  assert.equal(normalizePersonalFactorImpact(2), 1 / 3)
+  assert.equal(normalizePersonalFactorImpact(3), 2 / 3)
+  assert.equal(normalizePersonalFactorImpact(4), 1)
 })
 
-test('no selected personal factors produces the neutral score of 0.5', () => {
-  assert.equal(calculatePersonalFactorScore({}, 'BUSINESS CLUSTER'), 0.5)
+test('Personal Factor normalization rejects missing and out-of-range responses', () => {
+  for (const value of [undefined, null, 0, 5, 1.5, 'high']) {
+    assert.throws(() => normalizePersonalFactorImpact(value), RangeError)
+  }
 })
 
-test('factor_distance does not affect the personal factor score', () => {
-  const baseline = calculatePersonalFactorScore({}, 'AVIATION & MARITIME CLUSTER')
-  const withDistance = calculatePersonalFactorScore(
-    { factor_distance: true },
-    'AVIATION & MARITIME CLUSTER'
-  )
-
-  assert.equal(withDistance, baseline)
+test('all response-1 values produce the neutral 0.5 score in every cluster', () => {
+  for (const cluster of PARENT_CLUSTERS) {
+    assert.equal(calculatePersonalFactorScore(noImpactResponses, cluster), 0.5)
+  }
 })
 
-test('factor_others does not affect the personal factor score', () => {
-  const baseline = calculatePersonalFactorScore({}, 'CRIMINOLOGY CLUSTER')
-  const withOthers = calculatePersonalFactorScore(
-    { factor_others: 'Custom circumstance' },
-    'CRIMINOLOGY CLUSTER'
-  )
+test('the exact 13-by-5 relevance matrix is configured', () => {
+  assert.deepEqual(PERSONAL_FACTOR_RELEVANCE, {
+    'HEALTHCARE SCIENCE CLUSTER': { physical: 1, health: 1, financial: 1, family: 1, work: 1 },
+    'HUMANITIES & SOCIAL SCIENCE CLUSTER': { physical: 0, health: 0, financial: 0, family: 1, work: 1 },
+    'BUSINESS CLUSTER': { physical: 0, health: 0, financial: 0, family: 1, work: 1 },
+    'HOSPITALITY & TOURISM CLUSTER': { physical: 1, health: 0, financial: 0, family: 1, work: 1 },
+    'AVIATION & MARITIME CLUSTER': { physical: 1, health: 1, financial: 0, family: 1, work: 1 },
+    'LEGAL & PUBLIC SERVICE CLUSTER': { physical: 0, health: 0, financial: 0, family: 1, work: 1 },
+    'EDUCATION CLUSTER': { physical: 0, health: 0, financial: 0, family: 1, work: 1 },
+    'ARTS & MULTIMEDIA CLUSTER': { physical: 1, health: 0, financial: 0, family: 1, work: 1 },
+    'CRIMINOLOGY CLUSTER': { physical: 1, health: 1, financial: 1, family: 1, work: 1 },
+    'AGRICULTURE & ENVIRONMENTAL CLUSTER': { physical: 1, health: 0, financial: 0, family: 1, work: 1 },
+    'SCIENCE & MATHEMATICS CLUSTER': { physical: 0, health: 0, financial: 0, family: 0, work: 0 },
+    'SPORTS & PHYSICAL EDUCATION CLUSTER': { physical: 1, health: 1, financial: 0, family: 1, work: 1 },
+    'ENGINEERING / STEM CLUSTER': { physical: 1, health: 0, financial: 0, family: 1, work: 1 },
+  })
+})
 
-  assert.equal(withOthers, baseline)
+test('only relevant factors reduce the cluster score', () => {
+  const responses = { ...noImpactResponses, physical: 4 }
+  assert.equal(calculatePersonalFactorScore(responses, 'HEALTHCARE SCIENCE CLUSTER'), 0.4)
+  assert.equal(calculatePersonalFactorScore(responses, 'BUSINESS CLUSTER'), 0.5)
+})
+
+test('multiple relevant impacts accumulate with a floor of zero', () => {
+  const maximumImpact = Object.fromEntries(Object.keys(noImpactResponses).map((key) => [key, 4]))
+  assert.equal(calculatePersonalFactorScore(maximumImpact, 'HEALTHCARE SCIENCE CLUSTER'), 0)
+  assert.equal(calculatePersonalFactorScore(maximumImpact, 'BUSINESS CLUSTER'), 0.3)
+})
+
+test('legacy profiles without structured responses use the neutral score', () => {
+  assert.equal(calculatePersonalFactorScore(null, 'BUSINESS CLUSTER'), 0.5)
+  assert.equal(calculatePersonalFactorScore(undefined, 'BUSINESS CLUSTER'), 0.5)
+})
+
+test('Other Context and legacy fields cannot change a complete structured score', () => {
+  const baseline = calculatePersonalFactorScore(noImpactResponses, 'CRIMINOLOGY CLUSTER')
+  assert.equal(calculatePersonalFactorScore({
+    ...noImpactResponses,
+    factor_others: 'Private circumstances',
+    factor_health: true,
+    factor_others_classification_status: 'MATCHED',
+  }, 'CRIMINOLOGY CLUSTER'), baseline)
 })
 
 test('cluster score applies the configured deterministic WSM weights', () => {

@@ -6,7 +6,7 @@ const breakdownLabels = {
   skill_match: 'Skills',
   interest_match: 'Interests',
   personality_match: 'Personality',
-  personal_factor_match: 'Personal Factors',
+  personal_factor_match: 'Personal Factors Adjustment',
 }
 
 function formatAssessmentDate(value) {

@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { IconEye, IconEyeOff, IconShieldLock } from '@tabler/icons-react'
+import { FieldError, RequiredMark } from '../components/FormValidation'
+import { scrollToFirstInvalidField } from '../utils/formValidation'
 
 function AdminLogin() {
   const navigate = useNavigate()
@@ -8,14 +10,21 @@ function AdminLogin() {
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const [fieldErrors, setFieldErrors] = useState({})
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
+    setFieldErrors((current) => ({ ...current, [e.target.name]: undefined }))
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
+    const nextErrors = {}
+    if (!formData.username.trim()) nextErrors.username = 'Please enter your username.'
+    if (!formData.password) nextErrors.password = 'Please enter your password.'
+    if (Object.keys(nextErrors).length) { setFieldErrors(nextErrors); scrollToFirstInvalidField(Object.keys(nextErrors)); return }
+    setFieldErrors({})
     setSubmitting(true)
 
     try {
@@ -65,10 +74,10 @@ function AdminLogin() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
+          <form onSubmit={handleSubmit} noValidate className="space-y-4">
+            <div data-validation-field="username">
               <label className="block text-xs font-semibold text-gray-600 mb-2 uppercase tracking-wide">
-                Username
+                Username <RequiredMark />
               </label>
               <input
                 type="text"
@@ -78,12 +87,16 @@ function AdminLogin() {
                 className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                 required
                 autoFocus
+                aria-required="true"
+                aria-invalid={fieldErrors.username ? 'true' : undefined}
+                aria-describedby={fieldErrors.username ? 'admin-username-error' : undefined}
               />
+              <FieldError id="admin-username-error">{fieldErrors.username}</FieldError>
             </div>
 
-            <div>
+            <div data-validation-field="password">
               <label className="block text-xs font-semibold text-gray-600 mb-2 uppercase tracking-wide">
-                Password
+                Password <RequiredMark />
               </label>
               <div className="relative">
                 <input
@@ -93,6 +106,9 @@ function AdminLogin() {
                   onChange={handleChange}
                   className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 pr-11 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                   required
+                  aria-required="true"
+                  aria-invalid={fieldErrors.password ? 'true' : undefined}
+                  aria-describedby={fieldErrors.password ? 'admin-password-error' : undefined}
                 />
                 <button
                   type="button"
@@ -103,6 +119,7 @@ function AdminLogin() {
                   {showPassword ? <IconEyeOff size={18} stroke={1.75} /> : <IconEye size={18} stroke={1.75} />}
                 </button>
               </div>
+              <FieldError id="admin-password-error">{fieldErrors.password}</FieldError>
             </div>
 
             <button

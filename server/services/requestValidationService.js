@@ -1,4 +1,5 @@
 import { PARENT_CLUSTERS } from '../config/recommendationConfig.js'
+import { validateUsername } from './usernameValidationService.js'
 
 export const FEEDBACK_CATEGORIES = new Set([
   'Bug Report',
@@ -6,13 +7,27 @@ export const FEEDBACK_CATEGORIES = new Set([
   'General Feedback',
 ])
 
-const PROFILE_BOOLEAN_FIELDS = [
-  'factor_physical',
-  'factor_health',
-  'factor_financial',
-  'factor_family',
-  'factor_working_student',
-]
+export const PHYSICAL_ACCESSIBILITY_AREAS = Object.freeze([
+  'seeing',
+  'hearing',
+  'walking_climbing',
+  'self_care',
+  'other',
+])
+
+export const PHYSICAL_DIFFICULTY_LEVELS = Object.freeze([
+  'some_difficulty',
+  'a_lot_of_difficulty',
+  'cannot_do',
+])
+
+export const PERSONAL_FACTOR_IMPACT_FIELDS = Object.freeze([
+  'factor_physical_impact',
+  'factor_health_impact',
+  'factor_financial_impact',
+  'factor_family_impact',
+  'factor_work_impact',
+])
 
 const text = (value, { required = false, max }) => {
   if (value === undefined || value === null || value === '') {
@@ -74,22 +89,49 @@ export function validateProfile(body) {
   if (!body || typeof body !== 'object' || Array.isArray(body)) {
     return { valid: false, message: 'Invalid profile.' }
   }
-  const fullName = text(body.full_name, { required: true, max: 150 })
-  if (!fullName) return { valid: false, message: 'Full name is required and must be at most 150 characters.' }
-  for (const field of PROFILE_BOOLEAN_FIELDS) {
-    if (typeof body[field] !== 'boolean') {
-      return { valid: false, message: `${field} must be a boolean.` }
+  const usernameValidation = validateUsername(body.username)
+  if (!usernameValidation.valid) {
+    return { valid: false, field: 'username', message: usernameValidation.message }
+  }
+  const areas = body.physical_accessibility_areas
+  if (!Array.isArray(areas) || (areas.length === 0 && body.factor_physical_impact !== 1)) {
+    return { valid: false, message: 'Select at least one physical or accessibility area when the factor applies.' }
+  }
+  if (
+    new Set(areas).size !== areas.length
+    || areas.some((area) => !PHYSICAL_ACCESSIBILITY_AREAS.includes(area))
+  ) {
+    return { valid: false, message: 'Invalid physical or accessibility areas.' }
+  }
+
+  const difficulties = body.physical_accessibility_difficulties
+  if (!difficulties || typeof difficulties !== 'object' || Array.isArray(difficulties)) {
+    return { valid: false, message: 'Physical or accessibility difficulty levels are required.' }
+  }
+  const expectedDifficultyAreas = areas
+  const difficultyAreas = Object.keys(difficulties)
+  if (
+    difficultyAreas.length !== expectedDifficultyAreas.length
+    || expectedDifficultyAreas.some((area) => !PHYSICAL_DIFFICULTY_LEVELS.includes(difficulties[area]))
+    || difficultyAreas.some((area) => !expectedDifficultyAreas.includes(area))
+  ) {
+    return { valid: false, message: 'Provide one valid difficulty level for each selected area.' }
+  }
+
+  for (const field of PERSONAL_FACTOR_IMPACT_FIELDS) {
+    if (!Number.isInteger(body[field]) || body[field] < 1 || body[field] > 4) {
+      return { valid: false, message: `${field} must be an integer from 1 to 4.` }
     }
   }
-  const ranges = [['height_cm', 50, 300], ['weight_kg', 10, 500]]
-  for (const [field, min, max] of ranges) {
-    if (body[field] === '' || body[field] === null || body[field] === undefined) continue
-    const value = Number(body[field])
-    if (!Number.isFinite(value) || value < min || value > max) {
-      return { valid: false, message: `${field} must be between ${min} and ${max}.` }
-    }
+  return {
+    valid: true,
+    value: {
+      username: usernameValidation.value,
+      physical_accessibility_areas: [...areas],
+      physical_accessibility_difficulties: { ...difficulties },
+      ...Object.fromEntries(PERSONAL_FACTOR_IMPACT_FIELDS.map((field) => [field, body[field]])),
+    },
   }
-  return { valid: true, value: { ...body, full_name: fullName } }
 }
 
 export function validateCourse(body) {

@@ -12,6 +12,8 @@ import {
   IconShieldCheck,
 } from '@tabler/icons-react'
 import { Link, useNavigate } from 'react-router-dom'
+import { FieldError, RequiredMark } from '../components/FormValidation'
+import { scrollToFirstInvalidField } from '../utils/formValidation'
 
 const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
 
@@ -35,6 +37,7 @@ function ForgotPassword() {
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(false)
+  const [fieldErrors, setFieldErrors] = useState({})
 
   useEffect(() => {
     if (step !== 'success') return undefined
@@ -49,9 +52,11 @@ function ForgotPassword() {
 
     const normalizedEmail = email.trim().toLowerCase()
     if (!isValidEmail(normalizedEmail)) {
-      setError('Please enter a valid email address')
+      setFieldErrors({ email: normalizedEmail ? 'Please enter a valid email address.' : 'Please enter your email address.' })
+      scrollToFirstInvalidField(['forgotEmail'])
       return
     }
+    setFieldErrors({})
 
     setLoading(true)
     try {
@@ -84,9 +89,11 @@ function ForgotPassword() {
     setMessage('')
 
     if (!/^\d{6}$/.test(otpCode)) {
-      setError('Please enter the 6-digit code')
+      setFieldErrors({ otpCode: 'Please enter the 6-digit code.' })
+      scrollToFirstInvalidField(['forgotOtp'])
       return
     }
+    setFieldErrors({})
 
     setLoading(true)
     try {
@@ -115,15 +122,14 @@ function ForgotPassword() {
     event.preventDefault()
     setError('')
 
+    const nextErrors = {}
     const validationError = passwordValidationError(password)
-    if (validationError) {
-      setError(validationError)
-      return
-    }
-    if (password !== confirmPassword) {
-      setError('Passwords do not match')
-      return
-    }
+    if (!password) nextErrors.password = 'Please enter a new password.'
+    else if (validationError) nextErrors.password = validationError
+    if (!confirmPassword) nextErrors.confirmPassword = 'Please confirm your new password.'
+    else if (password !== confirmPassword) nextErrors.confirmPassword = 'Passwords do not match.'
+    if (Object.keys(nextErrors).length) { setFieldErrors(nextErrors); scrollToFirstInvalidField(Object.keys(nextErrors).map((key) => `forgot${key[0].toUpperCase()}${key.slice(1)}`)); return }
+    setFieldErrors({})
 
     setLoading(true)
     try {
@@ -199,13 +205,14 @@ function ForgotPassword() {
           {message && step === 'otp' && <div role="status" className="mb-6 rounded-xl border border-green-100 bg-green-50 px-4 py-3 text-sm text-green-700">{message}</div>}
 
           {step === 'email' && (
-            <form onSubmit={requestOtp} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+            <form onSubmit={requestOtp} noValidate className="space-y-4">
+              <div data-validation-field="forgotEmail">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Email <RequiredMark /></label>
                 <div className="relative">
                   <IconMail className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} stroke={1.8} />
-                  <input type="email" value={email} onChange={(event) => setEmail(event.target.value)} className="w-full rounded-2xl border border-stone-200/90 bg-white/85 py-3.5 pl-11 pr-4 text-sm outline-none transition duration-150 hover:border-orange-200 focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100/80" autoComplete="email" required autoFocus />
+                  <input type="email" value={email} onChange={(event) => { setEmail(event.target.value); setFieldErrors((current) => ({ ...current, email: undefined })) }} aria-invalid={fieldErrors.email ? 'true' : undefined} aria-describedby={fieldErrors.email ? 'forgot-email-error' : undefined} className="w-full rounded-2xl border border-stone-200/90 bg-white/85 py-3.5 pl-11 pr-4 text-sm outline-none transition duration-150 hover:border-orange-200 focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100/80" autoComplete="email" required aria-required="true" autoFocus />
                 </div>
+                <FieldError id="forgot-email-error">{fieldErrors.email}</FieldError>
               </div>
               <button type="submit" disabled={loading} className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-orange-500 to-orange-600 py-3.5 text-sm font-semibold text-white shadow-[0_12px_28px_-12px_rgba(234,88,12,.8)] transition duration-150 hover:-translate-y-0.5 hover:shadow-[0_16px_32px_-12px_rgba(234,88,12,.72)] active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-50">
                 {loading ? 'Sending...' : 'Send Verification Code'}
@@ -215,10 +222,11 @@ function ForgotPassword() {
           )}
 
           {step === 'otp' && (
-            <form onSubmit={verifyOtp} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Verification Code</label>
-                <input type="text" inputMode="numeric" maxLength={6} value={otpCode} onChange={(event) => setOtpCode(event.target.value.replace(/\D/g, ''))} placeholder="000000" className="w-full rounded-2xl border border-stone-200/90 bg-white/85 px-3 py-3.5 text-center text-xl font-bold tracking-[0.3em] outline-none transition duration-150 hover:border-orange-200 focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100/80 sm:px-4 sm:text-2xl sm:tracking-[0.5em]" required autoFocus />
+            <form onSubmit={verifyOtp} noValidate className="space-y-4">
+              <div data-validation-field="forgotOtp">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Verification Code <RequiredMark /></label>
+                <input type="text" inputMode="numeric" maxLength={6} value={otpCode} onChange={(event) => { setOtpCode(event.target.value.replace(/\D/g, '')); setFieldErrors((current) => ({ ...current, otpCode: undefined })) }} placeholder="000000" aria-invalid={fieldErrors.otpCode ? 'true' : undefined} aria-describedby={fieldErrors.otpCode ? 'forgot-otp-error' : undefined} className="w-full rounded-2xl border border-stone-200/90 bg-white/85 px-3 py-3.5 text-center text-xl font-bold tracking-[0.3em] outline-none transition duration-150 hover:border-orange-200 focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100/80 sm:px-4 sm:text-2xl sm:tracking-[0.5em]" required aria-required="true" autoFocus />
+                <FieldError id="forgot-otp-error">{fieldErrors.otpCode}</FieldError>
               </div>
               <div className="flex items-center justify-center gap-1.5 text-xs text-gray-500"><IconClock size={14} /> Code expires after 10 minutes</div>
               <button type="submit" disabled={loading || otpCode.length !== 6} className="w-full rounded-2xl bg-gradient-to-r from-orange-500 to-orange-600 py-3.5 text-sm font-semibold text-white shadow-[0_12px_28px_-12px_rgba(234,88,12,.8)] transition duration-150 hover:-translate-y-0.5 active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-50">
@@ -234,25 +242,27 @@ function ForgotPassword() {
           )}
 
           {step === 'password' && (
-            <form onSubmit={submitPassword} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">New Password</label>
+            <form onSubmit={submitPassword} noValidate className="space-y-4">
+              <div data-validation-field="forgotPassword">
+                <label className="block text-sm font-medium text-gray-700 mb-2">New Password <RequiredMark /></label>
                 <div className="relative">
-                  <input type={showPassword ? 'text' : 'password'} value={password} onChange={(event) => setPassword(event.target.value)} className="w-full rounded-2xl border border-stone-200/90 bg-white/85 px-4 py-3.5 pr-11 text-sm outline-none transition duration-150 hover:border-orange-200 focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100/80" autoComplete="new-password" minLength={8} required />
+                  <input type={showPassword ? 'text' : 'password'} value={password} onChange={(event) => { setPassword(event.target.value); setFieldErrors((current) => ({ ...current, password: undefined })) }} aria-invalid={fieldErrors.password ? 'true' : undefined} aria-describedby={fieldErrors.password ? 'forgot-password-error' : undefined} className="w-full rounded-2xl border border-stone-200/90 bg-white/85 px-4 py-3.5 pr-11 text-sm outline-none transition duration-150 hover:border-orange-200 focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100/80" autoComplete="new-password" minLength={8} required aria-required="true" />
                   <button type="button" onClick={() => setShowPassword((current) => !current)} className="absolute right-1 top-1/2 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-lg text-gray-400 transition duration-150 hover:bg-gray-50 hover:text-gray-600 active:scale-95" aria-label={showPassword ? 'Hide new password' : 'Show new password'}>
                     {showPassword ? <IconEyeOff size={18} stroke={1.75} /> : <IconEye size={18} stroke={1.75} />}
                   </button>
                 </div>
+                <FieldError id="forgot-password-error">{fieldErrors.password}</FieldError>
                 <p className="text-xs text-gray-400 mt-1.5">At least 8 characters, with 1 uppercase letter and 1 number</p>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
+              <div data-validation-field="forgotConfirmPassword">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Confirm Password <RequiredMark /></label>
                 <div className="relative">
-                  <input type={showConfirmPassword ? 'text' : 'password'} value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} className="w-full rounded-2xl border border-stone-200/90 bg-white/85 px-4 py-3.5 pr-11 text-sm outline-none transition duration-150 hover:border-orange-200 focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100/80" autoComplete="new-password" minLength={8} required />
+                  <input type={showConfirmPassword ? 'text' : 'password'} value={confirmPassword} onChange={(event) => { setConfirmPassword(event.target.value); setFieldErrors((current) => ({ ...current, confirmPassword: undefined })) }} aria-invalid={fieldErrors.confirmPassword ? 'true' : undefined} aria-describedby={fieldErrors.confirmPassword ? 'forgot-confirm-error' : undefined} className="w-full rounded-2xl border border-stone-200/90 bg-white/85 px-4 py-3.5 pr-11 text-sm outline-none transition duration-150 hover:border-orange-200 focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100/80" autoComplete="new-password" minLength={8} required aria-required="true" />
                   <button type="button" onClick={() => setShowConfirmPassword((current) => !current)} className="absolute right-1 top-1/2 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-lg text-gray-400 transition duration-150 hover:bg-gray-50 hover:text-gray-600 active:scale-95" aria-label={showConfirmPassword ? 'Hide password confirmation' : 'Show password confirmation'}>
                     {showConfirmPassword ? <IconEyeOff size={18} stroke={1.75} /> : <IconEye size={18} stroke={1.75} />}
                   </button>
                 </div>
+                <FieldError id="forgot-confirm-error">{fieldErrors.confirmPassword}</FieldError>
               </div>
               <button type="submit" disabled={loading} className="w-full rounded-2xl bg-gradient-to-r from-orange-500 to-orange-600 py-3.5 text-sm font-semibold text-white shadow-[0_12px_28px_-12px_rgba(234,88,12,.8)] transition duration-150 hover:-translate-y-0.5 active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-50">
                 {loading ? 'Resetting Password...' : 'Reset Password'}

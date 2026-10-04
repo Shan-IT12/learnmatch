@@ -23,15 +23,38 @@ test('skill quiz requires 30 unique positive IDs and A-D options', () => {
   assert.equal(validateSkillQuiz(answers.map((item, index) => index ? item : { ...item, selected_option: 'E' })).valid, false)
 })
 
-test('profile validation enforces required text, booleans, and physical ranges', () => {
+test('profile validation enforces structured accessibility and impact responses', () => {
   const profile = {
-    full_name: 'Student Name', height_cm: 170, weight_kg: 65,
-    factor_physical: false, factor_health: false, factor_financial: false,
-    factor_family: false, factor_working_student: false,
+    username: 'student_name',
+    physical_accessibility_areas: ['seeing'],
+    physical_accessibility_difficulties: { seeing: 'some_difficulty' },
+    factor_physical_impact: 1,
+    factor_health_impact: 2,
+    factor_financial_impact: 3,
+    factor_family_impact: 4,
+    factor_work_impact: 1,
   }
-  assert.equal(validateProfile(profile).valid, true)
-  assert.equal(validateProfile({ ...profile, factor_health: 'false' }).valid, false)
-  assert.equal(validateProfile({ ...profile, height_cm: 999 }).valid, false)
+  const result = validateProfile(profile)
+  assert.equal(result.valid, true)
+  assert.equal(result.value.username, 'student_name')
+  assert.equal(Object.hasOwn(result.value, 'full_name'), false)
+  assert.equal(Object.hasOwn(result.value, 'height_cm'), false)
+  assert.equal(Object.hasOwn(result.value, 'weight_kg'), false)
+  assert.equal(Object.hasOwn(result.value, 'factor_others'), false)
+  assert.equal(validateProfile({ ...profile, height_cm: 'invalid', weight_kg: {}, factor_others: ['ignored'] }).valid, true)
+  assert.equal(validateProfile({ ...profile, factor_health_impact: '2' }).valid, false)
+  assert.equal(validateProfile({ ...profile, username: '   ' }).valid, false)
+  assert.equal(validateProfile({ ...profile, username: 'ab' }).valid, false)
+  assert.equal(validateProfile({ ...profile, username: 'student-name' }).valid, false)
+  assert.equal(validateProfile({ ...profile, username: 'a'.repeat(31) }).valid, false)
+  assert.equal(validateProfile({ ...profile, factor_family_impact: 5 }).valid, false)
+  assert.equal(validateProfile({ ...profile, physical_accessibility_areas: ['none'], physical_accessibility_difficulties: {} }).valid, false)
+  assert.equal(validateProfile({ ...profile, physical_accessibility_areas: ['none', 'seeing'] }).valid, false)
+  assert.equal(validateProfile({ ...profile, physical_accessibility_difficulties: {} }).valid, false)
+  assert.equal(validateProfile({ ...profile, physical_accessibility_difficulties: { seeing: 'no_difficulty' } }).valid, false)
+  assert.equal(validateProfile({ ...profile, physical_accessibility_difficulties: { seeing: 'severe' } }).valid, false)
+  assert.equal(validateProfile({ ...profile, factor_physical_impact: 1, physical_accessibility_areas: [], physical_accessibility_difficulties: {} }).valid, true)
+  assert.equal(validateProfile({ ...profile, factor_physical_impact: 2, physical_accessibility_areas: [], physical_accessibility_difficulties: {} }).valid, false)
 })
 
 test('admin course and career validation trims values and caps text', () => {

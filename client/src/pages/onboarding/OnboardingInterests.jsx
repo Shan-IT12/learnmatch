@@ -6,6 +6,8 @@ import interestGroups, {
   MIN_INTEREST_SELECTIONS,
   updateInterestSelection,
 } from '../../data/interestList'
+import { FieldError, RequiredMark } from '../../components/FormValidation'
+import { scrollToFirstInvalidField } from '../../utils/formValidation'
 
 function OnboardingInterests() {
   const navigate = useNavigate()
@@ -21,9 +23,15 @@ function OnboardingInterests() {
       result.maxReached ? `You can select up to ${MAX_INTEREST_SELECTIONS} interests.` : ''
     )
     setSelected(result.selected)
+    if (result.selected.length >= MIN_INTEREST_SELECTIONS) setError('')
   }
 
  const handleNext = async () => {
+  if (selected.length < MIN_INTEREST_SELECTIONS) {
+    setError(`Please select at least ${MIN_INTEREST_SELECTIONS} interests.`)
+    scrollToFirstInvalidField(['interests'])
+    return
+  }
   setSubmitting(true)
   setError('')
   const token = localStorage.getItem('token')
@@ -81,7 +89,7 @@ function OnboardingInterests() {
               </svg>
               Tell us what you enjoy
             </div>
-            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900 mb-2">Interests & Hobbies</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900 mb-2">Interests & Hobbies <RequiredMark /></h2>
             <p className="max-w-xl text-gray-500 text-sm leading-relaxed">
               Choose at least 3 interests that genuinely describe you. You can select up to 10.
             </p>
@@ -100,13 +108,7 @@ function OnboardingInterests() {
           </div>
         </div>
 
-        {error && (
-          <div className="bg-red-50 text-red-600 px-4 py-3 rounded-xl text-sm mb-6">
-            {error}
-          </div>
-        )}
-
-        <div className="space-y-5 mb-10">
+        <div data-validation-field="interests" aria-invalid={error ? 'true' : undefined} aria-describedby={error ? 'interests-error' : undefined} className="space-y-5 mb-10">
           {interestGroups.map((group, groupIndex) => (
             <section key={group.group} className="rounded-3xl border border-gray-100 bg-white p-4 sm:p-6 shadow-[0_16px_40px_-34px_rgba(15,23,42,0.5)]">
               <div className="mb-4 flex items-center gap-3">
@@ -155,6 +157,7 @@ function OnboardingInterests() {
               </div>
             </section>
           ))}
+          <FieldError id="interests-error">{error}</FieldError>
         </div>
 
       </div>

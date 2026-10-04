@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import OnboardingLayout from '../../components/OnboardingLayout'
 import { getResponseChoices, mbtiQuestions } from '../../data/mbtiQuestions'
+import { FieldError, RequiredMark } from '../../components/FormValidation'
+import { scrollToFirstInvalidField } from '../../utils/formValidation'
 
 function OnboardingPersonality() {
   const navigate = useNavigate()
@@ -11,6 +13,7 @@ function OnboardingPersonality() {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [result, setResult] = useState(null)
+  const [questionError, setQuestionError] = useState('')
 
   const currentQuestion = mbtiQuestions[currentIndex]
   const selectedRating = answers[currentQuestion.id]
@@ -20,9 +23,15 @@ function OnboardingPersonality() {
 
   const handleSelect = (rating) => {
     setAnswers((prev) => ({ ...prev, [currentQuestion.id]: rating }))
+    setQuestionError('')
   }
 
   const handleNext = () => {
+    if (!answers[currentQuestion.id]) {
+      setQuestionError('Please select a response.')
+      scrollToFirstInvalidField(['personalityQuestion'])
+      return
+    }
     if (currentIndex < mbtiQuestions.length - 1) {
       setCurrentIndex(currentIndex + 1)
     }
@@ -36,7 +45,10 @@ function OnboardingPersonality() {
 
   const handleSubmit = async () => {
     if (Object.keys(answers).length < mbtiQuestions.length) {
-      setError('Please answer all questions before submitting.')
+      const firstMissingIndex = mbtiQuestions.findIndex((question) => !answers[question.id])
+      setCurrentIndex(firstMissingIndex)
+      setQuestionError('Please select a response.')
+      scrollToFirstInvalidField(['personalityQuestion'])
       return
     }
 
@@ -163,15 +175,16 @@ function OnboardingPersonality() {
           </div>
         )}
 
-        <div className="rounded-3xl border border-orange-100 bg-gradient-to-br from-orange-50 via-white to-amber-50 p-5 sm:p-8 shadow-[0_18px_45px_-32px_rgba(234,88,12,0.55)] mb-7">
+        <div data-validation-field="personalityQuestion" className="rounded-3xl border border-orange-100 bg-gradient-to-br from-orange-50 via-white to-amber-50 p-5 sm:p-8 shadow-[0_18px_45px_-32px_rgba(234,88,12,0.55)] mb-7" aria-invalid={questionError ? 'true' : undefined} aria-describedby={questionError ? 'personality-question-error' : undefined}>
           <div className="flex items-start gap-4 mb-7 sm:mb-9">
             <div className="hidden sm:flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white text-orange-500 shadow-sm ring-1 ring-orange-100">
               <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 4v-4z" />
               </svg>
             </div>
-            <p className="text-lg sm:text-xl font-semibold leading-relaxed text-gray-900">{currentQuestion.text}</p>
+            <p className="text-lg sm:text-xl font-semibold leading-relaxed text-gray-900">{currentQuestion.text} <RequiredMark /></p>
           </div>
+          <FieldError id="personality-question-error">{questionError}</FieldError>
 
           {/* Likert scale choices */}
           <div className="sm:px-2">
@@ -229,7 +242,7 @@ function OnboardingPersonality() {
             <button
               type="button"
               onClick={handleSubmit}
-              disabled={submitting || !selectedRating}
+              disabled={submitting}
               className="px-4 sm:px-6 py-3 rounded-xl text-sm font-medium bg-orange-500 text-white hover:bg-orange-600 disabled:opacity-50 transition shadow-sm shadow-orange-200"
             >
               {submitting ? 'Submitting...' : 'Submit Assessment'}
@@ -238,7 +251,6 @@ function OnboardingPersonality() {
             <button
               type="button"
               onClick={handleNext}
-              disabled={!selectedRating}
               className="px-5 sm:px-7 py-3 rounded-xl text-sm font-medium bg-orange-500 text-white hover:bg-orange-600 disabled:opacity-50 transition shadow-sm shadow-orange-200"
             >
               Next →

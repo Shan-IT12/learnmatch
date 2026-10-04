@@ -2,6 +2,8 @@ import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { IconPlus, IconEdit, IconArrowLeft, IconSearch, IconX } from '@tabler/icons-react'
 import AdminHeader from '../../components/AdminHeader'
+import { FieldError, RequiredMark } from '../../components/FormValidation'
+import { scrollToFirstInvalidField } from '../../utils/formValidation'
 
 const emptyCourseForm = {
   course_name: '',
@@ -158,6 +160,7 @@ function ManageCourses() {
   const [canonicalCareers, setCanonicalCareers] = useState([])
   const [error, setError] = useState('')
   const [saving, setSaving] = useState(false)
+  const [fieldErrors, setFieldErrors] = useState({})
   const [updatingStatusId, setUpdatingStatusId] = useState(null)
   const [search, setSearch] = useState('')
   const [clusterFilter, setClusterFilter] = useState('all')
@@ -301,16 +304,18 @@ function ManageCourses() {
   const handleCourseFormChange = (e) => {
     const { name, value } = e.target
     setCourseForm({ ...courseForm, [name]: value })
+    setFieldErrors((current) => ({ ...current, [name]: undefined }))
   }
 
   const handleSaveCourse = async (e) => {
     e.preventDefault()
     setError('')
 
-    if (!courseForm.course_name || !courseForm.cluster_category) {
-      setError('Course name and cluster category are required.')
-      return
-    }
+    const nextErrors = {}
+    if (!courseForm.course_name.trim()) nextErrors.course_name = 'Please enter a course name.'
+    if (!courseForm.cluster_category) nextErrors.cluster_category = 'Please select a cluster category.'
+    if (Object.keys(nextErrors).length) { setFieldErrors(nextErrors); scrollToFirstInvalidField(Object.keys(nextErrors)); return }
+    setFieldErrors({})
 
     setSaving(true)
     try {
@@ -562,10 +567,10 @@ function ManageCourses() {
           </div>
         )}
 
-        <form onSubmit={handleSaveCourse} className="space-y-5 mb-8 bg-white border border-orange-100 rounded-2xl p-5 sm:p-7 shadow-sm">
-          <div>
+        <form onSubmit={handleSaveCourse} noValidate className="space-y-5 mb-8 bg-white border border-orange-100 rounded-2xl p-5 sm:p-7 shadow-sm">
+          <div data-validation-field="course_name">
             <label className="block text-xs font-medium text-gray-400 mb-2 uppercase tracking-wide">
-              Course Name *
+              Course Name <RequiredMark />
             </label>
             <input
               type="text"
@@ -574,12 +579,14 @@ function ManageCourses() {
               onChange={handleCourseFormChange}
               className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500"
               required
+              aria-required="true" aria-invalid={fieldErrors.course_name ? 'true' : undefined} aria-describedby={fieldErrors.course_name ? 'course-name-error' : undefined}
             />
+            <FieldError id="course-name-error">{fieldErrors.course_name}</FieldError>
           </div>
 
-          <div>
+          <div data-validation-field="cluster_category">
             <label className="block text-xs font-medium text-gray-400 mb-2 uppercase tracking-wide">
-              Cluster Category *
+              Cluster Category <RequiredMark />
             </label>
             <select
               name="cluster_category"
@@ -587,10 +594,12 @@ function ManageCourses() {
               onChange={handleCourseFormChange}
               className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500"
               required
+              aria-required="true" aria-invalid={fieldErrors.cluster_category ? 'true' : undefined} aria-describedby={fieldErrors.cluster_category ? 'cluster-category-error' : undefined}
             >
               <option value="" disabled>Select a cluster</option>
               {clusterOptions.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
             </select>
+            <FieldError id="cluster-category-error">{fieldErrors.cluster_category}</FieldError>
             {editingCourseId && (
               <p className="mt-2 text-xs leading-5 text-amber-700">
                 Changing the cluster affects future recommendation behavior. Review the course matching profile after reclustering.

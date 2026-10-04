@@ -10,6 +10,8 @@ import {
   isApproximateEndAfterStart,
 } from '../../utils/collegeSchedule'
 import { ACADEMIC_CALENDARS, getCalendarTerms } from '../../constants/academicCalendars'
+import { FieldError, RequiredMark } from '../../components/FormValidation'
+import { scrollToFirstInvalidField } from '../../utils/formValidation'
 
 const MONTHS = [
   'January', 'February', 'March', 'April', 'May', 'June',
@@ -26,10 +28,10 @@ const POSITION_OPTIONS = [
   { value: 'End', label: "We're approaching final exams / the end of the term" },
 ]
 
-function SemesterPhaseSelector({ value, onChange }) {
+function SemesterPhaseSelector({ value, onChange, error = '' }) {
   return (
-    <fieldset>
-      <legend className="text-sm font-medium text-gray-700 mb-3">Where are you currently in this term?</legend>
+    <fieldset data-validation-field="semesterPosition" aria-invalid={error ? 'true' : undefined} aria-describedby={error ? 'semester-position-error' : undefined}>
+      <legend className="text-sm font-medium text-gray-700 mb-3">Where are you currently in this term? <RequiredMark /></legend>
       <div className="space-y-2">
         {POSITION_OPTIONS.map((option) => (
           <label key={option.value} className={`flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 transition duration-150 ${value === option.value ? 'border-orange-300 bg-orange-50/80 shadow-sm' : 'border-gray-200 bg-white hover:border-orange-200 hover:bg-orange-50/30'}`}>
@@ -38,19 +40,20 @@ function SemesterPhaseSelector({ value, onChange }) {
           </label>
         ))}
       </div>
+      <FieldError id="semester-position-error">{error}</FieldError>
     </fieldset>
   )
 }
 
-export function ApproximateScheduleFields({ academicYears, approximateStart, approximateEnd, setApproximateStart, setApproximateEnd }) {
+export function ApproximateScheduleFields({ academicYears, approximateStart, approximateEnd, setApproximateStart, setApproximateEnd, errors = {} }) {
   return (
     <div className="space-y-5">
       {[
         ['Around when did your term start?', approximateStart, setApproximateStart, false],
         ['Around when will your term end?', approximateEnd, setApproximateEnd, true],
       ].map(([label, value, setter, isEnd]) => (
-        <fieldset key={label}>
-          <legend className="text-sm font-medium text-gray-700 mb-2">{label}</legend>
+        <fieldset key={label} data-validation-field={isEnd ? 'approximateEnd' : 'approximateStart'} aria-invalid={errors[isEnd ? 'approximateEnd' : 'approximateStart'] ? 'true' : undefined} aria-describedby={errors[isEnd ? 'approximateEnd' : 'approximateStart'] ? `${isEnd ? 'approximate-end' : 'approximate-start'}-error` : undefined}>
+          <legend className="text-sm font-medium text-gray-700 mb-2">{label} <RequiredMark /></legend>
           <div className="grid sm:grid-cols-3 gap-2">
             <select aria-label={`${label} month`} value={value.month} onChange={(event) => setter({ ...value, month: event.target.value })} className="rounded-xl border border-gray-200 bg-white px-3 py-3 text-sm outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100/80">
               <option value="">Month</option>
@@ -75,6 +78,7 @@ export function ApproximateScheduleFields({ academicYears, approximateStart, app
               })}
             </select>
           </div>
+          <FieldError id={`${isEnd ? 'approximate-end' : 'approximate-start'}-error`}>{errors[isEnd ? 'approximateEnd' : 'approximateStart']}</FieldError>
         </fieldset>
       ))}
     </div>
@@ -120,6 +124,7 @@ function CollegeSetup() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [resumeProgramLoading, setResumeProgramLoading] = useState(isResume)
+  const [fieldErrors, setFieldErrors] = useState({})
 
   useEffect(() => {
     if (!token) navigate('/login')
@@ -221,6 +226,7 @@ function CollegeSetup() {
   const handleAcademicYearChange = (event) => {
     const value = event.target.value
     setAcademicYear(value)
+    setFieldErrors((current) => ({ ...current, academicYear: undefined }))
     const suggestedYears = getAcademicYearOptions(value)
     if (suggestedYears.length === 0) return
     const semesterYear = termCode === 'SEM_1' || termCode === 'TRI_1' ? suggestedYears[0] : suggestedYears[1]
@@ -239,6 +245,7 @@ function CollegeSetup() {
   const handleSemesterChoice = (term) => {
     setSemester(term.label)
     setTermCode(term.code)
+    setFieldErrors((current) => ({ ...current, semester: undefined }))
     if (academicYears.length !== 2) return
     const suggestedYear = term.code === 'SEM_1' || term.code === 'TRI_1' ? academicYears[0] : academicYears[1]
     setApproximateStart((current) => ({ ...current, year: suggestedYear }))
@@ -250,6 +257,7 @@ function CollegeSetup() {
     setSearch(course.course_name)
     setCourses([])
     setSearchStatus('idle')
+    setFieldErrors((current) => ({ ...current, course: undefined }))
   }
 
   const handleSearchChange = (event) => {
@@ -267,6 +275,7 @@ function CollegeSetup() {
 
   const handleApproximateStartChange = (nextStart) => {
     setApproximateStart(nextStart)
+    setFieldErrors((current) => ({ ...current, approximateStart: undefined }))
     setApproximateEnd((current) => (
       approximateScheduleValue(current) !== null && !isApproximateEndAfterStart(nextStart, current)
         ? { month: '', year: '', part: '' }
@@ -278,48 +287,36 @@ function CollegeSetup() {
     e.preventDefault()
     setError('')
 
-    if (!selectedCourse) {
-      setError('Please select a course from the list.')
-      return
-    }
-    if (!/^\d{4}\s*[-–]\s*\d{4}$/.test(academicYear)) {
-      setError('Enter an academic year such as 2026-2027.')
-      return
-    }
-    if (!yearLevel) {
-      setError('Please select your year level.')
-      return
-    }
-    if (!semester) {
-      setError('Please select your current term.')
-      return
-    }
+    const nextErrors = {}
+    if (!selectedCourse) nextErrors.course = 'Please select a course from the list.'
+    if (!/^\d{4}\s*[-–]\s*\d{4}$/.test(academicYear)) nextErrors.academicYear = 'Enter an academic year such as 2026-2027.'
+    if (!yearLevel) nextErrors.yearLevel = 'Please select your year level.'
+    if (!semester) nextErrors.semester = 'Please select your current term.'
     if (timingChoice === 'exact' && (!semesterStartDate || !semesterEndDate || semesterEndDate <= semesterStartDate)) {
-      setError('Enter valid term dates with the end date after the start date.')
-      return
+      if (!semesterStartDate) nextErrors.semesterStartDate = 'Please select the term start date.'
+      if (!semesterEndDate || semesterEndDate <= semesterStartDate) nextErrors.semesterEndDate = 'Select an end date after the start date.'
     }
     if (timingChoice === 'exact' && (
       !academicYears.includes(semesterStartDate.slice(0, 4)) ||
       !academicYears.includes(semesterEndDate.slice(0, 4))
     )) {
-      setError('Term dates must fall within the selected academic year.')
-      return
+      nextErrors.semesterStartDate = 'Term dates must fall within the selected academic year.'
     }
     if (timingChoice === 'approximate' && (
       !approximateStart.month || !approximateStart.year || !approximateStart.part ||
       !approximateEnd.month || !approximateEnd.year || !approximateEnd.part
     )) {
-      setError('Complete the approximate start and end schedule.')
-      return
+      if (!approximateStart.month || !approximateStart.year || !approximateStart.part) nextErrors.approximateStart = 'Please complete the approximate start schedule.'
+      if (!approximateEnd.month || !approximateEnd.year || !approximateEnd.part) nextErrors.approximateEnd = 'Please complete the approximate end schedule.'
     }
     if (timingChoice === 'approximate' && !isApproximateEndAfterStart(approximateStart, approximateEnd)) {
-      setError('Choose an approximate end after the term start.')
-      return
+      nextErrors.approximateEnd = 'Choose an approximate end after the term start.'
     }
     if ((timingChoice === 'approximate' || timingChoice === 'unknown') && !semesterPosition) {
-      setError('Select where you currently are in the term.')
-      return
+      nextErrors.semesterPosition = 'Please select your current position in the term.'
     }
+    if (Object.keys(nextErrors).length) { setFieldErrors(nextErrors); scrollToFirstInvalidField(Object.keys(nextErrors)); return }
+    setFieldErrors({})
 
     setLoading(true)
     try {
@@ -400,7 +397,7 @@ function CollegeSetup() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="grid gap-6 lg:grid-cols-2 lg:items-start">
+        <form onSubmit={handleSubmit} noValidate className="grid gap-6 lg:grid-cols-2 lg:items-start">
 
           <section className="rounded-[26px] border border-white/90 bg-white/75 p-5 shadow-[0_22px_60px_-42px_rgba(120,53,15,.48)] backdrop-blur-xl sm:p-7">
             <div className="mb-6 flex items-start gap-3">
@@ -415,7 +412,7 @@ function CollegeSetup() {
           {isResume ? (
             <ResumeProgramCard course={selectedCourse} loading={resumeProgramLoading} />
           ) : <>
-          <p className="text-sm font-semibold text-gray-800">What course are you enrolled in?</p>
+          <p className="text-sm font-semibold text-gray-800">What course are you enrolled in? <RequiredMark /></p>
           {lifecycleAction === 'change' && (
             <p className="mt-1 text-xs leading-relaxed text-amber-700">This records your actual enrollment. It is not a new LearnMatch recommendation. Your previous program history will remain unchanged.</p>
           )}
@@ -446,7 +443,7 @@ function CollegeSetup() {
           )}
 
           {/* Course search */}
-          <div>
+          <div data-validation-field="course" aria-invalid={fieldErrors.course ? 'true' : undefined} aria-describedby={fieldErrors.course ? 'college-course-error' : undefined}>
             <label className="mb-3 flex items-center gap-3 text-xs font-medium text-gray-500">
               <span className="h-px flex-1 bg-gray-200" />
               {savedRecommendations.length > 0 ? 'or search another course' : 'Search for your enrolled course'}
@@ -523,13 +520,14 @@ function CollegeSetup() {
                 </button>
               </div>
             )}
+            <FieldError id="college-course-error">{fieldErrors.course}</FieldError>
           </div>
           </>}
 
           {/* Year level */}
-          <div>
+          <div data-validation-field="academicYear">
             <label htmlFor="academic-year" className="block text-sm font-medium text-gray-700 mb-2">
-              Academic year
+              Academic year <RequiredMark />
             </label>
             <input
               id="academic-year"
@@ -537,21 +535,23 @@ function CollegeSetup() {
               value={academicYear}
               onChange={handleAcademicYearChange}
               placeholder="2026-2027"
+              required aria-required="true" aria-invalid={fieldErrors.academicYear ? 'true' : undefined} aria-describedby={fieldErrors.academicYear ? 'academic-year-error' : undefined}
               className="w-full rounded-2xl border border-stone-200 bg-white px-4 py-3.5 text-sm outline-none transition duration-150 hover:border-orange-200 focus:border-orange-400 focus:ring-4 focus:ring-orange-100/80"
             />
+            <FieldError id="academic-year-error">{fieldErrors.academicYear}</FieldError>
           </div>
 
           {/* Year level */}
-          <div>
+          <div data-validation-field="yearLevel" aria-invalid={fieldErrors.yearLevel ? 'true' : undefined} aria-describedby={fieldErrors.yearLevel ? 'year-level-error' : undefined}>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              What year level are you in?
+              What year level are you in? <RequiredMark />
             </label>
             <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
               {['1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year'].map((year) => (
                 <button
                   key={year}
                   type="button"
-                  onClick={() => setYearLevel(year)}
+                  onClick={() => { setYearLevel(year); setFieldErrors((current) => ({ ...current, yearLevel: undefined })) }}
                   className={`rounded-xl border py-3 text-sm font-medium transition duration-150 ${
                     yearLevel === year
                       ? 'border-orange-400 bg-orange-50 text-orange-700 shadow-sm ring-1 ring-orange-200'
@@ -562,12 +562,13 @@ function CollegeSetup() {
                 </button>
               ))}
             </div>
+            <FieldError id="year-level-error">{fieldErrors.yearLevel}</FieldError>
           </div>
 
           {/* Academic calendar */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Academic calendar type
+              Academic calendar type <RequiredMark />
             </label>
             <div className="grid grid-cols-2 gap-2">
               {Object.entries(ACADEMIC_CALENDARS).map(([value, calendar]) => (
@@ -592,8 +593,8 @@ function CollegeSetup() {
           </div>
 
           {/* Current term */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Current term</label>
+          <div data-validation-field="semester" aria-invalid={fieldErrors.semester ? 'true' : undefined} aria-describedby={fieldErrors.semester ? 'semester-error' : undefined}>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Current term <RequiredMark /></label>
             <div className="grid grid-cols-2 gap-2">
               {getCalendarTerms(calendarType).map((term) => (
                 <button key={term.code} type="button" onClick={() => handleSemesterChoice(term)} className={`rounded-xl border px-2 py-3 text-sm font-medium transition duration-150 ${semester === term.label ? 'border-orange-400 bg-orange-50 text-orange-700 shadow-sm ring-1 ring-orange-200' : 'border-gray-200 bg-white text-gray-600 hover:border-orange-300 hover:bg-orange-50/40'}`}>
@@ -601,6 +602,7 @@ function CollegeSetup() {
                 </button>
               ))}
             </div>
+            <FieldError id="semester-error">{fieldErrors.semester}</FieldError>
           </div>
 
             </div>
@@ -616,7 +618,7 @@ function CollegeSetup() {
               </div>
             </div>
 
-            <div className="space-y-2">
+            <fieldset className="space-y-2"><legend className="mb-2 text-sm font-medium text-gray-700">Schedule information <RequiredMark /></legend>
               {[
                 ['exact', 'I know my exact term dates'],
                 ['approximate', 'I only know the approximate schedule'],
@@ -627,21 +629,24 @@ function CollegeSetup() {
                   <span className="text-sm font-medium text-gray-700">{label}</span>
                 </label>
               ))}
-            </div>
+            </fieldset>
 
             {timingChoice === 'exact' && (
               <div className="grid sm:grid-cols-2 gap-4">
-                <div>
-                  <label htmlFor="semester-start" className="block text-sm font-medium text-gray-700 mb-2">Term start</label>
-                  <input id="semester-start" type="date" min={academicDateMin} max={academicDateMax} value={semesterStartDate} onChange={(event) => {
+                <div data-validation-field="semesterStartDate">
+                  <label htmlFor="semester-start" className="block text-sm font-medium text-gray-700 mb-2">Term start <RequiredMark /></label>
+                  <input id="semester-start" type="date" min={academicDateMin} max={academicDateMax} value={semesterStartDate} required aria-required="true" aria-invalid={fieldErrors.semesterStartDate ? 'true' : undefined} aria-describedby={fieldErrors.semesterStartDate ? 'semester-start-error' : undefined} onChange={(event) => {
                     const nextStart = event.target.value
                     setSemesterStartDate(nextStart)
+                    setFieldErrors((current) => ({ ...current, semesterStartDate: undefined }))
                     if (semesterEndDate && semesterEndDate <= nextStart) setSemesterEndDate('')
                   }} className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100/80" />
+                  <FieldError id="semester-start-error">{fieldErrors.semesterStartDate}</FieldError>
                 </div>
-                <div>
-                  <label htmlFor="semester-end" className="block text-sm font-medium text-gray-700 mb-2">Term end</label>
-                  <input id="semester-end" type="date" min={semesterStartDate || academicDateMin} max={academicDateMax} value={semesterEndDate} onChange={(event) => setSemesterEndDate(event.target.value)} className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100/80" />
+                <div data-validation-field="semesterEndDate">
+                  <label htmlFor="semester-end" className="block text-sm font-medium text-gray-700 mb-2">Term end <RequiredMark /></label>
+                  <input id="semester-end" type="date" min={semesterStartDate || academicDateMin} max={academicDateMax} value={semesterEndDate} onChange={(event) => { setSemesterEndDate(event.target.value); setFieldErrors((current) => ({ ...current, semesterEndDate: undefined })) }} required aria-required="true" aria-invalid={fieldErrors.semesterEndDate ? 'true' : undefined} aria-describedby={fieldErrors.semesterEndDate ? 'semester-end-error' : undefined} className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100/80" />
+                  <FieldError id="semester-end-error">{fieldErrors.semesterEndDate}</FieldError>
                 </div>
                 {detectedExactPhase && (
                   <div className="rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 sm:col-span-2">
@@ -658,16 +663,17 @@ function CollegeSetup() {
                 approximateStart={approximateStart}
                 approximateEnd={approximateEnd}
                 setApproximateStart={handleApproximateStartChange}
-                setApproximateEnd={setApproximateEnd}
+                setApproximateEnd={(value) => { setApproximateEnd(value); setFieldErrors((current) => ({ ...current, approximateEnd: undefined })) }}
+                errors={fieldErrors}
               />
             )}
 
             {timingChoice === 'approximate' && (
-              <SemesterPhaseSelector value={semesterPosition} onChange={setSemesterPosition} />
+              <SemesterPhaseSelector value={semesterPosition} onChange={(value) => { setSemesterPosition(value); setFieldErrors((current) => ({ ...current, semesterPosition: undefined })) }} error={fieldErrors.semesterPosition} />
             )}
 
             {timingChoice === 'unknown' && (
-              <SemesterPhaseSelector value={semesterPosition} onChange={setSemesterPosition} />
+              <SemesterPhaseSelector value={semesterPosition} onChange={(value) => { setSemesterPosition(value); setFieldErrors((current) => ({ ...current, semesterPosition: undefined })) }} error={fieldErrors.semesterPosition} />
             )}
           </section>
 
