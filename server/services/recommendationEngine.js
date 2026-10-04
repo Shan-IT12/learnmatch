@@ -197,6 +197,9 @@ export function rankCourses(courses) {
     if (typeof course.course_code !== 'string' || course.course_code.length === 0) {
       throw new TypeError('Every course must have a course_code')
     }
+    if (course.course_id === null || course.course_id === undefined || course.course_id === '') {
+      throw new TypeError('Every course must have a stable course_id')
+    }
     requireNormalizedScore(course.finalScore, `finalScore for ${course.course_code}`)
     return { ...course }
   })
@@ -205,9 +208,18 @@ export function rankCourses(courses) {
     if (right.finalScore !== left.finalScore) {
       return right.finalScore - left.finalScore
     }
-    if (left.course_code < right.course_code) return -1
-    if (left.course_code > right.course_code) return 1
-    return 0
+
+    const leftBreakdown = left.scoreBreakdown ?? {}
+    const rightBreakdown = right.scoreBreakdown ?? {}
+    for (const key of ['skillMatch', 'interestMatch']) {
+      const difference = Number(rightBreakdown[key] ?? 0) - Number(leftBreakdown[key] ?? 0)
+      if (difference !== 0) return difference
+    }
+
+    const leftId = Number(left.course_id)
+    const rightId = Number(right.course_id)
+    if (Number.isFinite(leftId) && Number.isFinite(rightId)) return leftId - rightId
+    return String(left.course_id).localeCompare(String(right.course_id))
   })
 
   return ranked.map((course, index) => ({

@@ -13,16 +13,17 @@ test('active College results hide the full Summary Dashboard shortcut', async ()
 })
 
 test('Career Path resolves active College state and returns directly to assessment results', async () => {
-  const [careerPath, results] = await Promise.all([
+  const [careerPath, results, navigation] = await Promise.all([
     source('./CareerPath.jsx'),
     source('./Results.jsx'),
+    source('../utils/careerPathNavigation.js'),
   ])
   assert.match(careerPath, /useActiveCollegePhase/)
   assert.match(careerPath, /if \(hasActiveCollegePhase \|\| !cameFromCareerPaths\)[\s\S]*?navigate\('\/results'\)/)
-  assert.match(careerPath, /Back to Results/)
+  assert.match(navigation, /Back to Results/)
   assert.match(careerPath, /hasActiveCollegePhase === false/)
   assert.match(results, /source: 'results'/)
-  assert.match(careerPath, /location\.state\?\.source === 'career-paths'/)
+  assert.match(navigation, /navigationState\?\.source === 'career-paths'/)
   assert.match(careerPath, /source: 'career-paths'/)
 })
 

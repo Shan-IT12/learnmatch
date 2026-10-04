@@ -22,3 +22,16 @@ test('Results uses a prominent school CTA and milestone-scoped feedback prompt',
   assert.match(source, /api\/recommendations\/latest/)
   assert.match(source, /milestoneReached=\{!loading && !error && recommendations\.length > 0\}/)
 })
+
+test('Course and Career Overview stays compact and delegates details to Career Path', async () => {
+  const source = await readFile(new URL('./SummaryDashboard.jsx', import.meta.url), 'utf8')
+  assert.match(source, /summarizeCourseDescription/)
+  assert.match(source, /slice\(0, 2\)/)
+  assert.match(source, /obtainableSkills\.slice\(0, 3\)/)
+  assert.match(source, /careerOpportunities\.slice\(0, 3\)/)
+  assert.match(source, /View Full Career Path/)
+  assert.match(source, /navigate\('\/results\/career-path\?returnTo=summary'\)/)
+  assert.doesNotMatch(source, /Explore Detailed Career Path/)
+  assert.doesNotMatch(source, /Salary figures are estimates/)
+  assert.doesNotMatch(source, /estimated_monthly_salary_php/)
+})

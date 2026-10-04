@@ -16,6 +16,7 @@ import publicCourseRoutes from './routes/publicCourseRoutes.js'
 import directionsRoutes from './routes/directionsRoutes.js'
 import { validateInterestSubmission } from './services/interestSubmissionService.js'
 import { validatePersonalitySubmission } from './services/personalitySubmissionService.js'
+import { calculateMbtiResult } from './services/mbtiScoringService.js'
 import {
   getAdminCourses,
   getCourseRecommendationReadiness,
@@ -615,31 +616,8 @@ app.post('/api/mbti', authenticateToken, async (req, res) => {
   }
  
   try {
-    // Sum ratings per dimension per pole, e.g. totals.EI.E, totals.EI.I
-    const totals = {
-      EI: { E: 0, I: 0 },
-      SN: { S: 0, N: 0 },
-      TF: { T: 0, F: 0 },
-      JP: { J: 0, P: 0 },
-    }
- 
-    for (const a of validation.answers) {
-      if (totals[a.dimension] && totals[a.dimension][a.pole] !== undefined) {
-        totals[a.dimension][a.pole] += Number(a.rating)
-      }
-    }
- 
-    // % leaning toward the first-listed letter of each dichotomy (E, N, T, J)
-    const scoreEI = (totals.EI.E / (totals.EI.E + totals.EI.I)) * 100
-    const scoreNS = (totals.SN.N / (totals.SN.N + totals.SN.S)) * 100
-    const scoreTF = (totals.TF.T / (totals.TF.T + totals.TF.F)) * 100
-    const scoreJP = (totals.JP.J / (totals.JP.J + totals.JP.P)) * 100
- 
-    const mbtiType =
-      (scoreEI >= 50 ? 'E' : 'I') +
-      (scoreNS >= 50 ? 'N' : 'S') +
-      (scoreTF >= 50 ? 'T' : 'F') +
-      (scoreJP >= 50 ? 'J' : 'P')
+    const { mbtiType, scores } = calculateMbtiResult(validation.answers)
+    const { EI: scoreEI, NS: scoreNS, TF: scoreTF, JP: scoreJP } = scores
  
     const attemptId = requestedAttemptId(req)
     if (attemptId) {

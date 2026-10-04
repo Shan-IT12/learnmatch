@@ -189,19 +189,21 @@ test('course score applies course components and inherited cluster components', 
   assert.ok(Math.abs(score - 0.715) < 1e-12)
 })
 
-test('course ranking sorts by score descending and course_code ascending on ties', () => {
+test('equal final course scores use course-level matches before stable course_id', () => {
   const ranked = rankCourses([
-    { course_code: 'CRS010', finalScore: 0.8 },
-    { course_code: 'CRS002', finalScore: 0.8 },
-    { course_code: 'CRS003', finalScore: 0.9 },
+    { course_id: 10, course_code: 'CRS010', finalScore: 0.8, scoreBreakdown: { skillMatch: 0.7, interestMatch: 0.9 } },
+    { course_id: 2, course_code: 'CRS002', finalScore: 0.8, scoreBreakdown: { skillMatch: 0.8, interestMatch: 0.5 } },
+    { course_id: 3, course_code: 'CRS003', finalScore: 0.9, scoreBreakdown: { skillMatch: 0.5, interestMatch: 0.5 } },
+    { course_id: 1, course_code: 'CRS001', finalScore: 0.8, scoreBreakdown: { skillMatch: 0.8, interestMatch: 0.5 } },
   ])
 
   assert.deepEqual(
     ranked.map(({ course_code, rankPosition }) => ({ course_code, rankPosition })),
     [
       { course_code: 'CRS003', rankPosition: 1 },
-      { course_code: 'CRS002', rankPosition: 2 },
-      { course_code: 'CRS010', rankPosition: 3 },
+      { course_code: 'CRS001', rankPosition: 2 },
+      { course_code: 'CRS002', rankPosition: 3 },
+      { course_code: 'CRS010', rankPosition: 4 },
     ]
   )
 })
@@ -215,8 +217,8 @@ test('the same inputs always produce the same score and ranking', () => {
     parentCluster: 'SCIENCE & MATHEMATICS CLUSTER',
   }
   const courses = [
-    { course_code: 'CRS021', finalScore: 0.7 },
-    { course_code: 'CRS020', finalScore: 0.7 },
+    { course_id: 21, course_code: 'CRS021', finalScore: 0.7 },
+    { course_id: 20, course_code: 'CRS020', finalScore: 0.7 },
   ]
 
   const first = {

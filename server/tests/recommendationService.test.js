@@ -9,6 +9,7 @@ import {
 import {
   RecommendationInputError,
   buildClusterRiasecVector,
+  buildCourseRecommendationSelection,
   buildPersonalFactorResponses,
   buildStudentDomainScores,
   buildStudentRiasecVector,
@@ -245,6 +246,7 @@ test('deprecated and quarantined courses cannot enter recommendation competition
 test('candidate courses retain deterministic course-level scoring and ranking', () => {
   const courses = [
     {
+      course_id: 10,
       course_code: 'CRS010',
       finalScore: calculateCourseScore({
         courseSkillMatch: 0.8,
@@ -255,6 +257,7 @@ test('candidate courses retain deterministic course-level scoring and ranking', 
       }),
     },
     {
+      course_id: 2,
       course_code: 'CRS002',
       finalScore: calculateCourseScore({
         courseSkillMatch: 0.9,
@@ -272,11 +275,26 @@ test('candidate courses retain deterministic course-level scoring and ranking', 
   )
 })
 
+test('presentation diversification preserves the complete raw computed ranking', () => {
+  const scoredCourses = [
+    { course_id: 1, course_code: 'CRS001', course_name: 'Bachelor of Science in Civil Engineering', finalScore: 0.9 },
+    { course_id: 2, course_code: 'CRS002', course_name: 'Bachelor of Science in Civil Engineering major in Structural Engineering', finalScore: 0.895 },
+    { course_id: 3, course_code: 'CRS003', course_name: 'Bachelor of Science in Architecture', finalScore: 0.88 },
+    { course_id: 4, course_code: 'CRS004', course_name: 'Bachelor of Science in Environmental Engineering', finalScore: 0.87 },
+  ]
+  const { rawRanking, selectedTopThree } = buildCourseRecommendationSelection(scoredCourses)
+
+  assert.deepEqual(rawRanking.map(({ course_id }) => course_id), [1, 2, 3, 4])
+  assert.deepEqual(rawRanking.map(({ finalScore }) => finalScore), [0.9, 0.895, 0.88, 0.87])
+  assert.deepEqual(selectedTopThree.map(({ course_id }) => course_id), [1, 3, 4])
+})
+
 test('the same student inputs produce the same cluster and course rankings', () => {
   const createRankings = () => {
     const clusters = scoreAndRankClusters(clusterScoringInput)
     const candidates = selectTopClusters(clusters)
     const courses = rankCourses(candidates.map((cluster, index) => ({
+      course_id: index + 1,
       course_code: `CRS00${index + 1}`,
       cluster_category: cluster.cluster_category,
       finalScore: calculateCourseScore({

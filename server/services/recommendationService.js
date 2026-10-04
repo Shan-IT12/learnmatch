@@ -21,6 +21,7 @@ import {
   rankCourses,
 } from './recommendationEngine.js'
 import { isCurrentIndependentCourse } from './courseIdentityService.js'
+import { selectDiversifiedTopThree } from './recommendationDiversityService.js'
 export function buildPersonalFactorResponses(profile = {}) {
   const responses = {
     physical: Number(profile.factor_physical_impact),
@@ -349,6 +350,14 @@ function shapeRecommendation(course) {
   }
 }
 
+export function buildCourseRecommendationSelection(scoredCourses) {
+  const rawRanking = rankCourses(scoredCourses)
+  return {
+    rawRanking,
+    selectedTopThree: selectDiversifiedTopThree(rawRanking),
+  }
+}
+
 export async function getTopCourseRecommendations(pool, userId) {
   const [
     [skillResponses],
@@ -502,5 +511,6 @@ export async function getTopCourseRecommendations(pool, userId) {
     }
   })
 
-  return rankCourses(scoredCourses).slice(0, 3).map(shapeRecommendation)
+  const { selectedTopThree } = buildCourseRecommendationSelection(scoredCourses)
+  return selectedTopThree.map(shapeRecommendation)
 }

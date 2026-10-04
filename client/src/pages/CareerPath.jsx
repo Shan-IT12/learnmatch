@@ -2,6 +2,12 @@ import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import CourseEnrichmentSections from '../components/CourseEnrichmentSections'
 import useActiveCollegePhase from '../hooks/useActiveCollegePhase'
+import {
+  cameFromCareerPathChooser,
+  careerPathChooserSearch,
+  careerPathDetailSearch,
+  getCareerPathReturnDestination,
+} from '../utils/careerPathNavigation'
 
 const apiUrl = import.meta.env.VITE_API_URL || ''
 
@@ -11,7 +17,8 @@ function CareerPath() {
   const { courseCode } = useParams()
   const hasActiveCollegePhase = useActiveCollegePhase()
   const passedRecommendations = location.state?.recommendations
-  const cameFromCareerPaths = location.state?.source === 'career-paths'
+  const cameFromCareerPaths = cameFromCareerPathChooser(location.search, location.state)
+  const returnDestination = getCareerPathReturnDestination(location.search, hasActiveCollegePhase)
   const [recommendations, setRecommendations] = useState(() => (
     Array.isArray(passedRecommendations) ? passedRecommendations : []
   ))
@@ -81,7 +88,7 @@ function CareerPath() {
   }, [courseCode, navigate, passedRecommendations])
 
   const openCourse = (recommendation) => {
-    navigate(`/results/career-path/${encodeURIComponent(recommendation.course_code)}`, {
+    navigate(`/results/career-path/${encodeURIComponent(recommendation.course_code)}${careerPathDetailSearch(location.search)}`, {
       state: { recommendations: topRecommendations, source: 'career-paths' },
     })
   }
@@ -91,7 +98,7 @@ function CareerPath() {
       navigate('/results')
       return
     }
-    navigate('/results/career-path', {
+    navigate(`/results/career-path${careerPathChooserSearch(location.search)}`, {
       state: topRecommendations.length ? { recommendations: topRecommendations } : undefined,
     })
   }
@@ -104,8 +111,8 @@ function CareerPath() {
         ) : (
           <span className="text-lg font-bold text-gray-900">Learn<span className="text-orange-500">Match</span></span>
         )}
-        <button onClick={courseCode ? backToSelector : () => navigate('/results')} disabled={hasActiveCollegePhase === null} className="text-sm text-gray-500 hover:text-gray-900 transition disabled:cursor-wait disabled:opacity-50">
-          ← {courseCode && cameFromCareerPaths && !hasActiveCollegePhase ? 'Back to Career Paths' : 'Back to Results'}
+        <button onClick={courseCode ? backToSelector : () => navigate(returnDestination.path)} disabled={hasActiveCollegePhase === null} className="text-sm text-gray-500 hover:text-gray-900 transition disabled:cursor-wait disabled:opacity-50">
+          ← {courseCode && cameFromCareerPaths && !hasActiveCollegePhase ? 'Back to Career Paths' : returnDestination.label}
         </button>
       </nav>
 

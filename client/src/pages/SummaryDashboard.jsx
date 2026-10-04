@@ -14,6 +14,15 @@ const personalFactorLabels = {
 
 const apiUrl = import.meta.env.VITE_API_URL || ''
 
+function summarizeCourseDescription(description) {
+  if (!description) return 'Course summary not yet available.'
+  const sentences = String(description)
+    .replace(/\s+/g, ' ')
+    .trim()
+    .match(/[^.!?]+(?:[.!?]+|$)/g)
+  return (sentences || [description]).slice(0, 2).join(' ').trim()
+}
+
 function SummaryDashboard() {
   const navigate = useNavigate()
   const token = localStorage.getItem('token')
@@ -118,6 +127,13 @@ function SummaryDashboard() {
   const personalityDimensions = mbti ? getDimensionResults(mbti.mbtiType, mbti.scores) : []
   const personalityMeaning = personalityDimensions.map(({ preferredName }) => preferredName).join(', ')
   const personalitySummary = mbti ? MBTI_TYPE_CONTENT[mbti.mbtiType]?.summary : ''
+  const courseSummary = summarizeCourseDescription(topCourseDetail?.description)
+  const obtainableSkills = topCourseDetail?.obtainable_skills || []
+  const featuredSkills = obtainableSkills.slice(0, 3)
+  const remainingSkillCount = Math.max(0, obtainableSkills.length - featuredSkills.length)
+  const careerOpportunities = topCourseDetail?.career_opportunities || []
+  const featuredCareers = careerOpportunities.slice(0, 3)
+  const remainingCareerCount = Math.max(0, careerOpportunities.length - featuredCareers.length)
  
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-[#fbf8f3] text-gray-900">
@@ -322,41 +338,45 @@ function SummaryDashboard() {
               <p className="text-xs font-bold uppercase tracking-[0.17em] text-orange-600">Course &amp; Career Overview</p>
               <h2 className="mt-1 text-xl font-bold tracking-tight text-gray-950">Your recommended direction</h2>
             </div>
-          <div className="overflow-hidden rounded-[26px] border border-white/90 bg-white/78 shadow-[0_20px_55px_-42px_rgba(120,53,15,.5)]">
-            <div className="flex flex-col gap-3 border-b border-orange-100/70 bg-orange-50/40 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-7">
-              <div><p className="text-[11px] font-semibold uppercase tracking-wide text-orange-500">
-                Career Path — {topRecommendation.course_name}
-              </p><p className="mt-1 text-sm font-bold text-gray-900">Full course and career overview</p></div>
+          <div className="overflow-hidden rounded-[26px] border border-white/90 bg-white/80 shadow-[0_20px_55px_-42px_rgba(120,53,15,.5)]">
+            <div className="flex flex-col gap-5 border-b border-orange-100/70 bg-orange-50/40 px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-7">
+              <div className="max-w-3xl">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-orange-600">Top recommendation</p>
+                <h3 className="mt-1.5 text-xl font-black leading-tight tracking-tight text-gray-950 sm:text-2xl">{topRecommendation.course_name}</h3>
+              </div>
               <button
-                onClick={() => navigate('/results/career-path')}
-                className="text-xs font-medium text-orange-500 hover:text-orange-600 transition inline-flex items-center gap-1 shrink-0"
+                onClick={() => navigate('/results/career-path?returnTo=summary')}
+                className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-orange-500 px-5 py-3 text-sm font-semibold text-white shadow-sm shadow-orange-200 transition hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-300 focus:ring-offset-2"
               >
-                Explore Detailed Career Path →
+                View Full Career Path <IconArrowRight size={16} stroke={2} />
               </button>
             </div>
-            <div className="grid gap-7 p-5 sm:p-7 lg:grid-cols-[minmax(0,1.65fr)_minmax(17rem,1fr)]">
-              <div><p className="text-sm text-gray-600 leading-7 mb-5">{topCourseDetail?.description || 'Course description not yet available.'}</p>
-            <p className="text-xs font-bold uppercase tracking-wide text-gray-500 mb-3">Obtainable Skills</p>
-            <div className="flex flex-wrap gap-2">
-              {(topCourseDetail?.obtainable_skills || []).map((skill) => (
-                <span
-                  key={skill}
-                  className="text-xs px-3 py-1.5 rounded-full bg-orange-50 text-orange-700 font-medium"
-                >
-                  {skill}
-                </span>
-              ))}
-            </div></div>
-            <div className="lg:border-l lg:border-gray-100 lg:pl-7"><p className="text-xs font-bold uppercase tracking-wide text-gray-500 mb-2">Career Opportunities</p>
-            <p className="text-xs text-gray-400 mb-3">Salary figures are estimates and may vary by employer, experience, location, and industry.</p>
-            <div className="space-y-2">
-              {(topCourseDetail?.career_opportunities || []).map((job) => (
-                <div key={job.career_id} className="flex justify-between items-center gap-4 rounded-xl bg-gray-50 px-3 py-2.5 text-sm">
-                  <span className="text-gray-700">{job.career_title}</span>
-                  <span className="text-xs text-gray-400 text-right">{job.estimated_monthly_salary_php?.display}</span>
+            <div className="grid gap-7 p-5 sm:p-7 lg:grid-cols-[minmax(0,1.4fr)_minmax(17rem,0.9fr)] lg:gap-9">
+              <div>
+                <p className="text-sm leading-6 text-gray-600 sm:text-[15px]">{courseSummary}</p>
+                <div className="mt-6 border-t border-gray-100 pt-5">
+                  <p className="mb-3 text-xs font-bold uppercase tracking-wide text-gray-500">Obtainable Skills</p>
+                  <div className="flex flex-wrap items-center gap-2">
+                    {featuredSkills.map((skill) => (
+                      <span key={skill} className="rounded-lg border border-orange-100 bg-orange-50 px-3 py-1.5 text-xs font-semibold text-orange-700">
+                        {skill}
+                      </span>
+                    ))}
+                    {remainingSkillCount > 0 && <span className="text-xs font-medium text-gray-400">+{remainingSkillCount} more</span>}
+                  </div>
                 </div>
-              ))}
-            </div></div>
+              </div>
+              <div className="lg:border-l lg:border-gray-100 lg:pl-9">
+                <p className="mb-3 text-xs font-bold uppercase tracking-wide text-gray-500">Career Opportunities</p>
+                <div className="space-y-2">
+                  {featuredCareers.map((job) => (
+                    <div key={job.career_id || job.career_title} className="rounded-xl border border-gray-100 bg-gray-50/80 px-4 py-3 text-sm font-semibold text-gray-700">
+                      {job.career_title}
+                    </div>
+                  ))}
+                </div>
+                {remainingCareerCount > 0 && <p className="mt-3 text-xs font-medium text-gray-400">+{remainingCareerCount} more</p>}
+              </div>
             </div>
           </div>
           </section>
