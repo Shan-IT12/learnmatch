@@ -147,7 +147,6 @@ function Landing() {
                   {searching ? 'Searching…' : 'Search'}
                 </button>
               </form>
-
               {results && (
                 <div className="absolute left-0 right-0 top-full z-50 mt-2 overflow-hidden rounded-2xl border border-orange-100 bg-white shadow-2xl">
                   {results.courses.length === 0 ? (
@@ -161,7 +160,8 @@ function Landing() {
                           key={course.course_code || index}
                           onClick={() => navigate(`/courses/${course.course_code}`, {
                             state: {
-                              entryContext: 'landing',
+                              entryContext: 'public-search',
+                              returnTo: `/courses/search?q=${encodeURIComponent(query.trim())}`,
                             },
                           })}
                           className="block w-full border-t border-orange-50 px-5 py-3 text-left transition duration-150 hover:bg-orange-50"

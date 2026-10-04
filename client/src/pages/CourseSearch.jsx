@@ -1,28 +1,42 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
-import { STUDENT_ACTIVE_INDEPENDENT_COURSE_COUNT } from '../constants/courseCatalog'
+import { getCourseCatalogUrl } from '../utils/courseCatalog'
+import useActiveCollegePhase from '../hooks/useActiveCollegePhase'
 import PublicHeader from '../components/PublicHeader'
 
 const apiUrl = import.meta.env.VITE_API_URL || ''
+const COURSES_PER_PAGE = 18
 
 function CourseSearch() {
   const navigate = useNavigate()
   const location = useLocation()
-  const fromDashboard = location.state?.entryContext === 'dashboard'
+  const [searchParams, setSearchParams] = useSearchParams()
+  const fromDashboard = searchParams.get('source') === 'dashboard' || location.state?.entryContext === 'dashboard'
+  const hasActiveCollegePhase = useActiveCollegePhase()
+  const contextSearch = fromDashboard ? '?source=dashboard' : ''
   const courseDetailsState = {
     entryContext: fromDashboard ? 'dashboard' : 'public-search',
     returnTo: `${location.pathname}${location.search}`,
   }
-  const [searchParams, setSearchParams] = useSearchParams()
   const query = searchParams.get('q')?.trim() || ''
   const [input, setInput] = useState(query)
   const [courses, setCourses] = useState([])
-  const [status, setStatus] = useState(query ? 'loading' : 'idle')
-  const [resolvedQuery, setResolvedQuery] = useState(query ? null : '')
+  const [status, setStatus] = useState('idle')
+  const [resolvedQuery, setResolvedQuery] = useState(null)
+  const [sort, setSort] = useState('asc')
+  const [page, setPage] = useState(1)
   const [suggestions, setSuggestions] = useState(null)
   const [suggestionStatus, setSuggestionStatus] = useState('idle')
   const [showSuggestions, setShowSuggestions] = useState(false)
   const displayStatus = !query ? 'idle' : resolvedQuery === query ? status : 'loading'
+  const sortedCourses = useMemo(() => [...courses].sort((left, right) => {
+    const comparison = left.course_name.localeCompare(right.course_name)
+    return sort === 'desc' ? -comparison : comparison
+  }), [courses, sort])
+  const pageCount = Math.ceil(sortedCourses.length / COURSES_PER_PAGE)
+  const visibleCourses = useMemo(() => (
+    sortedCourses.slice((page - 1) * COURSES_PER_PAGE, page * COURSES_PER_PAGE)
+  ), [page, sortedCourses])
 
   useEffect(() => {
     const suggestionQuery = input.trim()
@@ -64,7 +78,7 @@ function CourseSearch() {
       return () => controller.abort()
     }
 
-    fetch(`${apiUrl}/api/public/courses/search?q=${encodeURIComponent(query)}`, {
+    fetch(getCourseCatalogUrl(apiUrl, query), {
       signal: controller.signal,
     })
       .then(async (response) => {
@@ -88,16 +102,20 @@ function CourseSearch() {
 
   const submit = (event) => {
     event.preventDefault()
+    setPage(1)
     setShowSuggestions(false)
     setSearchParams(
-      input.trim() ? { q: input.trim() } : {},
+      Object.fromEntries([
+        ...(input.trim() ? [['q', input.trim()]] : []),
+        ...(fromDashboard ? [['source', 'dashboard']] : []),
+      ]),
       fromDashboard ? { state: { entryContext: 'dashboard' } } : undefined
     )
   }
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <PublicHeader />
+      <PublicHeader activeCollegePhase={hasActiveCollegePhase} showDashboard={fromDashboard} />
       <main className="max-w-5xl mx-auto px-5 sm:px-10 py-10 sm:py-14">
         {fromDashboard ? (
           <button onClick={() => navigate('/dashboard')} className="text-sm font-medium text-orange-600 hover:text-orange-700 mb-6">
@@ -112,8 +130,9 @@ function CourseSearch() {
         <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-3">Find a course</h1>
         <p className="text-gray-500 mb-7">Search by course name, abbreviation, skill, or career.</p>
 
-        <div className="relative">
-          <form onSubmit={submit} className="flex bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden focus-within:border-orange-300">
+        <div>
+          <div className="relative">
+          <form onSubmit={submit} className="flex min-w-0 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm focus-within:border-orange-300">
             <input
               value={input}
               onChange={(event) => {
@@ -154,7 +173,7 @@ function CourseSearch() {
                       aria-selected="false"
                       key={course.course_code}
                       onMouseDown={(event) => event.preventDefault()}
-                      onClick={() => navigate(`/courses/${course.course_code}`, { state: courseDetailsState })}
+                      onClick={() => navigate(`/courses/${course.course_code}${contextSearch}`, { state: courseDetailsState })}
                       className="block w-full text-left px-5 py-3 border-t border-gray-50 hover:bg-orange-50 transition group"
                     >
                       <p className="text-sm font-medium text-gray-800 group-hover:text-orange-600 transition">
@@ -166,11 +185,11 @@ function CourseSearch() {
               )}
             </div>
           )}
+          </div>
         </div>
 
         <section className="mt-9" aria-live="polite">
-          {displayStatus === 'idle' && <p className="text-gray-500">Enter a keyword to explore {STUDENT_ACTIVE_INDEPENDENT_COURSE_COUNT} validated programs.</p>}
-          {displayStatus === 'loading' && <p className="text-gray-500">Searching courses…</p>}
+          {displayStatus === 'loading' && <p className="text-gray-500">Loading courses…</p>}
           {displayStatus === 'error' && (
             <div className="bg-red-50 border border-red-100 text-red-700 rounded-xl p-5">We couldn’t load courses. Please try again.</div>
           )}
@@ -182,18 +201,45 @@ function CourseSearch() {
           )}
           {displayStatus === 'success' && courses.length > 0 && (
             <>
-              <p className="text-sm text-gray-500 mb-4">{courses.length} {courses.length === 1 ? 'course' : 'courses'} found for “{query}”</p>
+              <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+                <p className="text-sm text-gray-500">
+                  {`${courses.length} ${courses.length === 1 ? 'course' : 'courses'} found for “${query}”`}
+                </p>
+                <label className="flex items-center gap-2 text-sm font-medium text-gray-600">
+                  Sort
+                  <select value={sort} onChange={(event) => {
+                    setSort(event.target.value)
+                    setPage(1)
+                  }} className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 outline-none focus:border-orange-400 focus:ring-1 focus:ring-orange-400" aria-label="Sort courses">
+                    <option value="asc">A–Z</option>
+                    <option value="desc">Z–A</option>
+                  </select>
+                </label>
+              </div>
               <div className="grid gap-4">
-                {courses.map((course) => (
-                  <Link key={course.course_code} to={`/courses/${course.course_code}`} state={courseDetailsState} className="block bg-white border border-gray-100 rounded-2xl p-5 sm:p-6 shadow-sm hover:shadow-md hover:border-orange-200 transition group">
-                    <div className="flex flex-wrap items-center gap-2 mb-2">
+                {visibleCourses.map((course) => (
+                  <article key={course.course_code} className="flex flex-col bg-white border border-gray-100 rounded-2xl p-5 sm:p-6 shadow-sm hover:shadow-md hover:border-orange-200 transition">
+                    <div className="flex flex-wrap items-center gap-2 mb-3">
                       {course.course_abbreviation && <span className="text-xs font-bold text-orange-600 bg-orange-50 px-2.5 py-1 rounded-full">{course.course_abbreviation}</span>}
+                      {course.cluster_category && <span className="text-xs font-medium text-gray-600 bg-gray-100 px-2.5 py-1 rounded-full">{course.cluster_category}</span>}
                     </div>
-                    <h2 className="text-lg font-semibold text-gray-900 group-hover:text-orange-600 transition">{course.course_name}</h2>
+                    <h2 className="text-lg font-semibold text-gray-900">{course.course_name}</h2>
                     {course.description && <p className="text-sm text-gray-500 leading-relaxed mt-2 line-clamp-2">{course.description}</p>}
-                  </Link>
+                    <Link to={`/courses/${course.course_code}${contextSearch}`} state={courseDetailsState} className="mt-4 inline-flex w-fit items-center text-sm font-semibold text-orange-600 hover:text-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 rounded">
+                      View course details <span aria-hidden="true" className="ml-1">→</span>
+                    </Link>
+                  </article>
                 ))}
               </div>
+              {pageCount > 1 && (
+                <nav className="mt-7 flex flex-wrap items-center justify-between gap-3" aria-label="Course catalog pages">
+                  <p className="text-sm text-gray-500">Page {page} of {pageCount}</p>
+                  <div className="flex gap-2">
+                    <button type="button" onClick={() => setPage((current) => Math.max(1, current - 1))} disabled={page === 1} className="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:border-orange-300 hover:text-orange-700 disabled:cursor-not-allowed disabled:opacity-40">Previous</button>
+                    <button type="button" onClick={() => setPage((current) => Math.min(pageCount, current + 1))} disabled={page === pageCount} className="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:border-orange-300 hover:text-orange-700 disabled:cursor-not-allowed disabled:opacity-40">Next</button>
+                  </div>
+                </nav>
+              )}
             </>
           )}
         </section>

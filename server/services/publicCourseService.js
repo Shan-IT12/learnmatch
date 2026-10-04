@@ -88,12 +88,18 @@ function fieldScore(field, phrase, tokens, weight) {
 
 export function searchPublicCourses(query, { limit = currentIndexedCourses.length, courseCodes = null } = {}) {
   const phrase = normalize(query)
-  if (!phrase) return []
-
   const normalizedLimit = Math.max(0, Math.min(
     Number(limit) || currentIndexedCourses.length,
     currentIndexedCourses.length
   ))
+  if (!phrase) {
+    return currentIndexedCourses
+      .filter(({ course }) => !courseCodes || courseCodes.has(course.course_id))
+      .sort((left, right) => left.course.course_name.localeCompare(right.course.course_name))
+      .slice(0, normalizedLimit)
+      .map(({ course }) => publicCourse(course))
+  }
+
   const hasKnownExactAbbreviation = indexedCourses.some(({ abbreviation }) => abbreviation === phrase)
   if (hasKnownExactAbbreviation) {
     return currentIndexedCourses

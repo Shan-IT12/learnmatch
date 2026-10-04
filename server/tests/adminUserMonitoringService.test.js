@@ -41,8 +41,7 @@ test('user list returns monitored users with truthful derived states and paginat
 
   assert.deepEqual(result.users[0], {
     userId: 17,
-    displayName: 'Sample Student',
-    email: 'student@example.edu',
+    username: 'student17',
     accountStatus: 'Active',
     assessmentStatus: 'Completed',
     recommendationStatus: 'Available',
@@ -50,9 +49,11 @@ test('user list returns monitored users with truthful derived states and paginat
     latestAlignment: 'On Track',
     registeredAt: monitoredUser.created_at,
   })
+  assert.equal(Object.hasOwn(result.users[0], 'email'), false)
   assert.deepEqual(result.pagination, { page: 2, pageSize: 10, total: 21, totalPages: 3 })
   const listCall = database.calls.find(({ sql }) => sql.includes('ORDER BY created_at'))
   assert.deepEqual(listCall.values, [10, 10])
+  assert.doesNotMatch(listCall.sql, /u\.email|profile\.full_name/)
 })
 
 test('search and account, assessment, tracking, and alignment filters are parameterized', async () => {
@@ -66,13 +67,14 @@ test('search and account, assessment, tracking, and alignment filters are parame
   })
 
   const countCall = database.calls.find(({ sql }) => sql.includes('SELECT COUNT(*) AS total'))
-  assert.match(countCall.sql, /full_name LIKE \? OR email LIKE \? OR username LIKE \?/)
+  assert.match(countCall.sql, /CAST\(user_id AS CHAR\) LIKE \? OR username LIKE \?/)
+  assert.doesNotMatch(countCall.sql, /email LIKE/)
   assert.match(countCall.sql, /is_active = \?/)
   assert.match(countCall.sql, /assessment_status = \?/)
   assert.match(countCall.sql, /tracking_started = \?/)
   assert.match(countCall.sql, /alignment_status = \?/)
   assert.deepEqual(countCall.values, [
-    '%Sample%', '%Sample%', '%Sample%', 0, 'In Progress', 1, 'Needs Attention',
+    '%Sample%', '%Sample%', 0, 'In Progress', 1, 'Needs Attention',
   ])
 
   const noCheckinDatabase = listDatabase()

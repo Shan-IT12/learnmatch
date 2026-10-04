@@ -59,9 +59,14 @@ test('searches skills and career paths', () => {
   assert.ok(searchPublicCourses('nursing').some((course) => course.course_name.includes('Nursing')))
 })
 
-test('supports multiple words and blank/no-result queries', () => {
+test('supports multiple words, browsing without a query, and no-result queries', () => {
   assert.ok(searchPublicCourses('information technology').length > 0)
-  assert.deepEqual(searchPublicCourses('  '), [])
+  const browsableCourses = searchPublicCourses('  ')
+  assert.equal(browsableCourses.length, getPublicCourseCount())
+  assert.deepEqual(
+    browsableCourses.map(({ course_name }) => course_name),
+    [...browsableCourses].map(({ course_name }) => course_name).sort((left, right) => left.localeCompare(right))
+  )
   assert.deepEqual(searchPublicCourses('zzzz-no-such-course-zzzz'), [])
 })
 
@@ -141,6 +146,32 @@ test('includes active courses and excludes inactive or unmapped courses from pub
 
   assert.deepEqual(activeResults, [first])
   assert.deepEqual(inactiveResults, [])
+})
+
+test('returns the full active catalog when the available-course query is empty', async () => {
+  const allCourses = searchPublicCourses('')
+  const activeCodes = allCourses.map(({ course_code }) => course_code)
+  const availableCourses = await searchAvailablePublicCourses(
+    '',
+    {},
+    databaseWithActiveCodes(...activeCodes)
+  )
+
+  assert.equal(availableCourses.length, getPublicCourseCount())
+  assert.deepEqual(availableCourses, allCourses)
+})
+
+test('filters active catalog searches and restores all courses for a cleared query', async () => {
+  const allCourses = searchPublicCourses('')
+  const activeCodes = allCourses.map(({ course_code }) => course_code)
+  const database = databaseWithActiveCodes(...activeCodes)
+  const filteredCourses = await searchAvailablePublicCourses('nursing', {}, database)
+  const restoredCourses = await searchAvailablePublicCourses('', {}, database)
+
+  assert.ok(filteredCourses.length > 0)
+  assert.ok(filteredCourses.length < restoredCourses.length)
+  assert.ok(filteredCourses.every(({ course_name }) => course_name.toLowerCase().includes('nursing')))
+  assert.equal(restoredCourses.length, getPublicCourseCount())
 })
 
 test('preserves ranking among remaining active public courses', async () => {

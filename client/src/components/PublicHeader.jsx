@@ -1,9 +1,10 @@
 import { Link } from 'react-router-dom'
 
-function PublicHeader({ activeCollegePhase = false }) {
+function PublicHeader({ activeCollegePhase = false, showDashboard = false }) {
   const isAuthenticated = Boolean(localStorage.getItem('token'))
-  const homePath = isAuthenticated ? '/dashboard' : '/'
+  const dashboardNavigation = isAuthenticated && showDashboard && activeCollegePhase === false
   const suppressGenericNavigation = isAuthenticated && activeCollegePhase !== false
+  const homePath = dashboardNavigation ? '/dashboard' : '/'
 
   return (
     <nav className="border-b border-gray-100 bg-white">
@@ -19,11 +20,8 @@ function PublicHeader({ activeCollegePhase = false }) {
               Log In
             </Link>
           )}
-          {!suppressGenericNavigation && (
-            <Link to={isAuthenticated ? '/dashboard' : '/register'} className="text-sm bg-orange-500 text-white px-3 sm:px-4 py-2.5 rounded-lg hover:bg-orange-600 font-medium">
-              {isAuthenticated ? 'Dashboard' : 'Get Started'}
-            </Link>
-          )}
+          {!isAuthenticated && <Link to="/register" className="text-sm bg-orange-500 text-white px-3 sm:px-4 py-2.5 rounded-lg hover:bg-orange-600 font-medium">Get Started</Link>}
+          {!suppressGenericNavigation && dashboardNavigation && <Link to="/dashboard" className="text-sm bg-orange-500 text-white px-3 sm:px-4 py-2.5 rounded-lg hover:bg-orange-600 font-medium">Dashboard</Link>}
         </div>
       </div>
     </nav>

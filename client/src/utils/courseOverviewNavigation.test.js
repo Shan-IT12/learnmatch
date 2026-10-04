@@ -3,10 +3,18 @@ import assert from 'node:assert/strict'
 
 import { getCourseOverviewBackNavigation } from './courseOverviewNavigation.js'
 
-test('a Landing selection returns Course Overview directly to Landing', () => {
+test('a Landing selection returns Course Overview to Course Search', () => {
   assert.deepEqual(getCourseOverviewBackNavigation({ entryContext: 'landing' }), {
-    path: '/',
-    label: 'Back to Landing Page',
+    path: '/courses/search',
+    label: 'Back to Course Search',
+  })
+})
+
+test('Dashboard context survives a Course Overview refresh through the URL', () => {
+  assert.deepEqual(getCourseOverviewBackNavigation(undefined, '?source=dashboard'), {
+    path: '/courses/search?source=dashboard',
+    label: 'Back to Course Search',
+    state: { entryContext: 'dashboard' },
   })
 })
 

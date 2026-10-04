@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useLocation, useParams } from 'react-router-dom'
 import PublicHeader from '../components/PublicHeader'
 import { getCourseOverviewBackNavigation } from '../utils/courseOverviewNavigation'
+import useActiveCollegePhase from '../hooks/useActiveCollegePhase'
 
 const apiUrl = import.meta.env.VITE_API_URL || ''
 
@@ -19,7 +20,9 @@ function PublicCourseDetails() {
   const { courseCode } = useParams()
   const location = useLocation()
   const isAuthenticated = Boolean(localStorage.getItem('token'))
-  const backNavigation = getCourseOverviewBackNavigation(location.state)
+  const fromDashboard = new URLSearchParams(location.search).get('source') === 'dashboard' || location.state?.entryContext === 'dashboard'
+  const hasActiveCollegePhase = useActiveCollegePhase()
+  const backNavigation = getCourseOverviewBackNavigation(location.state, location.search)
   const [course, setCourse] = useState(null)
   const [status, setStatus] = useState('loading')
   const [resolvedCourseCode, setResolvedCourseCode] = useState(null)
@@ -59,7 +62,7 @@ function PublicCourseDetails() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <PublicHeader />
+      <PublicHeader activeCollegePhase={hasActiveCollegePhase} showDashboard={fromDashboard} />
       <main className="max-w-5xl mx-auto px-5 sm:px-10 py-10 sm:py-14">
         {displayStatus === 'loading' && <p className="text-gray-500">Loading course…</p>}
         {displayStatus === 'error' && <div className="bg-red-50 border border-red-100 text-red-700 rounded-xl p-5">We couldn’t load this course. Please try again.</div>}
@@ -81,7 +84,7 @@ function PublicCourseDetails() {
               {course.description && <p className="text-gray-600 leading-7 whitespace-pre-line mt-6">{course.description}</p>}
 
               <Link
-                to={`/schools/${encodeURIComponent(course.course_code)}`}
+                to={`/schools/${encodeURIComponent(course.course_code)}${fromDashboard ? '?source=dashboard' : ''}`}
                 state={{
                   source: 'course-overview',
                   returnTo: `${location.pathname}${location.search}`,

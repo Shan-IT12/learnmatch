@@ -64,14 +64,12 @@ const USER_MONITORING_CTE = `
     SELECT DISTINCT user_id FROM RECOMMENDATION
   ),
   user_monitoring AS (
-    SELECT u.user_id, u.email, u.username, u.is_active, u.created_at,
-           profile.full_name,
+    SELECT u.user_id, u.username, u.is_active, u.created_at,
            ${ASSESSMENT_STATUS_SQL} AS assessment_status,
            CASE WHEN recommendation_users.user_id IS NULL THEN 0 ELSE 1 END AS has_recommendation,
            CASE WHEN tracking_users.user_id IS NULL THEN 0 ELSE 1 END AS tracking_started,
            latest_completed.status AS alignment_status
     FROM USER_ACCOUNT u
-    LEFT JOIN PROFILE profile ON profile.user_id = u.user_id
     LEFT JOIN profile_stats ON profile_stats.user_id = u.user_id
     LEFT JOIN interest_stats ON interest_stats.user_id = u.user_id
     LEFT JOIN skill_stats ON skill_stats.user_id = u.user_id
@@ -101,9 +99,9 @@ function buildFilters({ search = '', account = '', assessment = '', tracking = '
   const values = []
   const normalizedSearch = String(search).trim().slice(0, 100)
   if (normalizedSearch) {
-    clauses.push('(full_name LIKE ? OR email LIKE ? OR username LIKE ?)')
+    clauses.push('(CAST(user_id AS CHAR) LIKE ? OR username LIKE ?)')
     const searchPattern = `%${normalizedSearch}%`
-    values.push(searchPattern, searchPattern, searchPattern)
+    values.push(searchPattern, searchPattern)
   }
   if (ACCOUNT_FILTERS.has(account)) {
     clauses.push('is_active = ?')
@@ -134,8 +132,7 @@ function buildFilters({ search = '', account = '', assessment = '', tracking = '
 function shapeListUser(row) {
   return {
     userId: Number(row.user_id),
-    displayName: row.full_name || row.username || row.email,
-    email: row.email,
+    username: row.username,
     accountStatus: Number(row.is_active) === 1 ? 'Active' : 'Inactive',
     assessmentStatus: row.assessment_status,
     recommendationStatus: Number(row.has_recommendation) === 1 ? 'Available' : 'Not Yet Generated',
@@ -159,7 +156,7 @@ export async function getAdminUsers(database, options = {}) {
     ),
     database.query(
       `${USER_MONITORING_CTE}
-       SELECT user_id, email, username, is_active, created_at, full_name,
+       SELECT user_id, username, is_active, created_at,
               assessment_status, has_recommendation, tracking_started, alignment_status
        FROM user_monitoring${filters.sql}
        ORDER BY created_at DESC, user_id DESC

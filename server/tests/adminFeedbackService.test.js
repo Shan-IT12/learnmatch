@@ -59,7 +59,7 @@ test('feedback list returns persisted records, aggregate metrics, and server pag
   ])
   assert.deepEqual(result.feedback[0], {
     feedbackId: 12,
-    user: { userId: 7, displayName: 'Sample Student', email: 'student@example.edu' },
+    user: { userId: 7 },
     rating: 5,
     category: 'Suggestion',
     submittedAt: persistedFeedback.submitted_at,
@@ -109,16 +109,11 @@ test('empty feedback data and no search matches are handled safely', async () =>
   assert.deepEqual(result.pagination, { page: 1, pageSize: 10, total: 0, totalPages: 1 })
 })
 
-test('missing profile uses username and then email as the safe identity fallback', async () => {
-  const usernameResult = await getAdminFeedback(feedbackDatabase({
-    feedbackRows: [{ ...persistedFeedback, full_name: null }],
-  }))
-  assert.equal(usernameResult.feedback[0].user.displayName, 'student7')
+test('feedback list exposes only the stable user ID', async () => {
+  const result = await getAdminFeedback(feedbackDatabase())
 
-  const emailResult = await getAdminFeedback(feedbackDatabase({
-    feedbackRows: [{ ...persistedFeedback, full_name: null, username: null }],
-  }))
-  assert.equal(emailResult.feedback[0].user.displayName, 'student@example.edu')
+  assert.deepEqual(result.feedback[0].user, { userId: 7 })
+  assert.doesNotMatch(JSON.stringify(result.feedback[0]), /Sample Student|student7|student@example\.edu/)
 })
 
 function detailDatabase(rows) {

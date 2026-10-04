@@ -209,12 +209,12 @@ function AdminFeedback() {
                 <section className="hidden overflow-hidden rounded-xl border border-orange-100 bg-white shadow-sm lg:block" aria-label="Submitted feedback">
                   <table className="w-full table-fixed text-left text-sm">
                     <thead className="border-b border-slate-200 bg-orange-50/50 text-xs uppercase tracking-wide text-slate-500">
-                      <tr><th className="w-[20%] px-5 py-3 font-semibold">User</th><th className="w-[15%] px-5 py-3 font-semibold">Category</th><th className="w-[10%] px-5 py-3 font-semibold">Rating</th><th className="px-5 py-3 font-semibold">Feedback</th><th className="w-[16%] px-5 py-3 font-semibold">Submitted</th><th className="w-20 px-5 py-3 font-semibold">Action</th></tr>
+                      <tr><th className="w-[10%] px-5 py-3 font-semibold">User ID</th><th className="w-[16%] px-5 py-3 font-semibold">Category</th><th className="w-[10%] px-5 py-3 font-semibold">Rating</th><th className="px-5 py-3 font-semibold">Feedback</th><th className="w-[18%] px-5 py-3 font-semibold">Submitted</th><th className="w-20 px-5 py-3 font-semibold">Action</th></tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
                       {feedback.map((item) => (
                         <tr key={item.feedbackId} className="align-top transition hover:bg-orange-50/30">
-                          <td className="px-5 py-4"><p className="font-medium text-slate-900">{item.user.displayName}</p><p className="mt-1 truncate text-xs text-slate-500">{item.user.email}</p></td>
+                          <td className="px-5 py-4 font-semibold tabular-nums text-slate-900">#{item.user.userId}</td>
                           <td className="px-5 py-4"><span className="inline-flex rounded-md border border-orange-100 bg-orange-50 px-2 py-1 text-xs font-medium text-orange-700">{item.category}</span></td>
                           <td className="px-5 py-4"><Rating value={item.rating} /></td>
                           <td className="px-5 py-4"><p className="line-clamp-2 break-words leading-5 text-slate-600">{item.commentPreview || 'No additional comment.'}</p></td>
@@ -229,7 +229,7 @@ function AdminFeedback() {
                 <section className="grid gap-4 sm:grid-cols-2 lg:hidden" aria-label="Submitted feedback">
                   {feedback.map((item) => (
                     <article key={item.feedbackId} className="rounded-xl border border-orange-100 bg-white p-5 shadow-sm">
-                      <div className="flex items-start justify-between gap-3"><div className="min-w-0"><p className="font-semibold text-slate-900">{item.user.displayName}</p><p className="mt-1 truncate text-xs text-slate-500">{item.user.email}</p></div><Rating value={item.rating} /></div>
+                      <div className="flex items-start justify-between gap-3"><div><p className="text-xs font-semibold uppercase tracking-wide text-slate-400">User ID</p><p className="mt-1 font-semibold tabular-nums text-slate-900">#{item.user.userId}</p></div><Rating value={item.rating} /></div>
                       <div className="mt-4 flex flex-wrap items-center gap-2"><span className="rounded-md border border-orange-100 bg-orange-50 px-2 py-1 text-xs font-medium text-orange-700">{item.category}</span><span className="text-xs text-slate-400">{formatDate(item.submittedAt)}</span></div>
                       <p className="mt-4 line-clamp-3 break-words text-sm leading-6 text-slate-600">{item.commentPreview || 'No additional comment.'}</p>
                       <Link to={`/admin/feedback/${item.feedbackId}`} className="mt-4 inline-flex text-sm font-semibold text-orange-600 hover:text-orange-700 hover:underline">View feedback</Link>

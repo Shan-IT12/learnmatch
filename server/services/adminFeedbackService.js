@@ -36,11 +36,13 @@ function buildFilters({ search = '', category = '', rating = '' } = {}) {
 function shapeFeedback(row, { includeFullComment = false } = {}) {
   const feedback = {
     feedbackId: Number(row.feedback_id),
-    user: {
-      userId: Number(row.user_id),
-      displayName: row.full_name || row.username || row.email || 'Unknown User',
-      email: row.email || null,
-    },
+    user: includeFullComment
+      ? {
+          userId: Number(row.user_id),
+          displayName: row.full_name || row.username || row.email || 'Unknown User',
+          email: row.email || null,
+        }
+      : { userId: Number(row.user_id) },
     rating: Number(row.rating),
     category: row.category || 'Uncategorized',
     submittedAt: row.submitted_at,

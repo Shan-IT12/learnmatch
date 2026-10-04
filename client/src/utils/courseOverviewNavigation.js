@@ -4,14 +4,15 @@ const safeCourseSearchPath = (value) => (
     : '/courses/search'
 )
 
-export function getCourseOverviewBackNavigation(state) {
+export function getCourseOverviewBackNavigation(state, search = '') {
+  const fromDashboard = new URLSearchParams(search).get('source') === 'dashboard'
   if (state?.entryContext === 'landing') {
-    return { path: '/', label: 'Back to Landing Page' }
+    return { path: '/courses/search', label: 'Back to Course Search' }
   }
 
-  if (state?.entryContext === 'dashboard') {
+  if (state?.entryContext === 'dashboard' || fromDashboard) {
     return {
-      path: safeCourseSearchPath(state.returnTo),
+      path: state?.returnTo ? safeCourseSearchPath(state.returnTo) : '/courses/search?source=dashboard',
       label: 'Back to Course Search',
       state: { entryContext: 'dashboard' },
     }

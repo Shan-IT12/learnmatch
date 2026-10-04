@@ -152,7 +152,7 @@ function AdminUsers() {
                 type="search"
                 value={searchInput}
                 onChange={(event) => setSearchInput(event.target.value)}
-                placeholder="Search by student name, username, or email"
+                placeholder="Search by User ID or username"
                 aria-label="Search users"
                 className="w-full rounded-lg border border-slate-200 bg-white py-2.5 pl-10 pr-11 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
               />
@@ -217,35 +217,40 @@ function AdminUsers() {
         ) : (
           <>
             <div className="hidden overflow-x-auto rounded-xl border border-orange-100 bg-white shadow-sm lg:block">
-              <table className="w-full min-w-[1120px] text-left text-sm">
+              <table className="w-full min-w-[780px] table-fixed text-left text-sm">
+                <colgroup>
+                  <col className="w-[18%]" />
+                  <col className="w-[16%]" />
+                  <col className="w-[23%]" />
+                  <col className="w-[25%]" />
+                  <col className="w-[18%]" />
+                </colgroup>
                 <thead className="border-b border-orange-100 bg-orange-50/50 text-xs uppercase tracking-wide text-slate-500">
                   <tr>
-                    <th className="px-5 py-3 font-semibold">Student</th>
-                    <th className="px-4 py-3 font-semibold">Account</th>
-                    <th className="px-4 py-3 font-semibold">Assessment</th>
-                    <th className="px-4 py-3 font-semibold">Recommendation</th>
-                    <th className="px-4 py-3 font-semibold">College Tracking</th>
-                    <th className="px-4 py-3 font-semibold">Latest Alignment</th>
-                    <th className="px-4 py-3 font-semibold">Registered</th>
-                    <th className="px-5 py-3 text-right font-semibold"><span className="sr-only">Actions</span></th>
+                    <th className="px-5 py-3.5 font-semibold">User ID</th>
+                    <th className="px-4 py-3.5 font-semibold">Account Status</th>
+                    <th className="px-4 py-3.5 font-semibold">Assessment Status</th>
+                    <th className="px-4 py-3.5 font-semibold">College Phase</th>
+                    <th className="px-5 py-3.5 font-semibold">Registered</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {users.map((user) => (
                     <tr key={user.userId} className="transition hover:bg-orange-50/30">
-                      <td className="px-5 py-4">
-                        <p className="font-semibold text-slate-900">{user.displayName}</p>
-                        <p className="mt-0.5 text-xs text-slate-500">{user.email}</p>
+                      <td className="px-5 py-4 align-top">
+                        <p className="font-bold tabular-nums text-slate-950">#{user.userId}</p>
+                        {user.username && <p className="mt-1 truncate text-xs font-medium text-slate-500">@{user.username}</p>}
                       </td>
-                      <td className="px-4 py-4"><StatusBadge>{user.accountStatus}</StatusBadge></td>
-                      <td className="px-4 py-4"><StatusBadge>{user.assessmentStatus}</StatusBadge></td>
-                      <td className="px-4 py-4"><StatusBadge>{user.recommendationStatus}</StatusBadge></td>
-                      <td className="px-4 py-4"><StatusBadge>{user.trackingStatus}</StatusBadge></td>
-                      <td className="px-4 py-4"><StatusBadge>{user.latestAlignment || 'No Check-in'}</StatusBadge></td>
-                      <td className="whitespace-nowrap px-4 py-4 text-slate-600">{formatDate(user.registeredAt)}</td>
-                      <td className="px-5 py-4 text-right">
-                        <button type="button" onClick={() => navigate(`/admin/users/${user.userId}`)} className="text-sm font-semibold text-orange-600 hover:text-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500">View</button>
+                      <td className="px-4 py-4 align-top"><StatusBadge>{user.accountStatus}</StatusBadge></td>
+                      <td className="px-4 py-4 align-top">
+                        <StatusBadge>{user.assessmentStatus}</StatusBadge>
+                        <p className="mt-1.5 break-words text-xs leading-5 text-slate-500">Recommendation: {user.recommendationStatus}</p>
                       </td>
+                      <td className="px-4 py-4 align-top">
+                        <StatusBadge>{user.trackingStatus}</StatusBadge>
+                        <p className="mt-1.5 break-words text-xs leading-5 text-slate-500">Alignment: {user.latestAlignment || 'No Check-in'}</p>
+                      </td>
+                      <td className="whitespace-nowrap px-5 py-4 align-top text-slate-600">{formatDate(user.registeredAt)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -257,20 +262,20 @@ function AdminUsers() {
                 <article key={user.userId} className="rounded-xl border border-orange-100 bg-white p-5 shadow-sm">
                   <div className="flex items-start justify-between gap-4 border-b border-slate-100 pb-4">
                     <div className="min-w-0">
-                      <p className="truncate font-semibold text-slate-900">{user.displayName}</p>
-                      <p className="mt-0.5 truncate text-sm text-slate-500">{user.email}</p>
+                      <p className="font-bold tabular-nums text-slate-950">User #{user.userId}</p>
+                      {user.username && <p className="mt-1 truncate text-sm font-medium text-slate-700">@{user.username}</p>}
                     </div>
-                    <StatusBadge>{user.accountStatus}</StatusBadge>
+                    <div className="shrink-0 text-right">
+                      <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-400">Account Status</p>
+                      <StatusBadge>{user.accountStatus}</StatusBadge>
+                    </div>
                   </div>
                   <dl className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <div><dt className="text-xs font-semibold uppercase tracking-wide text-slate-400">Assessment</dt><dd className="mt-1.5"><StatusBadge>{user.assessmentStatus}</StatusBadge></dd></div>
-                    <div><dt className="text-xs font-semibold uppercase tracking-wide text-slate-400">Recommendation</dt><dd className="mt-1.5"><StatusBadge>{user.recommendationStatus}</StatusBadge></dd></div>
-                    <div><dt className="text-xs font-semibold uppercase tracking-wide text-slate-400">College Tracking</dt><dd className="mt-1.5"><StatusBadge>{user.trackingStatus}</StatusBadge></dd></div>
-                    <div><dt className="text-xs font-semibold uppercase tracking-wide text-slate-400">Latest Alignment</dt><dd className="mt-1.5"><StatusBadge>{user.latestAlignment || 'No Check-in'}</StatusBadge></dd></div>
+                    <div><dt className="text-xs font-semibold uppercase tracking-wide text-slate-400">Assessment Status</dt><dd className="mt-1.5"><StatusBadge>{user.assessmentStatus}</StatusBadge><p className="mt-2 text-xs text-slate-500">Recommendation: {user.recommendationStatus}</p></dd></div>
+                    <div><dt className="text-xs font-semibold uppercase tracking-wide text-slate-400">College Phase</dt><dd className="mt-1.5"><StatusBadge>{user.trackingStatus}</StatusBadge><p className="mt-2 text-xs text-slate-500">Alignment: {user.latestAlignment || 'No Check-in'}</p></dd></div>
                   </dl>
-                  <div className="mt-5 flex items-center justify-between border-t border-slate-100 pt-4">
+                  <div className="mt-5 border-t border-slate-100 pt-4">
                     <p className="text-sm text-slate-500">Registered {formatDate(user.registeredAt)}</p>
-                    <button type="button" onClick={() => navigate(`/admin/users/${user.userId}`)} className="text-sm font-semibold text-orange-600 hover:text-orange-700">View details</button>
                   </div>
                 </article>
               ))}

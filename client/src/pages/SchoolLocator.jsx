@@ -18,8 +18,8 @@ const apiUrl = import.meta.env.VITE_API_URL || ''
 function SchoolLocator() {
   const { courseCode } = useParams()
   const location = useLocation()
-  const isAuthenticated = Boolean(localStorage.getItem('token'))
   const hasActiveCollegePhase = useActiveCollegePhase()
+  const fromDashboard = new URLSearchParams(location.search).get('source') === 'dashboard'
   const [result, setResult] = useState(null)
   const [status, setStatus] = useState('loading')
   const [retryCount, setRetryCount] = useState(0)
@@ -70,8 +70,11 @@ function SchoolLocator() {
           returnTo: location.state.returnTo,
           returnState: location.state.returnState,
         }
-      : location.state?.source,
-    isAuthenticated
+      : {
+          name: 'course-overview',
+          returnTo: `/courses/${encodeURIComponent(courseCode)}${fromDashboard ? '?source=dashboard' : ''}`,
+          returnState: fromDashboard ? { entryContext: 'dashboard' } : { entryContext: 'public-search' },
+        },
   )
 
   const showSchoolOnMap = (schoolId) => {
@@ -122,7 +125,7 @@ function SchoolLocator() {
 
   return (
     <div className="min-h-screen bg-[#fcfaf7] text-gray-900">
-      <PublicHeader activeCollegePhase={hasActiveCollegePhase} />
+      <PublicHeader activeCollegePhase={hasActiveCollegePhase} showDashboard={fromDashboard} />
       <main className="max-w-6xl mx-auto px-5 sm:px-8 lg:px-10 py-8 sm:py-12">
         {hasActiveCollegePhase === null ? (
           <span className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-400" aria-live="polite">Resolving return destination…</span>

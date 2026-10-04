@@ -3,22 +3,22 @@ import assert from 'node:assert/strict'
 
 import { getSchoolLocatorBackNavigation } from './schoolLocatorNavigation.js'
 
-test('recommendation source returns to Results regardless of authentication inference', () => {
-  assert.deepEqual(getSchoolLocatorBackNavigation('results', true), {
+test('recommendation source returns to Results', () => {
+  assert.deepEqual(getSchoolLocatorBackNavigation('results'), {
     path: '/results',
     label: 'Back to Results',
   })
 })
 
-test('logged-in explorer source returns to Dashboard even if recommendations may exist', () => {
-  assert.deepEqual(getSchoolLocatorBackNavigation('explorer', true), {
+test('an explicit Dashboard explorer source returns to Dashboard', () => {
+  assert.deepEqual(getSchoolLocatorBackNavigation('explorer'), {
     path: '/dashboard',
     label: 'Back to Dashboard',
   })
 })
 
-test('guest public search returns to Course Search', () => {
-  assert.deepEqual(getSchoolLocatorBackNavigation('public-search', false), {
+test('public search returns to Course Search', () => {
+  assert.deepEqual(getSchoolLocatorBackNavigation('public-search'), {
     path: '/courses/search',
     label: 'Back to Course Search',
   })
@@ -33,7 +33,7 @@ test('Course Overview source returns to the exact course and preserves its origi
     name: 'course-overview',
     returnTo: '/courses/CRS024',
     returnState,
-  }, false), {
+  }), {
     path: '/courses/CRS024',
     label: 'Back to Course Overview',
     state: returnState,
@@ -44,10 +44,9 @@ test('an invalid Course Overview return path uses the existing safe fallback', (
   assert.equal(getSchoolLocatorBackNavigation({
     name: 'course-overview',
     returnTo: '/dashboard',
-  }, false).path, '/courses/search')
+  }).path, '/courses/search')
 })
 
-test('unknown origins use safe authenticated and guest fallbacks', () => {
-  assert.equal(getSchoolLocatorBackNavigation(undefined, true).path, '/dashboard')
-  assert.equal(getSchoolLocatorBackNavigation(undefined, false).path, '/courses/search')
+test('unknown origins use a safe public Course Search fallback', () => {
+  assert.equal(getSchoolLocatorBackNavigation(undefined).path, '/courses/search')
 })

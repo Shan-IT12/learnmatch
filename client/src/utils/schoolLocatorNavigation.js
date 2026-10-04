@@ -4,7 +4,7 @@ const navigationBySource = Object.freeze({
   'public-search': Object.freeze({ path: '/courses/search', label: 'Back to Course Search' }),
 })
 
-export function getSchoolLocatorBackNavigation(source, isAuthenticated) {
+export function getSchoolLocatorBackNavigation(source) {
   if (source?.name === 'course-overview' && /^\/courses\/[^/?#]+(?:[?#].*)?$/.test(source.returnTo || '')) {
     return {
       path: source.returnTo,
@@ -13,8 +13,5 @@ export function getSchoolLocatorBackNavigation(source, isAuthenticated) {
     }
   }
 
-  return navigationBySource[source]
-    || (isAuthenticated
-      ? navigationBySource.explorer
-      : navigationBySource['public-search'])
+  return navigationBySource[source] || navigationBySource['public-search']
 }

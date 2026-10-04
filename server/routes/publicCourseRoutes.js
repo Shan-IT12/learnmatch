@@ -7,9 +7,18 @@ import { getSchoolsForCourse } from '../services/schoolLocatorService.js'
 
 const router = express.Router()
 
+router.get('/', async (req, res) => {
+  try {
+    const courses = await searchAvailablePublicCourses('')
+    res.json({ query: '', courses })
+  } catch (error) {
+    console.error('Public course catalog error:', error)
+    res.status(500).json({ message: 'Server error loading course catalog' })
+  }
+})
+
 router.get('/search', async (req, res) => {
   const query = typeof req.query.q === 'string' ? req.query.q.trim() : ''
-  if (!query) return res.json({ query: '', courses: [] })
 
   try {
     const requestedLimit = Number.parseInt(req.query.limit, 10)

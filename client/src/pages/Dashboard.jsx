@@ -182,7 +182,7 @@ function Dashboard() {
               <p className="font-semibold text-base mt-3 mb-1 text-gray-900">Explore courses first</p>
               <p className="text-xs text-gray-500 max-w-[420px] leading-relaxed">Not sure yet? Browse courses and explore your options.</p>
             </div>
-            <button onClick={() => navigate('/courses/search', { state: { entryContext: 'dashboard' } })} className="inline-flex items-center justify-center gap-1.5 bg-orange-500 text-white px-5 py-3 rounded-xl text-sm font-medium hover:bg-orange-600 transition shrink-0 w-full sm:w-auto md:w-full xl:w-auto">Explore Courses <IconArrowRight size={16} stroke={2} /></button>
+            <button onClick={() => navigate('/courses/search?source=dashboard', { state: { entryContext: 'dashboard' } })} className="inline-flex items-center justify-center gap-1.5 bg-orange-500 text-white px-5 py-3 rounded-xl text-sm font-medium hover:bg-orange-600 transition shrink-0 w-full sm:w-auto md:w-full xl:w-auto">Explore Courses <IconArrowRight size={16} stroke={2} /></button>
           </section>
         </div>
       </main>

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { IconEye, IconEyeOff, IconShieldLock } from '@tabler/icons-react'
 import { FieldError, RequiredMark } from '../components/FormValidation'
 import { scrollToFirstInvalidField } from '../utils/formValidation'
@@ -133,12 +133,6 @@ function AdminLogin() {
         </div>
 
         <div className="text-center mt-6">
-          <Link
-            to="/"
-            className="text-sm text-gray-500 hover:text-orange-600 transition focus:outline-none focus:ring-2 focus:ring-orange-500 rounded"
-          >
-            ← Back to LearnMatch
-          </Link>
           <p className="text-xs text-gray-400 mt-4">Restricted access — LearnMatch personnel only</p>
         </div>
       </div>
