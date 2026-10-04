@@ -33,4 +33,6 @@ test('retake completion requires canonical Profile Personal Factors without copy
   assert.match(source, /SELECT profile_id FROM PROFILE/)
   assert.match(source, /profileRows\.length !== 1/)
   assert.doesNotMatch(source, /UPDATE PROFILE SET physical_accessibility_areas/)
+  assert.match(source, /\/api\/assessment-attempts\/recover/)
+  assert.doesNotMatch(source, /Active assessment attempt not found\./)
 })

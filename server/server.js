@@ -106,6 +106,21 @@ app.post('/api/assessment-attempts', authenticateToken, async (req, res) => {
   }
 })
 
+app.post('/api/assessment-attempts/recover', authenticateToken, async (req, res) => {
+  try {
+    const requestedId = requestedAttemptId(req)
+    if (requestedId) {
+      const attempt = await getOwnedAttempt(pool, req.user.userId, requestedId)
+      if (attempt?.status === 'IN_PROGRESS') return res.json({ attemptId: requestedId, recovered: true })
+    }
+    const [result] = await pool.query(`INSERT INTO ASSESSMENT_ATTEMPT (user_id, status) VALUES (?, 'IN_PROGRESS')`, [req.user.userId])
+    res.status(201).json({ attemptId: result.insertId, recovered: false })
+  } catch (error) {
+    console.error('Assessment attempt recovery error:', error)
+    res.status(500).json({ message: 'Could not continue the assessment. Please try again.' })
+  }
+})
+
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`)
 })
@@ -147,7 +162,7 @@ app.post('/api/interests', authenticateToken, async (req, res) => {
     const attemptId = requestedAttemptId(req)
     if (attemptId) {
       const saved = await updateAttempt(pool, userId, attemptId, 'interests', interests)
-      if (!saved) return res.status(404).json({ message: 'Active assessment attempt not found.' })
+      if (!saved) return res.status(409).json({ message: 'Your assessment session needs to be refreshed. Please return to Personal Factors and continue again.' })
       return res.json({ message: 'Interests saved for this assessment attempt', count: interests.length })
     }
     await pool.query('DELETE FROM INTEREST_RESPONSE WHERE user_id = ?', [userId])
@@ -252,7 +267,7 @@ app.post('/api/quiz', authenticateToken, async (req, res) => {
 
     if (attemptId) {
       const attempt = await getOwnedAttempt(pool, userId, attemptId)
-      if (!attempt || attempt.status !== 'IN_PROGRESS') return res.status(404).json({ message: 'Active assessment attempt not found.' })
+      if (!attempt || attempt.status !== 'IN_PROGRESS') return res.status(409).json({ message: 'Your assessment session needs to be refreshed. Please return to Personal Factors and continue again.' })
       await updateAttempt(pool, userId, attemptId, 'skill_answers', scoredAnswers)
       await updateAttempt(pool, userId, attemptId, 'skill_result', { totalCorrect: correctCount, totalQuestions: answers.length, domainScores })
     }
