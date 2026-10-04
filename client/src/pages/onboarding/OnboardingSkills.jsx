@@ -1,8 +1,18 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import OnboardingLayout from '../../components/OnboardingLayout'
+import AssessmentQuestionNavigation from '../../components/AssessmentQuestionNavigation'
 import { FieldError, RequiredMark } from '../../components/FormValidation'
 import { scrollToFirstInvalidField } from '../../utils/formValidation'
+import {
+  ASSESSMENT_SESSION_KEYS,
+  assessmentHeaders,
+  boundedQuestionIndex,
+  firstUnansweredQuestionIndex,
+  markAssessmentStepComplete,
+  readAssessmentSession,
+  writeAssessmentSession,
+} from '../../utils/assessmentSession'
 
 function getQuestionGuide(question) {
   const text = question.question_text
@@ -145,29 +155,72 @@ function getQuestionGuide(question) {
 function OnboardingSkills() {
   const navigate = useNavigate()
 
-  const [questions, setQuestions] = useState([])
-  const [currentIndex, setCurrentIndex] = useState(0)
-  const [answers, setAnswers] = useState({})
-  const [loading, setLoading] = useState(true)
+  const storage = typeof sessionStorage === 'undefined' ? null : sessionStorage
+  const initialSession = readAssessmentSession(storage, ASSESSMENT_SESSION_KEYS.skills, {})
+  const [questions, setQuestions] = useState(() => initialSession.questions || [])
+  const [currentIndex, setCurrentIndex] = useState(() => boundedQuestionIndex(initialSession.currentIndex, initialSession.questions?.length || 0))
+  const [answers, setAnswers] = useState(() => initialSession.answers || {})
+  const [loading, setLoading] = useState(() => !initialSession.questions?.length)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [results, setResults] = useState(null)
   const [showExplanation, setShowExplanation] = useState(false)
   const [questionError, setQuestionError] = useState('')
+  const [assessmentAccessError, setAssessmentAccessError] = useState('')
 
-  // Fetch 30 questions once when the page loads
+  // A persisted submission is authoritative. Only load editable questions when
+  // the account has no saved Academic Skills result.
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_URL}/api/quiz`)
-      .then((res) => res.json())
-      .then((data) => {
-        setQuestions(data.questions || [])
-        setLoading(false)
+    const token = localStorage.getItem('token')
+    const headers = assessmentHeaders(storage, { Authorization: `Bearer ${token}` })
+
+    fetch(`${import.meta.env.VITE_API_URL}/api/quiz/results`, { headers })
+      .then((res) => {
+        if (!res.ok) throw new Error('Could not check saved Academic Skills results.')
+        return res.json()
+      })
+      .then((saved) => {
+        const domainScores = saved.domainScores || {}
+        if (Object.keys(domainScores).length > 0) {
+          const totals = Object.values(domainScores).reduce(
+            (sum, domain) => ({ correct: sum.correct + domain.correct, total: sum.total + domain.total }),
+            { correct: 0, total: 0 }
+          )
+          markAssessmentStepComplete(storage, 3)
+          setResults({ domainScores, totalCorrect: totals.correct, totalQuestions: totals.total })
+          setLoading(false)
+          return
+        }
+
+        if (questions.length > 0) {
+          setLoading(false)
+          return
+        }
+
+        return fetch(`${import.meta.env.VITE_API_URL}/api/quiz`)
+          .then((res) => {
+            if (!res.ok) throw new Error('Could not load Academic Skills questions.')
+            return res.json()
+          })
+          .then((data) => {
+            setQuestions(data.questions || [])
+            setLoading(false)
+          })
       })
       .catch(() => {
-        setError('Could not load quiz questions. Please refresh.')
+        setAssessmentAccessError('Could not confirm your saved Academic Skills result. Please refresh.')
         setLoading(false)
       })
-  }, [])
+  }, [questions.length, storage])
+
+  useEffect(() => {
+    if (!questions.length) return
+    writeAssessmentSession(storage, ASSESSMENT_SESSION_KEYS.skills, {
+      questions,
+      answers,
+      currentIndex,
+    })
+  }, [answers, currentIndex, questions, storage])
 
   const handleSelect = (questionId, choice) => {
     setAnswers((prev) => ({ ...prev, [questionId]: choice }))
@@ -195,7 +248,7 @@ function OnboardingSkills() {
 
   const handleSubmit = async () => {
   if (Object.keys(answers).length < questions.length) {
-    const firstMissingIndex = questions.findIndex((question) => !answers[question.question_id])
+    const firstMissingIndex = firstUnansweredQuestionIndex(questions, answers, (question) => question.question_id)
     setCurrentIndex(firstMissingIndex)
     setQuestionError('Please select an answer.')
     scrollToFirstInvalidField(['skillQuestion'])
@@ -214,10 +267,10 @@ function OnboardingSkills() {
   try {
     const response = await fetch(`${import.meta.env.VITE_API_URL}/api/quiz`, {
       method: 'POST',
-      headers: {
+      headers: assessmentHeaders(storage, {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`,
-      },
+      }),
       body: JSON.stringify({ answers: formattedAnswers }),
     })
     const data = await response.json()
@@ -228,6 +281,7 @@ function OnboardingSkills() {
       return
     }
 
+    markAssessmentStepComplete(storage, 3)
     setResults(data)
   } catch {
     setError('Cannot connect to server. Please try again.')
@@ -239,43 +293,89 @@ function OnboardingSkills() {
   }
 
   if (results) {
-    const domainNames = Object.keys(results.domainScores)
+    const domainNames = ['Verbal', 'Numerical', 'Abstract/Logical', 'Spatial', 'Scientific Reasoning', 'Practical/Applied']
+    const domainResults = domainNames.map((name) => {
+      const score = results.domainScores[name] || { correct: 0, total: 0 }
+      const percentage = score.total > 0 ? Math.round((score.correct / score.total) * 100) : 0
+      return { name, ...score, percentage }
+    })
+    const overallPercentage = results.totalQuestions > 0
+      ? Math.round((results.totalCorrect / results.totalQuestions) * 100)
+      : 0
+    const highestPercentage = Math.max(...domainResults.map((domain) => domain.percentage))
+    const lowestPercentage = Math.min(...domainResults.map((domain) => domain.percentage))
+    const strongestAreas = domainResults.filter((domain) => domain.percentage === highestPercentage)
+    const areasToImprove = domainResults.filter((domain) => domain.percentage === lowestPercentage)
 
     return (
-      <OnboardingLayout currentStep={3} isComplete={true}>
-        <div className="max-w-xl mx-auto px-6 py-12">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Your Skills Quiz Results</h2>
-          <p className="text-gray-500 text-sm mb-8">
-            You got {results.totalCorrect} out of {results.totalQuestions} correct.
-          </p>
-
-          <div className="space-y-5 mb-10">
-            {domainNames.map((domain) => {
-              const { correct, total } = results.domainScores[domain]
-              const percent = Math.round((correct / total) * 100)
-              return (
-                <div key={domain}>
-                  <div className="flex justify-between text-sm mb-1.5">
-                    <span className="font-medium text-gray-800">{domain}</span>
-                    <span className="text-gray-500">{correct}/{total}</span>
-                  </div>
-                  <div className="w-full bg-gray-100 rounded-full h-2.5">
-                    <div
-                      className="bg-orange-500 h-2.5 rounded-full transition-all"
-                      style={{ width: `${percent}%` }}
-                    />
+      <OnboardingLayout currentStep={3} isComplete={true} showFooterNavigation={false}>
+        <div className="mx-auto max-w-4xl px-5 py-8 sm:px-8 sm:py-12">
+          <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_20px_55px_-38px_rgba(15,23,42,0.45)]">
+            <div className="border-b border-slate-100 p-6 sm:p-8">
+              <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
+                <div className="max-w-2xl">
+                  <p className="mb-2 text-xs font-bold uppercase tracking-[0.18em] text-orange-600">Skills assessment complete</p>
+                  <h2 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Academic Skills Results</h2>
+                  <p className="mt-3 text-sm leading-6 text-slate-600 sm:text-base">This is a snapshot of your current performance and can help highlight the skills you already use well and the areas you can continue developing.</p>
+                </div>
+                <div className="rounded-2xl border border-orange-100 bg-orange-50/70 px-6 py-5 md:min-w-72">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-orange-700">Overall score</p>
+                  <div className="mt-2 flex items-end justify-between gap-6">
+                    <p className="text-3xl font-bold tracking-tight text-slate-900">
+                      {results.totalCorrect}
+                      <span className="ml-2 text-base font-medium tracking-normal text-slate-600">out of {results.totalQuestions} correct</span>
+                    </p>
+                    <p className="shrink-0 text-2xl font-bold text-orange-600">{overallPercentage}%</p>
                   </div>
                 </div>
-              )
-            })}
-          </div>
+              </div>
+            </div>
+
+            <div className="grid gap-4 p-6 sm:grid-cols-2 sm:p-8">
+              <div className="rounded-2xl border border-orange-100 bg-orange-50/50 p-5">
+                <h3 className="mb-3 font-bold text-slate-900">Strongest Areas</h3>
+                <div className="flex flex-wrap gap-2">
+                  {strongestAreas.map((domain) => <span key={domain.name} className="rounded-full border border-orange-200 bg-white px-3 py-1.5 text-sm font-semibold text-slate-700">{domain.name} · {domain.percentage}%</span>)}
+                </div>
+              </div>
+              <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-5">
+                <h3 className="mb-3 font-bold text-slate-900">Areas to Improve</h3>
+                <div className="flex flex-wrap gap-2">
+                  {areasToImprove.map((domain) => <span key={domain.name} className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm font-semibold text-slate-700">{domain.name} · {domain.percentage}%</span>)}
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section className="mt-6 rounded-3xl border border-slate-200 bg-white p-6 shadow-[0_18px_45px_-38px_rgba(15,23,42,0.45)] sm:p-8">
+            <h3 className="text-lg font-bold text-slate-900 sm:text-xl">Domain Breakdown</h3>
+            <p className="mt-1 text-sm text-slate-500">Your score across each Academic Skills domain.</p>
+            <div className="mt-6 grid gap-x-8 gap-y-6 md:grid-cols-2">
+              {domainResults.map((domain) => (
+                <div key={domain.name}>
+                  <div className="mb-2 flex items-end justify-between gap-4">
+                    <span className="text-sm font-semibold text-slate-800">{domain.name}</span>
+                    <span className="shrink-0 text-sm font-bold text-slate-900">{domain.correct}/{domain.total} <span className="ml-1 font-medium text-slate-500">({domain.percentage}%)</span></span>
+                  </div>
+                  <div className="h-2.5 overflow-hidden rounded-full bg-slate-100" role="progressbar" aria-label={`${domain.name}: ${domain.percentage}%`} aria-valuemin="0" aria-valuemax="100" aria-valuenow={domain.percentage}>
+                    <div className="h-full rounded-full bg-orange-500 transition-all duration-500" style={{ width: `${domain.percentage}%` }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <aside className="mt-6 rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 text-sm leading-6 text-slate-600 sm:px-6">
+            <span className="font-semibold text-slate-900">How LearnMatch uses your results: </span>
+            These results represent your current performance across the six Academic Skills domains. LearnMatch combines this with your Interests, Personality, and Personal Factors when generating recommendations.
+          </aside>
 
           <button
             type="button"
             onClick={handleContinue}
-            className="w-full bg-orange-500 text-white py-3 rounded-xl font-medium hover:bg-orange-600 transition text-sm"
+            className="mt-8 flex w-full items-center justify-center rounded-xl bg-orange-500 px-6 py-3.5 text-sm font-semibold text-white shadow-sm transition hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 sm:ml-auto sm:w-auto"
           >
-            Continue to Personality Assessment →
+            Continue to Personality Assessment
           </button>
         </div>
       </OnboardingLayout>
@@ -288,6 +388,14 @@ function OnboardingSkills() {
         <div className="max-w-xl mx-auto px-6 py-12 text-center text-gray-500 text-sm">
           Loading quiz questions...
         </div>
+      </OnboardingLayout>
+    )
+  }
+
+  if (assessmentAccessError) {
+    return (
+      <OnboardingLayout currentStep={3} isComplete={false} showFooterNavigation={false}>
+        <div className="mx-auto max-w-xl px-6 py-12 text-center text-sm text-red-600">{assessmentAccessError}</div>
       </OnboardingLayout>
     )
   }
@@ -316,7 +424,7 @@ function OnboardingSkills() {
   ]
 
   return (
-    <OnboardingLayout currentStep={3} isComplete={answeredCount === questions.length}>
+    <OnboardingLayout currentStep={3} isComplete={answeredCount === questions.length} showFooterNavigation={false}>
       <div className="max-w-2xl mx-auto px-5 sm:px-8 py-8 sm:py-12">
         <div className="flex items-start justify-between gap-4 mb-5">
           <div>
@@ -330,7 +438,7 @@ function OnboardingSkills() {
           </div>
           <div className="shrink-0 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-center">
             <p className="text-[10px] font-semibold uppercase tracking-wide text-gray-400">Question</p>
-            <p className="text-sm font-bold text-gray-900"><span className="text-orange-600">{currentIndex + 1}</span> / {questions.length}</p>
+            <p className="text-sm font-bold text-gray-900"><span className="text-orange-600">{currentIndex + 1}</span> of {questions.length}</p>
           </div>
         </div>
 
@@ -415,47 +523,23 @@ function OnboardingSkills() {
                   {choice.key}
                 </span>
                 <span className="min-w-0 flex-1 leading-relaxed">{choice.text}</span>
-                {selectedChoice === choice.key && (
-                  <svg className="h-5 w-5 shrink-0 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                  </svg>
-                )}
               </button>
             ))}
           </div>
           <FieldError id="skill-question-error">{questionError}</FieldError>
         </div>
 
-        {/* Navigation */}
-        <div className="flex justify-between items-center gap-3">
-          <button
-            type="button"
-            onClick={handleBack}
-            disabled={currentIndex === 0}
-            className="px-3 sm:px-5 py-2.5 rounded-xl text-sm font-medium text-gray-500 hover:text-gray-900 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition"
-          >
-            ← Back
-          </button>
-
-          {isLastQuestion ? (
-            <button
-              type="button"
-              onClick={handleSubmit}
-              disabled={submitting}
-              className="px-4 sm:px-6 py-3 rounded-xl text-sm font-medium bg-slate-900 text-white hover:bg-slate-800 disabled:opacity-50 transition shadow-sm"
-            >
-              {submitting ? 'Submitting...' : 'Submit Quiz'}
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={handleNext}
-              className="px-5 sm:px-7 py-3 rounded-xl text-sm font-medium bg-slate-900 text-white hover:bg-slate-800 disabled:opacity-50 transition shadow-sm"
-            >
-              Next →
-            </button>
-          )}
-        </div>
+        <AssessmentQuestionNavigation
+          currentIndex={currentIndex}
+          isLastQuestion={isLastQuestion}
+          currentAnswered={Boolean(selectedChoice)}
+          allAnswered={answeredCount === questions.length}
+          submitting={submitting}
+          finalLabel="Submit Academic Skills"
+          onBack={handleBack}
+          onNext={handleNext}
+          onSubmit={handleSubmit}
+        />
       </div>
     </OnboardingLayout>
   )

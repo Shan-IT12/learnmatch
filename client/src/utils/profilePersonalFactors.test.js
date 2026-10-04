@@ -5,10 +5,7 @@ import {
   applyFactorApplicability,
   buildProfilePayload,
   deriveFactorApplicability,
-  personalFactorsChanged,
-  shouldOfferRetake,
   shouldShowFactorDetails,
-  shouldWarnForPersonalFactorAttempt,
 } from './profilePersonalFactors.js'
 
 const saved = Object.freeze({
@@ -20,16 +17,6 @@ const saved = Object.freeze({
   factor_family_impact: 1,
   factor_work_impact: 3,
   factor_distance: true,
-})
-
-test('historical values are ignored and structured values are compared', () => {
-  assert.equal(personalFactorsChanged({ ...saved, factor_distance: false }, saved), false)
-  assert.equal(personalFactorsChanged({ ...saved, factor_health_impact: 2 }, saved), true)
-})
-
-test('accessibility ordering is stable while difficulty levels are compared', () => {
-  assert.equal(personalFactorsChanged({ ...saved, physical_accessibility_areas: ['hearing', 'seeing'] }, saved), false)
-  assert.equal(personalFactorsChanged({ ...saved, physical_accessibility_difficulties: { hearing: 'some_difficulty', seeing: 'cannot_do' } }, saved), true)
 })
 
 test('structured values derive safe Yes and No applicability without fabricating details', () => {
@@ -75,23 +62,4 @@ test('all five factors serialize without removed Profile fields', () => {
     payload.factor_family_impact,
     payload.factor_work_impact,
   ], [2, 1, 1, 1, 3])
-})
-
-test('warning requires a recommendation and an actual unconfirmed change', () => {
-  const changed = { ...saved, factor_family_impact: 2 }
-  const base = {
-    confirmationGranted: false,
-    nextProfile: changed,
-    savedProfile: saved,
-  }
-  assert.equal(shouldWarnForPersonalFactorAttempt({ ...base, hasRecommendation: false }), false)
-  assert.equal(shouldWarnForPersonalFactorAttempt({ ...base, hasRecommendation: true }), true)
-  assert.equal(shouldWarnForPersonalFactorAttempt({ ...base, hasRecommendation: true, confirmationGranted: true }), false)
-  assert.equal(shouldWarnForPersonalFactorAttempt({ ...base, hasRecommendation: true, nextProfile: saved }), false)
-})
-
-test('retake is offered only for recommendation owners with final factor changes', () => {
-  assert.equal(shouldOfferRetake({ hasRecommendation: false, factorsChanged: true }), false)
-  assert.equal(shouldOfferRetake({ hasRecommendation: true, factorsChanged: false }), false)
-  assert.equal(shouldOfferRetake({ hasRecommendation: true, factorsChanged: true }), true)
 })

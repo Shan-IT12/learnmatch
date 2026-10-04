@@ -5,6 +5,7 @@ import Register from './pages/Register'
 import ForgotPassword from './pages/ForgotPassword'
 import Dashboard from './pages/Dashboard'
 import Profile from './pages/Profile'
+import ProfileEdit from './pages/ProfileEdit'
 import OnboardingProfile from './pages/onboarding/OnboardingProfile'
 import OnboardingInterests from './pages/onboarding/OnboardingInterests'
 import OnboardingSkills from './pages/onboarding/OnboardingSkills'
@@ -44,6 +45,7 @@ function App() {
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/profile" element={<Profile />} />
+      <Route path="/profile/edit" element={<ProfileEdit />} />
       <Route path="/onboarding/profile" element={<OnboardingProfile />} />
       <Route path="/onboarding/interests" element={<OnboardingInterests />} />
       <Route path="/onboarding/skills" element={<OnboardingSkills />} />

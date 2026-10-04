@@ -1,25 +1,67 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import OnboardingLayout from '../../components/OnboardingLayout'
+import AssessmentQuestionNavigation from '../../components/AssessmentQuestionNavigation'
+import PersonalityResult from '../../components/PersonalityResult'
 import { getResponseChoices, mbtiQuestions } from '../../data/mbtiQuestions'
 import { FieldError, RequiredMark } from '../../components/FormValidation'
 import { scrollToFirstInvalidField } from '../../utils/formValidation'
+import {
+  ASSESSMENT_SESSION_KEYS,
+  assessmentHeaders,
+  finishAssessmentAttempt,
+  boundedQuestionIndex,
+  firstUnansweredQuestionIndex,
+  markAssessmentStepComplete,
+  readAssessmentSession,
+  writeAssessmentSession,
+} from '../../utils/assessmentSession'
 
 function OnboardingPersonality() {
   const navigate = useNavigate()
 
-  const [currentIndex, setCurrentIndex] = useState(0)
-  const [answers, setAnswers] = useState({})
+  const storage = typeof sessionStorage === 'undefined' ? null : sessionStorage
+  const initialSession = readAssessmentSession(storage, ASSESSMENT_SESSION_KEYS.personality, {})
+  const [currentIndex, setCurrentIndex] = useState(() => boundedQuestionIndex(initialSession.currentIndex, mbtiQuestions.length))
+  const [answers, setAnswers] = useState(() => initialSession.answers || {})
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [result, setResult] = useState(null)
   const [questionError, setQuestionError] = useState('')
+  const [checkingResult, setCheckingResult] = useState(true)
+  const [resultCheckFailed, setResultCheckFailed] = useState(false)
 
   const currentQuestion = mbtiQuestions[currentIndex]
   const selectedRating = answers[currentQuestion.id]
   const isLastQuestion = currentIndex === mbtiQuestions.length - 1
   const answeredCount = Object.keys(answers).length
   const responseChoices = getResponseChoices(currentQuestion)
+
+  useEffect(() => {
+    writeAssessmentSession(storage, ASSESSMENT_SESSION_KEYS.personality, {
+      answers,
+      currentIndex,
+    })
+  }, [answers, currentIndex, storage])
+
+  useEffect(() => {
+    const token = localStorage.getItem('token')
+    fetch(`${import.meta.env.VITE_API_URL}/api/mbti`, {
+      headers: assessmentHeaders(storage, { Authorization: `Bearer ${token}` }),
+    })
+      .then((response) => {
+        if (!response.ok) throw new Error('Could not check saved personality results.')
+        return response.json()
+      })
+      .then((savedResult) => {
+        if (savedResult.mbtiType) {
+          markAssessmentStepComplete(storage, 4)
+          setResult(savedResult)
+        }
+      })
+      .catch(() => setResultCheckFailed(true))
+      .finally(() => setCheckingResult(false))
+  }, [storage])
 
   const handleSelect = (rating) => {
     setAnswers((prev) => ({ ...prev, [currentQuestion.id]: rating }))
@@ -45,7 +87,7 @@ function OnboardingPersonality() {
 
   const handleSubmit = async () => {
     if (Object.keys(answers).length < mbtiQuestions.length) {
-      const firstMissingIndex = mbtiQuestions.findIndex((question) => !answers[question.id])
+      const firstMissingIndex = firstUnansweredQuestionIndex(mbtiQuestions, answers, (question) => question.id)
       setCurrentIndex(firstMissingIndex)
       setQuestionError('Please select a response.')
       scrollToFirstInvalidField(['personalityQuestion'])
@@ -65,10 +107,10 @@ function OnboardingPersonality() {
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/mbti`, {
         method: 'POST',
-        headers: {
+        headers: assessmentHeaders(storage, {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
-        },
+        }),
         body: JSON.stringify({ answers: formattedAnswers }),
       })
       const data = await response.json()
@@ -79,6 +121,8 @@ function OnboardingPersonality() {
         return
       }
 
+      markAssessmentStepComplete(storage, 4)
+      finishAssessmentAttempt(storage)
       setResult(data)
     } catch {
       setError('Cannot connect to server. Please try again.')
@@ -90,61 +134,34 @@ function OnboardingPersonality() {
     navigate('/results')
   }
 
+  if (checkingResult) {
+    return (
+      <OnboardingLayout currentStep={4} isComplete={false} showFooterNavigation={false}>
+        <div className="mx-auto max-w-xl px-6 py-12 text-center text-sm text-gray-500">Loading personality result...</div>
+      </OnboardingLayout>
+    )
+  }
+
+  if (resultCheckFailed) {
+    return (
+      <OnboardingLayout currentStep={4} isComplete={false} showFooterNavigation={false}>
+        <div className="mx-auto max-w-xl px-6 py-12 text-center text-sm text-red-600">Could not confirm your saved personality result. Please refresh.</div>
+      </OnboardingLayout>
+    )
+  }
+
   // ---------- Results screen ----------
   if (result) {
-    const dimensionLabels = {
-      EI: ['Extraversion (E)', 'Introversion (I)'],
-      NS: ['Intuition (N)', 'Sensing (S)'],
-      TF: ['Thinking (T)', 'Feeling (F)'],
-      JP: ['Judging (J)', 'Perceiving (P)'],
-    }
-
     return (
-      <OnboardingLayout currentStep={4} isComplete={true}>
-        <div className="max-w-xl mx-auto px-6 py-12">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Your Personality Type</h2>
-          <p className="text-gray-500 text-sm mb-1">Based on your answers, you're likely:</p>
-          <p className="text-4xl font-bold text-orange-500 mb-8">{result.mbtiType}</p>
-
-          <div className="space-y-5 mb-10">
-            {Object.entries(dimensionLabels).map(([key, [firstLabel, secondLabel]]) => {
-              const percent = Math.round(result.scores[key])
-              return (
-                <div key={key}>
-                  <div className="flex justify-between text-sm mb-1.5">
-                    <span className="font-medium text-gray-800">{firstLabel}</span>
-                    <span className="font-medium text-gray-800">{secondLabel}</span>
-                  </div>
-                  <div className="w-full bg-gray-100 rounded-full h-2.5 relative">
-                    <div
-                      className="bg-orange-500 h-2.5 rounded-full transition-all"
-                      style={{ width: `${percent}%` }}
-                    />
-                  </div>
-                  <div className="flex justify-between text-xs text-gray-400 mt-1">
-                    <span>{percent}%</span>
-                    <span>{100 - percent}%</span>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-
-          <button
-            type="button"
-            onClick={handleContinue}
-            className="w-full bg-orange-500 text-white py-3 rounded-xl font-medium hover:bg-orange-600 transition text-sm"
-          >
-            See Your Results →
-          </button>
-        </div>
+      <OnboardingLayout currentStep={4} isComplete={true} showFooterNavigation={false}>
+        <PersonalityResult result={result} onContinue={handleContinue} />
       </OnboardingLayout>
     )
   }
 
   // ---------- Question screen ----------
   return (
-    <OnboardingLayout currentStep={4} isComplete={answeredCount === mbtiQuestions.length}>
+    <OnboardingLayout currentStep={4} isComplete={answeredCount === mbtiQuestions.length} showFooterNavigation={false}>
       <div className="max-w-3xl mx-auto px-5 sm:px-8 py-8 sm:py-12">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between mb-6">
           <div>
@@ -158,7 +175,7 @@ function OnboardingPersonality() {
             </p>
           </div>
           <p className="shrink-0 text-sm font-semibold text-gray-500">
-            <span className="text-orange-600">{currentIndex + 1}</span> / {mbtiQuestions.length}
+            Question <span className="text-orange-600">{currentIndex + 1}</span> of {mbtiQuestions.length}
           </p>
         </div>
 
@@ -212,13 +229,7 @@ function OnboardingPersonality() {
                         ? 'border-gray-300 bg-gray-50 text-gray-400 group-hover:border-orange-300'
                         : 'border-orange-200 bg-orange-50 text-orange-500 group-hover:border-orange-400'
                   }`}>
-                    {selectedRating === choice.value ? (
-                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                      </svg>
-                    ) : (
-                      <span className="h-1.5 w-1.5 rounded-full bg-current" />
-                    )}
+                    <span className={selectedRating === choice.value ? 'h-2.5 w-2.5 rounded-full bg-current' : 'h-1.5 w-1.5 rounded-full bg-current'} />
                   </span>
                   <span>{choice.label}</span>
                 </button>
@@ -227,36 +238,17 @@ function OnboardingPersonality() {
           </div>
         </div>
 
-        {/* Navigation */}
-        <div className="flex justify-between items-center gap-3">
-          <button
-            type="button"
-            onClick={handleBack}
-            disabled={currentIndex === 0}
-            className="px-3 sm:px-5 py-2.5 rounded-xl text-sm font-medium text-gray-500 hover:text-gray-900 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition"
-          >
-            ← Back
-          </button>
-
-          {isLastQuestion ? (
-            <button
-              type="button"
-              onClick={handleSubmit}
-              disabled={submitting}
-              className="px-4 sm:px-6 py-3 rounded-xl text-sm font-medium bg-orange-500 text-white hover:bg-orange-600 disabled:opacity-50 transition shadow-sm shadow-orange-200"
-            >
-              {submitting ? 'Submitting...' : 'Submit Assessment'}
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={handleNext}
-              className="px-5 sm:px-7 py-3 rounded-xl text-sm font-medium bg-orange-500 text-white hover:bg-orange-600 disabled:opacity-50 transition shadow-sm shadow-orange-200"
-            >
-              Next →
-            </button>
-          )}
-        </div>
+        <AssessmentQuestionNavigation
+          currentIndex={currentIndex}
+          isLastQuestion={isLastQuestion}
+          currentAnswered={Boolean(selectedRating)}
+          allAnswered={answeredCount === mbtiQuestions.length}
+          submitting={submitting}
+          finalLabel="View Results"
+          onBack={handleBack}
+          onNext={handleNext}
+          onSubmit={handleSubmit}
+        />
       </div>
     </OnboardingLayout>
   )

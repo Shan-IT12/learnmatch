@@ -45,7 +45,7 @@ export function corsOptions(env = process.env) {
       return callback(null, false)
     },
     methods: ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'x-assessment-attempt-id'],
     maxAge: 600,
   }
 }

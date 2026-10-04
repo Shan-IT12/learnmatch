@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import OnboardingLayout from '../../components/OnboardingLayout'
 import interestGroups, {
@@ -8,14 +8,33 @@ import interestGroups, {
 } from '../../data/interestList'
 import { FieldError, RequiredMark } from '../../components/FormValidation'
 import { scrollToFirstInvalidField } from '../../utils/formValidation'
+import {
+  ASSESSMENT_SESSION_KEYS,
+  markAssessmentStepComplete,
+  readAssessmentSession,
+  writeAssessmentSession,
+  assessmentHeaders,
+} from '../../utils/assessmentSession'
 
 function OnboardingInterests() {
   const navigate = useNavigate()
 
-  const [selected, setSelected] = useState([])
+  const [selected, setSelected] = useState(() => readAssessmentSession(
+    typeof sessionStorage === 'undefined' ? null : sessionStorage,
+    ASSESSMENT_SESSION_KEYS.interests,
+    { selected: [] }
+  ).selected || [])
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [selectionMessage, setSelectionMessage] = useState('')
+
+  useEffect(() => {
+    writeAssessmentSession(
+      typeof sessionStorage === 'undefined' ? null : sessionStorage,
+      ASSESSMENT_SESSION_KEYS.interests,
+      { selected }
+    )
+  }, [selected])
 
   const toggleInterest = (name) => {
     const result = updateInterestSelection(selected, name)
@@ -39,10 +58,10 @@ function OnboardingInterests() {
   try {
     const response = await fetch(`${import.meta.env.VITE_API_URL}/api/interests`, {
       method: 'POST',
-      headers: {
+      headers: assessmentHeaders(sessionStorage, {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`,
-      },
+      }),
       body: JSON.stringify({ interests: selected }),
     })
     const data = await response.json()
@@ -53,6 +72,10 @@ function OnboardingInterests() {
       return
     }
 
+    markAssessmentStepComplete(
+      typeof sessionStorage === 'undefined' ? null : sessionStorage,
+      2
+    )
     navigate('/onboarding/skills')
   } catch {
     setError('Cannot connect to server. Please try again.')

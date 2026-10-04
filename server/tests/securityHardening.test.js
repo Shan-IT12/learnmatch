@@ -38,6 +38,17 @@ test('CORS permits configured production and approved local origins only', async
   assert.equal(await check('https://evil.example'), false)
 })
 
+test('CORS permits the assessment attempt request header without loosening the policy', () => {
+  const options = corsOptions({ NODE_ENV: 'production', FRONTEND_URL: 'https://learnmatch.example' })
+
+  assert.deepEqual(options.allowedHeaders, [
+    'Content-Type',
+    'Authorization',
+    'x-assessment-attempt-id',
+  ])
+  assert.equal(options.credentials, undefined)
+})
+
 test('JWT verification requires issuer, audience, algorithm, and an active account', async () => {
   process.env.JWT_SECRET = 'security-hardening-test-secret'
   pool.query = async () => [[{ user_id: 7 }]]

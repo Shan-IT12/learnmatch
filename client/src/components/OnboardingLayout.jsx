@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import { useNavigate } from "react-router-dom";
+import { readCompletedAssessmentSteps } from '../utils/assessmentSession'
 
 const steps = [
-    { label: 'Profile', path: '/onboarding/profile' },
-    { label: 'Interest', path: '/onboarding/interests' },
-    { label: 'Skills', path: '/onboarding/skills' },
+    { label: 'Personal Factors', path: '/onboarding/profile' },
+    { label: 'Interests', path: '/onboarding/interests' },
+    { label: 'Academic Skills', path: '/onboarding/skills' },
     { label: 'Personality', path: '/onboarding/personality' },
 ];
 
@@ -16,9 +17,14 @@ function OnboardingLayout({
   navigationStatus = null,
   nextLabel,
   onNext,
+  showFooterNavigation = true,
 }) {
   const navigate = useNavigate()
   const [showExitConfirm, setShowExitConfirm] = useState(false)
+  const completedSteps = readCompletedAssessmentSteps(
+    typeof sessionStorage === 'undefined' ? null : sessionStorage
+  )
+  const furthestReachedStep = Math.max(currentStep, ...completedSteps)
 
   const handleBack = () => {
     if (currentStep === 1) {
@@ -58,7 +64,7 @@ function OnboardingLayout({
           <div className="max-w-sm w-full max-h-[calc(100dvh-2rem)] overflow-y-auto bg-white rounded-2xl shadow-lg p-5 sm:p-7 text-center">
             <h3 className="text-lg font-bold text-gray-900 mb-1">Leave this assessment?</h3>
             <p className="text-sm text-gray-500 mb-6">
-              Your progress on this step hasn't been saved yet. If you leave now, you'll need to redo it.
+              Your answers are saved for this assessment session, so you can return without starting over.
             </p>
             <div className="flex flex-col-reverse gap-3 sm:flex-row">
               <button
@@ -102,17 +108,27 @@ function OnboardingLayout({
             <div
               className="absolute top-3 left-0 h-px bg-orange-500 z-0 transition-all duration-500"
               style={{
-                width: `${((currentStep - 1) / (steps.length - 1)) * 100}%`
+                width: `${((furthestReachedStep - 1) / (steps.length - 1)) * 100}%`
               }}
             />
 
             {steps.map((step, index) => {
               const stepNumber = index + 1
-              const isCompleted = stepNumber < currentStep
               const isCurrent = stepNumber === currentStep
+              const isCompleted = !isCurrent && (
+                stepNumber < currentStep || completedSteps.includes(stepNumber)
+              )
 
               return (
-                <div key={step.label} className="flex flex-col items-center z-10">
+                <button
+                  key={step.label}
+                  type="button"
+                  onClick={() => isCompleted && navigate(step.path)}
+                  disabled={!isCompleted}
+                  aria-current={isCurrent ? 'step' : undefined}
+                  aria-label={`${step.label}: ${isCompleted ? 'completed' : isCurrent ? 'current step' : 'not yet available'}`}
+                  className={`z-10 flex flex-col items-center rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 focus-visible:ring-offset-4 ${isCompleted ? 'cursor-pointer' : 'cursor-default'}`}
+                >
                   {/* Dot */}
                   <div
                     className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
@@ -138,7 +154,7 @@ function OnboardingLayout({
                   }`}>
                     {step.label}
                   </span>
-                </div>
+                </button>
               )
             })}
           </div>
@@ -152,6 +168,7 @@ function OnboardingLayout({
       </div>
 
       {/* Bottom navigation */}
+      {showFooterNavigation && (
       <div className={`${stickyChrome ? 'sticky bottom-0 z-40 shrink-0 shadow-[0_-4px_12px_rgba(0,0,0,0.04)]' : ''} border-t border-gray-100 px-3 sm:px-8 py-3 sm:py-4 grid grid-cols-[auto_minmax(0,1fr)_auto] gap-1 sm:gap-4 items-center bg-white`}>
         <button
           onClick={handleBack}
@@ -182,6 +199,7 @@ function OnboardingLayout({
           </svg>
         </button>
       </div>
+      )}
 
     </div>
   )

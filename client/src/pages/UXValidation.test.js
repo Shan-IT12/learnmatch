@@ -65,7 +65,10 @@ test('representative Profile and Registration controls render required and inlin
 })
 
 test('Profile source excludes retired body measurements and Other Context controls', async () => {
-  const source = await readFile(new URL('./Profile.jsx', import.meta.url), 'utf8')
+  const source = [
+    await readFile(new URL('./Profile.jsx', import.meta.url), 'utf8'),
+    await readFile(new URL('../components/PersonalFactorsForm.jsx', import.meta.url), 'utf8'),
+  ].join('\n')
   assert.doesNotMatch(source, /height_cm|weight_kg|factor_others|full_name|Full name/)
   assert.doesNotMatch(source, /\bBMI\b|Other Context|No current difficulty|No difficulty/)
   for (const label of ['Seeing', 'Hearing', 'Walking or climbing steps', 'Self-care', 'Other physical or accessibility difficulty']) {

@@ -33,6 +33,7 @@ function database({
   accountUsername = 'student9',
   existingProfile = [],
   duplicateUsers = [],
+  attempt = null,
 } = {}) {
   const calls = []
   return {
@@ -43,12 +44,84 @@ function database({
         return [accountUsername === null ? [] : [{ username: accountUsername }]]
       }
       if (sql.includes('SELECT user_id FROM USER_ACCOUNT WHERE username')) return [duplicateUsers]
-      if (sql.includes('SELECT profile_id FROM PROFILE')) return [existingProfile]
+      if (sql.includes('SELECT profile_id') && sql.includes('FROM PROFILE')) return [existingProfile]
       if (sql.includes('SELECT * FROM PROFILE')) return [existingProfile]
+      if (sql.includes('FROM ASSESSMENT_ATTEMPT')) return [attempt ? [attempt] : []]
       return [{ affectedRows: 1 }]
     },
   }
 }
+
+const attemptRequest = (body = baseBody, attemptId = 41) => ({
+  user: { userId: 9 },
+  body: { ...body },
+  get(name) { return name === 'x-assessment-attempt-id' ? String(attemptId) : undefined },
+})
+
+test('retake with no saved Personal Factors returns the canonical blank Profile state', async () => {
+  const db = database({
+    accountUsername: 'student9',
+    attempt: { attempt_id: 41, status: 'IN_PROGRESS', personal_factors: null },
+  })
+  const res = response()
+  await getProfileWithDependencies(attemptRequest(undefined), res, { database: db })
+
+  assert.equal(res.statusCode, 200)
+  assert.deepEqual(res.body, { username: 'student9', profile: null })
+  assert.equal(db.calls.some(({ sql }) => sql.includes('SELECT * FROM PROFILE')), true)
+  assert.equal(db.calls.some(({ sql }) => sql.includes('FROM ASSESSMENT_ATTEMPT')), false)
+})
+
+test('first retake save creates canonical Profile Personal Factors', async () => {
+  const db = database({ attempt: { attempt_id: 41, status: 'IN_PROGRESS', personal_factors: null } })
+  const res = response()
+  await saveProfileWithDependencies(attemptRequest(), res, { database: db })
+
+  assert.equal(res.statusCode, 201)
+  assert.equal(db.calls.some(({ sql }) => sql.startsWith('INSERT INTO PROFILE')), true)
+  assert.equal(db.calls.some(({ sql }) => sql.startsWith('UPDATE ASSESSMENT_ATTEMPT')), false)
+})
+
+test('retake preloads the latest canonical Profile Personal Factors', async () => {
+  const saved = { profile_id: 7, factor_health_impact: 4 }
+  const db = database({
+    existingProfile: [saved],
+    attempt: { attempt_id: 52, status: 'IN_PROGRESS', personal_factors: JSON.stringify(saved) },
+  })
+  const res = response()
+  await getProfileWithDependencies(attemptRequest(undefined, 52), res, { database: db })
+
+  assert.equal(res.body.profile.factor_health_impact, 4)
+  assert.equal(res.body.profile.profile_id, 7)
+  assert.equal(db.calls.some(({ sql }) => sql.includes('FROM ASSESSMENT_ATTEMPT')), false)
+})
+
+test('retake edits update the same canonical Profile Personal Factors', async () => {
+  const db = database({
+    existingProfile: [{ profile_id: 7, factor_health_impact: 2 }],
+    attempt: { attempt_id: 41, status: 'IN_PROGRESS', personal_factors: null },
+  })
+  const res = response()
+  await saveProfileWithDependencies(attemptRequest({ ...baseBody, factor_health_impact: 4 }), res, { database: db })
+
+  assert.equal(res.statusCode, 200)
+  assert.match(res.body.message, /updated successfully/i)
+  assert.equal(db.calls.filter(({ sql }) => sql.startsWith('UPDATE PROFILE')).length, 1)
+  assert.equal(db.calls.some(({ sql }) => sql.startsWith('UPDATE ASSESSMENT_ATTEMPT')), false)
+})
+
+test('a new retake ignores stale attempt Personal Factors and uses the canonical Profile', async () => {
+  const db = database({
+    existingProfile: [{ factor_health_impact: 4 }],
+    attempt: { attempt_id: 99, status: 'IN_PROGRESS', personal_factors: JSON.stringify({ factor_health_impact: 2 }) },
+  })
+  const res = response()
+  await getProfileWithDependencies(attemptRequest(undefined, 99), res, { database: db })
+
+  assert.equal(res.body.profile.factor_health_impact, 4)
+  assert.equal(db.calls.some(({ sql }) => sql.includes('SELECT * FROM PROFILE')), true)
+  assert.equal(db.calls.some(({ sql }) => sql.includes('FROM ASSESSMENT_ATTEMPT')), false)
+})
 
 async function save(body = {}, options = {}) {
   const db = database(options)
@@ -181,6 +254,27 @@ test('updates write only structured Profile fields and leave every legacy field 
   assert.doesNotMatch(profileWrite.sql, /height_cm\s*=/)
   assert.doesNotMatch(profileWrite.sql, /weight_kg\s*=/)
   assert.deepEqual(profileWrite.params, ['[]', '{}', 1, 1, 3, 4, 2, 9])
+})
+
+test('updating an existing Profile refreshes its saved recommendations', async () => {
+  const db = database({ existingProfile: [{ profile_id: 1 }] })
+  const res = response()
+  const refreshCalls = []
+  await saveProfileWithDependencies(
+    { user: { userId: 9 }, body: { ...baseBody } },
+    res,
+    {
+      database: db,
+      refreshRecommendations: async (databaseArg, userId) => {
+        refreshCalls.push({ databaseArg, userId })
+        return { refreshed: true }
+      },
+    }
+  )
+
+  assert.equal(res.statusCode, 200)
+  assert.equal(res.body.recommendationsRefreshed, true)
+  assert.deepEqual(refreshCalls, [{ databaseArg: db, userId: 9 }])
 })
 
 test('an invalid username returns a field-specific error and does not access the database', async () => {

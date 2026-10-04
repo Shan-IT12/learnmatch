@@ -1,10 +1,11 @@
 import pool from '../config/db.js'
 import { validateProfile } from '../services/requestValidationService.js'
+import { refreshSavedRecommendationsForLatestAssessment } from '../services/recommendationPersistenceService.js'
 
 export const saveProfileWithDependencies = async (
   req,
   res,
-  { database = pool } = {}
+  { database = pool, refreshRecommendations = refreshSavedRecommendationsForLatestAssessment } = {}
 ) => {
   const userId = req.user.userId
   const validation = validateProfile(req.body)
@@ -69,11 +70,24 @@ export const saveProfileWithDependencies = async (
     }
 
     const [existing] = await connection.query(
-      'SELECT profile_id FROM PROFILE WHERE user_id = ?',
+      `SELECT profile_id, factor_physical_impact, factor_health_impact,
+              factor_financial_impact, factor_family_impact, factor_work_impact
+       FROM PROFILE WHERE user_id = ?`,
       [userId]
     )
 
     if (existing.length > 0) {
+      const impactValues = [
+        factor_physical_impact, factor_health_impact, factor_financial_impact,
+        factor_family_impact, factor_work_impact,
+      ]
+      const impactFields = [
+        'factor_physical_impact', 'factor_health_impact', 'factor_financial_impact',
+        'factor_family_impact', 'factor_work_impact',
+      ]
+      const personalFactorScoreChanged = impactFields.some(
+        (field, index) => Number(existing[0][field]) !== Number(impactValues[index])
+      )
       await connection.query(
         `UPDATE PROFILE SET 
           physical_accessibility_areas = ?, physical_accessibility_difficulties = ?,
@@ -91,7 +105,10 @@ export const saveProfileWithDependencies = async (
         await connection.commit()
         transactionStarted = false
       }
-      return res.json({ message: 'Profile updated successfully', username })
+      const refresh = personalFactorScoreChanged
+        ? await refreshRecommendations(database, userId)
+        : { refreshed: false }
+      return res.json({ message: 'Profile updated successfully', username, recommendationsRefreshed: refresh.refreshed })
     }
 
     await connection.query(

@@ -47,6 +47,7 @@ import {
   getAssessmentHistory,
   getAssessmentHistoryDetail,
 } from './services/assessmentHistoryService.js'
+import { getOwnedAttempt, parseAttemptJson, requestedAttemptId, updateAttempt } from './services/assessmentAttemptService.js'
 import {
   CollegeTrackingError,
   changeCollegeProgram,
@@ -95,6 +96,16 @@ app.use('/api/profile', profileRoutes)
 app.use('/api/public/courses', publicCourseRoutes)
 app.use('/api/public/directions', directionsRoutes)
 
+app.post('/api/assessment-attempts', authenticateToken, async (req, res) => {
+  try {
+    const [result] = await pool.query(`INSERT INTO ASSESSMENT_ATTEMPT (user_id, status) VALUES (?, 'IN_PROGRESS')`, [req.user.userId])
+    res.status(201).json({ attemptId: result.insertId })
+  } catch (error) {
+    console.error('Assessment attempt start error:', error)
+    res.status(500).json({ message: 'Could not start a new assessment attempt.' })
+  }
+})
+
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`)
 })
@@ -133,6 +144,12 @@ app.post('/api/interests', authenticateToken, async (req, res) => {
   }
 
   try {
+    const attemptId = requestedAttemptId(req)
+    if (attemptId) {
+      const saved = await updateAttempt(pool, userId, attemptId, 'interests', interests)
+      if (!saved) return res.status(404).json({ message: 'Active assessment attempt not found.' })
+      return res.json({ message: 'Interests saved for this assessment attempt', count: interests.length })
+    }
     await pool.query('DELETE FROM INTEREST_RESPONSE WHERE user_id = ?', [userId])
 
     for (const interestName of interests) {
@@ -209,6 +226,8 @@ app.post('/api/quiz', authenticateToken, async (req, res) => {
 
     let correctCount = 0
     const domainScores = {}
+    const scoredAnswers = []
+    const attemptId = requestedAttemptId(req)
 
     for (const answer of answers) {
       const question = questionMap[answer.question_id]
@@ -222,12 +241,20 @@ app.post('/api/quiz', authenticateToken, async (req, res) => {
       }
       domainScores[question.dimension].total++
       if (isCorrect) domainScores[question.dimension].correct++
+      scoredAnswers.push({ ...answer, is_correct: isCorrect })
 
-      await pool.query(
+      if (!attemptId) await pool.query(
         `INSERT INTO SKILL_RESPONSE (user_id, question_id, selected_option, is_correct)
          VALUES (?, ?, ?, ?)`,
         [userId, answer.question_id, answer.selected_option, isCorrect]
       )
+    }
+
+    if (attemptId) {
+      const attempt = await getOwnedAttempt(pool, userId, attemptId)
+      if (!attempt || attempt.status !== 'IN_PROGRESS') return res.status(404).json({ message: 'Active assessment attempt not found.' })
+      await updateAttempt(pool, userId, attemptId, 'skill_answers', scoredAnswers)
+      await updateAttempt(pool, userId, attemptId, 'skill_result', { totalCorrect: correctCount, totalQuestions: answers.length, domainScores })
     }
 
     res.json({
@@ -457,6 +484,12 @@ app.get('/api/quiz/results', authenticateToken, async (req, res) => {
   const userId = req.user.userId
 
   try {
+    const attemptId = requestedAttemptId(req)
+    if (attemptId) {
+      const attempt = await getOwnedAttempt(pool, userId, attemptId)
+      if (!attempt) return res.status(404).json({ message: 'Assessment attempt not found.' })
+      return res.json(parseAttemptJson(attempt.skill_result, { domainScores: {} }))
+    }
     const [rows] = await pool.query(
       `SELECT sr.is_correct, q.dimension
        FROM SKILL_RESPONSE sr
@@ -535,11 +568,55 @@ app.post('/api/mbti', authenticateToken, async (req, res) => {
       (scoreTF >= 50 ? 'T' : 'F') +
       (scoreJP >= 50 ? 'J' : 'P')
  
-    await pool.query(
-      `INSERT INTO PERSONALITY_ASSESSMENT (user_id, mbti_type, score_ei, score_ns, score_tf, score_jp)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      [userId, mbtiType, scoreEI, scoreNS, scoreTF, scoreJP]
-    )
+    const attemptId = requestedAttemptId(req)
+    if (attemptId) {
+      const connection = await pool.getConnection()
+      try {
+        await connection.beginTransaction()
+        const attempt = await getOwnedAttempt(connection, userId, attemptId, { forUpdate: true })
+        const interests = parseAttemptJson(attempt?.interests, [])
+        const skillAnswers = parseAttemptJson(attempt?.skill_answers, [])
+        const [profileRows] = await connection.query(
+          `SELECT profile_id FROM PROFILE
+           WHERE user_id = ?
+             AND factor_physical_impact BETWEEN 1 AND 4
+             AND factor_health_impact BETWEEN 1 AND 4
+             AND factor_financial_impact BETWEEN 1 AND 4
+             AND factor_family_impact BETWEEN 1 AND 4
+             AND factor_work_impact BETWEEN 1 AND 4
+           LIMIT 1`,
+          [userId]
+        )
+        if (!attempt || attempt.status !== 'IN_PROGRESS' || profileRows.length !== 1 || interests.length < 3 || skillAnswers.length !== 30) {
+          await connection.rollback()
+          return res.status(400).json({ message: 'Complete every assessment section before submitting Personality.' })
+        }
+        await connection.query('DELETE FROM INTEREST_RESPONSE WHERE user_id = ?', [userId])
+        for (const interest of interests) await connection.query('INSERT INTO INTEREST_RESPONSE (user_id, interest_name) VALUES (?, ?)', [userId, interest])
+        for (const answer of skillAnswers) await connection.query(
+          'INSERT INTO SKILL_RESPONSE (user_id, question_id, selected_option, is_correct) VALUES (?, ?, ?, ?)',
+          [userId, answer.question_id, answer.selected_option, answer.is_correct]
+        )
+        const [personality] = await connection.query(
+          `INSERT INTO PERSONALITY_ASSESSMENT (user_id, mbti_type, score_ei, score_ns, score_tf, score_jp) VALUES (?, ?, ?, ?, ?, ?)`,
+          [userId, mbtiType, scoreEI, scoreNS, scoreTF, scoreJP]
+        )
+        await connection.query(
+          `UPDATE ASSESSMENT_ATTEMPT SET status = 'COMPLETED', personality_assessment_id = ?, completed_at = CURRENT_TIMESTAMP
+           WHERE attempt_id = ? AND user_id = ?`, [personality.insertId, attemptId, userId]
+        )
+        await connection.commit()
+      } catch (error) {
+        await connection.rollback()
+        throw error
+      } finally { connection.release() }
+    } else {
+      await pool.query(
+        `INSERT INTO PERSONALITY_ASSESSMENT (user_id, mbti_type, score_ei, score_ns, score_tf, score_jp)
+         VALUES (?, ?, ?, ?, ?, ?)`,
+        [userId, mbtiType, scoreEI, scoreNS, scoreTF, scoreJP]
+      )
+    }
  
     res.json({
       message: 'Personality assessment saved successfully',
@@ -557,6 +634,12 @@ app.get('/api/mbti', authenticateToken, async (req, res) => {
   const userId = req.user.userId
  
   try {
+    const attemptId = requestedAttemptId(req)
+    if (attemptId) {
+      const attempt = await getOwnedAttempt(pool, userId, attemptId)
+      if (!attempt) return res.status(404).json({ message: 'Assessment attempt not found.' })
+      if (!attempt.personality_assessment_id) return res.json({ mbtiType: null })
+    }
     const [rows] = await pool.query(
       `SELECT mbti_type, score_ei, score_ns, score_tf, score_jp
        FROM PERSONALITY_ASSESSMENT

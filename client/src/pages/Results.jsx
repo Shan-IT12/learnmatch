@@ -234,10 +234,10 @@ function Results() {
           Learn<span className="text-orange-500">Match</span>
         </button>
         <button
-          onClick={() => navigate('/dashboard')}
+          onClick={() => navigate('/dashboard/summary')}
           className="text-sm text-gray-500 hover:text-gray-900 transition"
         >
-          ← Back to Dashboard
+          Go to Summary Dashboard
         </button>
       </nav>
 

@@ -54,34 +54,3 @@ export function buildProfilePayload(profile) {
     factor_work_impact: Number(profile.factor_work_impact),
   }
 }
-
-function stableValue(value) {
-  if (Array.isArray(value)) return JSON.stringify([...value].sort())
-  if (value && typeof value === 'object') {
-    return JSON.stringify(Object.fromEntries(Object.entries(value).sort(([a], [b]) => a.localeCompare(b))))
-  }
-  return value ?? ''
-}
-
-export function personalFactorsChanged(current, saved) {
-  return SUPPORTED_PERSONAL_FACTOR_FIELDS.some(
-    (field) => stableValue(current?.[field]) !== stableValue(saved?.[field])
-  )
-}
-
-export function shouldWarnForPersonalFactorAttempt({
-  hasRecommendation,
-  confirmationGranted,
-  nextProfile,
-  savedProfile,
-}) {
-  return Boolean(
-    hasRecommendation
-    && !confirmationGranted
-    && personalFactorsChanged(nextProfile, savedProfile)
-  )
-}
-
-export function shouldOfferRetake({ hasRecommendation, factorsChanged }) {
-  return Boolean(hasRecommendation && factorsChanged)
-}

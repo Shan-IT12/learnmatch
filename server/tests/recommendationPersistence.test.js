@@ -6,9 +6,48 @@ import {
   getLatestSavedRecommendations,
   getOrCreateSavedRecommendations,
   getSavedRecommendationForAssessment,
+  refreshSavedRecommendationsForLatestAssessment,
   saveRecommendationSnapshot,
   validateTopThreeRecommendations,
 } from '../services/recommendationPersistenceService.js'
+
+test('Personal Factors refresh replaces recommendation items without changing the assessment snapshot', async () => {
+  const writes = []
+  const connection = {
+    beginTransaction: async () => writes.push('begin'),
+    commit: async () => writes.push('commit'),
+    rollback: async () => writes.push('rollback'),
+    release: () => writes.push('release'),
+    query: async (sql, values) => {
+      writes.push({ sql, values })
+      if (sql.includes('FROM COURSE')) return [[
+        { course_id: 10, course_code: 'CRS001' },
+        { course_id: 20, course_code: 'CRS002' },
+        { course_id: 30, course_code: 'CRS003' },
+      ]]
+      return [{ affectedRows: 1 }]
+    },
+  }
+  const pool = {
+    query: async (sql) => {
+      if (sql.includes('FROM PERSONALITY_ASSESSMENT')) return [[{ assessment_id: 11 }]]
+      if (sql.includes('FROM RECOMMENDATION')) return [[{ recommendation_id: 99, assessment_id: 11 }]]
+      throw new Error(`Unexpected SQL: ${sql}`)
+    },
+    getConnection: async () => connection,
+  }
+
+  const result = await refreshSavedRecommendationsForLatestAssessment(
+    pool,
+    7,
+    async () => generatedRecommendations
+  )
+
+  assert.deepEqual(result, { refreshed: true, recommendationId: 99 })
+  assert.equal(writes.filter((entry) => entry.sql?.includes('DELETE FROM RECOMMENDATION_ITEM')).length, 1)
+  assert.equal(writes.filter((entry) => entry.sql?.includes('INSERT INTO RECOMMENDATION_ITEM')).length, 3)
+  assert.ok(writes.includes('commit'))
+})
 
 const generatedRecommendations = [
   {

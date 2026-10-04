@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { IconArrowRight, IconRefresh, IconSchool, IconHistory, IconUser, IconHeart, IconBrain, IconShieldCheck, IconStar } from '@tabler/icons-react'
+import { beginAssessmentAttempt } from '../utils/assessmentSession'
 
 const personalFactorLabels = {
   factor_physical_impact: 'Physical / accessibility',
@@ -78,6 +79,16 @@ function SummaryDashboard() {
     localStorage.removeItem('userId')
     localStorage.removeItem('username')
     navigate('/login')
+  }
+
+  const handleRetake = async () => {
+    const response = await fetch(`${apiUrl}/api/assessment-attempts`, {
+      method: 'POST', headers: { Authorization: `Bearer ${token}` },
+    })
+    const data = await response.json()
+    if (!response.ok) return
+    beginAssessmentAttempt(sessionStorage, data.attemptId)
+    navigate('/onboarding/profile')
   }
  
   if (loading) {
@@ -357,7 +368,7 @@ function SummaryDashboard() {
         </div>
         <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
           <button
-            onClick={() => navigate('/onboarding/profile')}
+            onClick={handleRetake}
             className="flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-5 py-3 text-sm font-semibold text-gray-700 shadow-sm transition duration-150 hover:border-orange-200 hover:bg-orange-50 hover:text-orange-700"
           >
             <IconRefresh size={16} stroke={2} /> Retake Assessment

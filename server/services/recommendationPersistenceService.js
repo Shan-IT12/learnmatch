@@ -242,3 +242,66 @@ export async function getOrCreateSavedRecommendations(
   }
   return concurrentlySaved.recommendations
 }
+
+export async function refreshSavedRecommendationsForLatestAssessment(
+  pool,
+  userId,
+  generateRecommendations = getTopCourseRecommendations
+) {
+  const assessmentId = await getPersonalityAssessmentId(pool, userId)
+  if (!assessmentId) return { refreshed: false }
+  const header = await getRecommendationHeader(pool, userId, assessmentId)
+  if (!header) return { refreshed: false }
+
+  const generated = validateTopThreeRecommendations(await generateRecommendations(pool, userId))
+    .map((recommendation) => ({
+      ...recommendation,
+      ai_narrative: buildDeterministicExplanation(recommendation),
+    }))
+  const connection = typeof pool.getConnection === 'function' ? await pool.getConnection() : pool
+  let transactionStarted = false
+  try {
+    if (typeof connection.beginTransaction === 'function') {
+      await connection.beginTransaction()
+      transactionStarted = true
+    }
+    const courseCodes = generated.map(({ course_code }) => course_code)
+    const placeholders = courseCodes.map(() => '?').join(', ')
+    const [courseRows] = await connection.query(
+      `SELECT course_id, course_code FROM COURSE WHERE course_code IN (${placeholders})`,
+      courseCodes
+    )
+    const courseIds = new Map(courseRows.map((course) => [course.course_code, course.course_id]))
+    if (courseIds.size !== generated.length) {
+      throw new RecommendationDataError('A refreshed recommendation could not be mapped to the canonical COURSE table.')
+    }
+
+    await connection.query('DELETE FROM RECOMMENDATION_ITEM WHERE recommendation_id = ?', [header.recommendation_id])
+    for (const recommendation of generated) {
+      await connection.query(
+        `INSERT INTO RECOMMENDATION_ITEM
+          (recommendation_id, course_id, match_score, skill_match, interest_match,
+           personality_match, personal_factor_match, ai_narrative, rank_position)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          header.recommendation_id,
+          courseIds.get(recommendation.course_code),
+          toNormalizedScore(recommendation.match_score, 'Match score'),
+          toNormalizedScore(recommendation.score_breakdown.skill_match, 'Skill match'),
+          toNormalizedScore(recommendation.score_breakdown.interest_match, 'Interest match'),
+          toNormalizedScore(recommendation.score_breakdown.personality_match, 'Personality match'),
+          toNormalizedScore(recommendation.score_breakdown.personal_factor_match, 'Personal factor match'),
+          recommendation.ai_narrative,
+          recommendation.rank_position,
+        ]
+      )
+    }
+    if (transactionStarted) await connection.commit()
+    return { refreshed: true, recommendationId: header.recommendation_id }
+  } catch (error) {
+    if (transactionStarted) await connection.rollback()
+    throw error
+  } finally {
+    if (connection !== pool && typeof connection.release === 'function') connection.release()
+  }
+}
