@@ -24,6 +24,15 @@ export function getAcademicYearOptions(value) {
   )
 }
 
+export function getFutureAcademicYearRanges(date = new Date(), count = 6) {
+  const current = getCurrentAcademicYear(date)
+  const startYear = Number(current.slice(0, 4))
+  return Array.from({ length: count }, (_, index) => {
+    const start = startYear + index
+    return `${start}-${start + 1}`
+  })
+}
+
 const MONTH_PART_ORDER = Object.freeze({ early: 5, middle: 15, late: 25 })
 
 export function approximateScheduleValue(value) {
@@ -47,7 +56,10 @@ export function calculateDisplayedSemesterPhase(startDate, endDate, currentDate 
   const current = Date.UTC(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate())
   if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) return null
 
-  const progress = Math.min(1, Math.max(0, (current - start) / (end - start)))
+  if (current < start) return 'NOT_STARTED'
+  if (current > end) return 'ENDED'
+
+  const progress = (current - start) / (end - start)
   return progress <= 0.33 ? 'Early' : progress <= 0.66 ? 'Mid' : 'End'
 }
 

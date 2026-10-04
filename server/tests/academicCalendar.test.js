@@ -1,15 +1,13 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import fs from 'node:fs'
-import { ACADEMIC_CALENDARS, resolveCalendarTerm } from '../services/academicCalendar.js'
+import { ACADEMIC_CALENDARS, resolveActiveCalendarTerm, resolveCalendarTerm } from '../services/academicCalendar.js'
 import { calculateNextAcademicStage } from '../services/collegeTrackingService.js'
 
 test('calendar registry exposes only the supported semester and trimester terms', () => {
   assert.deepEqual(Object.keys(ACADEMIC_CALENDARS), ['semester', 'trimester'])
-  assert.deepEqual(ACADEMIC_CALENDARS.semester.terms.map(({ code }) => code), ['SEM_1', 'SEM_2', 'SUMMER_MIDYEAR'])
-  assert.deepEqual(ACADEMIC_CALENDARS.trimester.terms.map(({ code }) => code), ['TRI_1', 'TRI_2', 'TRI_3', 'SUMMER_MIDYEAR'])
-  assert.equal(ACADEMIC_CALENDARS.semester.terms.at(-1).optional, true)
-  assert.equal(ACADEMIC_CALENDARS.trimester.terms.at(-1).optional, true)
+  assert.deepEqual(ACADEMIC_CALENDARS.semester.terms.map(({ code }) => code), ['SEM_1', 'SEM_2'])
+  assert.deepEqual(ACADEMIC_CALENDARS.trimester.terms.map(({ code }) => code), ['TRI_1', 'TRI_2', 'TRI_3'])
 })
 
 test('legacy semester labels resolve without treating Third Semester as a trimester', () => {
@@ -20,13 +18,11 @@ test('legacy semester labels resolve without treating Third Semester as a trimes
   assert.equal(resolveCalendarTerm({ calendarType: 'semester', termCode: 'TRI_1' }), null)
 })
 
-test('semester progression supports optional Summer/Midyear without creating it automatically', () => {
+test('semester progression skips Summer/Midyear for new terms but supports legacy progression', () => {
   assert.equal(calculateNextAcademicStage('2nd Year', '2nd Semester', 4).termCode, 'SEM_1')
-  assert.deepEqual(
-    calculateNextAcademicStage('2nd Year', '2nd Semester', 4, 'semester', 'SEM_2', { startOptionalTerm: true }),
-    { programCompleted: false, yearLevel: '2nd Year', semester: 'Summer/Midyear', calendarType: 'semester', termCode: 'SUMMER_MIDYEAR' }
-  )
+  assert.equal(calculateNextAcademicStage('2nd Year', '2nd Semester', 4, 'semester', 'SEM_2', { startOptionalTerm: true }).termCode, 'SEM_1')
   assert.equal(calculateNextAcademicStage('2nd Year', 'Summer/Midyear', 4).termCode, 'SEM_1')
+  assert.equal(resolveActiveCalendarTerm({ calendarType: 'semester', termCode: 'SUMMER_MIDYEAR' }), null)
 })
 
 test('trimester progression advances through all three terms and then the year level', () => {
@@ -34,10 +30,7 @@ test('trimester progression advances through all three terms and then the year l
   assert.equal(calculateNextAcademicStage('1st Year', '2nd Trimester', 4, 'trimester', 'TRI_2').termCode, 'TRI_3')
   const nextYear = calculateNextAcademicStage('1st Year', '3rd Trimester', 4, 'trimester', 'TRI_3')
   assert.deepEqual(nextYear, { programCompleted: false, yearLevel: '2nd Year', semester: '1st Trimester', calendarType: 'trimester', termCode: 'TRI_1' })
-  assert.equal(
-    calculateNextAcademicStage('1st Year', '3rd Trimester', 4, 'trimester', 'TRI_3', { startOptionalTerm: true }).termCode,
-    'SUMMER_MIDYEAR'
-  )
+  assert.equal(calculateNextAcademicStage('1st Year', '3rd Trimester', 4, 'trimester', 'TRI_3', { startOptionalTerm: true }).termCode, 'TRI_1')
 })
 
 test('final program completion respects each calendar final regular term', () => {

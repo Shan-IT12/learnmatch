@@ -1,4 +1,5 @@
 import { isCurrentIndependentCourse } from './courseIdentityService.js'
+import { getPublicCourse } from './publicCourseService.js'
 
 export function normalizeCourseSearchQuery(value) {
   return String(value || '').trim().replace(/\s+/g, ' ')
@@ -25,5 +26,9 @@ export async function searchActiveCollegeCourses(database, value) {
 
   return courses
     .filter(({ course_code }) => isCurrentIndependentCourse(course_code))
+    .map((course) => ({
+      ...course,
+      program_duration_years: getPublicCourse(course.course_code)?.program_duration_years || null,
+    }))
     .slice(0, 5)
 }

@@ -1,7 +1,7 @@
 import { generateMismatchExplanation } from './collegeMismatchExplanationService.js'
 import { getPublicCourse } from './publicCourseService.js'
 import { isCurrentIndependentCourse } from './courseIdentityService.js'
-import { ACADEMIC_CALENDARS, getTermDefinition, resolveCalendarTerm } from './academicCalendar.js'
+import { ACADEMIC_CALENDARS, getTermDefinition, resolveActiveCalendarTerm, resolveCalendarTerm } from './academicCalendar.js'
 
 export const CHECKIN_PHASES = ['Early', 'Mid', 'End']
 export const YEAR_LEVELS = ['1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year']
@@ -107,6 +107,17 @@ export function normalizeAcademicYear(value) {
   return `${match[1]}-${match[2]}`
 }
 
+export function validateCurrentOrFutureAcademicYear(value, currentDate = new Date()) {
+  const normalized = normalizeAcademicYear(value)
+  const currentStart = Number(normalizeAcademicYear(
+    `${currentDate.getMonth() >= 5 ? currentDate.getFullYear() : currentDate.getFullYear() - 1}-${currentDate.getMonth() >= 5 ? currentDate.getFullYear() + 1 : currentDate.getFullYear()}`
+  ).slice(0, 4))
+  if (Number(normalized.slice(0, 4)) < currentStart) {
+    throw new CollegeTrackingError('Past academic years are not allowed.', 'PAST_ACADEMIC_YEAR')
+  }
+  return normalized
+}
+
 export function normalizeApproximateDate(value, academicYear, label = 'approximate date') {
   const year = Number(value?.year)
   const month = Number(value?.month)
@@ -149,7 +160,9 @@ export function resolveTimingInput(input, academicYear, currentDate = new Date()
       semesterStartDate: normalizedStart,
       semesterEndDate: normalizedEnd,
       datesSource: 'student_confirmed',
-      initialTrackingPhase: timing.expectedPhase,
+      initialTrackingPhase: timing.expectedPhase === 'NOT_STARTED'
+        ? null
+        : timing.expectedPhase === 'ENDED' ? 'End' : timing.expectedPhase,
     }
   }
 
@@ -211,14 +224,18 @@ export function calculateSemesterTiming(startDate, endDate, currentDate = new Da
   if (!Number.isFinite(now)) {
     throw new CollegeTrackingError('Invalid current date.', 'INVALID_CURRENT_DATE')
   }
-  const rawProgress = (now - start) / (end - start)
-  const progress = Math.min(1, Math.max(0, rawProgress))
-  const expectedPhase = progress <= 0.33 ? 'Early' : progress <= 0.66 ? 'Mid' : 'End'
   const currentDay = Date.UTC(
     new Date(now).getUTCFullYear(),
     new Date(now).getUTCMonth(),
     new Date(now).getUTCDate()
   )
+  const rawProgress = (now - start) / (end - start)
+  const progress = Math.min(1, Math.max(0, rawProgress))
+  const expectedPhase = currentDay < start
+    ? 'NOT_STARTED'
+    : currentDay > end
+      ? 'ENDED'
+      : progress <= 0.33 ? 'Early' : progress <= 0.66 ? 'Mid' : 'End'
 
   return {
     timingAvailable: true,
@@ -239,7 +256,9 @@ export function buildPhaseStates(
   const expectedPhase = timing?.expectedPhase || initialTrackingPhase || legacyCurrentPhase || 'Early'
   const completedHighestIndex = Math.max(-1, ...completedPhases.map((phase) => CHECKIN_PHASES.indexOf(phase)))
   const expectedIndex = timing?.timingAvailable
-    ? CHECKIN_PHASES.indexOf(expectedPhase)
+    ? expectedPhase === 'ENDED'
+      ? CHECKIN_PHASES.length - 1
+      : CHECKIN_PHASES.indexOf(expectedPhase)
     : Math.min(
       CHECKIN_PHASES.length - 1,
       Math.max(CHECKIN_PHASES.indexOf(expectedPhase), completedHighestIndex + 1)
@@ -335,7 +354,7 @@ export function calculateAlignmentResult(answers, { phase, gwa = null } = {}) {
   }
 }
 
-export function calculateNextAcademicStage(yearLevel, semester, programDurationYears, calendarType, termCode, { startOptionalTerm = false } = {}) {
+export function calculateNextAcademicStage(yearLevel, semester, programDurationYears, calendarType, termCode) {
   const yearMatch = String(yearLevel || '').match(/\d+/)
   const currentYear = yearMatch ? Number(yearMatch[0]) : NaN
   const duration = Number(programDurationYears)
@@ -354,9 +373,6 @@ export function calculateNextAcademicStage(yearLevel, semester, programDurationY
       yearLevel: `${currentYear}${currentYear === 1 ? 'st' : currentYear === 2 ? 'nd' : currentYear === 3 ? 'rd' : 'th'} Year`,
       semester: '2nd Semester', calendarType: 'semester', termCode: 'SEM_2',
     }
-  }
-  if (resolvedCalendar === 'semester' && resolvedCode === 'SEM_2' && startOptionalTerm) {
-    return { programCompleted: false, yearLevel, semester: 'Summer/Midyear', calendarType: 'semester', termCode: 'SUMMER_MIDYEAR' }
   }
   if (resolvedCalendar === 'semester' && resolvedCode === 'SEM_2' && currentYear === duration) {
     return { programCompleted: true, yearLevel: null, semester: null }
@@ -377,9 +393,6 @@ export function calculateNextAcademicStage(yearLevel, semester, programDurationY
     const nextCode = resolvedCode === 'TRI_1' ? 'TRI_2' : 'TRI_3'
     const next = getTermDefinition('trimester', nextCode)
     return { programCompleted: false, yearLevel, semester: next.label, calendarType: 'trimester', termCode: nextCode }
-  }
-  if (resolvedCalendar === 'trimester' && resolvedCode === 'TRI_3' && startOptionalTerm) {
-    return { programCompleted: false, yearLevel, semester: 'Summer/Midyear', calendarType: 'trimester', termCode: 'SUMMER_MIDYEAR' }
   }
   if (resolvedCalendar === 'trimester' && resolvedCode === 'TRI_3' && currentYear === duration) {
     return { programCompleted: true, yearLevel: null, semester: null, calendarType: 'trimester', termCode: null }
@@ -436,12 +449,12 @@ export async function createCollegeSetup(
   if (!Number.isInteger(normalizedCourseId) || normalizedCourseId <= 0) {
     throw new CollegeTrackingError('Please select a valid active course.', 'INVALID_COURSE')
   }
-  const calendarTerm = resolveCalendarTerm({ calendarType, termCode, semester })
+  const calendarTerm = resolveActiveCalendarTerm({ calendarType, termCode, semester })
   if (!calendarTerm || calendarTerm.calendarType === 'legacy') {
     throw new CollegeTrackingError('Select a valid term for the academic calendar.', 'INVALID_TERM')
   }
   semester = calendarTerm.termLabel
-  const normalizedAcademicYear = normalizeAcademicYear(academicYear)
+  const normalizedAcademicYear = validateCurrentOrFutureAcademicYear(academicYear)
   const timing = resolveTimingInput({
     timingMode,
     semesterStartDate,
@@ -560,11 +573,11 @@ export async function createCollegeSetup(
 }
 
 async function insertLifecycleTerm(connection, userId, cycleId, course, input, resolveCourse) {
-  const calendarTerm = resolveCalendarTerm(input)
+  const calendarTerm = resolveActiveCalendarTerm(input)
   if (!calendarTerm || calendarTerm.calendarType === 'legacy') {
     throw new CollegeTrackingError('Select a valid term for the academic calendar.', 'INVALID_TERM')
   }
-  const academicYear = normalizeAcademicYear(input.academicYear)
+  const academicYear = validateCurrentOrFutureAcademicYear(input.academicYear)
   validateYearWithinProgram(input.yearLevel, course.course_code, resolveCourse)
   const timing = resolveTimingInput(input, academicYear)
   const [existing] = await connection.query(
@@ -1262,7 +1275,7 @@ export async function startNextSemester(pool, userId, termInput = {}, resolveCou
     const institutionDependentProgression = !latestCalendarTerm || latestCalendarTerm.calendarType === 'legacy'
     let nextStage
     if (institutionDependentProgression) {
-      const confirmedTerm = resolveCalendarTerm({
+      const confirmedTerm = resolveActiveCalendarTerm({
         calendarType: termInput.calendarType,
         termCode: termInput.termCode,
         semester: termInput.nextSemester,
@@ -1290,8 +1303,7 @@ export async function startNextSemester(pool, userId, termInput = {}, resolveCou
         latest.semester,
         course.program_duration_years,
         latestCalendarTerm.calendarType,
-        latestCalendarTerm.termCode,
-        { startOptionalTerm: termInput.startOptionalTerm === true }
+        latestCalendarTerm.termCode
       )
     }
     if (nextStage.programCompleted) {

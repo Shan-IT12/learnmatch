@@ -62,7 +62,7 @@ export function isSemesterComplete(records = []) {
   return CHECKIN_PHASES.every((phase) => records.some((record) => record.phase === phase))
 }
 
-export function getNextAcademicStage(yearLevel, semester, programDurationYears, semesterComplete, calendarType = 'semester', termCode = null, startOptionalTerm = false) {
+export function getNextAcademicStage(yearLevel, semester, programDurationYears, semesterComplete, calendarType = 'semester', termCode = null) {
   if (!semesterComplete) return null
 
   const currentYear = parseYearNumber(yearLevel)
@@ -76,9 +76,6 @@ export function getNextAcademicStage(yearLevel, semester, programDurationYears, 
       yearLevel,
       semester: '2nd Semester', calendarType: 'semester', termCode: 'SEM_2',
     }
-  }
-  if (calendarType === 'semester' && resolvedCode === 'SEM_2' && startOptionalTerm) {
-    return { programCompleted: false, yearLevel, semester: 'Summer/Midyear', calendarType: 'semester', termCode: 'SUMMER_MIDYEAR' }
   }
   if (calendarType === 'semester' && resolvedCode === 'SEM_2' && currentYear === duration) {
     return { programCompleted: true, yearLevel: null, semester: null }
@@ -94,6 +91,14 @@ export function getNextAcademicStage(yearLevel, semester, programDurationYears, 
       yearLevel: `${nextYear}${ordinal} Year`,
       semester: '1st Semester', calendarType: 'semester', termCode: 'SEM_1',
     }
+  }
+  if (calendarType === 'trimester' && resolvedCode === 'SUMMER_MIDYEAR' && currentYear === duration) {
+    return { programCompleted: true, yearLevel: null, semester: null }
+  }
+  if (calendarType === 'trimester' && resolvedCode === 'SUMMER_MIDYEAR') {
+    const nextYear = currentYear + 1
+    const ordinal = nextYear === 1 ? 'st' : nextYear === 2 ? 'nd' : nextYear === 3 ? 'rd' : 'th'
+    return { programCompleted: false, yearLevel: `${nextYear}${ordinal} Year`, semester: '1st Trimester', calendarType: 'trimester', termCode: 'TRI_1' }
   }
   if (calendarType === 'trimester' && resolvedCode !== 'TRI_3') {
     const nextCode = resolvedCode === 'TRI_1' ? 'TRI_2' : 'TRI_3'

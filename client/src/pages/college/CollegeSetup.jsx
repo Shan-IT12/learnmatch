@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { IconCalendarEvent, IconSchool, IconSearch, IconX } from '@tabler/icons-react'
+import { IconCalendarEvent, IconSchool, IconSearch } from '@tabler/icons-react'
 import {
   approximateScheduleValue,
   buildCollegeSetupPayload,
   calculateDisplayedSemesterPhase,
   getAcademicYearOptions,
   getCurrentAcademicYear,
+  getFutureAcademicYearRanges,
   isApproximateEndAfterStart,
 } from '../../utils/collegeSchedule'
 import { ACADEMIC_CALENDARS, getCalendarTerms } from '../../constants/academicCalendars'
@@ -27,6 +28,10 @@ const POSITION_OPTIONS = [
   { value: 'Mid', label: "We're around the middle of the term" },
   { value: 'End', label: "We're approaching final exams / the end of the term" },
 ]
+const EXACT_PHASE_LABELS = {
+  NOT_STARTED: 'Not Started Yet',
+  ENDED: 'Term Ended',
+}
 
 function SemesterPhaseSelector({ value, onChange, error = '' }) {
   return (
@@ -106,7 +111,6 @@ function CollegeSetup() {
   const fixedCourse = lifecycleAction === 'restart' ? location.state?.course || null : null
 
   const [courses, setCourses] = useState([])
-  const [savedRecommendations, setSavedRecommendations] = useState([])
   const [search, setSearch] = useState('')
   const [searchStatus, setSearchStatus] = useState('idle')
   const [selectedCourse, setSelectedCourse] = useState(fixedCourse)
@@ -131,35 +135,6 @@ function CollegeSetup() {
   }, [token, navigate])
 
   useEffect(() => {
-    if (!token) return undefined
-
-    if (isResume) return undefined
-
-    const controller = new AbortController()
-    const loadSavedRecommendations = async () => {
-      try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/recommendations/latest`, {
-          headers: { Authorization: `Bearer ${token}` },
-          signal: controller.signal,
-        })
-        if (response.status === 401 || response.status === 403) {
-          navigate('/login', { replace: true })
-          return
-        }
-        if (!response.ok) return
-
-        const data = await response.json()
-        setSavedRecommendations(Array.isArray(data.recommendations) ? data.recommendations : [])
-      } catch (requestError) {
-        if (requestError.name !== 'AbortError') setSavedRecommendations([])
-      }
-    }
-
-    loadSavedRecommendations()
-    return () => controller.abort()
-  }, [token, navigate, isResume])
-
-  useEffect(() => {
     if (!token || !isResume) return undefined
     const controller = new AbortController()
     const loadPausedProgram = async () => {
@@ -176,7 +151,10 @@ function CollegeSetup() {
         if (!response.ok || data.lifecycleStatus !== 'paused') {
           throw new Error(data.message || 'Paused tracking could not be loaded.')
         }
-        setSelectedCourse({ course_id: data.courseId, course_name: data.courseName, course_code: data.courseCode })
+        const courseResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/search?q=${encodeURIComponent(data.courseCode)}`, { signal: controller.signal })
+        const courseData = courseResponse.ok ? await courseResponse.json() : { courses: [] }
+        const resolvedCourse = courseData.courses?.find((course) => course.course_id === data.courseId)
+        setSelectedCourse(resolvedCourse || { course_id: data.courseId, course_name: data.courseName, course_code: data.courseCode })
       } catch (requestError) {
         if (requestError.name !== 'AbortError') setError(requestError.message || 'Paused tracking could not be loaded.')
       } finally {
@@ -219,9 +197,28 @@ function CollegeSetup() {
   }, [search, selectedCourse, isResume])
 
   const academicYears = getAcademicYearOptions(academicYear)
+  const academicYearRanges = getFutureAcademicYearRanges()
+  const programDuration = Number(selectedCourse?.program_duration_years) || 5
   const academicDateMin = academicYears.length === 2 ? `${academicYears[0]}-01-01` : undefined
   const academicDateMax = academicYears.length === 2 ? `${academicYears[1]}-12-31` : undefined
   const detectedExactPhase = calculateDisplayedSemesterPhase(semesterStartDate, semesterEndDate)
+
+  const validTerm = getCalendarTerms(calendarType).some((term) => term.code === termCode && term.label === semester)
+  const validYearLevel = Boolean(yearLevel) && Number(yearLevel.match(/\d+/)?.[0]) <= programDuration
+  const validExactSchedule = timingChoice !== 'exact' || Boolean(
+    semesterStartDate && semesterEndDate && semesterEndDate > semesterStartDate &&
+    academicYears.includes(semesterStartDate.slice(0, 4)) && academicYears.includes(semesterEndDate.slice(0, 4))
+  )
+  const validApproximateSchedule = timingChoice !== 'approximate' || Boolean(
+    approximateStart.month && approximateStart.year && approximateStart.part &&
+    approximateEnd.month && approximateEnd.year && approximateEnd.part &&
+    isApproximateEndAfterStart(approximateStart, approximateEnd) && semesterPosition
+  )
+  const validUnknownSchedule = timingChoice !== 'unknown' || Boolean(semesterPosition)
+  const isFormComplete = Boolean(
+    selectedCourse && academicYearRanges.includes(academicYear) && validYearLevel && validTerm &&
+    validExactSchedule && validApproximateSchedule && validUnknownSchedule
+  )
 
   const handleAcademicYearChange = (event) => {
     const value = event.target.value
@@ -253,6 +250,8 @@ function CollegeSetup() {
   }
 
   const selectCourse = (course) => {
+    const nextDuration = Number(course?.program_duration_years) || 5
+    if (Number(String(yearLevel).match(/\d+/)?.[0]) > nextDuration) setYearLevel('')
     setSelectedCourse(course)
     setSearch(course.course_name)
     setCourses([])
@@ -263,12 +262,7 @@ function CollegeSetup() {
   const handleSearchChange = (event) => {
     setSearch(event.target.value)
     setSelectedCourse(null)
-    setCourses([])
-    setSearchStatus('idle')
-  }
-
-  const clearSearch = () => {
-    setSearch('')
+    setYearLevel('')
     setCourses([])
     setSearchStatus('idle')
   }
@@ -285,13 +279,14 @@ function CollegeSetup() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    if (loading) return
     setError('')
 
     const nextErrors = {}
     if (!selectedCourse) nextErrors.course = 'Please select a course from the list.'
-    if (!/^\d{4}\s*[-–]\s*\d{4}$/.test(academicYear)) nextErrors.academicYear = 'Enter an academic year such as 2026-2027.'
-    if (!yearLevel) nextErrors.yearLevel = 'Please select your year level.'
-    if (!semester) nextErrors.semester = 'Please select your current term.'
+    if (!academicYearRanges.includes(academicYear)) nextErrors.academicYear = 'Please select a current or future academic year.'
+    if (!yearLevel || Number(yearLevel.match(/\d+/)?.[0]) > programDuration) nextErrors.yearLevel = 'Please select a valid year level for this course.'
+    if (!getCalendarTerms(calendarType).some((term) => term.code === termCode && term.label === semester)) nextErrors.semester = 'Please select a valid term for this academic calendar.'
     if (timingChoice === 'exact' && (!semesterStartDate || !semesterEndDate || semesterEndDate <= semesterStartDate)) {
       if (!semesterStartDate) nextErrors.semesterStartDate = 'Please select the term start date.'
       if (!semesterEndDate || semesterEndDate <= semesterStartDate) nextErrors.semesterEndDate = 'Select an end date after the start date.'
@@ -350,14 +345,15 @@ function CollegeSetup() {
 
       if (!response.ok) {
         setError(data.message)
+        setLoading(false)
         return
       }
 
       navigate('/college')
     } catch {
       setError('Cannot connect to server. Please try again.')
+      setLoading(false)
     }
-    setLoading(false)
   }
 
   return (
@@ -370,7 +366,8 @@ function CollegeSetup() {
         </span>
         <button
           onClick={() => navigate('/dashboard')}
-          className="rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition duration-150 hover:border-orange-200 hover:bg-orange-50 hover:text-orange-700 active:translate-y-px"
+          disabled={loading}
+          className="rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition duration-150 hover:border-orange-200 hover:bg-orange-50 hover:text-orange-700 active:translate-y-px disabled:cursor-not-allowed disabled:opacity-50"
         >
           ← Back to Dashboard
         </button>
@@ -398,6 +395,7 @@ function CollegeSetup() {
         )}
 
         <form onSubmit={handleSubmit} noValidate className="grid gap-6 lg:grid-cols-2 lg:items-start">
+          <fieldset disabled={loading} className="contents">
 
           <section className="rounded-[26px] border border-white/90 bg-white/75 p-5 shadow-[0_22px_60px_-42px_rgba(120,53,15,.48)] backdrop-blur-xl sm:p-7">
             <div className="mb-6 flex items-start gap-3">
@@ -417,59 +415,24 @@ function CollegeSetup() {
             <p className="mt-1 text-xs leading-relaxed text-amber-700">This records your actual enrollment. It is not a new LearnMatch recommendation. Your previous program history will remain unchanged.</p>
           )}
 
-          {savedRecommendations.length > 0 && (
-            <section>
-              <h2 className="mb-3 text-[11px] font-bold uppercase tracking-[0.15em] text-orange-600">Based on your recommendations</h2>
-              <div className="overflow-hidden rounded-2xl border border-orange-100 bg-white">
-                {savedRecommendations.slice(0, 3).map((recommendation) => (
-                  <button
-                    key={recommendation.course_id}
-                    type="button"
-                    onClick={() => selectCourse(recommendation)}
-                    className={`flex w-full items-center gap-3 border-t px-4 py-3 text-left transition duration-150 first:border-t-0 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-orange-400 ${selectedCourse?.course_id === recommendation.course_id ? 'border-orange-200 bg-orange-50' : 'border-gray-100 bg-white hover:bg-orange-50/50'}`}
-                  >
-                    <span className="text-xs font-bold tabular-nums text-orange-500">{String(recommendation.rank_position).padStart(2, '0')}</span>
-                    <span className="min-w-0 flex-1">
-                      <span className="block text-sm font-semibold leading-snug text-gray-800">{recommendation.course_name}</span>
-                      {recommendation.course_abbreviation && <span className="mt-0.5 block text-xs text-gray-400">{recommendation.course_abbreviation}</span>}
-                    </span>
-                    <span aria-hidden="true" className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border ${selectedCourse?.course_id === recommendation.course_id ? 'border-orange-500 bg-orange-500 text-white' : 'border-gray-300 bg-white'}`}>
-                      {selectedCourse?.course_id === recommendation.course_id && <span className="h-1.5 w-1.5 rounded-full bg-white" />}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </section>
-          )}
-
           {/* Course search */}
           <div data-validation-field="course" aria-invalid={fieldErrors.course ? 'true' : undefined} aria-describedby={fieldErrors.course ? 'college-course-error' : undefined}>
             <label className="mb-3 flex items-center gap-3 text-xs font-medium text-gray-500">
               <span className="h-px flex-1 bg-gray-200" />
-              {savedRecommendations.length > 0 ? 'or search another course' : 'Search for your enrolled course'}
+              Search for your enrolled course
               <span className="h-px flex-1 bg-gray-200" />
             </label>
+            {!selectedCourse && <>
             <div className="relative">
               <IconSearch size={18} stroke={1.75} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
               <input
-                type="search"
+                type="text"
                 value={search}
                 onChange={handleSearchChange}
                 placeholder="Search by course name, abbreviation, or code..."
                 aria-label="Search active courses by name, abbreviation, or code"
                 className="w-full rounded-2xl border border-orange-200 bg-[#fffdf9] py-3.5 pl-11 pr-11 text-sm outline-none transition duration-150 hover:border-orange-300 focus:border-orange-400 focus:ring-4 focus:ring-orange-100/80"
               />
-              {search && !selectedCourse && (
-                <button
-                  type="button"
-                  disabled={['resume', 'restart'].includes(lifecycleAction)}
-                  onClick={clearSearch}
-                  aria-label="Clear course search"
-                  className="absolute right-1 top-1/2 -translate-y-1/2 w-10 h-10 inline-flex items-center justify-center rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-400"
-                >
-                  <IconX size={17} stroke={1.75} />
-                </button>
-              )}
             </div>
 
             {/* Search results dropdown */}
@@ -499,6 +462,7 @@ function CollegeSetup() {
             {searchStatus === 'error' && !selectedCourse && (
               <p className="mt-2 text-xs text-red-500">Course search is unavailable. Please try again.</p>
             )}
+            </>}
 
             {selectedCourse && (
               <div className="mt-2 bg-orange-50 border border-orange-200 rounded-xl px-4 py-3 flex justify-between items-center">
@@ -512,7 +476,9 @@ function CollegeSetup() {
                   type="button"
                   onClick={() => {
                     setSelectedCourse(null)
-                    clearSearch()
+                     setSearch('')
+                     setCourses([])
+                     setSearchStatus('idle')
                   }}
                   className="text-xs text-gray-400 hover:text-gray-600 disabled:hidden"
                 >
@@ -529,15 +495,15 @@ function CollegeSetup() {
             <label htmlFor="academic-year" className="block text-sm font-medium text-gray-700 mb-2">
               Academic year <RequiredMark />
             </label>
-            <input
+            <select
               id="academic-year"
-              type="text"
               value={academicYear}
               onChange={handleAcademicYearChange}
-              placeholder="2026-2027"
               required aria-required="true" aria-invalid={fieldErrors.academicYear ? 'true' : undefined} aria-describedby={fieldErrors.academicYear ? 'academic-year-error' : undefined}
               className="w-full rounded-2xl border border-stone-200 bg-white px-4 py-3.5 text-sm outline-none transition duration-150 hover:border-orange-200 focus:border-orange-400 focus:ring-4 focus:ring-orange-100/80"
-            />
+            >
+              {academicYearRanges.map((year) => <option key={year} value={year}>{year.replace('-', '–')}</option>)}
+            </select>
             <FieldError id="academic-year-error">{fieldErrors.academicYear}</FieldError>
           </div>
 
@@ -547,12 +513,13 @@ function CollegeSetup() {
               What year level are you in? <RequiredMark />
             </label>
             <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
-              {['1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year'].map((year) => (
+              {['1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year'].map((year, index) => (
                 <button
                   key={year}
                   type="button"
+                  disabled={!selectedCourse || index + 1 > programDuration}
                   onClick={() => { setYearLevel(year); setFieldErrors((current) => ({ ...current, yearLevel: undefined })) }}
-                  className={`rounded-xl border py-3 text-sm font-medium transition duration-150 ${
+                  className={`rounded-xl border py-3 text-sm font-medium transition duration-150 disabled:cursor-not-allowed disabled:border-gray-100 disabled:bg-gray-100 disabled:text-gray-300 ${
                     yearLevel === year
                       ? 'border-orange-400 bg-orange-50 text-orange-700 shadow-sm ring-1 ring-orange-200'
                       : 'border-gray-200 bg-white text-gray-600 hover:border-orange-300 hover:bg-orange-50/40'
@@ -651,7 +618,7 @@ function CollegeSetup() {
                 {detectedExactPhase && (
                   <div className="rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 sm:col-span-2">
                     <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">Detected current phase</p>
-                    <p className="mt-1 text-sm text-emerald-900"><strong>{detectedExactPhase}</strong> — calculated from today and your exact term dates.</p>
+                    <p className="mt-1 text-sm text-emerald-900"><strong>{EXACT_PHASE_LABELS[detectedExactPhase] || detectedExactPhase}</strong> — calculated from today and your exact term dates.</p>
                   </div>
                 )}
               </div>
@@ -680,12 +647,13 @@ function CollegeSetup() {
           <div className="flex justify-center lg:col-span-2">
           <button
             type="submit"
-            disabled={loading || resumeProgramLoading || (isResume && !selectedCourse)}
+            disabled={loading || resumeProgramLoading || !isFormComplete}
             className="inline-flex w-full max-w-md items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-orange-500 to-orange-600 px-7 py-3.5 text-sm font-semibold text-white shadow-[0_12px_28px_-12px_rgba(234,88,12,.8)] transition duration-150 hover:-translate-y-0.5 hover:shadow-[0_16px_32px_-12px_rgba(234,88,12,.72)] active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {loading ? 'Saving...' : lifecycleAction === 'resume' ? 'Resume Tracking' : lifecycleAction === 'change' ? 'Confirm Program Change' : 'Continue to College Phase →'}
           </button>
           </div>
+          </fieldset>
         </form>
       </main>
     </div>

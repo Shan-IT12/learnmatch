@@ -33,6 +33,12 @@ const STATUS_STYLES = {
   'Needs Attention': 'bg-red-50 text-red-700 border-red-200',
 }
 
+function formatTermPhase(phase) {
+  if (phase === 'NOT_STARTED') return 'Not Started Yet'
+  if (phase === 'ENDED') return 'Term Ended'
+  return phase
+}
+
 function statusStyle(status) {
   return STATUS_STYLES[status] || 'bg-gray-50 text-gray-600 border-gray-200'
 }
@@ -113,7 +119,6 @@ function CollegeDashboard() {
   const [nextSemesterAcademicYear, setNextSemesterAcademicYear] = useState('')
   const [confirmedNextYearLevel, setConfirmedNextYearLevel] = useState('')
   const [confirmedNextSemester, setConfirmedNextSemester] = useState('')
-  const [startOptionalTerm, setStartOptionalTerm] = useState(false)
   const [lifecyclePending, setLifecyclePending] = useState(false)
   const [nextTermErrors, setNextTermErrors] = useState({})
 
@@ -203,8 +208,7 @@ function CollegeDashboard() {
     courseRoadmap?.program_duration_years,
     checkinStatus?.progressionEligible,
     currentCalendarTerm?.calendarType,
-    currentCalendarTerm?.termCode,
-    startOptionalTerm
+    currentCalendarTerm?.termCode
   )
   const institutionDependentTerm = !currentCalendarTerm
   const nextAcademicYear = useMemo(() => {
@@ -299,7 +303,6 @@ function CollegeDashboard() {
           nextSemester: institutionDependentTerm ? confirmedNextSemester : undefined,
           calendarType: institutionDependentTerm ? 'semester' : nextAcademicStage?.calendarType,
           termCode: institutionDependentTerm ? undefined : nextAcademicStage?.termCode,
-          startOptionalTerm,
         }),
       })
       const payload = await response.json()
@@ -376,7 +379,7 @@ function CollegeDashboard() {
                 <p className="mt-1 text-lg font-bold text-white">{timingValue}</p>
                 {collegeInfo?.timingAvailable && (
                   <p className="mt-1 text-sm text-slate-300">
-                    {collegeInfo.timingEstimated ? 'Estimated Current Phase' : 'Current Phase'}: {collegeInfo.expectedPhase}
+                    {collegeInfo.timingEstimated ? 'Estimated Current Phase' : 'Current Phase'}: {formatTermPhase(collegeInfo.expectedPhase)}
                   </p>
                 )}
                 {!collegeInfo?.timingEstimated && collegeInfo?.semesterStartDate && collegeInfo?.semesterEndDate && (
@@ -415,9 +418,6 @@ function CollegeDashboard() {
         ) : (
           <section className="flex flex-wrap gap-2 rounded-[20px] border border-gray-100 bg-white p-4 shadow-sm">
             <button type="button" disabled={!checkinStatus?.progressionEligible} onClick={() => setShowNextSemesterForm(true)} className="rounded-xl bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40">Continue Next Term</button>
-            {checkinStatus?.progressionEligible && ['SEM_2', 'TRI_3'].includes(currentCalendarTerm?.termCode) && (
-              <button type="button" onClick={() => { setStartOptionalTerm(true); setShowNextSemesterForm(true) }} className="rounded-xl border border-orange-200 bg-orange-50 px-4 py-2.5 text-sm font-semibold text-orange-700">Start Summer/Midyear</button>
-            )}
             <button type="button" disabled={lifecyclePending} onClick={() => updateLifecycle('pause')} className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-700 disabled:opacity-50">Pause Tracking</button>
             <button type="button" onClick={() => {
               if (window.confirm('Change programs? Your previous program history will remain unchanged, and this will not create a LearnMatch recommendation.')) navigate('/college/setup?action=change')
@@ -509,11 +509,6 @@ function CollegeDashboard() {
                                 {nextAcademicStage?.programCompleted ? (
                                   <div>
                                     <p className="text-sm text-gray-700 mt-1">Program roadmap completed</p>
-                                    {['SEM_2', 'TRI_3'].includes(currentCalendarTerm?.termCode) && (
-                                      <button type="button" onClick={() => { setStartOptionalTerm(true); setShowNextSemesterForm(true) }} className="mt-3 w-full border border-orange-200 bg-orange-50 px-3 py-2 rounded-lg text-sm font-semibold text-orange-700 hover:bg-orange-100">
-                                        Start optional Summer/Midyear
-                                      </button>
-                                    )}
                                   </div>
                                 ) : nextAcademicStage || institutionDependentTerm ? (
                                   <>
@@ -533,15 +528,9 @@ function CollegeDashboard() {
                                     {showNextSemesterForm && (
                                       <div className="mt-3 space-y-2">
                                         <p className="text-xs text-gray-500">Confirm the new term and its student-provided dates.</p>
-                                        {['SEM_2', 'TRI_3'].includes(currentCalendarTerm?.termCode) && (
-                                          <label className="flex items-center gap-2 rounded-lg bg-orange-50 px-3 py-2 text-xs text-orange-800">
-                                            <input type="checkbox" checked={startOptionalTerm} onChange={(event) => setStartOptionalTerm(event.target.checked)} className="accent-orange-500" />
-                                            Start an optional Summer/Midyear term instead of advancing the year level
-                                          </label>
-                                        )}
                                         {institutionDependentTerm && (
                                           <>
-                                            <p className="text-xs text-orange-700">LearnMatch cannot assume what follows a Third Semester or Summer term. Select the next academic stage explicitly.</p>
+                                            <p className="text-xs text-orange-700">LearnMatch cannot assume what follows this legacy term. Select the next academic stage explicitly.</p>
                                             <label data-validation-field="nextYearLevel" className="block text-xs font-medium text-gray-700">Next year level <RequiredMark /><select value={confirmedNextYearLevel} onChange={(event) => { setConfirmedNextYearLevel(event.target.value); setNextTermErrors((current) => ({ ...current, nextYearLevel: undefined })) }} aria-invalid={nextTermErrors.nextYearLevel ? 'true' : undefined} aria-describedby={nextTermErrors.nextYearLevel ? 'next-year-level-error' : undefined} className="mt-1 w-full border border-gray-200 rounded-lg px-2 py-2 text-xs">
                                               <option value="">Next year level</option>
                                               {['1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year'].map((year) => <option key={year} value={year}>{year}</option>)}

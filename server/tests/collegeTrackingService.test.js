@@ -21,6 +21,7 @@ import {
   startNextSemester,
   submitCollegeCheckin,
   timingForCheckinAvailability,
+  validateCurrentOrFutureAcademicYear,
 } from '../services/collegeTrackingService.js'
 
 const answersAt = (score) => [1, 2, 3, 4, 5].map((question_number) => ({ question_number, score }))
@@ -39,6 +40,15 @@ test('term uniqueness migration scopes modern stages to a cycle and protects leg
   assert.match(sql, /tracking_cycle_id, academic_year, year_level, term_code/)
   assert.match(sql, /CASE WHEN tracking_cycle_id IS NULL THEN user_id ELSE NULL END/)
   assert.match(sql, /legacy_user_id, course_id, academic_year, year_level, semester/)
+})
+
+test('College Setup academic years cannot precede the current academic year', () => {
+  assert.equal(validateCurrentOrFutureAcademicYear('2026-2027', new Date(2026, 9, 4)), '2026-2027')
+  assert.equal(validateCurrentOrFutureAcademicYear('2027-2028', new Date(2026, 9, 4)), '2027-2028')
+  assert.throws(
+    () => validateCurrentOrFutureAcademicYear('2025-2026', new Date(2026, 9, 4)),
+    (error) => error instanceof CollegeTrackingError && error.code === 'PAST_ACADEMIC_YEAR'
+  )
 })
 
 test('pause changes only lifecycle state and creates no term or check-in', async () => {
@@ -188,7 +198,7 @@ test('calendar timing handles before, boundaries, active phases, end, and after'
 
   assert.deepEqual(
     { phase: timingAt(-day).expectedPhase, progress: timingAt(-day).semesterProgress, state: timingAt(-day).semesterState },
-    { phase: 'Early', progress: 0, state: 'upcoming' }
+    { phase: 'NOT_STARTED', progress: 0, state: 'upcoming' }
   )
   assert.equal(timingAt(0).expectedPhase, 'Early')
   assert.equal(timingAt(10 * day).expectedPhase, 'Early')
@@ -206,6 +216,7 @@ test('calendar timing handles before, boundaries, active phases, end, and after'
     { progress: timingAt(101 * day).semesterProgress, state: timingAt(101 * day).semesterState, ended: timingAt(101 * day).semesterEnded },
     { progress: 100, state: 'ended', ended: true }
   )
+  assert.equal(timingAt(101 * day).expectedPhase, 'ENDED')
   assert.equal(
     calculateSemesterTiming(new Date(2026, 0, 1), new Date(2026, 3, 11), new Date(2026, 0, 1)).semesterProgress,
     0
@@ -354,6 +365,16 @@ test('exact scheduling establishes Early, Mid, and End from the current date', (
     }, '2026-2027', new Date(currentDate))
     assert.equal(resolved.initialTrackingPhase, phase)
   }
+})
+
+test('future exact scheduling remains not started without storing a non-phase value', () => {
+  const timing = calculateSemesterTiming('2027-01-01', '2027-04-11', new Date('2026-12-31T00:00:00Z'))
+  assert.equal(timing.expectedPhase, 'NOT_STARTED')
+  assert.equal(resolveTimingInput({
+    timingMode: 'exact',
+    semesterStartDate: '2027-01-01',
+    semesterEndDate: '2027-04-11',
+  }, '2026-2027', new Date('2026-12-31T00:00:00Z')).initialTrackingPhase, null)
 })
 
 test('approximate and unknown scheduling preserve a confirmed Early, Mid, or End onboarding phase', () => {
