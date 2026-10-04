@@ -36,3 +36,10 @@ test('retake completion requires canonical Profile Personal Factors without copy
   assert.match(source, /\/api\/assessment-attempts\/recover/)
   assert.doesNotMatch(source, /Active assessment attempt not found\./)
 })
+
+test('starting a recommendation assessment does not mutate College tracking data', async () => {
+  const source = await readFile(new URL('../server.js', import.meta.url), 'utf8')
+  const route = source.match(/app\.post\('\/api\/assessment-attempts',[\s\S]*?\n\}\)\r?\n/)[0]
+  assert.match(route, /INSERT INTO ASSESSMENT_ATTEMPT/)
+  assert.doesNotMatch(route, /COLLEGE_TRACKING_CYCLE|COLLEGE_TERM|SEMESTER_CHECKIN|UPDATE COURSE/)
+})

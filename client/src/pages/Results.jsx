@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { IconLoader2 } from '@tabler/icons-react'
 import FeedbackPopup from '../components/FeedbackPopup'
+import { getAssessmentReturnDestination, SUMMARY_DASHBOARD_DESTINATION } from '../utils/assessmentReturnDestination'
 
 const RECOMMENDATIONS_TIMEOUT_MS = 30000
 
@@ -108,6 +109,7 @@ function Results() {
   const [error, setError] = useState('')
   const [retryCount, setRetryCount] = useState(0)
   const [assessment, setAssessment] = useState({ interests: [], domainScores: {}, mbti: null, profile: null })
+  const [returnDestination, setReturnDestination] = useState(SUMMARY_DASHBOARD_DESTINATION)
 
   useEffect(() => {
     const token = localStorage.getItem('token')
@@ -158,7 +160,6 @@ function Results() {
         }
 
         setRecommendations(Array.isArray(data.recommendations) ? data.recommendations : [])
-        setLoading(false)
 
         const headers = { Authorization: `Bearer ${token}` }
         const userId = localStorage.getItem('userId')
@@ -167,6 +168,8 @@ function Results() {
           fetch(`${import.meta.env.VITE_API_URL}/api/quiz/results`, { headers, signal: controller.signal }).then((res) => res.json()),
           fetch(`${import.meta.env.VITE_API_URL}/api/mbti`, { headers, signal: controller.signal }).then((res) => res.json()),
           fetch(`${import.meta.env.VITE_API_URL}/api/profile?userId=${userId}`, { headers, signal: controller.signal }).then((res) => res.json()),
+          fetch(`${import.meta.env.VITE_API_URL}/api/college/status`, { headers, signal: controller.signal })
+            .then(async (res) => res.ok ? res.json() : null),
         ])
 
         const valueAt = (index) => assessmentResponses[index].status === 'fulfilled'
@@ -179,6 +182,7 @@ function Results() {
             mbti: valueAt(2).mbtiType || null,
             profile: valueAt(3).profile || null,
           })
+          setReturnDestination(getAssessmentReturnDestination(valueAt(4)))
         }
       } catch (requestError) {
         if (requestTimedOut) {
@@ -227,18 +231,14 @@ function Results() {
     <div className="min-h-screen bg-gray-50">
       {/* Nav */}
       <nav className="bg-white border-b border-gray-100 px-5 sm:px-8 py-4 sm:py-5 flex justify-between items-center gap-3">
-        <button
-          onClick={() => navigate('/dashboard')}
-          className="text-lg font-bold text-gray-900 hover:opacity-80 transition"
-        >
-          Learn<span className="text-orange-500">Match</span>
-        </button>
-        <button
-          onClick={() => navigate('/dashboard/summary')}
-          className="text-sm text-gray-500 hover:text-gray-900 transition"
-        >
-          Go to Summary Dashboard
-        </button>
+        {loading || returnDestination.path === '/college' ? (
+          <span className="text-lg font-bold text-gray-900">Learn<span className="text-orange-500">Match</span></span>
+        ) : (
+          <button onClick={() => navigate(returnDestination.path)} className="text-lg font-bold text-gray-900 hover:opacity-80 transition">Learn<span className="text-orange-500">Match</span></button>
+        )}
+        {!loading && (
+          <button onClick={() => navigate(returnDestination.path)} className="text-sm text-gray-500 hover:text-gray-900 transition">{returnDestination.label}</button>
+        )}
       </nav>
 
       <div className="max-w-5xl mx-auto px-5 sm:px-8 py-8 sm:py-12">
@@ -246,6 +246,11 @@ function Results() {
         <p className="text-gray-500 text-sm mb-6">
           Based on your skills, interests, and profile, here are your top matches.
         </p>
+        {returnDestination.path === '/college' && (
+          <p className="mb-6 rounded-xl border border-orange-100 bg-orange-50 px-4 py-3 text-sm text-orange-900">
+            These recommendations are informational and do not change your enrolled course or College Phase tracking.
+          </p>
+        )}
 
         {loading ? (
           <RecommendationsLoadingState />
@@ -272,9 +277,11 @@ function Results() {
                 <p className="text-[11px] font-bold uppercase tracking-wider text-orange-600">Assessment snapshot</p>
                 <h2 id="assessment-snapshot-title" className="mt-0.5 font-bold text-gray-900">The inputs considered in your matches</h2>
               </div>
-              <button type="button" onClick={() => navigate('/dashboard/summary')} className="text-left text-xs font-semibold text-orange-600 hover:text-orange-700 sm:text-right">
-                Open Full Summary →
-              </button>
+              {returnDestination.path !== '/college' && (
+                <button type="button" onClick={() => navigate('/dashboard/summary')} className="text-left text-xs font-semibold text-orange-600 hover:text-orange-700 sm:text-right">
+                  Open Full Summary →
+                </button>
+              )}
             </div>
             <div className="grid sm:grid-cols-3">
               <div className="border-b border-gray-100 p-5 sm:border-b-0 sm:border-r">

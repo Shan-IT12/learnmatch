@@ -39,6 +39,20 @@ export function getPreviousSemesterRecords(history = [], collegeInfo = {}) {
     ))
 }
 
+export function getCheckinHistoryRecords(history = []) {
+  return [...history].sort((left, right) => {
+    const idDifference = Number(right.checkinId || 0) - Number(left.checkinId || 0)
+    if (idDifference !== 0) return idDifference
+    return new Date(right.checkinDate || 0).getTime() - new Date(left.checkinDate || 0).getTime()
+  })
+}
+
+export function hasDisplayableGwa(record = {}) {
+  if (record.phase !== 'End' || record.gwa === null || record.gwa === undefined || record.gwa === '') return false
+  const gwa = Number(record.gwa)
+  return Number.isFinite(gwa) && gwa >= 0 && gwa <= 100
+}
+
 export function getAlignmentTrend(records = []) {
   if (records.length < 2) return { direction: 'insufficient', delta: null }
 

@@ -86,7 +86,7 @@ test('Check-in Complete separates the existing explanation and recommendation wi
     assert.match(markup, /Summer\/Midyear/)
     assert.match(markup, /End Phase/)
     assert.match(markup, /Career Alignment Result/)
-    assert.match(markup, />Monitor</)
+    assert.match(markup, />Keep an Eye On</)
     assert.match(markup, />68%</)
     assert.match(markup, /What your result means/)
     assert.match(markup, new RegExp(result.feedback))

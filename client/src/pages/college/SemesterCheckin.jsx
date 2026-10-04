@@ -10,6 +10,11 @@ const RESULT_STYLES = {
   Monitor: 'border-amber-200 bg-amber-50 text-amber-700',
   'Needs Attention': 'border-red-200 bg-red-50 text-red-700',
 }
+const RESULT_LABELS = {
+  'On Track': 'Going Well',
+  Monitor: 'Keep an Eye On',
+  'Needs Attention': 'Support Recommended',
+}
 
 export function CheckinResult({ result, courseName, termLabel, phase, onBack = () => {} }) {
   const statusStyle = RESULT_STYLES[result.status] || 'border-gray-200 bg-gray-50 text-gray-700'
@@ -35,7 +40,7 @@ export function CheckinResult({ result, courseName, termLabel, phase, onBack = (
           <div className="grid gap-5 border-b border-gray-100 p-5 sm:grid-cols-[1fr_auto] sm:items-center sm:p-7">
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.16em] text-gray-400">Career Alignment Result</p>
-              <span className={`mt-3 inline-flex rounded-full border px-3 py-1.5 text-sm font-bold ${statusStyle}`}>{result.status}</span>
+              <span className={`mt-3 inline-flex rounded-full border px-3 py-1.5 text-sm font-bold ${statusStyle}`}>{RESULT_LABELS[result.status] || result.status}</span>
             </div>
             <div className="sm:text-right">
               <p className="text-4xl font-bold tracking-tight text-gray-950 sm:text-5xl">{result.alignmentPercent}%</p>
@@ -234,8 +239,12 @@ function SemesterCheckin() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <p className="text-sm text-gray-400">Loading your check-in...</p>
+      <div className="min-h-screen bg-gray-50" aria-label="Loading check-in">
+        <div className="h-[73px] border-b border-gray-100 bg-white" />
+        <main className="mx-auto max-w-5xl space-y-5 px-4 py-8 sm:px-6">
+          <div className="h-52 animate-pulse rounded-[24px] bg-slate-200" />
+          {[0, 1, 2].map((item) => <div key={item} className="h-40 animate-pulse rounded-2xl bg-white" />)}
+        </main>
       </div>
     )
   }

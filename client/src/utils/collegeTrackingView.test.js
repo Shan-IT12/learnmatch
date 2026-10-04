@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { getCurrentSemesterRecords, getPreviousSemesterRecords, getNextAcademicStage } from './collegeTrackingView.js'
+import { getCheckinHistoryRecords, getCurrentSemesterRecords, getPreviousSemesterRecords, getNextAcademicStage, hasDisplayableGwa } from './collegeTrackingView.js'
 
 test('modern history is separated by term_id even when labels are identical', () => {
   const history = [
@@ -9,6 +9,24 @@ test('modern history is separated by term_id even when labels are identical', ()
   ]
   assert.deepEqual(getCurrentSemesterRecords(history, { termId: 20 }).map(({ checkinId }) => checkinId), [2])
   assert.deepEqual(getPreviousSemesterRecords(history, { termId: 20 }).map(({ checkinId }) => checkinId), [1])
+})
+
+test('check-in history includes current-term records and sorts newest first', () => {
+  const history = [
+    { checkinId: 7, termId: 20, phase: 'Early' },
+    { checkinId: 9, termId: 20, phase: 'Mid' },
+    { checkinId: 3, termId: 10, phase: 'End' },
+  ]
+  assert.deepEqual(getCheckinHistoryRecords(history).map(({ checkinId }) => checkinId), [9, 7, 3])
+  assert.equal(history[0].checkinId, 7)
+})
+
+test('GWA is shown only for End check-ins with a valid stored value', () => {
+  assert.equal(hasDisplayableGwa({ phase: 'Early', gwa: 91 }), false)
+  assert.equal(hasDisplayableGwa({ phase: 'Mid', gwa: 88 }), false)
+  assert.equal(hasDisplayableGwa({ phase: 'End', gwa: null }), false)
+  assert.equal(hasDisplayableGwa({ phase: 'End', gwa: 'not recorded' }), false)
+  assert.equal(hasDisplayableGwa({ phase: 'End', gwa: 87.5 }), true)
 })
 
 test('client progression uses regular terms while retaining legacy Summer progression', () => {

@@ -27,15 +27,21 @@ test('renders both approximate year dropdowns with the active academic-year opti
 
     const yearSelects = [...markup.matchAll(/<select aria-label="([^"]+ year)"[^>]*>(.*?)<\/select>/g)]
     assert.deepEqual(yearSelects.map((match) => match[1]), [
-      'Around when did your term start? year',
-      'Around when will your term end? year',
+      'Approximate start year',
+      'Approximate end year',
     ])
+    assert.match(markup, /Approximate start/)
+    assert.match(markup, /Approximate end/)
+    assert.equal((markup.match(/>Month<select/g) || []).length, 2)
+    assert.equal((markup.match(/>Year<select/g) || []).length, 2)
+    assert.equal((markup.match(/>Part of month<select/g) || []).length, 2)
+    assert.doesNotMatch(markup, /sm:grid-cols-3/)
 
     for (const [, , optionsMarkup] of yearSelects) {
       const options = [...optionsMarkup.matchAll(/<option value="([^"]*)"(?: selected="")?>([^<]+)<\/option>/g)]
         .map((match) => ({ value: match[1], label: match[2] }))
       assert.deepEqual(options, [
-        { value: '', label: 'Year' },
+        { value: '', label: 'Select year' },
         { value: '2026', label: '2026' },
         { value: '2027', label: '2027' },
       ])

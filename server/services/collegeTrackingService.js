@@ -291,6 +291,21 @@ function requiredTrackingPhases(initialTrackingPhase) {
   return CHECKIN_PHASES.slice(startIndex < 0 ? 0 : startIndex)
 }
 
+function effectiveTrackingStartPhase(initialTrackingPhase, completedPhases = []) {
+  if (CHECKIN_PHASES.includes(initialTrackingPhase)) return initialTrackingPhase
+  return CHECKIN_PHASES.find((phase) => completedPhases.includes(phase)) || 'Early'
+}
+
+export function getNextSequentialCheckinPhase(completedPhases = [], initialTrackingPhase = null) {
+  const completedIndexes = completedPhases
+    .map((phase) => CHECKIN_PHASES.indexOf(phase))
+    .filter((index) => index >= 0)
+  if (completedIndexes.length > 0) {
+    return CHECKIN_PHASES[Math.max(...completedIndexes) + 1] || null
+  }
+  return effectiveTrackingStartPhase(initialTrackingPhase, completedPhases)
+}
+
 export function validateCheckinAnswers(answers) {
   if (!Array.isArray(answers) || answers.length !== 5) {
     throw new CollegeTrackingError('Please answer all 5 check-in questions.', 'INVALID_CHECKIN_ANSWERS')
@@ -652,7 +667,7 @@ export async function endCollegeTracking(pool, userId, reason = 'student_ended')
   }
 }
 
-export async function resumeCollegeTracking(pool, userId, termInput, resolveCourse = getPublicCourse) {
+export async function resumeCollegeTracking(pool, userId) {
   const connection = await pool.getConnection()
   try {
     await connection.beginTransaction()
@@ -660,24 +675,41 @@ export async function resumeCollegeTracking(pool, userId, termInput, resolveCour
     if (!cycle || cycle.status !== 'paused') {
       throw new CollegeTrackingError('Only paused college tracking can be resumed.', 'TRACKING_NOT_PAUSED', 409)
     }
-    const [courses] = await connection.query(
-      'SELECT course_id, course_code, course_name FROM COURSE WHERE course_id = ? AND is_active = 1',
-      [cycle.course_id]
+    const [terms] = await connection.query(
+      `SELECT term_id, course_id, academic_year, year_level, calendar_type, term_code, semester,
+              semester_start_date, semester_end_date
+       FROM COLLEGE_TERM
+       WHERE user_id = ? AND tracking_cycle_id = ?
+       ORDER BY term_id DESC
+       LIMIT 1 FOR UPDATE`,
+      [userId, cycle.tracking_cycle_id]
     )
-    if (courses.length === 0 || !isCurrentIndependentCourse(courses[0].course_code)) {
-      throw new CollegeTrackingError('The enrolled course is unavailable or inactive.', 'COURSE_UNAVAILABLE', 404)
+    const storedTerm = terms[0]
+    const normalizedTerm = storedTerm && resolveActiveCalendarTerm({
+      calendarType: storedTerm.calendar_type,
+      termCode: storedTerm.term_code,
+      semester: storedTerm.semester || storedTerm.term_code,
+    })
+    if (!storedTerm || !normalizedTerm || Number(storedTerm.course_id) !== Number(cycle.course_id)) {
+      throw new CollegeTrackingError(
+        'Select a valid term for the academic calendar.',
+        'INVALID_TERM'
+      )
     }
-    const term = await insertLifecycleTerm(
-      connection, userId, cycle.tracking_cycle_id, courses[0], termInput, resolveCourse
-    )
     await connection.query(
       `UPDATE COLLEGE_TRACKING_CYCLE
-       SET status = 'active', paused_at = NULL, ended_at = NULL, end_reason = NULL
+       SET status = 'active', paused_at = NULL, end_reason = NULL
        WHERE tracking_cycle_id = ?`,
       [cycle.tracking_cycle_id]
     )
     await connection.commit()
-    return { ...term, trackingCycleId: cycle.tracking_cycle_id, lifecycleStatus: 'active' }
+    return {
+      trackingCycleId: cycle.tracking_cycle_id,
+      lifecycleStatus: 'active',
+      termId: storedTerm.term_id,
+      calendarType: normalizedTerm.calendarType,
+      termCode: normalizedTerm.termCode,
+    }
   } catch (error) {
     await connection.rollback()
     throw normalizeTermWriteError(error)
@@ -1033,17 +1065,24 @@ export async function getCheckinStatus(database, userId, currentDate = new Date(
     college.timingMode,
     college.initialTrackingPhase
   )
-  const phaseStates = buildPhaseStates(completedPhases, availabilityTiming, {
+  const effectiveInitialPhase = effectiveTrackingStartPhase(college.initialTrackingPhase, completedPhases)
+  let phaseStates = buildPhaseStates(completedPhases, availabilityTiming, {
     legacyCurrentPhase: college.currentPhase,
-    initialTrackingPhase: college.initialTrackingPhase,
+    initialTrackingPhase: effectiveInitialPhase,
   })
-  const availablePhases = phaseStates
-    .filter(({ state }) => state === 'available' || state === 'missed_available')
-    .map(({ phase }) => phase)
-  const requiredPhases = requiredTrackingPhases(college.initialTrackingPhase)
+  const requiredPhases = requiredTrackingPhases(effectiveInitialPhase)
+  const nextRequiredPhase = getNextSequentialCheckinPhase(completedPhases, effectiveInitialPhase)
+  // Recommended timing is guidance, not a gate. Keep check-ins sequential while
+  // allowing the next required phase to be completed early.
+  if (nextRequiredPhase) {
+    phaseStates = phaseStates.map((item) => item.phase === nextRequiredPhase && item.state === 'upcoming'
+      ? { ...item, state: 'available_early' }
+      : item)
+  }
+  const availablePhases = nextRequiredPhase ? [nextRequiredPhase] : []
   const allCheckinsCompleted = requiredPhases.every((phase) => completedPhases.includes(phase))
   const semesterTrackingCompleted = allCheckinsCompleted && college.semesterEnded
-  const progressionEligible = allCheckinsCompleted && (college.semesterEnded || !college.timingAvailable)
+  const progressionEligible = allCheckinsCompleted
 
   return {
     state: allCheckinsCompleted ? 'complete' : pending ? 'pending' : availablePhases.length ? 'due' : 'not_due',
@@ -1070,11 +1109,12 @@ export async function getCheckinStatus(database, userId, currentDate = new Date(
     timingEstimated: college.timingEstimated,
     initialTrackingPhase: college.initialTrackingPhase,
     requiredPhases,
-    nextExpectedPhase: availablePhases[0] || phaseStates.find(({ state }) => state === 'upcoming')?.phase || null,
+    nextExpectedPhase: nextRequiredPhase,
+    earlyCheckin: phaseStates.some(({ phase, state }) => phase === nextRequiredPhase && state === 'available_early'),
   }
 }
 
-export async function startNextCheckin(pool, userId, { phase: requestedPhase, currentDate = new Date() } = {}) {
+export async function startNextCheckin(pool, userId, { phase: requestedPhase } = {}) {
   const connection = await pool.getConnection()
   try {
     await connection.beginTransaction()
@@ -1090,11 +1130,6 @@ export async function startNextCheckin(pool, userId, { phase: requestedPhase, cu
     )
     if (termRows.length > 0) {
       const term = termRows[0]
-      const timing = calculateSemesterTiming(
-        term.semester_start_date,
-        term.semester_end_date,
-        currentDate
-      )
       const [completedRows] = await connection.query(
         `SELECT DISTINCT sc.phase
          FROM SEMESTER_CHECKIN sc
@@ -1105,19 +1140,10 @@ export async function startNextCheckin(pool, userId, { phase: requestedPhase, cu
            )`,
         [userId, term.term_id]
       )
-      const availabilityTiming = timingForCheckinAvailability(
-        timing,
-        term.timing_mode,
-        term.initial_tracking_phase
-      )
-      const phaseStates = buildPhaseStates(completedRows.map(({ phase }) => phase), availabilityTiming, {
-        initialTrackingPhase: term.initial_tracking_phase,
-      })
-      const available = phaseStates
-        .filter(({ state }) => state === 'available' || state === 'missed_available')
-        .map(({ phase }) => phase)
-      const phase = requestedPhase || available[0]
-      if (!available.includes(phase)) {
+      const completedPhases = completedRows.map(({ phase }) => phase)
+      const nextRequiredPhase = getNextSequentialCheckinPhase(completedPhases, term.initial_tracking_phase)
+      const phase = requestedPhase || nextRequiredPhase
+      if (!nextRequiredPhase || phase !== nextRequiredPhase) {
         throw new CollegeTrackingError('That check-in is not currently available.', 'CHECKIN_NOT_AVAILABLE', 409)
       }
 
@@ -1235,7 +1261,6 @@ export async function startNextSemester(pool, userId, termInput = {}, resolveCou
     if (!latest.is_active) {
       throw new CollegeTrackingError('The enrolled course is unavailable or inactive.', 'COURSE_UNAVAILABLE', 404)
     }
-    const timing = calculateSemesterTiming(latest.semester_start_date, latest.semester_end_date)
     const [recentRows] = await connection.query(
       `SELECT sc.phase,
               COUNT(response.response_id) AS response_count
@@ -1255,9 +1280,9 @@ export async function startNextSemester(pool, userId, termInput = {}, resolveCou
       .map(({ phase }) => phase)
     const completedCurrentSemester = requiredTrackingPhases(latest.initial_tracking_phase)
       .every((phase) => completedPhases.includes(phase))
-    if (!completedCurrentSemester || (!legacy && timing.timingAvailable && !timing.semesterEnded)) {
+    if (!completedCurrentSemester) {
       throw new CollegeTrackingError(
-        'Complete all check-ins and wait until the term has ended before starting the next term.',
+        'Complete all check-ins before starting the next term.',
         'SEMESTER_NOT_COMPLETE',
         409
       )

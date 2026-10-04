@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import CourseEnrichmentSections from '../components/CourseEnrichmentSections'
+import useActiveCollegePhase from '../hooks/useActiveCollegePhase'
 
 const apiUrl = import.meta.env.VITE_API_URL || ''
 
@@ -8,6 +9,7 @@ function CareerPath() {
   const navigate = useNavigate()
   const location = useLocation()
   const { courseCode } = useParams()
+  const hasActiveCollegePhase = useActiveCollegePhase()
   const passedRecommendations = location.state?.recommendations
   const [recommendations, setRecommendations] = useState(() => (
     Array.isArray(passedRecommendations) ? passedRecommendations : []
@@ -84,6 +86,10 @@ function CareerPath() {
   }
 
   const backToSelector = () => {
+    if (hasActiveCollegePhase) {
+      navigate('/results')
+      return
+    }
     navigate('/results/career-path', {
       state: topRecommendations.length ? { recommendations: topRecommendations } : undefined,
     })
@@ -92,11 +98,13 @@ function CareerPath() {
   return (
     <div className="min-h-screen bg-gray-50">
       <nav className="bg-white border-b border-gray-100 px-6 sm:px-8 py-5 flex justify-between items-center">
-        <button onClick={() => navigate('/dashboard')} className="text-lg font-bold text-gray-900 hover:opacity-80 transition">
-          Learn<span className="text-orange-500">Match</span>
-        </button>
-        <button onClick={courseCode ? backToSelector : () => navigate('/results')} className="text-sm text-gray-500 hover:text-gray-900 transition">
-          ← {courseCode ? 'Back to Career Paths' : 'Back to Results'}
+        {hasActiveCollegePhase === false ? (
+          <button onClick={() => navigate('/dashboard')} className="text-lg font-bold text-gray-900 hover:opacity-80 transition">Learn<span className="text-orange-500">Match</span></button>
+        ) : (
+          <span className="text-lg font-bold text-gray-900">Learn<span className="text-orange-500">Match</span></span>
+        )}
+        <button onClick={courseCode ? backToSelector : () => navigate('/results')} disabled={hasActiveCollegePhase === null} className="text-sm text-gray-500 hover:text-gray-900 transition disabled:cursor-wait disabled:opacity-50">
+          ← {courseCode && !hasActiveCollegePhase ? 'Back to Career Paths' : 'Back to Results'}
         </button>
       </nav>
 

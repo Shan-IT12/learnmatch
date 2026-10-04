@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from "react-router-dom";
 import { readCompletedAssessmentSteps } from '../utils/assessmentSession'
+import useActiveCollegePhase from '../hooks/useActiveCollegePhase'
 
 const steps = [
     { label: 'Personal Factors', path: '/onboarding/profile' },
@@ -20,6 +21,7 @@ function OnboardingLayout({
   showFooterNavigation = true,
 }) {
   const navigate = useNavigate()
+  const hasActiveCollegePhase = useActiveCollegePhase()
   const [showExitConfirm, setShowExitConfirm] = useState(false)
   const completedSteps = readCompletedAssessmentSteps(
     typeof sessionStorage === 'undefined' ? null : sessionStorage
@@ -28,7 +30,8 @@ function OnboardingLayout({
 
   const handleBack = () => {
     if (currentStep === 1) {
-      navigate('/dashboard')
+      if (hasActiveCollegePhase === null) return
+      navigate(hasActiveCollegePhase ? '/college' : '/dashboard/summary')
     } else {
       navigate(steps[currentStep - 2].path)
     }
@@ -52,7 +55,8 @@ function OnboardingLayout({
   }
 
   const confirmExit = () => {
-    navigate('/dashboard')
+    if (hasActiveCollegePhase === null) return
+    navigate(hasActiveCollegePhase ? '/college' : '/dashboard/summary')
   }
 
   return (
@@ -75,9 +79,10 @@ function OnboardingLayout({
               </button>
               <button
                 onClick={confirmExit}
-                className="flex-1 bg-orange-500 text-white px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-orange-600 transition"
+                disabled={hasActiveCollegePhase === null}
+                className="flex-1 bg-orange-500 text-white px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-orange-600 transition disabled:cursor-wait disabled:bg-gray-200 disabled:text-gray-500"
               >
-                Leave anyway
+                {hasActiveCollegePhase === null ? 'Checking destination...' : 'Cancel Assessment'}
               </button>
             </div>
           </div>
@@ -172,7 +177,8 @@ function OnboardingLayout({
       <div className={`${stickyChrome ? 'sticky bottom-0 z-40 shrink-0 shadow-[0_-4px_12px_rgba(0,0,0,0.04)]' : ''} border-t border-gray-100 px-3 sm:px-8 py-3 sm:py-4 grid grid-cols-[auto_minmax(0,1fr)_auto] gap-1 sm:gap-4 items-center bg-white`}>
         <button
           onClick={handleBack}
-          className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-gray-500 hover:text-gray-900 transition px-2 sm:px-4 py-2 rounded-lg hover:bg-gray-50"
+          disabled={currentStep === 1 && hasActiveCollegePhase === null}
+          className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-gray-500 hover:text-gray-900 transition px-2 sm:px-4 py-2 rounded-lg hover:bg-gray-50 disabled:cursor-wait disabled:opacity-50"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />

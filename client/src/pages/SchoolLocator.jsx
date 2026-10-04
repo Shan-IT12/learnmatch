@@ -11,6 +11,7 @@ import {
   routeDistanceLabel,
 } from '../utils/schoolDirections'
 import { getSchoolOwnershipLabel } from '../utils/schoolOwnership'
+import useActiveCollegePhase from '../hooks/useActiveCollegePhase'
 
 const apiUrl = import.meta.env.VITE_API_URL || ''
 
@@ -18,6 +19,7 @@ function SchoolLocator() {
   const { courseCode } = useParams()
   const location = useLocation()
   const isAuthenticated = Boolean(localStorage.getItem('token'))
+  const hasActiveCollegePhase = useActiveCollegePhase()
   const [result, setResult] = useState(null)
   const [status, setStatus] = useState('loading')
   const [retryCount, setRetryCount] = useState(0)
@@ -60,7 +62,9 @@ function SchoolLocator() {
   }, [courseCode, retryCount])
 
   const backNavigation = getSchoolLocatorBackNavigation(
-    location.state?.source === 'course-overview'
+    hasActiveCollegePhase
+      ? 'results'
+      : location.state?.source === 'course-overview'
       ? {
           name: location.state.source,
           returnTo: location.state.returnTo,
@@ -118,11 +122,15 @@ function SchoolLocator() {
 
   return (
     <div className="min-h-screen bg-[#fcfaf7] text-gray-900">
-      <PublicHeader />
+      <PublicHeader activeCollegePhase={hasActiveCollegePhase} />
       <main className="max-w-6xl mx-auto px-5 sm:px-8 lg:px-10 py-8 sm:py-12">
-        <Link to={backNavigation.path} state={backNavigation.state} className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-orange-600 transition">
-          <IconArrowLeft size={17} stroke={2} /> {backNavigation.label}
-        </Link>
+        {hasActiveCollegePhase === null ? (
+          <span className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-400" aria-live="polite">Resolving return destination…</span>
+        ) : (
+          <Link to={backNavigation.path} state={backNavigation.state} className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-orange-600 transition">
+            <IconArrowLeft size={17} stroke={2} /> {backNavigation.label}
+          </Link>
+        )}
 
         {displayStatus === 'loading' && (
           <section className="mt-8 bg-white border border-gray-100 rounded-3xl p-8 sm:p-12 shadow-sm" aria-live="polite">
@@ -173,7 +181,11 @@ function SchoolLocator() {
                 <h2 className="text-xl sm:text-2xl font-bold mt-5">No school match is currently available for this course.</h2>
                 <p className="text-sm text-gray-500 leading-6 mt-3 max-w-2xl mx-auto">This does not necessarily mean the course is unavailable in San Jose del Monte. Some school program information may not yet be available in LearnMatch.</p>
                 <div className="flex flex-col sm:flex-row justify-center gap-3 mt-7">
-                  <Link to={backNavigation.path} state={backNavigation.state} className="bg-gray-900 text-white px-5 py-3 rounded-xl text-sm font-semibold hover:bg-gray-800 transition">{backNavigation.label}</Link>
+                  {hasActiveCollegePhase === null ? (
+                    <span className="cursor-wait bg-gray-200 text-gray-500 px-5 py-3 rounded-xl text-sm font-semibold">Resolving return destination…</span>
+                  ) : (
+                    <Link to={backNavigation.path} state={backNavigation.state} className="bg-gray-900 text-white px-5 py-3 rounded-xl text-sm font-semibold hover:bg-gray-800 transition">{backNavigation.label}</Link>
+                  )}
                   <Link to="/courses/search" className="border border-orange-200 bg-orange-50 text-orange-700 px-5 py-3 rounded-xl text-sm font-semibold hover:bg-orange-100 transition">Explore other courses</Link>
                 </div>
               </section>

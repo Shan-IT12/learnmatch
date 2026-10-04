@@ -25,10 +25,11 @@ test('submitted assessment routes resolve persisted results before editable ques
   assert.match(personality, /if \(resultCheckFailed\)/)
 })
 
-test('recommendation navigation goes to the Summary Dashboard without reopening Personality', async () => {
+test('recommendation navigation derives College or Summary Dashboard from persisted tracking status', async () => {
   const results = await source('../Results.jsx')
-  assert.match(results, /navigate\('\/dashboard\/summary'\)/)
-  assert.match(results, /Go to Summary Dashboard/)
+  assert.match(results, /api\/college\/status/)
+  assert.match(results, /navigate\(returnDestination\.path\)/)
+  assert.match(results, /returnDestination\.label/)
   assert.doesNotMatch(results, /Back to Personality Result/)
 })
 

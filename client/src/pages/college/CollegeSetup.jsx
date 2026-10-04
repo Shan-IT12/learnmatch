@@ -52,36 +52,45 @@ function SemesterPhaseSelector({ value, onChange, error = '' }) {
 
 export function ApproximateScheduleFields({ academicYears, approximateStart, approximateEnd, setApproximateStart, setApproximateEnd, errors = {} }) {
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
       {[
-        ['Around when did your term start?', approximateStart, setApproximateStart, false],
-        ['Around when will your term end?', approximateEnd, setApproximateEnd, true],
+        ['Approximate start', approximateStart, setApproximateStart, false],
+        ['Approximate end', approximateEnd, setApproximateEnd, true],
       ].map(([label, value, setter, isEnd]) => (
-        <fieldset key={label} data-validation-field={isEnd ? 'approximateEnd' : 'approximateStart'} aria-invalid={errors[isEnd ? 'approximateEnd' : 'approximateStart'] ? 'true' : undefined} aria-describedby={errors[isEnd ? 'approximateEnd' : 'approximateStart'] ? `${isEnd ? 'approximate-end' : 'approximate-start'}-error` : undefined}>
-          <legend className="text-sm font-medium text-gray-700 mb-2">{label} <RequiredMark /></legend>
-          <div className="grid sm:grid-cols-3 gap-2">
-            <select aria-label={`${label} month`} value={value.month} onChange={(event) => setter({ ...value, month: event.target.value })} className="rounded-xl border border-gray-200 bg-white px-3 py-3 text-sm outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100/80">
-              <option value="">Month</option>
-              {MONTHS.map((month, index) => {
-                const monthValue = String(index + 1)
-                const disabled = isEnd && value.year === approximateStart.year && Number(monthValue) < Number(approximateStart.month)
-                return <option key={month} value={monthValue} disabled={disabled}>{month}</option>
-              })}
-            </select>
-            <select aria-label={`${label} year`} value={value.year} onChange={(event) => setter({ ...value, year: event.target.value })} className="rounded-xl border border-gray-200 bg-white px-3 py-3 text-sm outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100/80">
-              <option value="">Year</option>
-              {academicYears.map((year) => (
-                <option key={year} value={year} disabled={isEnd && Number(year) < Number(approximateStart.year)}>{year}</option>
-              ))}
-            </select>
-            <select aria-label={`${label} part of month`} value={value.part} onChange={(event) => setter({ ...value, part: event.target.value })} className="rounded-xl border border-gray-200 bg-white px-3 py-3 text-sm outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100/80">
-              <option value="">Part of month</option>
-              {MONTH_PARTS.map((part) => {
-                const candidate = { ...value, part: part.value }
-                const disabled = isEnd && value.year === approximateStart.year && value.month === approximateStart.month && approximateScheduleValue(candidate) <= approximateScheduleValue(approximateStart)
-                return <option key={part.value} value={part.value} disabled={disabled}>{part.label}</option>
-              })}
-            </select>
+        <fieldset key={label} data-validation-field={isEnd ? 'approximateEnd' : 'approximateStart'} aria-invalid={errors[isEnd ? 'approximateEnd' : 'approximateStart'] ? 'true' : undefined} aria-describedby={errors[isEnd ? 'approximateEnd' : 'approximateStart'] ? `${isEnd ? 'approximate-end' : 'approximate-start'}-error` : undefined} className="rounded-xl border border-gray-100 bg-gray-50/60 p-4">
+          <legend className="px-1 text-sm font-semibold text-gray-800">{label} <RequiredMark /></legend>
+          <div className="mt-2 grid gap-3 sm:grid-cols-2">
+            <label className="block min-w-0 text-xs font-medium text-gray-600">
+              Month
+              <select aria-label={`${label} month`} value={value.month} onChange={(event) => setter({ ...value, month: event.target.value })} className="mt-1.5 w-full min-w-0 rounded-xl border border-gray-200 bg-white px-3 py-3 text-sm outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100/80">
+                <option value="">Select month</option>
+                {MONTHS.map((month, index) => {
+                  const monthValue = String(index + 1)
+                  const disabled = isEnd && value.year === approximateStart.year && Number(monthValue) < Number(approximateStart.month)
+                  return <option key={month} value={monthValue} disabled={disabled}>{month}</option>
+                })}
+              </select>
+            </label>
+            <label className="block min-w-0 text-xs font-medium text-gray-600">
+              Year
+              <select aria-label={`${label} year`} value={value.year} onChange={(event) => setter({ ...value, year: event.target.value })} className="mt-1.5 w-full min-w-0 rounded-xl border border-gray-200 bg-white px-3 py-3 text-sm outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100/80">
+                <option value="">Select year</option>
+                {academicYears.map((year) => (
+                  <option key={year} value={year} disabled={isEnd && Number(year) < Number(approximateStart.year)}>{year}</option>
+                ))}
+              </select>
+            </label>
+            <label className="block min-w-0 text-xs font-medium text-gray-600 sm:col-span-2">
+              Part of month
+              <select aria-label={`${label} part of month`} value={value.part} onChange={(event) => setter({ ...value, part: event.target.value })} className="mt-1.5 w-full min-w-0 rounded-xl border border-gray-200 bg-white px-3 py-3 text-sm outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100/80">
+                <option value="">Select part of month</option>
+                {MONTH_PARTS.map((part) => {
+                  const candidate = { ...value, part: part.value }
+                  const disabled = isEnd && value.year === approximateStart.year && value.month === approximateStart.month && approximateScheduleValue(candidate) <= approximateScheduleValue(approximateStart)
+                  return <option key={part.value} value={part.value} disabled={disabled}>{part.label}</option>
+                })}
+              </select>
+            </label>
           </div>
           <FieldError id={`${isEnd ? 'approximate-end' : 'approximate-start'}-error`}>{errors[isEnd ? 'approximateEnd' : 'approximateStart']}</FieldError>
         </fieldset>

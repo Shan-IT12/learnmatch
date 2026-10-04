@@ -14,6 +14,7 @@ import {
   pauseCollegeTracking,
   getCollegeStatus,
   getCheckinHistory,
+  getNextSequentialCheckinPhase,
   normalizeApproximateDate,
   resolveTimingInput,
   resumeCollegeTracking,
@@ -94,53 +95,99 @@ test('program change rolls back closing the old cycle when the new term fails', 
   assert.equal(state.rolledBack, true)
 })
 
-test('resume creates a fresh term in the paused cycle without fabricating check-ins', async () => {
+function pausedResumePool(storedTerm) {
   const statements = []
   const connection = {
     beginTransaction: async () => {}, commit: async () => {}, rollback: async () => {}, release: () => {},
     query: async (sql, values) => {
       statements.push({ sql, values })
       if (sql.includes('FROM COLLEGE_TRACKING_CYCLE')) return [[{ tracking_cycle_id: 9, course_id: 430, status: 'paused' }]]
-      if (sql.includes('FROM COURSE')) return [[{ course_id: 430, course_code: 'CRS001', course_name: 'Course One' }]]
-      if (sql.includes('SELECT term_id FROM COLLEGE_TERM')) return [[]]
-      if (sql.includes('INSERT INTO COLLEGE_TERM')) return [{ insertId: 22 }]
+      if (sql.includes('FROM COLLEGE_TERM')) return [[storedTerm]]
       if (sql.includes('UPDATE COLLEGE_TRACKING_CYCLE')) return [{ affectedRows: 1 }]
       throw new Error(`Unexpected SQL: ${sql}`)
     },
   }
-  const result = await resumeCollegeTracking(
-    { getConnection: async () => connection }, 7,
-    {
-      courseId: 999,
-      academicYear: '2027-2028', yearLevel: '2nd Year', calendarType: 'trimester', termCode: 'TRI_2',
-      timingMode: 'phase_only', initialTrackingPhase: 'End',
-    },
-    () => ({ program_duration_years: 4 })
-  )
-  assert.equal(result.termId, 22)
+  return { pool: { getConnection: async () => connection }, statements }
+}
+
+test('paused semester cycle resumes its existing term without changing stored tracking data', async () => {
+  const storedTerm = {
+    term_id: 22, course_id: 430, academic_year: '2026-2027', year_level: '2nd Year',
+    calendar_type: 'semester', term_code: 'SEM_2', semester: '2nd Semester',
+    semester_start_date: '2027-01-10', semester_end_date: '2027-05-20',
+  }
+  const { pool, statements } = pausedResumePool(storedTerm)
+  const result = await resumeCollegeTracking(pool, 7, {
+    courseId: 999, calendarType: 'trimester', termCode: 'TRI_3', yearLevel: '4th Year',
+  })
+  assert.equal(result.trackingCycleId, 9)
   assert.equal(result.lifecycleStatus, 'active')
-  const termInsert = statements.find(({ sql }) => sql.includes('INSERT INTO COLLEGE_TERM'))
-  assert.equal(termInsert.values[2], 430)
-  assert.notEqual(termInsert.values[2], 999)
-  assert.equal(statements.some(({ sql }) => sql.includes('INSERT INTO SEMESTER_CHECKIN')), false)
+  assert.equal(result.termId, 22)
+  assert.equal(result.calendarType, 'semester')
+  assert.equal(result.termCode, 'SEM_2')
+  assert.equal(statements.some(({ sql }) => /INSERT|DELETE|UPDATE COLLEGE_TERM|SEMESTER_CHECKIN/.test(sql)), false)
 })
 
-test('resume rejects an existing term in the same cycle with a meaningful conflict', async () => {
+test('paused trimester cycle resumes its existing trimester term', async () => {
+  const { pool } = pausedResumePool({
+    term_id: 23, course_id: 430, academic_year: '2026-2027', year_level: '2nd Year',
+    calendar_type: 'trimester', term_code: 'TRI_2', semester: '2nd Trimester',
+    semester_start_date: '2026-10-01', semester_end_date: '2027-01-31',
+  })
+  const result = await resumeCollegeTracking(pool, 7)
+  assert.equal(result.calendarType, 'trimester')
+  assert.equal(result.termCode, 'TRI_2')
+})
+
+test('resume normalizes a legacy semester label from the stored term', async () => {
+  const { pool } = pausedResumePool({
+    term_id: 24, course_id: 430, academic_year: '2026-2027', year_level: '1st Year',
+    calendar_type: 'semester', term_code: null, semester: '1st Semester',
+    semester_start_date: '2026-08-01', semester_end_date: '2026-12-15',
+  })
+  const result = await resumeCollegeTracking(pool, 7)
+  assert.equal(result.calendarType, 'semester')
+  assert.equal(result.termCode, 'SEM_1')
+})
+
+test('resume ignores forged course and term input and uses only the stored paused term', async () => {
+  const { pool, statements } = pausedResumePool({
+    term_id: 25, course_id: 430, academic_year: '2026-2027', year_level: '3rd Year',
+    calendar_type: 'trimester', term_code: null, semester: '3rd Trimester',
+    semester_start_date: '2027-02-01', semester_end_date: '2027-05-31',
+  })
+  const result = await resumeCollegeTracking(pool, 7, {
+    courseId: 777, calendarType: 'semester', termCode: 'SEM_1', semester: '1st Semester',
+  })
+  assert.equal(result.termId, 25)
+  assert.equal(result.calendarType, 'trimester')
+  assert.equal(result.termCode, 'TRI_3')
+  assert.equal(statements.some(({ sql }) => sql.includes('FROM COURSE') || sql.includes('UPDATE COLLEGE_TERM')), false)
+})
+
+test('resume returns INVALID_TERM only when the persisted term is incompatible', async () => {
+  const { pool } = pausedResumePool({
+    term_id: 26, course_id: 430, academic_year: '2026-2027', year_level: '2nd Year',
+    calendar_type: 'semester', term_code: 'TRI_2', semester: '2nd Trimester',
+    semester_start_date: '2026-10-01', semester_end_date: '2027-01-31',
+  })
+  await assert.rejects(
+    resumeCollegeTracking(pool, 7),
+    (error) => error.code === 'INVALID_TERM'
+  )
+})
+
+test('resume rejects a cycle that is not paused', async () => {
   const connection = {
     beginTransaction: async () => {}, commit: async () => {}, rollback: async () => {}, release: () => {},
     query: async (sql) => {
-      if (sql.includes('FROM COLLEGE_TRACKING_CYCLE')) return [[{ tracking_cycle_id: 9, course_id: 430, status: 'paused' }]]
-      if (sql.includes('FROM COURSE')) return [[{ course_id: 430, course_code: 'CRS001', course_name: 'Course One' }]]
-      if (sql.includes('SELECT term_id FROM COLLEGE_TERM')) return [[{ term_id: 21 }]]
+      if (sql.includes('FROM COLLEGE_TRACKING_CYCLE')) return [[{ tracking_cycle_id: 9, course_id: 430, status: 'ended' }]]
       throw new Error(`Unexpected SQL: ${sql}`)
     },
   }
   await assert.rejects(
-    resumeCollegeTracking({ getConnection: async () => connection }, 7, {
-      academicYear: '2026-2027', yearLevel: '3rd Year', calendarType: 'semester', termCode: 'SEM_1',
-      timingMode: 'phase_only', initialTrackingPhase: 'Mid',
-    }, () => ({ program_duration_years: 4 })),
-    (error) => error.code === 'TERM_ALREADY_EXISTS' && error.status === 409
+    resumeCollegeTracking({ getConnection: async () => connection }, 7),
+    (error) => error.code === 'TRACKING_NOT_PAUSED' && error.status === 409
   )
 })
 
@@ -655,6 +702,77 @@ test('modern End check-in is created against the current term before GWA submiss
   assert.deepEqual(insertedValues, [7, 430, 77, '1st Trimester', 'End', '2nd Year'])
 })
 
+test('the next sequential check-in can start before its recommended timeframe', async () => {
+  let insertedValues = null
+  const connection = {
+    beginTransaction: async () => {}, commit: async () => {}, rollback: async () => {}, release: () => {},
+    query: async (sql, values) => {
+      if (sql.includes('FROM COLLEGE_TERM')) return [[{
+        term_id: 77, course_id: 430, year_level: '2nd Year', semester: '1st Semester',
+        semester_start_date: '2026-01-01', semester_end_date: '2026-04-11',
+        initial_tracking_phase: 'Early', timing_mode: 'exact',
+      }]]
+      if (sql.includes('SELECT DISTINCT sc.phase')) return [[{ phase: 'Early' }]]
+      if (sql.includes('SELECT checkin_id FROM SEMESTER_CHECKIN')) return [[]]
+      if (sql.includes('INSERT INTO SEMESTER_CHECKIN')) {
+        insertedValues = values
+        return [{ insertId: 92 }]
+      }
+      throw new Error(`Unexpected SQL: ${sql}`)
+    },
+  }
+  const result = await startNextCheckin({ getConnection: async () => connection }, 7, {
+    phase: 'Mid',
+    currentDate: new Date('2026-01-10T00:00:00Z'),
+  })
+  assert.equal(result.phase, 'Mid')
+  assert.deepEqual(insertedValues, [7, 430, 77, '1st Semester', 'Mid', '2nd Year'])
+})
+
+test('sequential availability follows completed state and skips an unrecorded past phase', () => {
+  assert.equal(getNextSequentialCheckinPhase([], 'Early'), 'Early')
+  assert.equal(getNextSequentialCheckinPhase([], 'Mid'), 'Mid')
+  assert.equal(getNextSequentialCheckinPhase(['Mid'], 'Mid'), 'End')
+  assert.equal(getNextSequentialCheckinPhase(['Mid'], null), 'End')
+  assert.equal(getNextSequentialCheckinPhase(['Early', 'Mid'], 'Early'), 'End')
+  assert.equal(getNextSequentialCheckinPhase(['Early', 'Mid', 'End'], 'Early'), null)
+})
+
+test('a Mid-start term can start End early but cannot skip directly to another phase', async () => {
+  const makePool = () => {
+    let insertedPhase = null
+    const connection = {
+      beginTransaction: async () => {}, commit: async () => {}, rollback: async () => {}, release: () => {},
+      query: async (sql, values) => {
+        if (sql.includes('FROM COLLEGE_TERM')) return [[{
+          term_id: 78, course_id: 430, year_level: '2nd Year', semester: '1st Semester',
+          semester_start_date: '2026-01-01', semester_end_date: '2026-04-11',
+          initial_tracking_phase: 'Mid', timing_mode: 'exact',
+        }]]
+        if (sql.includes('SELECT DISTINCT sc.phase')) return [[{ phase: 'Mid' }]]
+        if (sql.includes('SELECT checkin_id FROM SEMESTER_CHECKIN')) return [[]]
+        if (sql.includes('INSERT INTO SEMESTER_CHECKIN')) {
+          insertedPhase = values[4]
+          return [{ insertId: 93 }]
+        }
+        throw new Error(`Unexpected SQL: ${sql}`)
+      },
+    }
+    return { pool: { getConnection: async () => connection }, getInsertedPhase: () => insertedPhase }
+  }
+
+  const allowed = makePool()
+  assert.equal((await startNextCheckin(allowed.pool, 7, { phase: 'End' })).phase, 'End')
+  assert.equal(allowed.getInsertedPhase(), 'End')
+
+  const skipped = makePool()
+  await assert.rejects(
+    startNextCheckin(skipped.pool, 7, { phase: 'Early' }),
+    (error) => error.code === 'CHECKIN_NOT_AVAILABLE' && error.status === 409
+  )
+  assert.equal(skipped.getInsertedPhase(), null)
+})
+
 test('academic progression never skips semesters or exceeds the program duration', () => {
   assert.deepEqual(calculateNextAcademicStage('1st Year', '1st Semester', 4), {
     programCompleted: false,
@@ -817,7 +935,7 @@ test('semester progression safely reuses an already-created next term', async ()
   assert.equal(pending.state.inserts.length, 0)
 })
 
-test('semester cannot advance after the date alone or while End is missing', async () => {
+test('semester cannot advance while End is missing but completed check-ins may transition before the calendar end', async () => {
   const endMissing = semesterProgressionPool({ phases: ['Early', 'Mid'] })
   await assert.rejects(
     startNextSemester(
@@ -830,15 +948,14 @@ test('semester cannot advance after the date alone or while End is missing', asy
   )
 
   const notEnded = semesterProgressionPool({ endDate: '2099-12-15' })
-  await assert.rejects(
-    startNextSemester(
-      notEnded.pool,
-      7,
-      { academicYear: '2020-2021', semesterStartDate: '2021-01-10', semesterEndDate: '2021-05-20' },
-      () => ({ program_duration_years: 4 })
-    ),
-    (error) => error.code === 'SEMESTER_NOT_COMPLETE'
+  const advanced = await startNextSemester(
+    notEnded.pool,
+    7,
+    { academicYear: '2020-2021', semesterStartDate: '2021-01-10', semesterEndDate: '2021-05-20' },
+    () => ({ program_duration_years: 4 })
   )
+  assert.equal(advanced.created, true)
+  assert.equal(notEnded.state.inserts.length, 1)
 })
 
 test('Summer advances to the next year while ambiguous Third Semester requires confirmation', async () => {
