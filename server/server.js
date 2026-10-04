@@ -47,7 +47,7 @@ import {
   getAssessmentHistory,
   getAssessmentHistoryDetail,
 } from './services/assessmentHistoryService.js'
-import { getOwnedAttempt, parseAttemptJson, requestedAttemptId, updateAttempt } from './services/assessmentAttemptService.js'
+import { createAssessmentAttempt, ensureAttemptPersonalFactors, ensureFinalizedSkillResponses, getCurrentAttempt, getOwnedAttempt, hasCompletePersonalityPrerequisites, insertFinalizedSkillResponses, parseAttemptJson, requestedAttemptId, scoreSkillAnswers, updateAttempt, updateCurrentAttemptDraft } from './services/assessmentAttemptService.js'
 import {
   CollegeTrackingError,
   changeCollegeProgram,
@@ -98,8 +98,8 @@ app.use('/api/public/directions', directionsRoutes)
 
 app.post('/api/assessment-attempts', authenticateToken, async (req, res) => {
   try {
-    const [result] = await pool.query(`INSERT INTO ASSESSMENT_ATTEMPT (user_id, status) VALUES (?, 'IN_PROGRESS')`, [req.user.userId])
-    res.status(201).json({ attemptId: result.insertId })
+    const attempt = await createAssessmentAttempt(pool, req.user.userId)
+    res.status(201).json({ attemptId: attempt.attemptId, personalFactorsSnapshotted: Boolean(attempt.personalFactors) })
   } catch (error) {
     console.error('Assessment attempt start error:', error)
     res.status(500).json({ message: 'Could not start a new assessment attempt.' })
@@ -111,13 +111,79 @@ app.post('/api/assessment-attempts/recover', authenticateToken, async (req, res)
     const requestedId = requestedAttemptId(req)
     if (requestedId) {
       const attempt = await getOwnedAttempt(pool, req.user.userId, requestedId)
-      if (attempt?.status === 'IN_PROGRESS') return res.json({ attemptId: requestedId, recovered: true })
+      if (attempt?.status === 'IN_PROGRESS') {
+        const personalFactors = await ensureAttemptPersonalFactors(pool, req.user.userId, requestedId)
+        return res.json({ attemptId: requestedId, recovered: true, personalFactorsSnapshotted: Boolean(personalFactors) })
+      }
     }
-    const [result] = await pool.query(`INSERT INTO ASSESSMENT_ATTEMPT (user_id, status) VALUES (?, 'IN_PROGRESS')`, [req.user.userId])
-    res.status(201).json({ attemptId: result.insertId, recovered: false })
+    const [activeAttempts] = await pool.query(
+      `SELECT attempt_id FROM ASSESSMENT_ATTEMPT
+       WHERE user_id = ? AND status = 'IN_PROGRESS'
+       ORDER BY attempt_id DESC LIMIT 1`,
+      [req.user.userId]
+    )
+    if (activeAttempts.length) {
+      const personalFactors = await ensureAttemptPersonalFactors(pool, req.user.userId, activeAttempts[0].attempt_id)
+      return res.json({ attemptId: activeAttempts[0].attempt_id, recovered: true, personalFactorsSnapshotted: Boolean(personalFactors) })
+    }
+    const attempt = await createAssessmentAttempt(pool, req.user.userId)
+    res.status(201).json({ attemptId: attempt.attemptId, recovered: false, personalFactorsSnapshotted: Boolean(attempt.personalFactors) })
   } catch (error) {
     console.error('Assessment attempt recovery error:', error)
     res.status(500).json({ message: 'Could not continue the assessment. Please try again.' })
+  }
+})
+
+app.get('/api/assessment-attempts/current', authenticateToken, async (req, res) => {
+  try {
+    const requestedId = requestedAttemptId(req)
+    const attempt = requestedId
+      ? await getOwnedAttempt(pool, req.user.userId, requestedId)
+      : await getCurrentAttempt(pool, req.user.userId)
+    if (!attempt || attempt.status !== 'IN_PROGRESS') return res.status(404).json({ message: 'Assessment progress is no longer active.' })
+    res.json({
+      attemptId: attempt.attempt_id,
+      interests: parseAttemptJson(attempt.interests, []),
+      skillQuestions: parseAttemptJson(attempt.skill_questions, []),
+      skillAnswers: parseAttemptJson(attempt.skill_answers, []),
+      skillResult: parseAttemptJson(attempt.skill_result, null),
+      personalityAnswers: parseAttemptJson(attempt.personality_answers, {}),
+      personalFactors: parseAttemptJson(attempt.personal_factors, null),
+    })
+  } catch (error) {
+    console.error('Assessment attempt fetch error:', error)
+    res.status(500).json({ message: 'Could not load the active assessment attempt.' })
+  }
+})
+
+app.patch('/api/assessment-attempts/current', authenticateToken, async (req, res) => {
+  const body = req.body || {}
+  const draft = {
+    ...(body.interests_json !== undefined || body.interests !== undefined
+      ? { interests: body.interests_json ?? body.interests }
+      : {}),
+    ...(body.skill_questions !== undefined || body.skillQuestions !== undefined
+      ? { skill_questions: body.skill_questions ?? body.skillQuestions }
+      : {}),
+    ...(body.skill_answers !== undefined || body.skillAnswers !== undefined
+      ? { skill_answers: body.skill_answers ?? body.skillAnswers }
+      : {}),
+    ...(body.personality_answers !== undefined || body.personalityAnswers !== undefined
+      ? { personality_answers: body.personality_answers ?? body.personalityAnswers }
+      : {}),
+  }
+  if (!Object.keys(draft).length) return res.status(400).json({ message: 'Provide at least one supported assessment draft field.' })
+  if (draft.interests !== undefined && !Array.isArray(draft.interests)) return res.status(400).json({ message: 'interests_json must be an array.' })
+  if (draft.skill_questions !== undefined && !Array.isArray(draft.skill_questions)) return res.status(400).json({ message: 'skill_questions must be an array.' })
+  if (draft.skill_answers !== undefined && !Array.isArray(draft.skill_answers)) return res.status(400).json({ message: 'skill_answers must be an array.' })
+  if (draft.personality_answers !== undefined && (!draft.personality_answers || typeof draft.personality_answers !== 'object' || Array.isArray(draft.personality_answers))) return res.status(400).json({ message: 'personality_answers must be an object.' })
+  try {
+    const saved = await updateCurrentAttemptDraft(pool, req.user.userId, draft, requestedAttemptId(req))
+    if (!saved) return res.status(404).json({ message: 'No active assessment attempt exists for this user.' })
+    res.json({ saved: true })
+  } catch (error) {
+    console.error('Assessment attempt draft save error:', error)
+    res.status(500).json({ message: 'Could not save assessment progress.' })
   }
 })
 
@@ -234,42 +300,34 @@ app.post('/api/quiz', authenticateToken, async (req, res) => {
       return res.status(400).json({ message: 'One or more question IDs are invalid.' })
     }
 
-    const questionMap = {}
-    questions.forEach((q) => {
-      questionMap[q.question_id] = q
-    })
-
-    let correctCount = 0
-    const domainScores = {}
-    const scoredAnswers = []
+    const { scoredAnswers, correctCount, domainScores } = scoreSkillAnswers(answers, questions)
     const attemptId = requestedAttemptId(req)
 
-    for (const answer of answers) {
-      const question = questionMap[answer.question_id]
-      if (!question) continue
-
-      const isCorrect = question.correct_answer === answer.selected_option ? 1 : 0
-      if (isCorrect) correctCount++
-
-      if (!domainScores[question.dimension]) {
-        domainScores[question.dimension] = { correct: 0, total: 0 }
-      }
-      domainScores[question.dimension].total++
-      if (isCorrect) domainScores[question.dimension].correct++
-      scoredAnswers.push({ ...answer, is_correct: isCorrect })
-
-      if (!attemptId) await pool.query(
-        `INSERT INTO SKILL_RESPONSE (user_id, question_id, selected_option, is_correct)
-         VALUES (?, ?, ?, ?)`,
-        [userId, answer.question_id, answer.selected_option, isCorrect]
-      )
-    }
-
     if (attemptId) {
-      const attempt = await getOwnedAttempt(pool, userId, attemptId)
-      if (!attempt || attempt.status !== 'IN_PROGRESS') return res.status(409).json({ message: 'Your assessment session needs to be refreshed. Please return to Personal Factors and continue again.' })
-      await updateAttempt(pool, userId, attemptId, 'skill_answers', scoredAnswers)
-      await updateAttempt(pool, userId, attemptId, 'skill_result', { totalCorrect: correctCount, totalQuestions: answers.length, domainScores })
+      const connection = await pool.getConnection()
+      try {
+        await connection.beginTransaction()
+        const attempt = await getOwnedAttempt(connection, userId, attemptId, { forUpdate: true })
+        if (!attempt || attempt.status !== 'IN_PROGRESS') {
+          await connection.rollback()
+          return res.status(409).json({ message: 'Your assessment session needs to be refreshed. Please return to Personal Factors and continue again.' })
+        }
+        if (parseAttemptJson(attempt.skill_result, null)) {
+          await connection.rollback()
+          return res.status(409).json({ message: 'Academic Skills has already been finalized for this assessment attempt.' })
+        }
+        await insertFinalizedSkillResponses(connection, userId, scoredAnswers)
+        await updateAttempt(connection, userId, attemptId, 'skill_answers', scoredAnswers)
+        await updateAttempt(connection, userId, attemptId, 'skill_result', { totalCorrect: correctCount, totalQuestions: answers.length, domainScores })
+        await connection.commit()
+      } catch (error) {
+        await connection.rollback()
+        throw error
+      } finally {
+        connection.release()
+      }
+    } else {
+      await insertFinalizedSkillResponses(pool, userId, scoredAnswers)
     }
 
     res.json({
@@ -419,9 +477,9 @@ app.get('/api/college/status', authenticateToken, async (req, res) => {
   try {
     const status = await getCollegeStatus(pool, req.user.userId)
     if (!status) {
-      return res.status(404).json({ message: 'No college enrollment found' })
+      return res.json({ active: false, trackingCycle: null })
     }
-    res.json(status)
+    res.json({ active: status.lifecycleStatus === 'active', ...status })
   } catch (error) {
     console.error('College status fetch error:', error)
     res.status(500).json({ message: 'Server error fetching college status' })
@@ -589,29 +647,21 @@ app.post('/api/mbti', authenticateToken, async (req, res) => {
       try {
         await connection.beginTransaction()
         const attempt = await getOwnedAttempt(connection, userId, attemptId, { forUpdate: true })
+        const personalFactors = parseAttemptJson(attempt?.personal_factors, null) || await ensureAttemptPersonalFactors(connection, userId, attemptId)
         const interests = parseAttemptJson(attempt?.interests, [])
         const skillAnswers = parseAttemptJson(attempt?.skill_answers, [])
-        const [profileRows] = await connection.query(
-          `SELECT profile_id FROM PROFILE
-           WHERE user_id = ?
-             AND factor_physical_impact BETWEEN 1 AND 4
-             AND factor_health_impact BETWEEN 1 AND 4
-             AND factor_financial_impact BETWEEN 1 AND 4
-             AND factor_family_impact BETWEEN 1 AND 4
-             AND factor_work_impact BETWEEN 1 AND 4
-           LIMIT 1`,
-          [userId]
-        )
-        if (!attempt || attempt.status !== 'IN_PROGRESS' || profileRows.length !== 1 || interests.length < 3 || skillAnswers.length !== 30) {
+        const attemptForValidation = personalFactors && !attempt?.personal_factors
+          ? { ...attempt, personal_factors: personalFactors }
+          : attempt
+        if (!hasCompletePersonalityPrerequisites(attemptForValidation)) {
           await connection.rollback()
           return res.status(400).json({ message: 'Complete every assessment section before submitting Personality.' })
         }
         await connection.query('DELETE FROM INTEREST_RESPONSE WHERE user_id = ?', [userId])
         for (const interest of interests) await connection.query('INSERT INTO INTEREST_RESPONSE (user_id, interest_name) VALUES (?, ?)', [userId, interest])
-        for (const answer of skillAnswers) await connection.query(
-          'INSERT INTO SKILL_RESPONSE (user_id, question_id, selected_option, is_correct) VALUES (?, ?, ?, ?)',
-          [userId, answer.question_id, answer.selected_option, answer.is_correct]
-        )
+        // Compatibility for attempts whose Academic Skills result was finalized
+        // before SKILL_RESPONSE persistence moved out of the Personality flow.
+        await ensureFinalizedSkillResponses(connection, userId, skillAnswers)
         const [personality] = await connection.query(
           `INSERT INTO PERSONALITY_ASSESSMENT (user_id, mbti_type, score_ei, score_ns, score_tf, score_jp) VALUES (?, ?, ?, ?, ?, ?)`,
           [userId, mbtiType, scoreEI, scoreNS, scoreTF, scoreJP]

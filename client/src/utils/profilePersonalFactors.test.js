@@ -5,6 +5,7 @@ import {
   applyFactorApplicability,
   buildProfilePayload,
   deriveFactorApplicability,
+  isPersonalFactorsComplete,
   shouldShowFactorDetails,
 } from './profilePersonalFactors.js'
 
@@ -24,6 +25,14 @@ test('structured values derive safe Yes and No applicability without fabricating
     physical: 'yes', health: 'no', financial: 'no', family: 'no', work: 'yes',
   })
   assert.equal(deriveFactorApplicability({}).physical, '')
+})
+
+test('profile completeness requires every Personal Factor and conditional physical details', () => {
+  assert.equal(isPersonalFactorsComplete(saved), true)
+  assert.equal(isPersonalFactorsComplete({}), false)
+  assert.equal(isPersonalFactorsComplete({ ...saved, factor_family_impact: null }), false)
+  assert.equal(isPersonalFactorsComplete({ ...saved, physical_accessibility_difficulties: { seeing: 'some_difficulty' } }), false)
+  assert.equal(isPersonalFactorsComplete({ ...saved, factor_physical_impact: 1, physical_accessibility_areas: [], physical_accessibility_difficulties: {} }), true)
 })
 
 test('No maps every factor to impact 1 and Physical No clears stale details', () => {

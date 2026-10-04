@@ -15,6 +15,19 @@ test('retake clears all prior drafts and starts with a distinct attempt id', () 
   assert.deepEqual(assessmentHeaders(store), { 'X-Assessment-Attempt-Id': '42' })
 })
 
+test('revisiting steps keeps drafts when the active attempt id is unchanged', () => {
+  const store = storage({
+    [ASSESSMENT_SESSION_KEYS.attemptId]: '42',
+    [ASSESSMENT_SESSION_KEYS.interests]: '{"selected":["Reading"]}',
+    [ASSESSMENT_SESSION_KEYS.skills]: '{"answers":{"1":"A"}}',
+    [ASSESSMENT_SESSION_KEYS.personality]: '{"answers":{"1":5}}',
+  })
+  assert.deepEqual(assessmentHeaders(store), { 'X-Assessment-Attempt-Id': '42' })
+  assert.notEqual(store.getItem(ASSESSMENT_SESSION_KEYS.interests), null)
+  assert.notEqual(store.getItem(ASSESSMENT_SESSION_KEYS.skills), null)
+  assert.notEqual(store.getItem(ASSESSMENT_SESSION_KEYS.personality), null)
+})
+
 test('finishing a retake returns normal revisits to saved answers', () => {
   const store = storage()
   beginAssessmentAttempt(store, 42)

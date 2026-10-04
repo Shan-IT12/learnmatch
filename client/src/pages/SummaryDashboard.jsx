@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { IconArrowRight, IconRefresh, IconSchool, IconHistory, IconUser, IconHeart, IconBrain, IconShieldCheck, IconStar } from '@tabler/icons-react'
 import { beginAssessmentAttempt } from '../utils/assessmentSession'
+import { getDimensionResults, MBTI_TYPE_CONTENT } from '../data/mbtiResultContent'
 
 const personalFactorLabels = {
   factor_physical_impact: 'Physical / accessibility',
@@ -114,12 +115,9 @@ function SummaryDashboard() {
   )
   const skillPercent = skillTotals.total ? Math.round((skillTotals.correct / skillTotals.total) * 100) : null
  
-  const mbtiDimensionLabels = {
-    EI: ['E', 'I'],
-    NS: ['N', 'S'],
-    TF: ['T', 'F'],
-    JP: ['J', 'P'],
-  }
+  const personalityDimensions = mbti ? getDimensionResults(mbti.mbtiType, mbti.scores) : []
+  const personalityMeaning = personalityDimensions.map(({ preferredName }) => preferredName).join(', ')
+  const personalitySummary = mbti ? MBTI_TYPE_CONTENT[mbti.mbtiType]?.summary : ''
  
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-[#fbf8f3] text-gray-900">
@@ -284,26 +282,30 @@ function SummaryDashboard() {
         </div>
         <section className="mb-10 rounded-[26px] border border-white/90 bg-white/78 p-5 shadow-[0_20px_55px_-42px_rgba(120,53,15,.5)] sm:p-7">
           {mbti ? (
-            <div className="grid gap-6 md:grid-cols-[13rem_minmax(0,1fr)] md:items-center">
-              <div className="rounded-2xl bg-slate-950 p-5 text-white shadow-[0_16px_34px_-24px_rgba(15,23,42,.75)]"><p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Personality Type</p><p className="mt-2 text-4xl font-black tracking-[0.16em] text-orange-400">{mbti.mbtiType}</p><p className="mt-2 text-xs leading-relaxed text-slate-400">Your four-letter preference profile</p></div>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                {Object.entries(mbtiDimensionLabels).map(([key, [first, second]]) => {
-                  const percent = Math.round(mbti.scores[key])
-                  return (
-                    <div key={key}>
-                      <div className="flex justify-between text-[11px] text-gray-500 mb-1">
-                        <span>{first}</span>
-                        <span>{second}</span>
-                      </div>
-                      <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-gradient-to-r from-orange-400 to-orange-600 rounded-full"
-                          style={{ width: `${percent}%` }}
-                        />
-                      </div>
+            <div className="grid gap-6 md:grid-cols-[14rem_minmax(0,1fr)] md:items-start">
+              <div className="rounded-2xl bg-slate-950 p-5 text-white shadow-[0_16px_34px_-24px_rgba(15,23,42,.75)]"><p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Personality Type</p><p className="mt-2 text-4xl font-black tracking-[0.16em] text-orange-400">{mbti.mbtiType}</p><p className="mt-3 text-sm font-semibold leading-6 text-white">{personalityMeaning}</p></div>
+              <div className="space-y-5">
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                {personalityDimensions.map((dimension) => (
+                    <div key={dimension.key} className="rounded-xl border border-gray-100 bg-gray-50 px-3 py-3 text-center">
+                      <p className="text-lg font-black text-gray-950">{dimension.preferred}</p>
+                      <p className="mt-0.5 text-xs font-semibold text-orange-600">{dimension.preferred === dimension.left ? dimension.leftPercent : dimension.rightPercent}%</p>
+                      <p className="mt-1 text-[10px] text-gray-500">{dimension.preferredName}</p>
                     </div>
-                  )
-                })}
+                ))}
+                </div>
+                {personalitySummary && <div className="rounded-2xl border border-orange-100 bg-orange-50/55 px-4 py-3.5"><p className="text-xs font-bold uppercase tracking-wide text-orange-700">Personality Summary</p><p className="mt-1.5 text-sm leading-6 text-gray-700">{personalitySummary}</p></div>}
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-wide text-gray-500">What your letters mean</p>
+                  <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                    {personalityDimensions.map((dimension) => (
+                      <div key={`meaning-${dimension.key}`} className="flex gap-3 rounded-xl border border-gray-100 bg-gray-50/80 p-3">
+                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-orange-100 text-sm font-black text-orange-700">{dimension.preferred}</span>
+                        <p className="text-xs leading-5 text-gray-600"><strong className="text-gray-900">{dimension.preferredName}:</strong> You may prefer {dimension.preferredMeaning}.</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
           ) : (

@@ -1051,3 +1051,11 @@ test('all College Phase routes require authentication', () => {
     assert.match(serverSource, new RegExp(`app\\.(?:get|post)\\('${path.replaceAll('/', '\\/')}', authenticateToken`))
   }
 })
+
+test('College status returns a successful inactive payload when no tracking cycle exists', () => {
+  const serverSource = fs.readFileSync(new URL('../server.js', import.meta.url), 'utf8')
+  const route = serverSource.match(/app\.get\('\/api\/college\/status',[\s\S]*?\n\}\)\r?\n/)[0]
+  assert.match(route, /res\.json\(\{ active: false, trackingCycle: null \}\)/)
+  assert.doesNotMatch(route, /res\.status\(404\)/)
+  assert.match(route, /active: status\.lifecycleStatus === 'active'/)
+})

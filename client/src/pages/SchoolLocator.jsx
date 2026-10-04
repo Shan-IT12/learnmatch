@@ -186,7 +186,6 @@ function SchoolLocator() {
                   ) : (
                     <Link to={backNavigation.path} state={backNavigation.state} className="bg-gray-900 text-white px-5 py-3 rounded-xl text-sm font-semibold hover:bg-gray-800 transition">{backNavigation.label}</Link>
                   )}
-                  <Link to="/courses/search" className="border border-orange-200 bg-orange-50 text-orange-700 px-5 py-3 rounded-xl text-sm font-semibold hover:bg-orange-100 transition">Explore other courses</Link>
                 </div>
               </section>
             ) : (

@@ -12,6 +12,8 @@ import {
   markAssessmentStepComplete,
   readAssessmentSession,
   writeAssessmentSession,
+  readActiveAttempt,
+  saveActiveAttemptDraft,
 } from '../../utils/assessmentSession'
 
 function getQuestionGuide(question) {
@@ -167,10 +169,25 @@ function OnboardingSkills() {
   const [showExplanation, setShowExplanation] = useState(false)
   const [questionError, setQuestionError] = useState('')
   const [assessmentAccessError, setAssessmentAccessError] = useState('')
+  const [attemptLoaded, setAttemptLoaded] = useState(false)
+
+  useEffect(() => {
+    readActiveAttempt(import.meta.env.VITE_API_URL, localStorage.getItem('token'), storage)
+      .then((attempt) => {
+        if (!attempt) return
+        if (attempt.skillQuestions?.length) setQuestions(attempt.skillQuestions)
+        if (attempt.skillAnswers?.length) setAnswers(Object.fromEntries(
+          attempt.skillAnswers.map((answer) => [answer.question_id, answer.selected_option])
+        ))
+      })
+      .catch(() => setAssessmentAccessError('Could not restore your saved Academic Skills progress. Please refresh.'))
+      .finally(() => setAttemptLoaded(true))
+  }, [storage])
 
   // A persisted submission is authoritative. Only load editable questions when
   // the account has no saved Academic Skills result.
   useEffect(() => {
+    if (!attemptLoaded) return
     const token = localStorage.getItem('token')
     const headers = assessmentHeaders(storage, { Authorization: `Bearer ${token}` })
 
@@ -211,7 +228,7 @@ function OnboardingSkills() {
         setAssessmentAccessError('Could not confirm your saved Academic Skills result. Please refresh.')
         setLoading(false)
       })
-  }, [questions.length, storage])
+  }, [attemptLoaded, questions.length, storage])
 
   useEffect(() => {
     if (!questions.length) return
@@ -220,7 +237,18 @@ function OnboardingSkills() {
       answers,
       currentIndex,
     })
-  }, [answers, currentIndex, questions, storage])
+    if (!attemptLoaded) return
+    const skillAnswers = Object.entries(answers).map(([questionId, selectedOption]) => ({
+      question_id: Number(questionId), selected_option: selectedOption,
+    }))
+    const timer = setTimeout(() => {
+      saveActiveAttemptDraft(import.meta.env.VITE_API_URL, localStorage.getItem('token'), storage, {
+        skill_questions: questions,
+        skill_answers: skillAnswers,
+      }).catch(() => console.warn('Academic Skills draft autosave will retry on the next change.'))
+    }, 250)
+    return () => clearTimeout(timer)
+  }, [answers, attemptLoaded, currentIndex, questions, storage])
 
   const handleSelect = (questionId, choice) => {
     setAnswers((prev) => ({ ...prev, [questionId]: choice }))

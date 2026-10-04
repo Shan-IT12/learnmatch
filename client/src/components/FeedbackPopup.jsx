@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { IconStar, IconStarFilled, IconX } from '@tabler/icons-react'
+import { setFeedbackPromptState, shouldShowFeedbackPrompt } from '../utils/feedbackPrompt'
 
-function FeedbackPopup() {
+function FeedbackPopup({ promptKey, milestoneReached = false }) {
   const navigate = useNavigate()
   const token = localStorage.getItem('token')
 
@@ -12,22 +13,20 @@ function FeedbackPopup() {
   const [submitted, setSubmitted] = useState(false)
 
   useEffect(() => {
-    const alreadyShown = sessionStorage.getItem('feedbackPopupShown')
-    if (!alreadyShown) {
-      const timer = setTimeout(() => setVisible(true), 1500)
-      return () => clearTimeout(timer)
-    }
-  }, [])
+    if (!shouldShowFeedbackPrompt(localStorage, promptKey, milestoneReached)) return undefined
+    const timer = setTimeout(() => setVisible(true), 2000)
+    return () => clearTimeout(timer)
+  }, [milestoneReached, promptKey])
 
   const dismiss = () => {
-    sessionStorage.setItem('feedbackPopupShown', 'true')
+    setFeedbackPromptState(localStorage, promptKey, 'dismissed')
     setVisible(false)
   }
 
   const handleStarClick = async (star) => {
     setRating(star)
     try {
-      await fetch(`${import.meta.env.VITE_API_URL}/api/feedback`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/feedback`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -35,8 +34,9 @@ function FeedbackPopup() {
         },
         body: JSON.stringify({ rating: star, category: 'General Feedback' }),
       })
+      if (!response.ok) throw new Error('Feedback could not be submitted.')
       setSubmitted(true)
-      sessionStorage.setItem('feedbackPopupShown', 'true')
+      setFeedbackPromptState(localStorage, promptKey, 'submitted')
       setTimeout(() => setVisible(false), 2000)
     } catch {
       dismiss()
@@ -88,7 +88,7 @@ function FeedbackPopup() {
           <button
             onClick={() => {
               dismiss()
-              navigate('/feedback')
+              navigate('/feedback', { state: { feedbackPromptKey: promptKey } })
             }}
             className="text-xs text-orange-500 hover:underline font-medium"
           >

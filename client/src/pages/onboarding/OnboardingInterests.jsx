@@ -14,6 +14,8 @@ import {
   readAssessmentSession,
   writeAssessmentSession,
   assessmentHeaders,
+  readActiveAttempt,
+  saveActiveAttemptDraft,
 } from '../../utils/assessmentSession'
 
 function OnboardingInterests() {
@@ -27,6 +29,17 @@ function OnboardingInterests() {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [selectionMessage, setSelectionMessage] = useState('')
+  const [attemptLoaded, setAttemptLoaded] = useState(false)
+
+  useEffect(() => {
+    const storage = typeof sessionStorage === 'undefined' ? null : sessionStorage
+    readActiveAttempt(import.meta.env.VITE_API_URL, localStorage.getItem('token'), storage)
+      .then((attempt) => {
+        if (attempt && Array.isArray(attempt.interests) && attempt.interests.length > 0) setSelected(attempt.interests)
+      })
+      .catch(() => setError('Could not restore your saved assessment progress. Please refresh.'))
+      .finally(() => setAttemptLoaded(true))
+  }, [])
 
   useEffect(() => {
     writeAssessmentSession(
@@ -34,7 +47,13 @@ function OnboardingInterests() {
       ASSESSMENT_SESSION_KEYS.interests,
       { selected }
     )
-  }, [selected])
+    if (!attemptLoaded) return
+    const timer = setTimeout(() => {
+      saveActiveAttemptDraft(import.meta.env.VITE_API_URL, localStorage.getItem('token'), sessionStorage, { interests_json: selected })
+        .catch(() => console.warn('Interest draft autosave will retry on the next change.'))
+    }, 250)
+    return () => clearTimeout(timer)
+  }, [attemptLoaded, selected])
 
   const toggleInterest = (name) => {
     const result = updateInterestSelection(selected, name)

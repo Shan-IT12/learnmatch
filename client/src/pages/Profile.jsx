@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { IconArrowLeft, IconEdit, IconUser } from '@tabler/icons-react'
-import { deriveFactorApplicability } from '../utils/profilePersonalFactors'
+import { deriveFactorApplicability, isPersonalFactorsComplete } from '../utils/profilePersonalFactors'
 
 export { ApplicabilityQuestion, ImpactOptions } from '../components/PersonalFactorsForm'
 export { UsernameField } from './ProfileEdit'
@@ -29,15 +29,17 @@ export default function Profile() {
   useEffect(() => {
     if (!token) { navigate('/login', { replace: true }); return }
     fetch(`${import.meta.env.VITE_API_URL}/api/profile`, { headers: { Authorization: `Bearer ${token}` } })
-      .then((response) => { if (response.status === 401 || response.status === 403) { navigate('/login', { replace: true }); return null }; if (!response.ok) throw new Error(); return response.json() })
+      .then((response) => { if (response.status === 401 || response.status === 403) { navigate('/login', { replace: true }); return null }; if (response.status === 404 || response.status === 204) { navigate('/profile/edit', { replace: true }); return null }; if (!response.ok) throw new Error(); return response.json() })
       .then((data) => {
         if (!data) return
         setUsername(data.username || localStorage.getItem('username') || '')
-        if (!data.profile) return
+        if (!data.profile) { navigate('/profile/edit', { replace: true }); return }
         const rawAreas = parseJsonValue(data.profile.physical_accessibility_areas, [])
         const areas = Array.isArray(rawAreas) ? rawAreas.filter((area) => area !== 'none') : []
         const rawDifficulties = parseJsonValue(data.profile.physical_accessibility_difficulties, {})
-        setProfile({ ...data.profile, physical_accessibility_areas: areas, physical_accessibility_difficulties: rawDifficulties && typeof rawDifficulties === 'object' ? rawDifficulties : {} })
+        const loaded = { ...data.profile, physical_accessibility_areas: areas, physical_accessibility_difficulties: rawDifficulties && typeof rawDifficulties === 'object' ? rawDifficulties : {} }
+        if (!isPersonalFactorsComplete(loaded)) { navigate('/profile/edit', { replace: true }); return }
+        setProfile(loaded)
       })
       .catch(() => setError('Could not load your profile.'))
       .finally(() => setLoading(false))

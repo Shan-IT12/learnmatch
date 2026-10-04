@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from "react-router-dom";
 import { readCompletedAssessmentSteps } from '../utils/assessmentSession'
 import useActiveCollegePhase from '../hooks/useActiveCollegePhase'
+import { getAssessmentCancelDestination } from '../utils/assessmentReturnDestination'
 
 const steps = [
     { label: 'Personal Factors', path: '/onboarding/profile' },
@@ -27,11 +28,12 @@ function OnboardingLayout({
     typeof sessionStorage === 'undefined' ? null : sessionStorage
   )
   const furthestReachedStep = Math.max(currentStep, ...completedSteps)
+  const cancelDestination = getAssessmentCancelDestination(hasActiveCollegePhase)
 
   const handleBack = () => {
     if (currentStep === 1) {
       if (hasActiveCollegePhase === null) return
-      navigate(hasActiveCollegePhase ? '/college' : '/dashboard/summary')
+      navigate(cancelDestination.path)
     } else {
       navigate(steps[currentStep - 2].path)
     }
@@ -56,7 +58,7 @@ function OnboardingLayout({
 
   const confirmExit = () => {
     if (hasActiveCollegePhase === null) return
-    navigate(hasActiveCollegePhase ? '/college' : '/dashboard/summary')
+    navigate(cancelDestination.path)
   }
 
   return (

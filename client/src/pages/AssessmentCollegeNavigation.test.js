@@ -13,11 +13,17 @@ test('active College results hide the full Summary Dashboard shortcut', async ()
 })
 
 test('Career Path resolves active College state and returns directly to assessment results', async () => {
-  const careerPath = await source('./CareerPath.jsx')
+  const [careerPath, results] = await Promise.all([
+    source('./CareerPath.jsx'),
+    source('./Results.jsx'),
+  ])
   assert.match(careerPath, /useActiveCollegePhase/)
-  assert.match(careerPath, /if \(hasActiveCollegePhase\)[\s\S]*?navigate\('\/results'\)/)
+  assert.match(careerPath, /if \(hasActiveCollegePhase \|\| !cameFromCareerPaths\)[\s\S]*?navigate\('\/results'\)/)
   assert.match(careerPath, /Back to Results/)
   assert.match(careerPath, /hasActiveCollegePhase === false/)
+  assert.match(results, /source: 'results'/)
+  assert.match(careerPath, /location\.state\?\.source === 'career-paths'/)
+  assert.match(careerPath, /source: 'career-paths'/)
 })
 
 test('School Locator resolves active College state independently of temporary route state', async () => {
@@ -25,6 +31,8 @@ test('School Locator resolves active College state independently of temporary ro
   assert.match(locator, /useActiveCollegePhase/)
   assert.match(locator, /hasActiveCollegePhase[\s\S]*?\? 'results'/)
   assert.match(locator, /Resolving return destination/)
+  assert.match(locator, /No school match is currently available for this course\./)
+  assert.doesNotMatch(locator, /Explore other courses/)
   assert.match(locator, /<PublicHeader activeCollegePhase=\{hasActiveCollegePhase\}/)
   const header = await source('../components/PublicHeader.jsx')
   assert.match(header, /suppressGenericNavigation/)
@@ -37,10 +45,12 @@ test('assessment cancel and Step 1 back use persisted active College Phase statu
     source('../hooks/useActiveCollegePhase.js'),
   ])
   assert.match(layout, /useActiveCollegePhase\(\)/)
-  assert.match(layout, /hasActiveCollegePhase \? '\/college' : '\/dashboard\/summary'/)
+  assert.match(layout, /getAssessmentCancelDestination\(hasActiveCollegePhase\)/)
+  assert.match(layout, /navigate\(cancelDestination\.path\)/)
   assert.match(layout, /Cancel Assessment/)
-  assert.doesNotMatch(layout, /navigate\('\/dashboard\/summary'\)/)
+  assert.doesNotMatch(layout, /\/dashboard\/summary/)
   assert.match(hook, /api\/college\/status/)
-  assert.match(hook, /status\?\.lifecycleStatus === 'active'/)
+  assert.match(hook, /status\?\.active === true/)
   assert.match(hook, /setHasActiveCollegePhase\(null\)/)
+  assert.match(hook, /statusRequest\?\.token === token/)
 })

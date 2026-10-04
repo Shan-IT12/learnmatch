@@ -29,6 +29,18 @@ export function deriveFactorApplicability(profile = {}) {
   return applicability
 }
 
+export function isPersonalFactorsComplete(profile = {}) {
+  const applicability = deriveFactorApplicability(profile)
+  if (PERSONAL_FACTOR_KEYS.some((factor) => !applicability[factor])) return false
+  if (PERSONAL_FACTOR_KEYS.some((factor) => applicability[factor] === 'yes' && ![1, 2, 3, 4].includes(Number(profile[impactField(factor)])))) return false
+  if (applicability.physical === 'yes') {
+    const areas = Array.isArray(profile.physical_accessibility_areas) ? profile.physical_accessibility_areas : []
+    const difficulties = profile.physical_accessibility_difficulties && typeof profile.physical_accessibility_difficulties === 'object' ? profile.physical_accessibility_difficulties : {}
+    if (areas.length === 0 || areas.some((area) => !['some_difficulty', 'a_lot_of_difficulty', 'cannot_do'].includes(difficulties[area]))) return false
+  }
+  return true
+}
+
 export function applyFactorApplicability(profile, factor, answer) {
   const next = { ...profile, [impactField(factor)]: answer === 'no' ? 1 : '' }
   if (factor === 'physical' && answer === 'no') {

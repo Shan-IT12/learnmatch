@@ -16,6 +16,34 @@ export function assessmentHeaders(storage, headers = {}) {
   return attemptId ? { ...headers, 'X-Assessment-Attempt-Id': String(attemptId) } : headers
 }
 
+export async function readActiveAttempt(apiUrl, token, storage) {
+  if (!getAssessmentAttemptId(storage)) return null
+  const response = await fetch(`${apiUrl}/api/assessment-attempts/current`, {
+    headers: assessmentHeaders(storage, { Authorization: `Bearer ${token}` }),
+  })
+  if (!response.ok) throw new Error('Could not load assessment progress.')
+  return response.json()
+}
+
+export async function saveActiveAttemptDraft(apiUrl, token, storage, draft) {
+  if (!getAssessmentAttemptId(storage)) return
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    try {
+      const response = await fetch(`${apiUrl}/api/assessment-attempts/current`, {
+        method: 'PATCH',
+        headers: assessmentHeaders(storage, { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }),
+        body: JSON.stringify(draft),
+      })
+      if (response.ok) return
+      if (response.status < 500) throw new Error('Could not save assessment progress.')
+    } catch (error) {
+      if (attempt === 1) throw error
+    }
+    await new Promise((resolve) => setTimeout(resolve, 300))
+  }
+  throw new Error('Could not save assessment progress.')
+}
+
 export function beginAssessmentAttempt(storage, attemptId) {
   if (!storage) return
   Object.values(ASSESSMENT_SESSION_KEYS).forEach((key) => storage.removeItem(key))

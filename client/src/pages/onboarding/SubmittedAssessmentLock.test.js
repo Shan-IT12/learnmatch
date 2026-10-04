@@ -47,7 +47,8 @@ test('retake reuses canonical Personal Factors while Profile keeps separate view
   assert.match(onboardingProfile, /Edit Personal Factors/)
   assert.match(onboardingProfile, /setIsEditing\(false\)/)
   assert.match(onboardingProfile, /api\/assessment-attempts\/recover/)
-  assert.match(onboardingProfile, /fetch\(`\$\{import\.meta\.env\.VITE_API_URL\}\/api\/profile`, \{ method: 'POST', headers: \{ 'Content-Type': 'application\/json', Authorization: `Bearer \$\{token\}` \}/)
+  assert.match(onboardingProfile, /!data\.personalFactorsSnapshotted/)
+  assert.match(onboardingProfile, /fetch\(`\$\{import\.meta\.env\.VITE_API_URL\}\/api\/profile`, \{ method: 'POST', headers: assessmentHeaders\(sessionStorage, \{ 'Content-Type': 'application\/json', Authorization: `Bearer \$\{token\}` \}\)/)
   assert.match(onboardingProfile, /disabled=\{saving \|\| !isComplete\}/)
   assert.match(onboardingProfile, /headers: \{ Authorization: `Bearer \$\{token\}` \}/)
   assert.match(onboardingProfile, /response\.status === 404 \|\| response\.status === 204/)
@@ -60,11 +61,30 @@ test('retake reuses canonical Personal Factors while Profile keeps separate view
   assert.match(profile, /Physical \/ Accessibility/)
   assert.match(profile, /navigate\('\/profile\/edit'\)/)
   assert.match(profile, /Edit Profile/)
+  assert.match(profile, /!isPersonalFactorsComplete\(loaded\)/)
+  assert.match(profile, /navigate\('\/profile\/edit', \{ replace: true \}\)/)
   assert.match(profileEdit, /<PersonalFactorsForm/)
   assert.match(profileEdit, /<UsernameField/)
+  assert.match(profileEdit, /Save Profile/)
   assert.match(profileEdit, /Save Changes/)
-  assert.match(profileEdit, /navigate\('\/profile', \{ replace: true, state: \{ message: 'Profile updated successfully\.' \} \}\)/)
+  assert.match(profileEdit, /isFirstTime \? 'Profile saved successfully\.' : 'Profile updated successfully\.'/)
+  assert.match(profileEdit, /isFirstTime \? 'Save Profile' : 'Save Changes'/)
   assert.match(app, /path="\/profile\/edit" element=\{<ProfileEdit \/>\}/)
   assert.doesNotMatch(profile, /dashboard\/summary/)
   assert.doesNotMatch(profile, /Retake Assessment|Changes will not update an existing saved recommendation/)
+})
+
+test('same-attempt revisits preserve local drafts when the persisted draft is still empty', async () => {
+  const [interests, skills, personality, profile] = await Promise.all([
+    source('./OnboardingInterests.jsx'),
+    source('./OnboardingSkills.jsx'),
+    source('./OnboardingPersonality.jsx'),
+    source('./OnboardingProfile.jsx'),
+  ])
+  assert.match(interests, /attempt\.interests\.length > 0/)
+  assert.doesNotMatch(interests, /setSelected\(Array\.isArray\(attempt\.interests\) \? attempt\.interests : \[\]\)/)
+  assert.match(skills, /if \(attempt\.skillAnswers\?\.length\) setAnswers/)
+  assert.match(personality, /Object\.keys\(attempt\.personalityAnswers\)\.length > 0/)
+  assert.match(profile, /const currentAttemptId = getAssessmentAttemptId\(sessionStorage\)/)
+  assert.match(profile, /if \(data\.attemptId !== currentAttemptId\) beginAssessmentAttempt/)
 })

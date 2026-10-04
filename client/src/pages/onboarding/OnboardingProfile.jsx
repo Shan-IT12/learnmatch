@@ -55,7 +55,7 @@ function OnboardingProfile() {
     if (Object.keys(errors).length) { setFieldErrors(errors); scrollToFirstInvalidField(Object.keys(errors)); return }
     setSaving(true)
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/profile`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify(buildProfilePayload(formData)) })
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/profile`, { method: 'POST', headers: assessmentHeaders(sessionStorage, { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }), body: JSON.stringify(buildProfilePayload(formData)) })
       const data = await response.json()
       if (!response.ok) { setError(data.message || 'Could not save Personal Factors.'); return }
       setHasSavedProfile(true); setIsEditing(false); setMessage('Personal Factors updated successfully.')
@@ -72,7 +72,7 @@ function OnboardingProfile() {
         headers: assessmentHeaders(sessionStorage, { Authorization: `Bearer ${token}` }),
       })
       const data = await response.json()
-      if (!response.ok || !data.attemptId) { setError('Could not continue the assessment. Please try again.'); return }
+      if (!response.ok || !data.attemptId || !data.personalFactorsSnapshotted) { setError('Could not save Personal Factors to this assessment. Please try again.'); return }
       if (data.attemptId !== currentAttemptId) beginAssessmentAttempt(sessionStorage, data.attemptId)
       navigate('/onboarding/interests')
     } catch { setError('Could not continue the assessment. Please try again.') } finally { setContinuing(false) }

@@ -207,13 +207,13 @@ function CollegeDashboard() {
           navigate('/login', { replace: true })
           return
         }
-        if (collegeRes.status === 404) {
+        const collegeData = await collegeRes.json()
+        if (collegeData.active === false && collegeData.trackingCycle === null) {
           navigate('/college/setup', { replace: true })
           return
         }
         if (!collegeRes.ok || !statusRes.ok) throw new Error('College tracking data is unavailable')
 
-        const collegeData = await collegeRes.json()
         const statusData = await statusRes.json()
         const historyData = historyRes.ok ? await historyRes.json() : { history: [] }
 

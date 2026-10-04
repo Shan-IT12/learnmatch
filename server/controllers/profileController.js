@@ -1,6 +1,7 @@
 import pool from '../config/db.js'
 import { validateProfile } from '../services/requestValidationService.js'
 import { refreshSavedRecommendationsForLatestAssessment } from '../services/recommendationPersistenceService.js'
+import { buildPersonalFactorsSnapshot, requestedAttemptId, setAttemptPersonalFactors } from '../services/assessmentAttemptService.js'
 
 export const saveProfileWithDependencies = async (
   req,
@@ -101,6 +102,8 @@ export const saveProfileWithDependencies = async (
           factor_family_impact, factor_work_impact, userId,
         ]
       )
+      const attemptId = requestedAttemptId(req)
+      if (attemptId) await setAttemptPersonalFactors(connection, userId, attemptId, buildPersonalFactorsSnapshot(req.body))
       if (transactionStarted) {
         await connection.commit()
         transactionStarted = false
@@ -130,6 +133,8 @@ export const saveProfileWithDependencies = async (
         factor_family_impact, factor_work_impact,
       ]
     )
+    const attemptId = requestedAttemptId(req)
+    if (attemptId) await setAttemptPersonalFactors(connection, userId, attemptId, buildPersonalFactorsSnapshot(req.body))
     if (transactionStarted) {
       await connection.commit()
       transactionStarted = false

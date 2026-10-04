@@ -19,6 +19,7 @@ import {
   getFeedbackDashboardPath,
   getFeedbackEntryContext,
 } from '../utils/feedbackNavigation'
+import { getActiveFeedbackPromptKey, setFeedbackPromptState } from '../utils/feedbackPrompt'
 
 const categories = [
   { value: 'Bug Report', label: 'Something is broken', icon: IconBug, iconClass: 'bg-rose-50 text-rose-500' },
@@ -81,6 +82,11 @@ function Feedback() {
       }
 
       setSubmitted(true)
+      setFeedbackPromptState(
+        localStorage,
+        location.state?.feedbackPromptKey || getActiveFeedbackPromptKey(localStorage),
+        'submitted'
+      )
     } catch {
       setError('Cannot connect to server. Please try again.')
       setSubmitting(false)

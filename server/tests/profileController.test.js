@@ -72,14 +72,17 @@ test('retake with no saved Personal Factors returns the canonical blank Profile 
   assert.equal(db.calls.some(({ sql }) => sql.includes('FROM ASSESSMENT_ATTEMPT')), false)
 })
 
-test('first retake save creates canonical Profile Personal Factors', async () => {
+test('first retake save creates canonical Profile Personal Factors and its attempt snapshot', async () => {
   const db = database({ attempt: { attempt_id: 41, status: 'IN_PROGRESS', personal_factors: null } })
   const res = response()
   await saveProfileWithDependencies(attemptRequest(), res, { database: db })
 
   assert.equal(res.statusCode, 201)
   assert.equal(db.calls.some(({ sql }) => sql.startsWith('INSERT INTO PROFILE')), true)
-  assert.equal(db.calls.some(({ sql }) => sql.startsWith('UPDATE ASSESSMENT_ATTEMPT')), false)
+  const snapshotWrite = db.calls.find(({ sql }) => sql.startsWith('UPDATE ASSESSMENT_ATTEMPT'))
+  assert.ok(snapshotWrite)
+  assert.equal(JSON.parse(snapshotWrite.params[0]).factor_health_impact, 1)
+  assert.deepEqual(snapshotWrite.params.slice(1), [41, 9])
 })
 
 test('retake preloads the latest canonical Profile Personal Factors', async () => {
@@ -96,7 +99,7 @@ test('retake preloads the latest canonical Profile Personal Factors', async () =
   assert.equal(db.calls.some(({ sql }) => sql.includes('FROM ASSESSMENT_ATTEMPT')), false)
 })
 
-test('retake edits update the same canonical Profile Personal Factors', async () => {
+test('retake edits update canonical Profile Personal Factors and the same active attempt snapshot', async () => {
   const db = database({
     existingProfile: [{ profile_id: 7, factor_health_impact: 2 }],
     attempt: { attempt_id: 41, status: 'IN_PROGRESS', personal_factors: null },
@@ -107,7 +110,9 @@ test('retake edits update the same canonical Profile Personal Factors', async ()
   assert.equal(res.statusCode, 200)
   assert.match(res.body.message, /updated successfully/i)
   assert.equal(db.calls.filter(({ sql }) => sql.startsWith('UPDATE PROFILE')).length, 1)
-  assert.equal(db.calls.some(({ sql }) => sql.startsWith('UPDATE ASSESSMENT_ATTEMPT')), false)
+  const snapshotWrites = db.calls.filter(({ sql }) => sql.startsWith('UPDATE ASSESSMENT_ATTEMPT'))
+  assert.equal(snapshotWrites.length, 1)
+  assert.equal(JSON.parse(snapshotWrites[0].params[0]).factor_health_impact, 4)
 })
 
 test('a new retake ignores stale attempt Personal Factors and uses the canonical Profile', async () => {

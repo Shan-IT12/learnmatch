@@ -15,6 +15,8 @@ import {
   markAssessmentStepComplete,
   readAssessmentSession,
   writeAssessmentSession,
+  readActiveAttempt,
+  saveActiveAttemptDraft,
 } from '../../utils/assessmentSession'
 
 function OnboardingPersonality() {
@@ -30,6 +32,16 @@ function OnboardingPersonality() {
   const [questionError, setQuestionError] = useState('')
   const [checkingResult, setCheckingResult] = useState(true)
   const [resultCheckFailed, setResultCheckFailed] = useState(false)
+  const [attemptLoaded, setAttemptLoaded] = useState(false)
+
+  useEffect(() => {
+    readActiveAttempt(import.meta.env.VITE_API_URL, localStorage.getItem('token'), storage)
+      .then((attempt) => {
+        if (attempt?.personalityAnswers && Object.keys(attempt.personalityAnswers).length > 0) setAnswers(attempt.personalityAnswers)
+      })
+      .catch(() => setError('Could not restore your saved Personality progress. Please refresh.'))
+      .finally(() => setAttemptLoaded(true))
+  }, [storage])
 
   const currentQuestion = mbtiQuestions[currentIndex]
   const selectedRating = answers[currentQuestion.id]
@@ -42,7 +54,13 @@ function OnboardingPersonality() {
       answers,
       currentIndex,
     })
-  }, [answers, currentIndex, storage])
+    if (!attemptLoaded) return
+    const timer = setTimeout(() => {
+      saveActiveAttemptDraft(import.meta.env.VITE_API_URL, localStorage.getItem('token'), storage, { personality_answers: answers })
+        .catch(() => console.warn('Personality draft autosave will retry on the next change.'))
+    }, 250)
+    return () => clearTimeout(timer)
+  }, [answers, attemptLoaded, currentIndex, storage])
 
   useEffect(() => {
     const token = localStorage.getItem('token')

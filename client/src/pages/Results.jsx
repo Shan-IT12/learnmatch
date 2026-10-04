@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { IconLoader2 } from '@tabler/icons-react'
+import { IconLoader2, IconSchool } from '@tabler/icons-react'
 import FeedbackPopup from '../components/FeedbackPopup'
 import { getAssessmentReturnDestination, SUMMARY_DASHBOARD_DESTINATION } from '../utils/assessmentReturnDestination'
+import { feedbackPromptKey, setActiveFeedbackPromptKey } from '../utils/feedbackPrompt'
 
 const RECOMMENDATIONS_TIMEOUT_MS = 30000
 
@@ -110,6 +111,7 @@ function Results() {
   const [retryCount, setRetryCount] = useState(0)
   const [assessment, setAssessment] = useState({ interests: [], domainScores: {}, mbti: null, profile: null })
   const [returnDestination, setReturnDestination] = useState(SUMMARY_DASHBOARD_DESTINATION)
+  const [feedbackMilestoneKey, setFeedbackMilestoneKey] = useState(null)
 
   useEffect(() => {
     const token = localStorage.getItem('token')
@@ -170,6 +172,8 @@ function Results() {
           fetch(`${import.meta.env.VITE_API_URL}/api/profile?userId=${userId}`, { headers, signal: controller.signal }).then((res) => res.json()),
           fetch(`${import.meta.env.VITE_API_URL}/api/college/status`, { headers, signal: controller.signal })
             .then(async (res) => res.ok ? res.json() : null),
+          fetch(`${import.meta.env.VITE_API_URL}/api/recommendations/latest`, { headers, signal: controller.signal })
+            .then(async (res) => res.ok ? res.json() : null),
         ])
 
         const valueAt = (index) => assessmentResponses[index].status === 'fulfilled'
@@ -183,6 +187,9 @@ function Results() {
             profile: valueAt(3).profile || null,
           })
           setReturnDestination(getAssessmentReturnDestination(valueAt(4)))
+          const promptKey = feedbackPromptKey(userId, valueAt(5)?.recommendation?.recommendation_id)
+          setFeedbackMilestoneKey(promptKey)
+          setActiveFeedbackPromptKey(localStorage, promptKey)
         }
       } catch (requestError) {
         if (requestTimedOut) {
@@ -377,16 +384,16 @@ function Results() {
                 </div>
                 <div className="flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-gray-100 bg-gray-50/60 px-5 py-3.5 sm:px-6">
                 <button
-                onClick={() => navigate(`/results/career-path/${encodeURIComponent(rec.course_code)}`, { state: { recommendations } })}
+                onClick={() => navigate(`/results/career-path/${encodeURIComponent(rec.course_code)}`, { state: { recommendations, source: 'results' } })}
                 className="text-sm font-medium text-orange-500 hover:text-orange-600 transition inline-flex items-center gap-1"
               >
                 View Career Path →
               </button>
                   <button
                     onClick={() => navigate(`/schools/${encodeURIComponent(rec.course_code)}`, { state: { source: 'results' } })}
-                    className="text-sm font-medium text-gray-600 hover:text-orange-600 transition"
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-orange-500 px-3.5 py-2 text-sm font-semibold text-white shadow-sm shadow-orange-200 transition hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
                   >
-                    Find Schools in SJDM
+                    <IconSchool size={16} stroke={2} /> Find Schools in SJDM
                   </button>
                 </div>
               </div>
@@ -395,7 +402,10 @@ function Results() {
           </>
         )}
       </div>
-      <FeedbackPopup />
+      <FeedbackPopup
+        promptKey={feedbackMilestoneKey}
+        milestoneReached={!loading && !error && recommendations.length > 0}
+      />
     </div>
   )
 }

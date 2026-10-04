@@ -11,6 +11,7 @@ function CareerPath() {
   const { courseCode } = useParams()
   const hasActiveCollegePhase = useActiveCollegePhase()
   const passedRecommendations = location.state?.recommendations
+  const cameFromCareerPaths = location.state?.source === 'career-paths'
   const [recommendations, setRecommendations] = useState(() => (
     Array.isArray(passedRecommendations) ? passedRecommendations : []
   ))
@@ -81,12 +82,12 @@ function CareerPath() {
 
   const openCourse = (recommendation) => {
     navigate(`/results/career-path/${encodeURIComponent(recommendation.course_code)}`, {
-      state: { recommendations: topRecommendations },
+      state: { recommendations: topRecommendations, source: 'career-paths' },
     })
   }
 
   const backToSelector = () => {
-    if (hasActiveCollegePhase) {
+    if (hasActiveCollegePhase || !cameFromCareerPaths) {
       navigate('/results')
       return
     }
@@ -104,7 +105,7 @@ function CareerPath() {
           <span className="text-lg font-bold text-gray-900">Learn<span className="text-orange-500">Match</span></span>
         )}
         <button onClick={courseCode ? backToSelector : () => navigate('/results')} disabled={hasActiveCollegePhase === null} className="text-sm text-gray-500 hover:text-gray-900 transition disabled:cursor-wait disabled:opacity-50">
-          ← {courseCode && !hasActiveCollegePhase ? 'Back to Career Paths' : 'Back to Results'}
+          ← {courseCode && cameFromCareerPaths && !hasActiveCollegePhase ? 'Back to Career Paths' : 'Back to Results'}
         </button>
       </nav>
 
