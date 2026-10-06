@@ -20,9 +20,12 @@ function PublicCourseDetails() {
   const { courseCode } = useParams()
   const location = useLocation()
   const isAuthenticated = Boolean(localStorage.getItem('token'))
-  const fromDashboard = new URLSearchParams(location.search).get('source') === 'dashboard' || location.state?.entryContext === 'dashboard'
+  const source = new URLSearchParams(location.search).get('source')
+  const fromDashboard = source === 'dashboard' || location.state?.entryContext === 'dashboard'
   const hasActiveCollegePhase = useActiveCollegePhase()
-  const backNavigation = getCourseOverviewBackNavigation(location.state, location.search)
+  const resultsContext = hasActiveCollegePhase || source === 'results' || location.state?.entryContext === 'results'
+  const backNavigation = getCourseOverviewBackNavigation(location.state, location.search, hasActiveCollegePhase)
+  const locatorSourceSearch = resultsContext ? '?source=results' : fromDashboard ? '?source=dashboard' : '?source=public-search'
   const [course, setCourse] = useState(null)
   const [status, setStatus] = useState('loading')
   const [resolvedCourseCode, setResolvedCourseCode] = useState(null)
@@ -70,12 +73,20 @@ function PublicCourseDetails() {
           <div className="bg-white border border-gray-100 rounded-2xl p-8 text-center">
             <h1 className="text-2xl font-bold text-gray-900">Course not found</h1>
             <p className="text-gray-500 mt-2 mb-5">The course code may be invalid or unavailable.</p>
-            <Link to={backNavigation.path} state={backNavigation.state} className="text-orange-600 font-medium hover:text-orange-700">{backNavigation.label}</Link>
+            {hasActiveCollegePhase === null ? (
+              <span className="text-sm text-gray-400">Resolving return destination…</span>
+            ) : (
+              <Link to={backNavigation.path} state={backNavigation.state} className="text-orange-600 font-medium hover:text-orange-700">{backNavigation.label}</Link>
+            )}
           </div>
         )}
         {displayStatus === 'success' && course && (
           <article>
-            <Link to={backNavigation.path} state={backNavigation.state} className="text-sm text-orange-600 hover:text-orange-700">← {backNavigation.label}</Link>
+            {hasActiveCollegePhase === null ? (
+              <span className="text-sm text-gray-400">Resolving return destination…</span>
+            ) : (
+              <Link to={backNavigation.path} state={backNavigation.state} className="text-sm text-orange-600 hover:text-orange-700">← {backNavigation.label}</Link>
+            )}
             <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-6 sm:p-9 mt-5">
               <div className="flex flex-wrap items-center gap-2 mb-4">
                 {course.course_abbreviation && <span className="text-xs font-bold text-orange-600 bg-orange-50 px-3 py-1.5 rounded-full">{course.course_abbreviation}</span>}
@@ -83,17 +94,23 @@ function PublicCourseDetails() {
               <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 leading-tight">{course.course_name}</h1>
               {course.description && <p className="text-gray-600 leading-7 whitespace-pre-line mt-6">{course.description}</p>}
 
-              <Link
-                to={`/schools/${encodeURIComponent(course.course_code)}${fromDashboard ? '?source=dashboard' : ''}`}
-                state={{
-                  source: 'course-overview',
-                  returnTo: `${location.pathname}${location.search}`,
-                  returnState: location.state || null,
-                }}
-                className="inline-flex mt-6 bg-orange-500 text-white px-5 py-3 rounded-xl text-sm font-semibold hover:bg-orange-600 transition"
-              >
-                Find Schools in SJDM
-              </Link>
+              {hasActiveCollegePhase === null ? (
+                <span className="inline-flex mt-6 cursor-wait bg-gray-200 text-gray-500 px-5 py-3 rounded-xl text-sm font-semibold">
+                  Resolving return destination…
+                </span>
+              ) : (
+                <Link
+                  to={`/schools/${encodeURIComponent(course.course_code)}${locatorSourceSearch}`}
+                  state={{
+                    source: 'course-overview',
+                    returnTo: `${location.pathname}${location.search}`,
+                    returnState: resultsContext ? { entryContext: 'results' } : location.state || null,
+                  }}
+                  className="inline-flex mt-6 bg-orange-500 text-white px-5 py-3 rounded-xl text-sm font-semibold hover:bg-orange-600 transition"
+                >
+                  Find Schools in SJDM
+                </Link>
+              )}
 
               <div className="grid md:grid-cols-2 gap-8 mt-10 pt-8 border-t border-gray-100">
                 <section>

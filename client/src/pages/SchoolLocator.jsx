@@ -19,7 +19,9 @@ function SchoolLocator() {
   const { courseCode } = useParams()
   const location = useLocation()
   const hasActiveCollegePhase = useActiveCollegePhase()
-  const fromDashboard = new URLSearchParams(location.search).get('source') === 'dashboard'
+  const source = new URLSearchParams(location.search).get('source')
+  const fromDashboard = source === 'dashboard'
+  const resultsContext = hasActiveCollegePhase || source === 'results' || location.state?.source === 'results'
   const [result, setResult] = useState(null)
   const [status, setStatus] = useState('loading')
   const [retryCount, setRetryCount] = useState(0)
@@ -62,7 +64,7 @@ function SchoolLocator() {
   }, [courseCode, retryCount])
 
   const backNavigation = getSchoolLocatorBackNavigation(
-    hasActiveCollegePhase
+    resultsContext
       ? 'results'
       : location.state?.source === 'course-overview'
       ? {
@@ -72,7 +74,7 @@ function SchoolLocator() {
         }
       : {
           name: 'course-overview',
-          returnTo: `/courses/${encodeURIComponent(courseCode)}${fromDashboard ? '?source=dashboard' : ''}`,
+          returnTo: `/courses/${encodeURIComponent(courseCode)}${fromDashboard ? '?source=dashboard' : source === 'public-search' ? '?source=public-search' : ''}`,
           returnState: fromDashboard ? { entryContext: 'dashboard' } : { entryContext: 'public-search' },
         },
   )
@@ -159,7 +161,11 @@ function SchoolLocator() {
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-orange-600 mt-5">School Locator</p>
             <h1 className="text-2xl sm:text-3xl font-bold mt-2">Course not found</h1>
             <p className="text-sm text-gray-500 mt-3 max-w-lg mx-auto">The course code may be invalid, inactive, or unavailable.</p>
-            <Link to="/courses/search" className="inline-flex mt-6 bg-orange-500 text-white px-5 py-3 rounded-xl text-sm font-semibold hover:bg-orange-600 transition">Explore courses</Link>
+            {hasActiveCollegePhase === null ? (
+              <span className="inline-flex mt-6 bg-gray-200 text-gray-500 px-5 py-3 rounded-xl text-sm font-semibold">Resolving return destination…</span>
+            ) : (
+              <Link to={backNavigation.path} state={backNavigation.state} className="inline-flex mt-6 bg-orange-500 text-white px-5 py-3 rounded-xl text-sm font-semibold hover:bg-orange-600 transition">{backNavigation.label}</Link>
+            )}
           </section>
         )}
 

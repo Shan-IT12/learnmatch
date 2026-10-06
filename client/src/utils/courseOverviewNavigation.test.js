@@ -49,3 +49,21 @@ test('missing or unsafe route state falls back safely to Course Search', () => {
     returnTo: '/dashboard',
   }).path, '/courses/search')
 })
+
+test('Results context returns Course Overview to Results and survives refresh', () => {
+  assert.deepEqual(getCourseOverviewBackNavigation(undefined, '?source=results'), {
+    path: '/results',
+    label: 'Back to Results',
+  })
+  assert.deepEqual(getCourseOverviewBackNavigation({ entryContext: 'results' }), {
+    path: '/results',
+    label: 'Back to Results',
+  })
+})
+
+test('an active College Phase always returns Course Overview to Results', () => {
+  assert.deepEqual(getCourseOverviewBackNavigation({ entryContext: 'public-search' }, '', true), {
+    path: '/results',
+    label: 'Back to Results',
+  })
+})

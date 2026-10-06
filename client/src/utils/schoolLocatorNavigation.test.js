@@ -50,3 +50,13 @@ test('an invalid Course Overview return path uses the existing safe fallback', (
 test('unknown origins use a safe public Course Search fallback', () => {
   assert.equal(getSchoolLocatorBackNavigation(undefined).path, '/courses/search')
 })
+
+test('a results-backed Course Overview remains results-backed when restored', () => {
+  const navigation = getSchoolLocatorBackNavigation({
+    name: 'course-overview',
+    returnTo: '/courses/CRS024?source=results',
+    returnState: { entryContext: 'results' },
+  })
+  assert.equal(navigation.path, '/courses/CRS024?source=results')
+  assert.equal(navigation.state.entryContext, 'results')
+})
