@@ -72,6 +72,20 @@ const isValidPassword = (password) => {
   return null
 }
 
+const createUserAuthPayload = (user, message) => ({
+  message,
+  token: jwt.sign(
+    {
+      userId: user.user_id,
+      username: user.username,
+    },
+    process.env.JWT_SECRET,
+    jwtSignOptions(USER_JWT_AUDIENCE, '7d')
+  ),
+  userId: user.user_id,
+  username: user.username,
+})
+
 export const registerUser = async (req, res) => {
   const { email, username, password } = req.body
 
@@ -229,7 +243,7 @@ export const verifyOtp = async (req, res) => {
 
     const [users] = await connection.query(
       `
-      SELECT user_id, is_active
+      SELECT user_id, username, is_active
       FROM USER_ACCOUNT
       WHERE user_id = ?
       FOR UPDATE
@@ -296,12 +310,13 @@ export const verifyOtp = async (req, res) => {
       `,
       [otpRecord.otp_id, normalizedUserId]
     )
+    const authPayload = createUserAuthPayload(
+      users[0],
+      'Account verified successfully!',
+    )
     await connection.commit()
 
-    return res.json({
-      message:
-        'Account verified successfully! You can now log in.',
-    })
+    return res.json(authPayload)
   } catch (error) {
     if (connection) await connection.rollback()
     console.error('OTP verify error:', error)
@@ -454,21 +469,7 @@ export const loginUser = async (req, res) => {
       })
     }
 
-    const token = jwt.sign(
-      {
-        userId: user.user_id,
-        username: user.username,
-      },
-      process.env.JWT_SECRET,
-      jwtSignOptions(USER_JWT_AUDIENCE, '7d')
-    )
-
-    return res.json({
-      message: 'Login successful',
-      token,
-      userId: user.user_id,
-      username: user.username,
-    })
+    return res.json(createUserAuthPayload(user, 'Login successful'))
   } catch (error) {
     console.error('Login error:', error)
 

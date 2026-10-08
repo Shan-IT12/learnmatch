@@ -61,7 +61,7 @@ function installOtpDatabase({
     release: () => state.events.push('release'),
     query: async (sql, values) => {
       if (/FROM USER_ACCOUNT\s+WHERE user_id/.test(sql)) {
-        return [[{ user_id: state.userId, is_active: state.active ? 1 : 0 }]]
+        return [[{ user_id: state.userId, username: 'student', is_active: state.active ? 1 : 0 }]]
       }
       if (/FROM OTP_VERIFICATION\s+WHERE user_id/.test(sql)) {
         return [state.otp ? [{ ...state.otp }] : []]
@@ -107,12 +107,18 @@ function restoreGlobals() {
 test.afterEach(restoreGlobals)
 
 test('correct registration OTP activates the account and consumes the OTP', async () => {
+  process.env.JWT_SECRET = 'otp-protection-test-secret'
   const state = installOtpDatabase()
   const result = await invoke(verifyOtp, { userId: 7, otpCode: '123456' })
 
   assert.equal(result.status, 200)
   assert.equal(state.active, true)
   assert.equal(state.otp, null)
+  assert.equal(result.body.userId, 7)
+  assert.equal(result.body.username, 'student')
+  const decoded = jwt.verify(result.body.token, process.env.JWT_SECRET)
+  assert.equal(decoded.userId, 7)
+  assert.equal(decoded.username, 'student')
   assert.deepEqual(state.events, ['begin', 'commit', 'release'])
 })
 
@@ -121,6 +127,7 @@ test('wrong registration OTP increments persistent attempts', async () => {
   const result = await invoke(verifyOtp, { userId: 7, otpCode: '654321' })
 
   assert.equal(result.status, 400)
+  assert.equal(result.body.token, undefined)
   assert.equal(state.otp.failed_attempts, 1)
   assert.equal(result.body.failedAttempts, undefined)
 })

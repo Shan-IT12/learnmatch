@@ -4,6 +4,7 @@ import { IconEye, IconEyeOff } from '@tabler/icons-react'
 import AuthJourneyPanel from '../components/AuthJourneyPanel'
 import { FieldError, RequiredMark } from '../components/FormValidation'
 import { scrollToFirstInvalidField } from '../utils/formValidation'
+import { storeUserAuth } from '../utils/userAuth'
 
 
 function Login() {
@@ -44,9 +45,7 @@ function Login() {
         return
       }
 
-      localStorage.setItem('token', data.token)
-      localStorage.setItem('userId', data.userId)
-      localStorage.setItem('username', data.username)
+      storeUserAuth(localStorage, data)
 
       navigate('/dashboard')
     } catch {

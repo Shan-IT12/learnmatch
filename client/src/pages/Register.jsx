@@ -4,6 +4,7 @@ import { IconEye, IconEyeOff } from '@tabler/icons-react'
 import AuthJourneyPanel from '../components/AuthJourneyPanel'
 import { FieldError, RequiredMark } from '../components/FormValidation'
 import { scrollToFirstInvalidField } from '../utils/formValidation'
+import { getPostRegistrationDestination, storeUserAuth } from '../utils/userAuth'
 import {
   USERNAME_MAX_LENGTH,
   USERNAME_MIN_LENGTH,
@@ -118,8 +119,9 @@ function Register() {
         return
       }
 
+      storeUserAuth(localStorage, data)
       setStep('verified')
-      setTimeout(() => navigate('/login'), 1500)
+      navigate(getPostRegistrationDestination(), { replace: true })
     } catch {
       setOtpError('Cannot connect to server. Please try again.')
       setVerifying(false)
@@ -393,7 +395,7 @@ function Register() {
                 Account verified!
               </h1>
               <p className="text-base text-gray-500 leading-relaxed">
-                Redirecting you to log in...
+                Taking you to your next step...
               </p>
             </div>
           )}

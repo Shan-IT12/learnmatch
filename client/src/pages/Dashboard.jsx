@@ -4,6 +4,7 @@ import { IconArrowRight, IconBook2, IconBrain, IconCertificate, IconChecklist, I
 import loadingGif from '../assets/loading2.gif'
 import { getNextAssessmentRoute } from '../utils/assessmentNavigation'
 import { getPhilippineDateTime } from '../utils/philippineDateTime'
+import { clearUserAuth } from '../utils/userAuth'
 
 const loadingMessages = ['Checking your progress...', 'Almost there...', 'Getting things ready...']
 
@@ -55,9 +56,7 @@ function Dashboard() {
   }, [navigate, token])
 
   const handleLogout = () => {
-    localStorage.removeItem('token')
-    localStorage.removeItem('userId')
-    localStorage.removeItem('username')
+    clearUserAuth(localStorage)
     navigate('/login')
   }
 
