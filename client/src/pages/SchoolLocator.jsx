@@ -140,7 +140,7 @@ function SchoolLocator() {
         )}
 
         {displayStatus === 'loading' && (
-          <section className="mt-8 bg-white border border-gray-100 rounded-3xl p-8 sm:p-12 shadow-sm" aria-live="polite">
+          <section className="motion-swap mt-8 bg-white border border-gray-100 rounded-3xl p-8 sm:p-12 shadow-sm" aria-live="polite">
             <div className="h-3 w-28 bg-orange-100 rounded-full animate-pulse" />
             <div className="h-8 max-w-xl bg-gray-100 rounded-xl animate-pulse mt-5" />
             <div className="h-4 max-w-2xl bg-gray-100 rounded-lg animate-pulse mt-4" />
@@ -215,7 +215,7 @@ function SchoolLocator() {
                   coverageResetKey={coverageResetKey}
                   onRecenterCoverage={() => setCoverageResetKey((key) => key + 1)}
                 />
-                <div className="min-h-0" aria-live="polite">
+                <div className="motion-swap min-h-0" aria-live="polite">
                   {directions.status === 'loading' && (
                     <div className="mt-4 rounded-2xl border border-blue-100 bg-blue-50 px-5 py-4 text-sm text-blue-800">
                       Requesting your location and calculating a driving route...

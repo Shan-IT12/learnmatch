@@ -8,6 +8,8 @@ import interestGroups, {
 } from '../../data/interestList'
 import { FieldError, RequiredMark } from '../../components/FormValidation'
 import { scrollToFirstInvalidField } from '../../utils/formValidation'
+import SuccessConfirmation from '../../components/SuccessConfirmation'
+import { waitForSuccessConfirmation } from '../../utils/successConfirmation'
 import {
   ASSESSMENT_SESSION_KEYS,
   markAssessmentStepComplete,
@@ -30,6 +32,7 @@ function OnboardingInterests() {
   const [error, setError] = useState('')
   const [selectionMessage, setSelectionMessage] = useState('')
   const [attemptLoaded, setAttemptLoaded] = useState(false)
+  const [saveConfirmed, setSaveConfirmed] = useState(false)
 
   useEffect(() => {
     const storage = typeof sessionStorage === 'undefined' ? null : sessionStorage
@@ -95,12 +98,18 @@ function OnboardingInterests() {
       typeof sessionStorage === 'undefined' ? null : sessionStorage,
       2
     )
+    setSaveConfirmed(true)
+    await waitForSuccessConfirmation()
     navigate('/onboarding/skills')
   } catch {
     setError('Cannot connect to server. Please try again.')
     setSubmitting(false)
   }
 }
+
+  if (saveConfirmed) {
+    return <OnboardingLayout currentStep={2} isComplete={false} showFooterNavigation={false}><div className="flex min-h-80 items-center justify-center"><SuccessConfirmation message="Interests Saved" /></div></OnboardingLayout>
+  }
 
   return (
     <OnboardingLayout

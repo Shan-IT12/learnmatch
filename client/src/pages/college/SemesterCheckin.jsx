@@ -5,6 +5,8 @@ import { checkinQuestions, checkinScale } from '../../data/checkinQuestions'
 import { FieldError, RequiredMark } from '../../components/FormValidation'
 import { scrollToFirstInvalidField } from '../../utils/formValidation'
 import CourseName from '../../components/CourseName'
+import SuccessConfirmation from '../../components/SuccessConfirmation'
+import { waitForSuccessConfirmation } from '../../utils/successConfirmation'
 
 const RESULT_STYLES = {
   'On Track': 'border-emerald-200 bg-emerald-50 text-emerald-700',
@@ -150,6 +152,7 @@ function SemesterCheckin() {
   const [error, setError] = useState('')
   const [result, setResult] = useState(null)
   const [fieldErrors, setFieldErrors] = useState({})
+  const [saveConfirmed, setSaveConfirmed] = useState(false)
 
   useEffect(() => {
     if (!token) {
@@ -231,6 +234,8 @@ function SemesterCheckin() {
         return
       }
 
+      setSaveConfirmed(true)
+      await waitForSuccessConfirmation()
       setResult(data)
     } catch {
       setError('Cannot connect to server. Please try again.')
@@ -252,6 +257,10 @@ function SemesterCheckin() {
 
   if (result) {
     return <CheckinResult result={result} courseName={courseName} termLabel={termLabel} phase={phase} onBack={() => navigate('/college')} />
+  }
+
+  if (saveConfirmed) {
+    return <div className="flex min-h-screen items-center justify-center bg-slate-50 px-5"><SuccessConfirmation message="Check-in Saved" /></div>
   }
 
   const questions = checkinQuestions[phase]
@@ -279,7 +288,7 @@ function SemesterCheckin() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} noValidate className="space-y-4">
+        <form onSubmit={handleSubmit} noValidate className="motion-stagger space-y-4">
           {questions.map((question) => <CheckinQuestionCard key={question.number} question={question} selectedValue={answers[question.number]} onSelect={handleSelect} error={fieldErrors[question.number]} />)}
 
           {phase === 'End' && <EndPhaseGwaField value={gwa} onChange={(event) => setGwa(event.target.value)} />}

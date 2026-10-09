@@ -140,7 +140,7 @@ function LoadingState() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         {metricDefinitions.map(({ key }) => <div key={key} className="h-28 rounded-xl border border-slate-200 bg-white" />)}
       </div>
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="motion-stagger grid gap-6 lg:grid-cols-3">
         <div className="h-96 rounded-xl border border-slate-200 bg-white lg:col-span-2" />
         <div className="h-96 rounded-xl border border-slate-200 bg-white" />
       </div>
@@ -329,7 +329,7 @@ function AdminDashboard() {
 
             <ChartCard title="Recently Registered Users" subtitle="Newest student accounts" icon={IconUserPlus}>
               {dashboard.recentlyRegisteredUsers.length > 0 ? (
-                <ol className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+                <ol className="motion-stagger grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
                   {dashboard.recentlyRegisteredUsers.map((user) => (
                     <li key={user.userId} className="rounded-lg border border-slate-100 bg-slate-50/60 p-4">
                       <p className="truncate text-sm font-semibold text-slate-800">{user.username}</p>

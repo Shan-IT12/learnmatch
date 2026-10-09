@@ -7,6 +7,51 @@ body { margin: 0; overflow-x: hidden; }
 img, svg, canvas { max-width: 100%; }
 button, input, select, textarea { max-width: 100%; }
 
+@keyframes lm-enter {
+  from { opacity: 0; transform: translate3d(0, 4px, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+@keyframes lm-popover-enter {
+  from { opacity: 0; transform: translate3d(0, 3px, 0) scale(.985); }
+  to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+
+@keyframes lm-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes lm-success-check {
+  from { opacity: 0; transform: scale(.88); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.motion-page { animation: lm-fade 240ms ease-out both; }
+.motion-enter { animation: lm-enter 260ms cubic-bezier(.22, 1, .36, 1) both; }
+.motion-delay-1 { animation-delay: 50ms; }
+.motion-delay-2 { animation-delay: 100ms; }
+.motion-delay-3 { animation-delay: 150ms; }
+.motion-stagger > * { animation: lm-enter 260ms cubic-bezier(.22, 1, .36, 1) both; }
+.motion-stagger > *:nth-child(2) { animation-delay: 55ms; }
+.motion-stagger > *:nth-child(3) { animation-delay: 110ms; }
+.motion-stagger > *:nth-child(4) { animation-delay: 165ms; }
+.motion-stagger > *:nth-child(5) { animation-delay: 220ms; }
+.motion-stagger > *:nth-child(n + 6) { animation-delay: 260ms; }
+.motion-swap > * { animation: lm-fade 180ms ease-out both; }
+.motion-popover,
+[role="dialog"],
+[role="listbox"] { transform-origin: top center; animation: lm-popover-enter 160ms cubic-bezier(.22, 1, .36, 1) both; }
+.success-confirmation-icon { animation: lm-success-check 220ms cubic-bezier(.22, 1, .36, 1) both; }
+
+:where(button, [role="button"], a) {
+  transition-property: color, background-color, border-color, box-shadow, opacity, transform;
+  transition-duration: 160ms;
+  transition-timing-function: ease-out;
+}
+
+:where(button, [role="button"]):not(:disabled):active { transform: translateY(1px) scale(.99); }
+
 @keyframes hero-people-float {
   0%, 100% { transform: translate3d(0, 0, 0) rotate(-0.25deg); }
   50% { transform: translate3d(0, -10px, 0) rotate(0.25deg); }
@@ -22,6 +67,19 @@ button, input, select, textarea { max-width: 100%; }
 .hero-orbit-delayed { animation-delay: -2s; }
 
 @media (prefers-reduced-motion: reduce) {
+  .motion-page,
+  .motion-enter,
+  .motion-stagger > *,
+  .motion-swap > *,
+  .motion-popover,
+  [role="dialog"],
+  [role="listbox"] {
+    animation: none !important;
+    transform: none !important;
+  }
+  .success-confirmation-icon { animation: none !important; transform: none !important; }
+  :where(button, [role="button"], a) { transition-duration: 0.01ms !important; }
+  :where(button, [role="button"]):not(:disabled):active { transform: none; }
   .hero-people-float,
   .hero-orbit { animation: none; }
 }
@@ -34,6 +92,29 @@ button, input, select, textarea { max-width: 100%; }
 }
 
 .responsive-table > table { min-width: 42rem; }
+
+.course-suggestion-scroll {
+  max-height: min(18rem, 45vh);
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(249, 115, 22, 0.42) rgba(255, 247, 237, 0.8);
+  -webkit-overflow-scrolling: touch;
+}
+
+.course-suggestion-scroll::-webkit-scrollbar { width: 8px; }
+.course-suggestion-scroll::-webkit-scrollbar-track {
+  background: rgba(255, 247, 237, 0.8);
+  border-radius: 9999px;
+}
+.course-suggestion-scroll::-webkit-scrollbar-thumb {
+  background: rgba(249, 115, 22, 0.42);
+  border: 2px solid rgba(255, 247, 237, 0.9);
+  border-radius: 9999px;
+}
+.course-suggestion-scroll::-webkit-scrollbar-thumb:hover { background: rgba(234, 88, 12, 0.58); }
 
 .school-locator-map {
   height: min(52vh, 32rem);

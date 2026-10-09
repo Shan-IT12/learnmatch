@@ -3,15 +3,22 @@ import assert from 'node:assert/strict'
 import {
   calculateDisplayedSemesterPhase,
   getAcademicYearOptions,
+  getCollegeSetupAcademicYear,
   getCurrentAcademicYear,
   getFutureAcademicYearRanges,
   isApproximateEndAfterStart,
 } from './collegeSchedule.js'
 
 test('derives the current academic year across the June boundary', () => {
-  assert.equal(getCurrentAcademicYear(new Date(2026, 4, 31)), '2025-2026')
-  assert.equal(getCurrentAcademicYear(new Date(2026, 5, 1)), '2026-2027')
-  assert.equal(getCurrentAcademicYear(new Date(2026, 8, 29)), '2026-2027')
+  assert.equal(getCurrentAcademicYear(new Date(2026, 9, 1)), '2026-2027')
+  assert.equal(getCurrentAcademicYear(new Date(2027, 0, 1)), '2026-2027')
+  assert.equal(getCurrentAcademicYear(new Date(2027, 5, 1)), '2027-2028')
+})
+
+test('new setup uses the current year while resume preserves its saved academic year', () => {
+  const today = new Date(2027, 5, 1)
+  assert.equal(getCollegeSetupAcademicYear('setup', '2024-2025', today), '2027-2028')
+  assert.equal(getCollegeSetupAcademicYear('resume', '2024-2025', today), '2024-2025')
 })
 
 test('generates both dropdown years from a hyphenated academic year', () => {

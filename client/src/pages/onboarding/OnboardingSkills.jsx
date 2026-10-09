@@ -4,6 +4,8 @@ import OnboardingLayout from '../../components/OnboardingLayout'
 import AssessmentQuestionNavigation from '../../components/AssessmentQuestionNavigation'
 import { FieldError, RequiredMark } from '../../components/FormValidation'
 import { scrollToFirstInvalidField } from '../../utils/formValidation'
+import SuccessConfirmation from '../../components/SuccessConfirmation'
+import { waitForSuccessConfirmation } from '../../utils/successConfirmation'
 import {
   ASSESSMENT_SESSION_KEYS,
   assessmentHeaders,
@@ -170,6 +172,7 @@ function OnboardingSkills() {
   const [questionError, setQuestionError] = useState('')
   const [assessmentAccessError, setAssessmentAccessError] = useState('')
   const [attemptLoaded, setAttemptLoaded] = useState(false)
+  const [submitConfirmed, setSubmitConfirmed] = useState(false)
 
   useEffect(() => {
     readActiveAttempt(import.meta.env.VITE_API_URL, localStorage.getItem('token'), storage)
@@ -310,6 +313,9 @@ function OnboardingSkills() {
     }
 
     markAssessmentStepComplete(storage, 3)
+    setSubmitConfirmed(true)
+    await waitForSuccessConfirmation()
+    setSubmitConfirmed(false)
     setResults(data)
   } catch {
     setError('Cannot connect to server. Please try again.')
@@ -318,6 +324,10 @@ function OnboardingSkills() {
 }
   const handleContinue = () => {
     navigate('/onboarding/personality')
+  }
+
+  if (submitConfirmed) {
+    return <OnboardingLayout currentStep={3} isComplete={false} showFooterNavigation={false}><div className="flex min-h-80 items-center justify-center"><SuccessConfirmation message="Academic Skills Saved" /></div></OnboardingLayout>
   }
 
   if (results) {
@@ -486,7 +496,7 @@ function OnboardingSkills() {
           </div>
         )}
 
-        <div data-validation-field="skillQuestion" className="rounded-3xl border border-gray-200 bg-white p-5 sm:p-7 shadow-[0_18px_45px_-34px_rgba(15,23,42,0.45)] mb-7" aria-invalid={questionError ? 'true' : undefined} aria-describedby={questionError ? 'skill-question-error' : undefined}>
+        <div key={currentQuestion.question_id} data-validation-field="skillQuestion" className="motion-enter rounded-3xl border border-gray-200 bg-white p-5 sm:p-7 shadow-[0_18px_45px_-34px_rgba(15,23,42,0.45)] mb-7" aria-invalid={questionError ? 'true' : undefined} aria-describedby={questionError ? 'skill-question-error' : undefined}>
           {/* Question figure, if this item has one */}
           {currentQuestion.image_url && (
             <div className="mb-5 overflow-hidden rounded-2xl border border-gray-100 bg-gray-50 p-3">

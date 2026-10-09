@@ -14,6 +14,7 @@ import Results from './pages/Results'
 import AssessmentHistory from './pages/AssessmentHistory'
 import AssessmentHistoryResult from './pages/AssessmentHistoryResult'
 import CollegeSetup from './pages/college/CollegeSetup' 
+import CollegeSetupReview from './pages/college/CollegeSetupReview'
 import CollegeDashboard from './pages/college/CollegeDashboard'
 import SemesterCheckin from './pages/college/SemesterCheckin'
 import SummaryDashboard from './pages/SummaryDashboard'
@@ -31,11 +32,12 @@ import AdminRoute from './components/AdminRoute'
 import CourseSearch from './pages/CourseSearch'
 import PublicCourseDetails from './pages/PublicCourseDetails'
 import SchoolLocator from './pages/SchoolLocator'
+import PageTransition from './components/PageTransition'
 
 
 function App() {
   return (
-    <Routes>
+    <PageTransition><Routes>
       <Route path="/" element={<Landing />} />
       <Route path="/courses/search" element={<CourseSearch />} />
       <Route path="/courses/:courseCode" element={<PublicCourseDetails />} />
@@ -51,6 +53,7 @@ function App() {
       <Route path="/onboarding/skills" element={<OnboardingSkills />} />
       <Route path="/onboarding/personality" element={<OnboardingPersonality />} />
       <Route path="/college/setup" element={<CollegeSetup />} />
+      <Route path="/college/setup/review" element={<CollegeSetupReview />} />
       <Route path="/college" element={<CollegeDashboard />} />
       <Route path="/college/checkin" element={<SemesterCheckin />} />
       <Route path="/results" element={<Results />} />
@@ -68,7 +71,7 @@ function App() {
       <Route path="/admin/analytics" element={<AdminRoute><AdminAnalytics /></AdminRoute>} />
       <Route path="/admin/feedback" element={<AdminRoute><AdminFeedback /></AdminRoute>} />
       <Route path="/admin/feedback/:feedbackId" element={<AdminRoute><AdminFeedbackDetail /></AdminRoute>} />
-    </Routes>
+    </Routes></PageTransition>
   )
 }
 

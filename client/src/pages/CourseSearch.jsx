@@ -166,7 +166,7 @@ function CourseSearch() {
                 <div className="px-5 py-4 text-sm text-gray-400">No suggestions for "{input.trim()}"</div>
               )}
               {suggestionStatus === 'success' && suggestions?.length > 0 && (
-                <div>
+                <div className="course-suggestion-scroll">
                   <div className="px-5 py-2 bg-gray-50 text-xs font-semibold text-gray-400 uppercase tracking-widest">Courses</div>
                   {suggestions.map((course) => (
                     <button
@@ -188,7 +188,7 @@ function CourseSearch() {
           </div>
         </div>
 
-        <section className="mt-9" aria-live="polite">
+        <section className="motion-swap mt-9" aria-live="polite">
           {displayStatus === 'loading' && <p className="text-gray-500">Loading courses…</p>}
           {displayStatus === 'error' && (
             <div className="bg-red-50 border border-red-100 text-red-700 rounded-xl p-5">We couldn’t load courses. Please try again.</div>
@@ -216,7 +216,7 @@ function CourseSearch() {
                   </select>
                 </label>
               </div>
-              <div className="grid gap-4">
+              <div className="motion-stagger grid gap-4">
                 {visibleCourses.map((course) => (
                   <article key={course.course_code} className="flex flex-col bg-white border border-gray-100 rounded-2xl p-5 sm:p-6 shadow-sm hover:shadow-md hover:border-orange-200 transition">
                     <div className="flex flex-wrap items-center gap-2 mb-3">

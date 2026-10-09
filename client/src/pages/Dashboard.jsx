@@ -106,7 +106,7 @@ function Dashboard() {
           </div>
         )}
 
-        <div className="grid lg:grid-cols-[1.55fr_1fr] gap-6 mb-7 items-stretch">
+        <div className="motion-stagger grid lg:grid-cols-[1.55fr_1fr] gap-6 mb-7 items-stretch">
           <section className="min-h-[360px] rounded-3xl p-7 sm:p-10 relative overflow-hidden flex flex-col justify-between border border-orange-200 shadow-[0_16px_45px_-24px_rgba(234,88,12,0.5)] bg-gradient-to-br from-orange-50 via-orange-100 to-orange-200">
             <svg width="320" height="320" viewBox="0 0 320 320" aria-hidden="true" className="absolute -top-20 -right-16 opacity-50">
               <circle cx="160" cy="160" r="140" fill="none" stroke="#fff" strokeWidth="1.5" />
@@ -165,7 +165,7 @@ function Dashboard() {
           </section>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="motion-stagger grid md:grid-cols-2 gap-6">
           <section className="rounded-3xl bg-white border border-gray-100 px-6 sm:px-8 py-7 shadow-sm flex flex-col sm:flex-row md:flex-col xl:flex-row gap-5 justify-between sm:items-center md:items-start xl:items-center">
             <div>
               <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center"><IconSchool size={21} stroke={1.75} className="text-gray-600" /></div>

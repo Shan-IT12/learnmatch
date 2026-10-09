@@ -153,7 +153,7 @@ function Landing() {
                   {results.courses.length === 0 ? (
                     <div className="px-5 py-4 text-sm text-gray-500">No courses found for “{query}”.</div>
                   ) : (
-                    <>
+                    <div className="course-suggestion-scroll">
                       <div className="bg-orange-50/70 px-5 py-2 text-[10px] font-bold uppercase tracking-[0.16em] text-orange-600">Courses</div>
                       {results.courses.map((course, index) => (
                         <button
@@ -170,7 +170,7 @@ function Landing() {
                           <CourseName name={course.course_name} abbreviation={course.course_abbreviation} className="text-sm font-medium text-gray-800" secondaryClassName="mt-1 text-sm font-normal text-gray-500" />
                         </button>
                       ))}
-                    </>
+                    </div>
                   )}
                 </div>
               )}

@@ -10,6 +10,13 @@ export function getCurrentAcademicYear(date = new Date()) {
   return `${startYear}-${startYear + 1}`
 }
 
+export function getCollegeSetupAcademicYear(action, savedAcademicYear, date = new Date()) {
+  if (action === 'resume' && typeof savedAcademicYear === 'string' && savedAcademicYear.trim()) {
+    return savedAcademicYear
+  }
+  return getCurrentAcademicYear(date)
+}
+
 export function getAcademicYearOptions(value) {
   const match = String(value || '').trim().match(ACADEMIC_YEAR_PATTERN)
   if (!match) return []

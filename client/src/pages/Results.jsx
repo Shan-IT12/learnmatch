@@ -328,7 +328,7 @@ function Results() {
             </div>
           </section>
 
-          <div className="space-y-5">
+          <div className="motion-stagger space-y-5">
             {recommendations.map((rec) => (
               <div
                 key={rec.course_id}

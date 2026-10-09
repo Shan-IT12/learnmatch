@@ -6,6 +6,8 @@ import PersonalityResult from '../../components/PersonalityResult'
 import { getResponseChoices, mbtiQuestions } from '../../data/mbtiQuestions'
 import { FieldError, RequiredMark } from '../../components/FormValidation'
 import { scrollToFirstInvalidField } from '../../utils/formValidation'
+import SuccessConfirmation from '../../components/SuccessConfirmation'
+import { waitForSuccessConfirmation } from '../../utils/successConfirmation'
 import {
   ASSESSMENT_SESSION_KEYS,
   assessmentHeaders,
@@ -33,6 +35,7 @@ function OnboardingPersonality() {
   const [checkingResult, setCheckingResult] = useState(true)
   const [resultCheckFailed, setResultCheckFailed] = useState(false)
   const [attemptLoaded, setAttemptLoaded] = useState(false)
+  const [submitConfirmed, setSubmitConfirmed] = useState(false)
 
   useEffect(() => {
     readActiveAttempt(import.meta.env.VITE_API_URL, localStorage.getItem('token'), storage)
@@ -141,6 +144,9 @@ function OnboardingPersonality() {
 
       markAssessmentStepComplete(storage, 4)
       finishAssessmentAttempt(storage)
+      setSubmitConfirmed(true)
+      await waitForSuccessConfirmation()
+      setSubmitConfirmed(false)
       setResult(data)
     } catch {
       setError('Cannot connect to server. Please try again.')
@@ -150,6 +156,10 @@ function OnboardingPersonality() {
 
   const handleContinue = () => {
     navigate('/results')
+  }
+
+  if (submitConfirmed) {
+    return <OnboardingLayout currentStep={4} isComplete={false} showFooterNavigation={false}><div className="flex min-h-80 items-center justify-center"><SuccessConfirmation message="Assessment Completed" /></div></OnboardingLayout>
   }
 
   if (checkingResult) {
@@ -210,7 +220,7 @@ function OnboardingPersonality() {
           </div>
         )}
 
-        <div data-validation-field="personalityQuestion" className="rounded-3xl border border-orange-100 bg-gradient-to-br from-orange-50 via-white to-amber-50 p-5 sm:p-8 shadow-[0_18px_45px_-32px_rgba(234,88,12,0.55)] mb-7" aria-invalid={questionError ? 'true' : undefined} aria-describedby={questionError ? 'personality-question-error' : undefined}>
+        <div key={currentQuestion.id} data-validation-field="personalityQuestion" className="motion-enter rounded-3xl border border-orange-100 bg-gradient-to-br from-orange-50 via-white to-amber-50 p-5 sm:p-8 shadow-[0_18px_45px_-32px_rgba(234,88,12,0.55)] mb-7" aria-invalid={questionError ? 'true' : undefined} aria-describedby={questionError ? 'personality-question-error' : undefined}>
           <div className="flex items-start gap-4 mb-7 sm:mb-9">
             <div className="hidden sm:flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white text-orange-500 shadow-sm ring-1 ring-orange-100">
               <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">

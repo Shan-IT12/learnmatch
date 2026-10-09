@@ -6,6 +6,8 @@ import PersonalFactorsForm, { ApplicabilityQuestion, ImpactOptions, difficultyLe
 import { PERSONAL_FACTOR_KEYS, buildProfilePayload, deriveFactorApplicability, isPersonalFactorsComplete } from '../utils/profilePersonalFactors'
 import { scrollToFirstInvalidField } from '../utils/formValidation'
 import { USERNAME_MAX_LENGTH, USERNAME_MIN_LENGTH, validateUsername } from '../utils/usernameValidation'
+import SuccessConfirmation from '../components/SuccessConfirmation'
+import { waitForSuccessConfirmation } from '../utils/successConfirmation'
 
 export { ApplicabilityQuestion, ImpactOptions }
 
@@ -21,6 +23,7 @@ export default function ProfileEdit() {
   const navigate = useNavigate(); const token = localStorage.getItem('token')
   const [loading, setLoading] = useState(true); const [saving, setSaving] = useState(false)
   const [isFirstTime, setIsFirstTime] = useState(true)
+  const [saveConfirmed, setSaveConfirmed] = useState(false)
   const [formData, setFormData] = useState(emptyProfile); const [applicability, setApplicability] = useState(emptyApplicability); const [fieldErrors, setFieldErrors] = useState({}); const [error, setError] = useState('')
 
   useEffect(() => {
@@ -54,10 +57,13 @@ export default function ProfileEdit() {
       if (response.status === 401 || response.status === 403) { navigate('/login', { replace: true }); return }
       if (!response.ok) { if (data.field === 'username') { setFieldErrors((current) => ({ ...current, username: data.message || 'Username is already taken.' })); scrollToFirstInvalidField(['username']); return }; setError(data.message || 'Could not save your profile.'); return }
       localStorage.setItem('username', data.username || formData.username)
+      setSaveConfirmed(true)
+      await waitForSuccessConfirmation()
       navigate('/profile', { replace: true, state: { message: isFirstTime ? 'Profile saved successfully.' : 'Profile updated successfully.' } })
     } catch { setError('Cannot connect to server. Please try again.') } finally { setSaving(false) }
   }
 
   if (loading) return <div className="flex min-h-screen items-center justify-center bg-[#fcfbf9]"><p className="text-sm text-gray-500">Loading your profile...</p></div>
+  if (saveConfirmed) return <div className="flex min-h-screen items-center justify-center bg-[#fcfbf9] px-5"><SuccessConfirmation message={isFirstTime ? 'Profile Saved' : 'Profile Updated'} /></div>
   return <div className="min-h-screen bg-[#fcfbf9] text-gray-900"><nav className="flex items-center justify-between border-b border-gray-200/80 bg-white/90 px-4 py-4 backdrop-blur sm:px-8 lg:px-14"><button onClick={() => navigate('/dashboard')} className="text-lg font-bold tracking-tight">Learn<span className="text-orange-500">Match</span></button><button onClick={() => navigate(isFirstTime ? '/dashboard' : '/profile')} className="inline-flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-sm font-medium text-gray-500 hover:bg-gray-50 hover:text-gray-800"><IconArrowLeft size={16} /> {isFirstTime ? 'Back to Dashboard' : 'Back to Profile'}</button></nav><main className="mx-auto max-w-5xl px-4 py-8 sm:px-8 sm:py-10"><header className="mb-8"><p className="text-xs font-bold uppercase tracking-[0.16em] text-orange-500">Account profile</p><h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">{isFirstTime ? 'Set up your profile' : 'Edit profile'}</h1></header>{error && <div role="alert" className="mb-5 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-600">{error}</div>}<form onSubmit={handleSubmit} noValidate className="space-y-6"><section className="rounded-2xl border border-gray-200/80 bg-white p-4 shadow-sm sm:p-5"><div className="flex flex-col gap-4 sm:flex-row sm:items-start"><div className="flex min-w-44 items-center gap-3 sm:pt-1"><span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-orange-50 text-orange-600"><IconUser size={20} /></span><div><h2 className="font-semibold">Account username</h2><p className="mt-0.5 text-sm text-gray-500">Used across LearnMatch</p></div></div><UsernameField value={formData.username} error={fieldErrors.username} onChange={(username) => { clearFieldError('username'); setFormData({ ...formData, username }) }} /></div></section><section className="rounded-3xl border border-gray-200/80 bg-white p-4 shadow-sm sm:p-7"><div className="mb-6 border-b border-gray-100 pb-5"><p className="text-xs font-bold uppercase tracking-[0.14em] text-orange-500">About your circumstances</p><h2 className="mt-1.5 text-xl font-bold">Personal Factors</h2><p className="mt-1.5 text-sm leading-6 text-gray-500">Tell us about personal circumstances that may affect your studies.</p></div><PersonalFactorsForm formData={formData} applicability={applicability} fieldErrors={fieldErrors} setFormData={setFormData} setApplicability={setApplicability} clearFieldError={clearFieldError} /></section><div className="flex justify-end"><button type="submit" disabled={saving} className="inline-flex items-center justify-center gap-2 rounded-xl bg-orange-500 px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-orange-600 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-500">{saving ? 'Saving...' : isFirstTime ? 'Save Profile' : 'Save Changes'} <IconArrowRight size={17} /></button></div></form></main></div>
 }

@@ -51,6 +51,25 @@ test('renders both approximate year dropdowns with the active academic-year opti
   }
 })
 
+test('Academic Year is displayed read-only and cannot select past or future years', async () => {
+  const vite = await createServer({
+    server: { middlewareMode: true },
+    appType: 'custom',
+    optimizeDeps: { noDiscovery: true },
+  })
+  try {
+    const { AcademicYearField } = await vite.ssrLoadModule('/src/pages/college/CollegeSetup.jsx')
+    const markup = renderToStaticMarkup(React.createElement(AcademicYearField, { academicYear: '2026-2027' }))
+    assert.match(markup, /Academic year/)
+    assert.match(markup, /2026–2027/)
+    assert.match(markup, /Automatically based on the current academic year\./)
+    assert.match(markup, /aria-readonly="true"/)
+    assert.doesNotMatch(markup, /<select|<option|<input/)
+  } finally {
+    await vite.close()
+  }
+})
+
 test('Resume renders the existing program without recommendation or course-selection controls', async () => {
   const vite = await createServer({
     server: { middlewareMode: true },

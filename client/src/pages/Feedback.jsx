@@ -8,12 +8,12 @@ import {
   IconBug,
   IconBulb,
   IconCheck,
-  IconCircleCheck,
   IconMessageCircle,
   IconSend,
   IconStar,
   IconStarFilled,
 } from '@tabler/icons-react'
+import SuccessConfirmation from '../components/SuccessConfirmation'
 import {
   FEEDBACK_ENTRY_CONTEXT_KEY,
   getFeedbackDashboardPath,
@@ -110,7 +110,7 @@ function Feedback() {
         </nav>
         <main className="relative z-0 mx-auto flex max-w-3xl items-center px-4 py-12 sm:px-8 sm:py-20">
           <section className="w-full rounded-3xl border border-white/80 bg-white/85 px-5 py-10 text-center shadow-[0_12px_40px_rgba(15,23,42,0.06)] backdrop-blur-md sm:px-10 sm:py-14">
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600"><IconCircleCheck size={34} stroke={1.8} /></div>
+            <SuccessConfirmation message="Feedback Submitted" />
             <h1 className="mt-6 text-2xl font-bold tracking-tight text-gray-950">Thanks for your feedback!</h1>
             <p className="mt-2 text-sm text-gray-500">It genuinely helps us improve LearnMatch.</p>
             <button onClick={() => navigate(dashboardPath)} className="mt-8 inline-flex items-center justify-center gap-2 rounded-xl bg-orange-500 px-6 py-3 text-sm font-semibold text-white shadow-sm shadow-orange-200 transition hover:-translate-y-0.5 hover:bg-orange-600 focus:outline-none focus:ring-4 focus:ring-orange-100">

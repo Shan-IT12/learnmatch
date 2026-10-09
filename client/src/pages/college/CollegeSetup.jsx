@@ -6,14 +6,17 @@ import {
   buildCollegeSetupPayload,
   calculateDisplayedSemesterPhase,
   getAcademicYearOptions,
+  getCollegeSetupAcademicYear,
   getCurrentAcademicYear,
-  getFutureAcademicYearRanges,
   isApproximateEndAfterStart,
 } from '../../utils/collegeSchedule'
 import { ACADEMIC_CALENDARS, getCalendarTerms } from '../../constants/academicCalendars'
 import { FieldError, RequiredMark } from '../../components/FormValidation'
 import { scrollToFirstInvalidField } from '../../utils/formValidation'
 import CourseName from '../../components/CourseName'
+import { shouldReviewCollegeSetup } from '../../utils/collegeSetupReview'
+import SuccessConfirmation from '../../components/SuccessConfirmation'
+import { waitForSuccessConfirmation } from '../../utils/successConfirmation'
 
 const MONTHS = [
   'January', 'February', 'March', 'April', 'May', 'June',
@@ -110,33 +113,47 @@ export function ResumeProgramCard({ course, loading = false }) {
   )
 }
 
+export function AcademicYearField({ academicYear, isStored = false }) {
+  return (
+    <div>
+      <label htmlFor="academic-year" className="mb-2 block text-sm font-medium text-gray-700">Academic year</label>
+      <output id="academic-year" aria-readonly="true" className="block w-full rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3.5 text-sm font-semibold text-gray-900">
+        {academicYear.replace('-', '–')}
+      </output>
+      <p className="mt-2 text-xs text-gray-500">{isStored ? 'Saved academic year for this tracking cycle.' : 'Automatically based on the current academic year.'}</p>
+    </div>
+  )
+}
+
 function CollegeSetup() {
   const navigate = useNavigate()
   const location = useLocation()
   const token = localStorage.getItem('token')
   const lifecycleAction = new URLSearchParams(location.search).get('action') || 'setup'
   const isResume = lifecycleAction === 'resume'
+  const restoredDraft = shouldReviewCollegeSetup(lifecycleAction) ? location.state?.setupDraft : null
   const fixedCourse = lifecycleAction === 'restart' ? location.state?.course || null : null
 
   const [courses, setCourses] = useState([])
-  const [search, setSearch] = useState('')
+  const [search, setSearch] = useState(restoredDraft?.selectedCourse?.course_name || '')
   const [searchStatus, setSearchStatus] = useState('idle')
-  const [selectedCourse, setSelectedCourse] = useState(fixedCourse)
-  const [academicYear, setAcademicYear] = useState(getCurrentAcademicYear)
-  const [yearLevel, setYearLevel] = useState('')
-  const [semester, setSemester] = useState('')
-  const [calendarType, setCalendarType] = useState('semester')
-  const [termCode, setTermCode] = useState('')
-  const [semesterStartDate, setSemesterStartDate] = useState('')
-  const [semesterEndDate, setSemesterEndDate] = useState('')
-  const [timingChoice, setTimingChoice] = useState('exact')
-  const [approximateStart, setApproximateStart] = useState({ month: '', year: '', part: '' })
-  const [approximateEnd, setApproximateEnd] = useState({ month: '', year: '', part: '' })
-  const [semesterPosition, setSemesterPosition] = useState('')
+  const [selectedCourse, setSelectedCourse] = useState(restoredDraft?.selectedCourse || fixedCourse)
+  const [academicYear, setAcademicYear] = useState(restoredDraft?.academicYear || getCurrentAcademicYear)
+  const [yearLevel, setYearLevel] = useState(restoredDraft?.yearLevel || '')
+  const [semester, setSemester] = useState(restoredDraft?.semester || '')
+  const [calendarType, setCalendarType] = useState(restoredDraft?.calendarType || 'semester')
+  const [termCode, setTermCode] = useState(restoredDraft?.termCode || '')
+  const [semesterStartDate, setSemesterStartDate] = useState(restoredDraft?.semesterStartDate || '')
+  const [semesterEndDate, setSemesterEndDate] = useState(restoredDraft?.semesterEndDate || '')
+  const [timingChoice, setTimingChoice] = useState(restoredDraft?.timingChoice || 'exact')
+  const [approximateStart, setApproximateStart] = useState(restoredDraft?.approximateStart || { month: '', year: '', part: '' })
+  const [approximateEnd, setApproximateEnd] = useState(restoredDraft?.approximateEnd || { month: '', year: '', part: '' })
+  const [semesterPosition, setSemesterPosition] = useState(restoredDraft?.semesterPosition || '')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [resumeProgramLoading, setResumeProgramLoading] = useState(isResume)
   const [fieldErrors, setFieldErrors] = useState({})
+  const [successMessage, setSuccessMessage] = useState('')
 
   useEffect(() => {
     if (!token) navigate('/login')
@@ -163,6 +180,7 @@ function CollegeSetup() {
         const courseData = courseResponse.ok ? await courseResponse.json() : { courses: [] }
         const resolvedCourse = courseData.courses?.find((course) => course.course_id === data.courseId)
         setSelectedCourse(resolvedCourse || { course_id: data.courseId, course_name: data.courseName, course_code: data.courseCode })
+        setAcademicYear(getCollegeSetupAcademicYear('resume', data.academicYear))
       } catch (requestError) {
         if (requestError.name !== 'AbortError') setError(requestError.message || 'Paused tracking could not be loaded.')
       } finally {
@@ -205,7 +223,6 @@ function CollegeSetup() {
   }, [search, selectedCourse, isResume])
 
   const academicYears = getAcademicYearOptions(academicYear)
-  const academicYearRanges = getFutureAcademicYearRanges()
   const programDuration = Number(selectedCourse?.program_duration_years) || 5
   const academicDateMin = academicYears.length === 2 ? `${academicYears[0]}-01-01` : undefined
   const academicDateMax = academicYears.length === 2 ? `${academicYears[1]}-12-31` : undefined
@@ -224,28 +241,9 @@ function CollegeSetup() {
   )
   const validUnknownSchedule = timingChoice !== 'unknown' || Boolean(semesterPosition)
   const isFormComplete = Boolean(
-    selectedCourse && academicYearRanges.includes(academicYear) && validYearLevel && validTerm &&
+    selectedCourse && academicYears.length === 2 && validYearLevel && validTerm &&
     validExactSchedule && validApproximateSchedule && validUnknownSchedule
   )
-
-  const handleAcademicYearChange = (event) => {
-    const value = event.target.value
-    setAcademicYear(value)
-    setFieldErrors((current) => ({ ...current, academicYear: undefined }))
-    const suggestedYears = getAcademicYearOptions(value)
-    if (suggestedYears.length === 0) return
-    const semesterYear = termCode === 'SEM_1' || termCode === 'TRI_1' ? suggestedYears[0] : suggestedYears[1]
-    setApproximateStart((current) => ({
-      ...current,
-      year: suggestedYears.includes(current.year) ? current.year : semesterYear,
-    }))
-    setApproximateEnd((current) => ({
-      ...current,
-      year: suggestedYears.includes(current.year) ? current.year : semesterYear,
-    }))
-    setSemesterStartDate((current) => current && (current < `${suggestedYears[0]}-01-01` || current > `${suggestedYears[1]}-12-31`) ? '' : current)
-    setSemesterEndDate((current) => current && (current < `${suggestedYears[0]}-01-01` || current > `${suggestedYears[1]}-12-31`) ? '' : current)
-  }
 
   const handleSemesterChoice = (term) => {
     setSemester(term.label)
@@ -292,7 +290,7 @@ function CollegeSetup() {
 
     const nextErrors = {}
     if (!selectedCourse) nextErrors.course = 'Please select a course from the list.'
-    if (!academicYearRanges.includes(academicYear)) nextErrors.academicYear = 'Please select a current or future academic year.'
+    if (academicYears.length !== 2) nextErrors.academicYear = 'The academic year is unavailable.'
     if (!yearLevel || Number(yearLevel.match(/\d+/)?.[0]) > programDuration) nextErrors.yearLevel = 'Please select a valid year level for this course.'
     if (!getCalendarTerms(calendarType).some((term) => term.code === termCode && term.label === semester)) nextErrors.semester = 'Please select a valid term for this academic calendar.'
     if (timingChoice === 'exact' && (!semesterStartDate || !semesterEndDate || semesterEndDate <= semesterStartDate)) {
@@ -321,6 +319,43 @@ function CollegeSetup() {
     if (Object.keys(nextErrors).length) { setFieldErrors(nextErrors); scrollToFirstInvalidField(Object.keys(nextErrors)); return }
     setFieldErrors({})
 
+    const enrollment = {
+      academicYear,
+      yearLevel,
+      semester,
+      calendarType,
+      termCode,
+      timingMode: timingChoice === 'unknown' ? 'phase_only' : timingChoice,
+      semesterStartDate: timingChoice === 'exact' ? semesterStartDate : undefined,
+      semesterEndDate: timingChoice === 'exact' ? semesterEndDate : undefined,
+      approximateStart: timingChoice === 'approximate' ? approximateStart : undefined,
+      approximateEnd: timingChoice === 'approximate' ? approximateEnd : undefined,
+      initialTrackingPhase: timingChoice !== 'exact' ? semesterPosition : undefined,
+    }
+
+    if (shouldReviewCollegeSetup(lifecycleAction)) {
+      navigate('/college/setup/review', {
+        state: {
+          setupDraft: {
+            selectedCourse,
+            academicYear,
+            yearLevel,
+            semester,
+            calendarType,
+            termCode,
+            timingChoice,
+            semesterStartDate,
+            semesterEndDate,
+            approximateStart,
+            approximateEnd,
+            semesterPosition,
+            payload: buildCollegeSetupPayload(lifecycleAction, selectedCourse, enrollment),
+          },
+        },
+      })
+      return
+    }
+
     setLoading(true)
     try {
       const lifecycleEndpoints = {
@@ -334,19 +369,7 @@ function CollegeSetup() {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify(buildCollegeSetupPayload(lifecycleAction, selectedCourse, {
-          academicYear,
-          yearLevel,
-          semester,
-          calendarType,
-          termCode,
-          timingMode: timingChoice === 'unknown' ? 'phase_only' : timingChoice,
-          semesterStartDate: timingChoice === 'exact' ? semesterStartDate : undefined,
-          semesterEndDate: timingChoice === 'exact' ? semesterEndDate : undefined,
-          approximateStart: timingChoice === 'approximate' ? approximateStart : undefined,
-          approximateEnd: timingChoice === 'approximate' ? approximateEnd : undefined,
-          initialTrackingPhase: timingChoice !== 'exact' ? semesterPosition : undefined,
-        })),
+        body: JSON.stringify(buildCollegeSetupPayload(lifecycleAction, selectedCourse, enrollment)),
       })
 
       const data = await response.json()
@@ -357,12 +380,16 @@ function CollegeSetup() {
         return
       }
 
+      setSuccessMessage(lifecycleAction === 'resume' ? 'Tracking Resumed' : lifecycleAction === 'change' ? 'Program Changed' : 'College Phase Started')
+      await waitForSuccessConfirmation()
       navigate('/college')
     } catch {
       setError('Cannot connect to server. Please try again.')
       setLoading(false)
     }
   }
+
+  if (successMessage) return <div className="flex min-h-screen items-center justify-center bg-[#fbf8f3] px-5"><SuccessConfirmation message={successMessage} /></div>
 
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-[#fbf8f3] text-gray-900">
@@ -402,7 +429,7 @@ function CollegeSetup() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} noValidate className="grid gap-6 lg:grid-cols-2 lg:items-start">
+        <form onSubmit={handleSubmit} noValidate className="motion-stagger grid gap-6 lg:grid-cols-2 lg:items-start">
           <fieldset disabled={loading} className="contents">
 
           <section className="rounded-[26px] border border-white/90 bg-white/75 p-5 shadow-[0_22px_60px_-42px_rgba(120,53,15,.48)] backdrop-blur-xl sm:p-7">
@@ -448,7 +475,7 @@ function CollegeSetup() {
               <p className="mt-2 text-xs text-gray-400">Finding courses...</p>
             )}
             {searchStatus === 'success' && courses.length > 0 && !selectedCourse && (
-              <div className="mt-2 max-h-64 overflow-y-auto rounded-xl border border-orange-100 bg-white shadow-lg">
+              <div className="course-suggestion-scroll mt-2 w-full rounded-xl border border-orange-100 bg-white shadow-lg">
                 {courses.map((course) => (
                   <button
                     key={course.course_id}
@@ -492,20 +519,9 @@ function CollegeSetup() {
           </div>
           </>}
 
-          {/* Year level */}
+          {/* Academic year */}
           <div data-validation-field="academicYear">
-            <label htmlFor="academic-year" className="block text-sm font-medium text-gray-700 mb-2">
-              Academic year <RequiredMark />
-            </label>
-            <select
-              id="academic-year"
-              value={academicYear}
-              onChange={handleAcademicYearChange}
-              required aria-required="true" aria-invalid={fieldErrors.academicYear ? 'true' : undefined} aria-describedby={fieldErrors.academicYear ? 'academic-year-error' : undefined}
-              className="w-full rounded-2xl border border-stone-200 bg-white px-4 py-3.5 text-sm outline-none transition duration-150 hover:border-orange-200 focus:border-orange-400 focus:ring-4 focus:ring-orange-100/80"
-            >
-              {academicYearRanges.map((year) => <option key={year} value={year}>{year.replace('-', '–')}</option>)}
-            </select>
+            <AcademicYearField academicYear={academicYear} isStored={isResume} />
             <FieldError id="academic-year-error">{fieldErrors.academicYear}</FieldError>
           </div>
 

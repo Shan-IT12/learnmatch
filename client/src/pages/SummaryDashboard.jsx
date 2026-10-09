@@ -207,7 +207,7 @@ function SummaryDashboard() {
         </div>
  
         {/* Assessment overview */}
-        <div className="mb-10 grid items-start gap-5 md:grid-cols-2">
+        <div className="motion-stagger mb-10 grid items-start gap-5 md:grid-cols-2">
           <div className="space-y-5">
           <section className="rounded-2xl border border-white/90 bg-white/78 p-5 shadow-[0_18px_48px_-40px_rgba(120,53,15,.5)] sm:p-6">
             <div className="flex items-center gap-3 mb-4">

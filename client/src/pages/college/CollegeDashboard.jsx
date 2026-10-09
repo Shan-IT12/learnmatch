@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import CourseName from '../../components/CourseName'
+import SuccessConfirmation from '../../components/SuccessConfirmation'
+import { waitForSuccessConfirmation } from '../../utils/successConfirmation'
 import {
   IconAlertTriangle,
   IconArrowRight,
@@ -187,6 +189,7 @@ function CollegeDashboard() {
   const [nextTermErrors, setNextTermErrors] = useState({})
   const [startingAssessment, setStartingAssessment] = useState(false)
   const [showFullHistory, setShowFullHistory] = useState(false)
+  const [successMessage, setSuccessMessage] = useState('')
 
   useEffect(() => {
     if (!token) {
@@ -317,6 +320,8 @@ function CollegeDashboard() {
       })
       const payload = await response.json()
       if (!response.ok) throw new Error(payload.message || 'Unable to update college tracking.')
+      setSuccessMessage(action === 'pause' ? 'Tracking Paused' : action === 'resume' ? 'Tracking Resumed' : 'Tracking Ended')
+      await waitForSuccessConfirmation()
       navigate(0)
     } catch (requestError) {
       setError(requestError.message)
@@ -406,6 +411,8 @@ function CollegeDashboard() {
         setError(payload.message || 'We could not start the next semester.')
         return
       }
+      setSuccessMessage('Next Term Started')
+      await waitForSuccessConfirmation()
       navigate(0)
     } catch {
       setError('We could not start the next semester. Please try again.')
@@ -427,7 +434,7 @@ function CollegeDashboard() {
         <div className="h-[73px] border-b border-gray-100 bg-white" />
         <main className="mx-auto max-w-[1280px] space-y-6 px-4 py-8 sm:px-8 lg:px-12">
           <div className="h-56 animate-pulse rounded-[24px] bg-slate-200" />
-          <div className="grid gap-6 lg:grid-cols-3">
+          <div className="motion-stagger grid gap-6 lg:grid-cols-3">
             {[0, 1, 2].map((item) => <div key={item} className="h-48 animate-pulse rounded-[20px] bg-white" />)}
           </div>
           <div className="h-72 animate-pulse rounded-[20px] bg-white" />
@@ -462,6 +469,7 @@ function CollegeDashboard() {
 
       <main className="max-w-[1280px] mx-auto px-4 sm:px-8 lg:px-12 py-8 lg:py-11 space-y-6">
         {error && <div className="rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700">{error}</div>}
+        {successMessage && <div className="rounded-2xl border border-emerald-100 bg-emerald-50/70 px-5 py-4"><SuccessConfirmation compact message={successMessage} /></div>}
 
         <section className="relative overflow-hidden rounded-[24px] border border-slate-800 bg-slate-950 p-6 text-white shadow-[0_22px_55px_-34px_rgba(15,23,42,.8)] sm:p-8">
           <div className="pointer-events-none absolute inset-y-0 left-0 w-1.5 bg-gradient-to-b from-orange-400 via-orange-500 to-amber-300" />
@@ -814,7 +822,7 @@ function CollegeDashboard() {
                 {institutionDependentTerm && (
                   <div className="space-y-4 rounded-2xl border border-orange-100 bg-orange-50/60 p-4 sm:p-5">
                     <p className="text-sm text-orange-800">LearnMatch cannot assume what follows this legacy term. Select the next academic stage explicitly.</p>
-                    <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="motion-stagger grid gap-4 sm:grid-cols-2">
                       <label data-validation-field="nextYearLevel" className="block text-sm font-medium text-gray-700">Next year level <RequiredMark /><select value={confirmedNextYearLevel} onChange={(event) => { setConfirmedNextYearLevel(event.target.value); setNextTermErrors((current) => ({ ...current, nextYearLevel: undefined })) }} aria-invalid={nextTermErrors.nextYearLevel ? 'true' : undefined} aria-describedby={nextTermErrors.nextYearLevel ? 'next-year-level-error' : undefined} className="mt-2 w-full rounded-xl border border-gray-200 bg-white px-3 py-3 text-sm">
                         <option value="">Next year level</option>
                         {['1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year'].map((year) => <option key={year} value={year}>{year}</option>)}
