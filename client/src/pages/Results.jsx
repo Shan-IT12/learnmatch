@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { IconLoader2, IconSchool } from '@tabler/icons-react'
 import FeedbackPopup from '../components/FeedbackPopup'
+import CourseName from '../components/CourseName'
 import { getAssessmentReturnDestination, SUMMARY_DASHBOARD_DESTINATION } from '../utils/assessmentReturnDestination'
 import { feedbackPromptKey, setActiveFeedbackPromptKey } from '../utils/feedbackPrompt'
 
@@ -339,10 +340,7 @@ function Results() {
                     <span className="text-xs font-semibold text-orange-500 uppercase tracking-wide">
                       {rankLabel[rec.rank_position - 1] || `#${rec.rank_position}`}
                     </span>
-                    <h2 className="text-lg sm:text-xl font-bold text-gray-900 mt-1 leading-snug">
-                      {rec.course_name}
-                      {rec.course_abbreviation && ` (${rec.course_abbreviation})`}
-                    </h2>
+                    <CourseName as="h2" name={rec.course_name} abbreviation={rec.course_abbreviation} className="text-lg sm:text-xl font-bold text-gray-900 mt-1 leading-snug" secondaryClassName="mt-1 text-base font-medium text-gray-500" />
                   </div>
                   <div className="flex items-baseline gap-1 sm:block sm:text-right shrink-0">
                     <span className="text-2xl font-bold text-orange-500">{rec.match_score}%</span>

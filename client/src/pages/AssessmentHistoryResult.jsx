@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { IconArrowLeft, IconBrain, IconLoader2, IconLock } from '@tabler/icons-react'
+import CourseName from '../components/CourseName'
 
 const breakdownLabels = {
   skill_match: 'Skills',
@@ -43,9 +44,7 @@ export function HistoricalResultContent({ result }) {
                 <p className="text-xs font-bold uppercase tracking-wide text-orange-500">
                   {recommendation.rank_position === 1 ? 'Top Match' : `Rank ${recommendation.rank_position}`}
                 </p>
-                <h2 className="mt-1 text-xl font-bold leading-snug text-gray-900">
-                  {recommendation.course_name}{recommendation.course_abbreviation ? ` (${recommendation.course_abbreviation})` : ''}
-                </h2>
+                <CourseName as="h2" name={recommendation.course_name} abbreviation={recommendation.course_abbreviation} className="mt-1 text-xl font-bold leading-snug text-gray-900" secondaryClassName="mt-1 text-base font-medium text-gray-500" />
               </div>
               <div className="shrink-0 sm:text-right"><span className="text-3xl font-black text-orange-500">{recommendation.match_score}%</span><p className="text-xs text-gray-400">compatibility</p></div>
             </div>

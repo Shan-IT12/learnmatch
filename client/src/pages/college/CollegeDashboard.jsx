@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import CourseName from '../../components/CourseName'
 import {
   IconAlertTriangle,
   IconArrowRight,
@@ -470,7 +471,7 @@ function CollegeDashboard() {
               <span className="mb-3 inline-flex rounded-full border border-slate-700 bg-slate-900 px-3 py-1 text-xs font-semibold text-slate-200">
                 Tracking status: {lifecycleStatus === 'active' ? 'Active' : lifecycleStatus === 'paused' ? 'Paused' : 'Ended / Archived'}
               </span>
-              <h1 className="text-2xl font-bold text-white sm:text-3xl">{collegeInfo?.courseName}</h1>
+              <CourseName as="h1" name={collegeInfo?.courseName} className="text-2xl font-bold text-white sm:text-3xl" secondaryClassName="mt-1 text-sm font-medium text-slate-300 sm:text-base" />
               <p className="mt-2 text-sm text-slate-300">
                 {[collegeInfo?.yearLevel, collegeInfo?.semester].filter(Boolean).join(' • ')}
               </p>
@@ -880,7 +881,10 @@ function CollegeDashboard() {
                 <article key={record.checkinId} className="border border-gray-100 rounded-2xl px-4 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                   <div>
                     <div className="flex flex-wrap items-center gap-2">
-                      <p className="text-sm font-semibold text-gray-900">{record.courseName} · {record.yearLevel} · {record.semester} · {record.phase}</p>
+                      <div className="text-sm font-semibold text-gray-900">
+                        <CourseName name={record.courseName} secondaryClassName="mt-0.5 text-sm font-medium text-gray-500" />
+                        <p className="mt-1 text-xs font-medium text-gray-500">{record.yearLevel} · {record.semester} · {record.phase}</p>
+                      </div>
                       <span className={`inline-flex border rounded-full px-2 py-0.5 text-[9px] font-bold ${statusStyle(record.status)}`}>{statusLabel(record.status)}</span>
                     </div>
                     <p className="text-xs text-gray-400 mt-1">{formatCheckinDate(record.checkinDate) || 'Date unavailable'}</p>

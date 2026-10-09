@@ -3,6 +3,8 @@ import { Link, useLocation, useParams } from 'react-router-dom'
 import { IconAlertCircle, IconArrowLeft, IconBook2, IconMapPin, IconRoute, IconSchool } from '@tabler/icons-react'
 import PublicHeader from '../components/PublicHeader'
 import SchoolLocatorMap from '../components/SchoolLocatorMap'
+import CourseName from '../components/CourseName'
+import { getDisplayCourseAbbreviation } from '../utils/courseName'
 import { getSchoolLocatorBackNavigation } from '../utils/schoolLocatorNavigation'
 import {
   directionsErrorMessage,
@@ -51,7 +53,7 @@ function SchoolLocator() {
         setDirections({ status: 'idle' })
         setStatus('success')
         setResolvedCourseCode(courseCode)
-        document.title = `Schools for ${data.course.course_abbreviation || data.course.course_name} | LearnMatch`
+        document.title = `Schools for ${getDisplayCourseAbbreviation(data.course.course_name, data.course.course_abbreviation) || data.course.course_name} | LearnMatch`
       })
       .catch((error) => {
         if (error.name !== 'AbortError') {
@@ -175,9 +177,12 @@ function SchoolLocator() {
               <div className="absolute -right-12 -top-16 w-56 h-56 rounded-full border-[34px] border-white/35" aria-hidden="true" />
               <div className="relative max-w-3xl">
                 <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-orange-700"><IconSchool size={17} stroke={1.8} /> School Locator</div>
-                <h1 className="text-2xl sm:text-4xl font-bold leading-tight mt-4">Schools associated with {result.course.course_name}</h1>
+                <h1 className="text-2xl sm:text-4xl font-bold leading-tight mt-4">
+                  <span className="block text-base font-semibold text-orange-800 sm:text-lg">Schools associated with</span>
+                  <CourseName name={result.course.course_name} className="mt-1 block" secondaryClassName="mt-1 text-base font-medium text-orange-900/70 sm:text-lg" />
+                </h1>
                 <div className="flex flex-wrap gap-2.5 mt-5">
-                  {result.course.course_abbreviation && <span className="bg-white/80 border border-white text-gray-700 text-xs font-semibold px-3 py-1.5 rounded-full">{result.course.course_abbreviation}</span>}
+                  {result.course.course_abbreviation && <span className="bg-white/80 border border-white text-gray-700 text-xs font-semibold px-3 py-1.5 rounded-full">{getDisplayCourseAbbreviation(result.course.course_name, result.course.course_abbreviation)}</span>}
                   <span className="inline-flex items-center gap-1.5 bg-white/80 border border-white text-gray-700 text-xs font-semibold px-3 py-1.5 rounded-full"><IconMapPin size={14} /> {result.location_scope}</span>
                 </div>
                 <p className="text-sm sm:text-base text-amber-950/70 leading-relaxed mt-5">Explore schools in San Jose del Monte that offer this course based on available program information.</p>

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import CourseEnrichmentSections from '../components/CourseEnrichmentSections'
+import CourseName from '../components/CourseName'
 import useActiveCollegePhase from '../hooks/useActiveCollegePhase'
 import {
   cameFromCareerPathChooser,
@@ -150,9 +151,7 @@ function CareerPath() {
                         <p className="text-xs font-bold uppercase tracking-[0.13em] text-orange-600">
                           #{recommendation.rank_position} Recommendation
                         </p>
-                        <h2 className="mt-4 text-xl font-bold leading-snug text-gray-950 sm:text-2xl">
-                          {recommendation.course_name}
-                        </h2>
+                        <CourseName as="h2" name={recommendation.course_name} abbreviation={recommendation.course_abbreviation} className="mt-4 text-xl font-bold leading-snug text-gray-950 sm:text-2xl" secondaryClassName="mt-1 text-base font-medium text-gray-500" />
 
                         <div className="mt-6">
                           <div className="flex items-end justify-between gap-3">
@@ -218,7 +217,7 @@ function CareerPath() {
 
         {courseCode && status === 'success' && course && (
           <>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mt-1 mb-1">{course.course_name}</h1>
+            <CourseName as="h1" name={course.course_name} abbreviation={course.course_abbreviation} className="text-2xl sm:text-3xl font-bold text-gray-900 mt-1 mb-1" secondaryClassName="mt-1 text-base font-medium text-gray-500" />
             <p className="text-sm text-gray-600 leading-7 mb-8 max-w-4xl">{course.description}</p>
 
             <section className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm mb-6">

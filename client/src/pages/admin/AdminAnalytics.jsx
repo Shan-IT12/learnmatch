@@ -20,6 +20,7 @@ import {
   IconUsers,
 } from '@tabler/icons-react'
 import AdminHeader from '../../components/AdminHeader'
+import { parseCourseName } from '../../utils/courseName'
 
 ChartJS.register(ArcElement, BarElement, CategoryScale, Legend, LinearScale, Tooltip)
 
@@ -108,6 +109,11 @@ function wrapLabel(label, maxLength = 24) {
     else lines[lines.length - 1] = `${current} ${word}`
   }
   return lines
+}
+
+function wrapCourseLabel(courseName) {
+  const { baseName, specialization } = parseCourseName(courseName)
+  return [...wrapLabel(baseName), ...(specialization ? wrapLabel(specialization) : [])]
 }
 
 function ChartCard({ title, subtitle, icon: Icon, children, aside }) {
@@ -230,7 +236,7 @@ function AdminAnalytics() {
         }],
       },
       courses: {
-        labels: analytics.topRecommendedCourses.map(({ courseName }) => wrapLabel(courseName)),
+        labels: analytics.topRecommendedCourses.map(({ courseName }) => wrapCourseLabel(courseName)),
         datasets: [{
           data: analytics.topRecommendedCourses.map(({ count }) => count),
           backgroundColor: '#f97316',

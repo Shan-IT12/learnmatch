@@ -10,6 +10,8 @@ import {
   IconListNumbers, IconRefresh, IconUserPlus, IconUsers,
 } from '@tabler/icons-react'
 import AdminHeader from '../../components/AdminHeader'
+import CourseName from '../../components/CourseName'
+import { parseCourseName } from '../../utils/courseName'
 
 ChartJS.register(
   ArcElement, BarElement, CategoryScale, Legend, LineElement,
@@ -80,6 +82,11 @@ const metricDefinitions = [
 ]
 
 function formatCourseChartLabel(courseName, maxLength = 26) {
+  const { baseName, specialization } = parseCourseName(courseName)
+  if (specialization) {
+    const shorten = (value) => value.length > maxLength ? `${value.slice(0, maxLength - 1).trimEnd()}…` : value
+    return [shorten(baseName), shorten(specialization)]
+  }
   if (courseName.length <= maxLength) return courseName
 
   const words = courseName.split(/\s+/)
@@ -310,8 +317,7 @@ function AdminDashboard() {
                       <li key={course.courseId} className="flex items-center gap-3 py-4 first:pt-0 last:pb-0">
                         <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-orange-50 text-sm font-bold text-orange-700">{index + 1}</span>
                         <div className="min-w-0 flex-1">
-                          <p className="truncate text-sm font-semibold text-slate-800">{course.courseCode || course.courseName}</p>
-                          {course.courseCode && <p className="truncate text-xs text-slate-500">{course.courseName}</p>}
+                          {course.courseCode ? <><p className="truncate text-sm font-semibold text-slate-800">{course.courseCode}</p><CourseName name={course.courseName} className="text-sm text-slate-500" secondaryClassName="mt-0.5 text-sm text-slate-400" /></> : <CourseName name={course.courseName} className="text-sm font-semibold text-slate-800" secondaryClassName="mt-0.5 text-sm font-normal text-slate-500" />}
                         </div>
                         <span className="shrink-0 text-sm font-semibold tabular-nums text-slate-600">{course.count}</span>
                       </li>

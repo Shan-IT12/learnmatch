@@ -13,6 +13,7 @@ import {
 import { ACADEMIC_CALENDARS, getCalendarTerms } from '../../constants/academicCalendars'
 import { FieldError, RequiredMark } from '../../components/FormValidation'
 import { scrollToFirstInvalidField } from '../../utils/formValidation'
+import CourseName from '../../components/CourseName'
 
 const MONTHS = [
   'January', 'February', 'March', 'April', 'May', 'June',
@@ -103,9 +104,7 @@ export function ResumeProgramCard({ course, loading = false }) {
   return (
     <div aria-label="Current Program" className="rounded-2xl border border-orange-200 bg-orange-50 px-4 py-4">
       <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-orange-600">Current Program</p>
-      <p className="mt-2 text-base font-semibold text-gray-900">
-        {loading ? 'Loading your existing program...' : course?.course_name || 'Program unavailable'}
-      </p>
+      {loading ? <p className="mt-2 text-base font-semibold text-gray-900">Loading your existing program...</p> : <CourseName name={course?.course_name || 'Program unavailable'} className="mt-2 block text-base font-semibold text-gray-900" secondaryClassName="mt-0.5 text-sm font-medium text-gray-600" />}
       {!loading && <p className="mt-1 text-sm text-gray-600">You’re resuming tracking for your existing program.</p>}
     </div>
   )
@@ -457,10 +456,7 @@ function CollegeSetup() {
                     onClick={() => selectCourse(course)}
                     className="block w-full text-left px-4 py-3 hover:bg-orange-50 border-t border-gray-50 first:border-t-0 focus:outline-none focus:bg-orange-50"
                   >
-                    <p className="text-sm font-medium text-gray-800">
-                      {course.course_name}
-                      {course.course_abbreviation && ` (${course.course_abbreviation})`}
-                    </p>
+                    <CourseName name={course.course_name} abbreviation={course.course_abbreviation} className="text-sm font-medium text-gray-800" secondaryClassName="mt-1 text-sm font-normal text-gray-500" />
                   </button>
                 ))}
               </div>
@@ -476,10 +472,7 @@ function CollegeSetup() {
             {selectedCourse && (
               <div className="mt-2 bg-orange-50 border border-orange-200 rounded-xl px-4 py-3 flex justify-between items-center">
                 <div>
-                  <p className="text-sm font-medium text-gray-800">
-                    {selectedCourse.course_name}
-                    {selectedCourse.course_abbreviation && ` (${selectedCourse.course_abbreviation})`}
-                  </p>
+                  <CourseName name={selectedCourse.course_name} abbreviation={selectedCourse.course_abbreviation} className="text-sm font-medium text-gray-800" secondaryClassName="mt-1 text-sm font-normal text-gray-500" />
                 </div>
                 <button
                   type="button"

@@ -3,6 +3,8 @@ import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-do
 import { getCourseCatalogUrl } from '../utils/courseCatalog'
 import useActiveCollegePhase from '../hooks/useActiveCollegePhase'
 import PublicHeader from '../components/PublicHeader'
+import CourseName from '../components/CourseName'
+import { getDisplayCourseAbbreviation } from '../utils/courseName'
 
 const apiUrl = import.meta.env.VITE_API_URL || ''
 const COURSES_PER_PAGE = 18
@@ -176,9 +178,7 @@ function CourseSearch() {
                       onClick={() => navigate(`/courses/${course.course_code}${contextSearch}`, { state: courseDetailsState })}
                       className="block w-full text-left px-5 py-3 border-t border-gray-50 hover:bg-orange-50 transition group"
                     >
-                      <p className="text-sm font-medium text-gray-800 group-hover:text-orange-600 transition">
-                        {course.course_name}{course.course_abbreviation ? ` (${course.course_abbreviation})` : ''}
-                      </p>
+                      <CourseName name={course.course_name} abbreviation={course.course_abbreviation} className="text-sm font-medium text-gray-800 transition group-hover:text-orange-600" secondaryClassName="mt-1 text-sm font-normal text-gray-500" />
                     </button>
                   ))}
                 </div>
@@ -220,10 +220,10 @@ function CourseSearch() {
                 {visibleCourses.map((course) => (
                   <article key={course.course_code} className="flex flex-col bg-white border border-gray-100 rounded-2xl p-5 sm:p-6 shadow-sm hover:shadow-md hover:border-orange-200 transition">
                     <div className="flex flex-wrap items-center gap-2 mb-3">
-                      {course.course_abbreviation && <span className="text-xs font-bold text-orange-600 bg-orange-50 px-2.5 py-1 rounded-full">{course.course_abbreviation}</span>}
+                      {course.course_abbreviation && <span className="text-xs font-bold text-orange-600 bg-orange-50 px-2.5 py-1 rounded-full">{getDisplayCourseAbbreviation(course.course_name, course.course_abbreviation)}</span>}
                       {course.cluster_category && <span className="text-xs font-medium text-gray-600 bg-gray-100 px-2.5 py-1 rounded-full">{course.cluster_category}</span>}
                     </div>
-                    <h2 className="text-lg font-semibold text-gray-900">{course.course_name}</h2>
+                    <CourseName as="h2" name={course.course_name} className="text-lg font-semibold text-gray-900" secondaryClassName="mt-1 text-base font-medium text-gray-500" />
                     {course.description && <p className="text-sm text-gray-500 leading-relaxed mt-2 line-clamp-2">{course.description}</p>}
                     <Link to={`/courses/${course.course_code}${contextSearch}`} state={courseDetailsState} className="mt-4 inline-flex w-fit items-center text-sm font-semibold text-orange-600 hover:text-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 rounded">
                       View course details <span aria-hidden="true" className="ml-1">→</span>

@@ -12,6 +12,7 @@ import {
   IconX,
 } from '@tabler/icons-react'
 import AdminHeader from '../../components/AdminHeader'
+import CourseName from '../../components/CourseName'
 
 const alignmentStyles = {
   'On Track': 'border-emerald-200 bg-emerald-50 text-emerald-700',
@@ -171,7 +172,7 @@ function AdminUserDetail() {
                           <span className="text-xs font-semibold uppercase tracking-wide text-orange-600">Rank {course.rank}</span>
                           <span className="text-sm font-bold text-slate-800">{course.matchPercent}%</span>
                         </div>
-                        <h3 className="mt-2 text-sm font-semibold leading-5 text-slate-900">{course.courseName}</h3>
+                        <CourseName as="h3" name={course.courseName} className="mt-2 text-sm font-semibold leading-5 text-slate-900" secondaryClassName="mt-0.5 text-sm font-normal text-slate-500" />
                         {course.courseCode && <p className="mt-1 text-xs text-slate-500">{course.courseCode}</p>}
                       </article>
                     ))}
@@ -187,7 +188,7 @@ function AdminUserDetail() {
                 <div className="space-y-6">
                   <div className="flex flex-col justify-between gap-4 border-b border-slate-100 pb-5 sm:flex-row sm:items-center">
                     <div>
-                      <p className="text-sm font-semibold text-slate-900">{user.tracking.course.courseName}</p>
+                      <CourseName name={user.tracking.course.courseName} className="text-sm font-semibold text-slate-900" secondaryClassName="mt-0.5 text-sm font-normal text-slate-500" />
                       {user.tracking.course.courseCode && <p className="mt-1 text-xs text-slate-500">{user.tracking.course.courseCode}</p>}
                     </div>
                     <span className={`w-fit rounded-md border px-2.5 py-1.5 text-sm font-semibold ${alignmentStyles[user.tracking.latestAlignment] || 'border-slate-200 bg-slate-50 text-slate-600'}`}>

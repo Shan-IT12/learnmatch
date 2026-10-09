@@ -4,6 +4,7 @@ import { IconArrowRight, IconCircleCheck } from '@tabler/icons-react'
 import { checkinQuestions, checkinScale } from '../../data/checkinQuestions'
 import { FieldError, RequiredMark } from '../../components/FormValidation'
 import { scrollToFirstInvalidField } from '../../utils/formValidation'
+import CourseName from '../../components/CourseName'
 
 const RESULT_STYLES = {
   'On Track': 'border-emerald-200 bg-emerald-50 text-emerald-700',
@@ -28,7 +29,7 @@ export function CheckinResult({ result, courseName, termLabel, phase, onBack = (
           <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 text-emerald-600"><IconCircleCheck size={27} stroke={2} /></span>
           <p className="mt-4 text-xs font-bold uppercase tracking-[0.18em] text-orange-600">Term Check-in</p>
           <h1 className="mt-1 text-3xl font-bold tracking-tight text-gray-950 sm:text-4xl">Check-in Complete</h1>
-          <p className="mt-2 text-base font-semibold text-gray-800">{courseName}</p>
+          <CourseName name={courseName} className="mt-2 block text-base font-semibold text-gray-800" secondaryClassName="mt-0.5 text-sm font-medium text-gray-500" />
           <div className="mt-2 flex flex-wrap items-center justify-center gap-2 text-sm text-gray-500">
             {termLabel && <span>{termLabel}</span>}
             {termLabel && <span aria-hidden="true">•</span>}
@@ -89,7 +90,7 @@ export function CheckinHeader({ courseName, termLabel, phase, answeredCount }) {
     <header className="mb-6 overflow-hidden rounded-[24px] border border-slate-800 bg-slate-950 px-5 py-6 text-white shadow-[0_22px_55px_-36px_rgba(15,23,42,.85)] sm:px-7 sm:py-7">
       <p className="text-xs font-bold uppercase tracking-[0.18em] text-orange-400">Term Check-in</p>
       <div className="mt-3 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div><h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{courseName}</h1><div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-slate-300">{termLabel && <span>{termLabel}</span>}{termLabel && <span aria-hidden="true">•</span>}<span className="rounded-full border border-orange-400/40 bg-orange-400/10 px-2.5 py-1 font-semibold text-orange-200">{phase} Phase</span></div></div>
+        <div><CourseName as="h1" name={courseName} className="text-2xl font-bold tracking-tight sm:text-3xl" secondaryClassName="mt-1 text-sm font-medium text-slate-300 sm:text-base" /><div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-slate-300">{termLabel && <span>{termLabel}</span>}{termLabel && <span aria-hidden="true">•</span>}<span className="rounded-full border border-orange-400/40 bg-orange-400/10 px-2.5 py-1 font-semibold text-orange-200">{phase} Phase</span></div></div>
         <p className="max-w-md text-sm leading-relaxed text-slate-400">Answer based on your current experience in this term. Choose the response that feels most accurate for you right now.</p>
       </div>
       <AnsweredProgress answeredCount={answeredCount} />

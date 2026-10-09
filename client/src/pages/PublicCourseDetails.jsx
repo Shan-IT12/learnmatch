@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useParams } from 'react-router-dom'
 import PublicHeader from '../components/PublicHeader'
+import CourseName from '../components/CourseName'
+import { getDisplayCourseAbbreviation } from '../utils/courseName'
 import { getCourseOverviewBackNavigation } from '../utils/courseOverviewNavigation'
 import useActiveCollegePhase from '../hooks/useActiveCollegePhase'
 
@@ -51,7 +53,7 @@ function PublicCourseDetails() {
         setCourse(data.course)
         setStatus('success')
         setResolvedCourseCode(courseCode)
-        document.title = `${data.course.course_abbreviation || data.course.course_name} | LearnMatch`
+        document.title = `${getDisplayCourseAbbreviation(data.course.course_name, data.course.course_abbreviation) || data.course.course_name} | LearnMatch`
         setMetaDescription((data.course.description || `Explore ${data.course.course_name} on LearnMatch`).slice(0, 160))
       })
       .catch((error) => {
@@ -89,9 +91,9 @@ function PublicCourseDetails() {
             )}
             <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-6 sm:p-9 mt-5">
               <div className="flex flex-wrap items-center gap-2 mb-4">
-                {course.course_abbreviation && <span className="text-xs font-bold text-orange-600 bg-orange-50 px-3 py-1.5 rounded-full">{course.course_abbreviation}</span>}
+                {course.course_abbreviation && <span className="text-xs font-bold text-orange-600 bg-orange-50 px-3 py-1.5 rounded-full">{getDisplayCourseAbbreviation(course.course_name, course.course_abbreviation)}</span>}
               </div>
-              <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 leading-tight">{course.course_name}</h1>
+              <CourseName as="h1" name={course.course_name} className="text-3xl sm:text-4xl font-bold text-gray-900 leading-tight" secondaryClassName="mt-2 text-lg font-medium text-gray-500" />
               {course.description && <p className="text-gray-600 leading-7 whitespace-pre-line mt-6">{course.description}</p>}
 
               {hasActiveCollegePhase === null ? (

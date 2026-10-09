@@ -4,6 +4,8 @@ import { IconPlus, IconEdit, IconArrowLeft, IconSearch, IconX } from '@tabler/ic
 import AdminHeader from '../../components/AdminHeader'
 import { FieldError, RequiredMark } from '../../components/FormValidation'
 import { scrollToFirstInvalidField } from '../../utils/formValidation'
+import CourseName from '../../components/CourseName'
+import { getDisplayCourseAbbreviation } from '../../utils/courseName'
 
 const emptyCourseForm = {
   course_name: '',
@@ -100,12 +102,12 @@ function CourseTable({ courses, openEditCourseForm, handleStatusChange, updating
           <tbody className="divide-y divide-gray-100">
             {courses.map((course) => {
               const active = isCourseActive(course)
-              const courseIdentifiers = [course.course_code, course.course_abbreviation].filter(Boolean).join(' · ')
+              const courseIdentifiers = [course.course_code, getDisplayCourseAbbreviation(course.course_name, course.course_abbreviation)].filter(Boolean).join(' · ')
 
               return (
                 <tr key={course.course_id} className="transition hover:bg-orange-50/30">
                   <td className="px-6 py-4 align-middle">
-                    <p className="break-words font-medium leading-5 text-gray-900">{course.course_name}</p>
+                    <CourseName name={course.course_name} className="break-words font-medium leading-5 text-gray-900" secondaryClassName="mt-1 text-sm font-normal text-gray-500" />
                     {courseIdentifiers && <p className="mt-1 break-words text-xs text-gray-500">{courseIdentifiers}</p>}
                   </td>
                   <td className="px-5 py-4 align-middle">
@@ -124,11 +126,11 @@ function CourseTable({ courses, openEditCourseForm, handleStatusChange, updating
       <div className="divide-y divide-gray-100 md:hidden">
         {courses.map((course) => {
           const active = isCourseActive(course)
-          const courseIdentifiers = [course.course_code, course.course_abbreviation].filter(Boolean).join(' · ')
+          const courseIdentifiers = [course.course_code, getDisplayCourseAbbreviation(course.course_name, course.course_abbreviation)].filter(Boolean).join(' · ')
 
           return (
             <article key={course.course_id} className="px-4 py-4 sm:px-5">
-              <p className="break-words text-sm font-medium leading-5 text-gray-900">{course.course_name}</p>
+              <CourseName name={course.course_name} className="break-words text-sm font-medium leading-5 text-gray-900" secondaryClassName="mt-1 text-sm font-normal text-gray-500" />
               {courseIdentifiers && <p className="mt-1 break-words text-xs text-gray-500">{courseIdentifiers}</p>}
               <div className="mt-4 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-4">
                 <div>

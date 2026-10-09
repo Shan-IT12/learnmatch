@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { IconArrowLeft, IconArrowRight, IconBrain, IconHistory, IconLoader2 } from '@tabler/icons-react'
 import { getAssessmentHistoryResultPath } from '../utils/assessmentHistory'
+import CourseName from '../components/CourseName'
 
 function formatAssessmentDate(value) {
   if (!value) return 'Date unavailable'
@@ -60,9 +61,7 @@ export function HistoryListContent({ history, onView }) {
                     <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-orange-50 text-xs font-bold text-orange-600">
                       {recommendation.rank_position}
                     </span>
-                    <p className="min-w-0 text-sm font-semibold leading-6 text-gray-800">
-                      {recommendation.course_name}
-                    </p>
+                    <CourseName name={recommendation.course_name} className="min-w-0 text-sm font-semibold leading-6 text-gray-800" secondaryClassName="mt-0.5 text-sm font-normal leading-5 text-gray-500" />
                   </div>
                   <span className="shrink-0 text-sm font-bold text-orange-600">{recommendation.match_score}%</span>
                 </li>

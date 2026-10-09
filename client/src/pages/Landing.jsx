@@ -11,6 +11,7 @@ import {
 } from '@tabler/icons-react'
 import { STUDENT_ACTIVE_INDEPENDENT_COURSE_COUNT } from '../constants/courseCatalog'
 import landingCoursePathway from '../assets/landing-course-pathway.png'
+import CourseName from '../components/CourseName'
 
 const journeySteps = [
   {
@@ -166,7 +167,7 @@ function Landing() {
                           })}
                           className="block w-full border-t border-orange-50 px-5 py-3 text-left transition duration-150 hover:bg-orange-50"
                         >
-                          <span className="text-sm font-medium text-gray-800">{course.course_name}{course.course_abbreviation ? ` (${course.course_abbreviation})` : ''}</span>
+                          <CourseName name={course.course_name} abbreviation={course.course_abbreviation} className="text-sm font-medium text-gray-800" secondaryClassName="mt-1 text-sm font-normal text-gray-500" />
                         </button>
                       ))}
                     </>

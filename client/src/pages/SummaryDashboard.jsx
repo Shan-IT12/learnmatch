@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { IconArrowRight, IconRefresh, IconSchool, IconHistory, IconUser, IconHeart, IconBrain, IconShieldCheck, IconStar } from '@tabler/icons-react'
 import { beginAssessmentAttempt } from '../utils/assessmentSession'
 import { getDimensionResults, MBTI_TYPE_CONTENT } from '../data/mbtiResultContent'
+import CourseName from '../components/CourseName'
 
 const personalFactorLabels = {
   factor_physical_impact: 'Physical / accessibility',
@@ -186,9 +187,7 @@ function SummaryDashboard() {
               <p className="mb-3 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.16em] text-orange-600">
                 <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-orange-100"><IconStar size={15} fill="currentColor" stroke={1.7} /></span> Top Recommendation
               </p>
-              <p className="mb-4 max-w-3xl text-xl font-bold leading-snug tracking-tight text-gray-950 sm:text-2xl">
-                {topRecommendation.course_name}
-              </p>
+              <CourseName name={topRecommendation.course_name} abbreviation={topRecommendation.course_abbreviation} className="mb-4 block max-w-3xl text-xl font-bold leading-snug tracking-tight text-gray-950 sm:text-2xl" secondaryClassName="mt-1 text-base font-medium text-gray-500" />
               <div className="inline-flex items-center gap-2 rounded-full border border-orange-200 bg-orange-50 px-3 py-1.5 text-sm font-semibold text-orange-800">
                 <span className="h-2 w-2 rounded-full bg-orange-500" /> {topRecommendation.match_score}% overall match
               </div>
@@ -342,7 +341,7 @@ function SummaryDashboard() {
             <div className="flex flex-col gap-5 border-b border-orange-100/70 bg-orange-50/40 px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-7">
               <div className="max-w-3xl">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-orange-600">Top recommendation</p>
-                <h3 className="mt-1.5 text-xl font-black leading-tight tracking-tight text-gray-950 sm:text-2xl">{topRecommendation.course_name}</h3>
+                <CourseName as="h3" name={topRecommendation.course_name} abbreviation={topRecommendation.course_abbreviation} className="mt-1.5 text-xl font-black leading-tight tracking-tight text-gray-950 sm:text-2xl" secondaryClassName="mt-1 text-base font-medium tracking-normal text-gray-500" />
               </div>
               <button
                 onClick={() => navigate('/results/career-path?returnTo=summary')}
