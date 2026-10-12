@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import CourseName from '../../components/CourseName'
 import SuccessConfirmation from '../../components/SuccessConfirmation'
+import ActionConfirmationModal from '../../components/ActionConfirmationModal'
 import { waitForSuccessConfirmation } from '../../utils/successConfirmation'
 import {
   IconAlertTriangle,
@@ -190,6 +191,8 @@ function CollegeDashboard() {
   const [startingAssessment, setStartingAssessment] = useState(false)
   const [showFullHistory, setShowFullHistory] = useState(false)
   const [successMessage, setSuccessMessage] = useState('')
+  const [pendingLifecycleAction, setPendingLifecycleAction] = useState(null)
+  const lifecycleRequestRef = useRef(false)
 
   useEffect(() => {
     if (!token) {
@@ -305,11 +308,8 @@ function CollegeDashboard() {
   }
 
   const updateLifecycle = async (action) => {
-    const prompts = {
-      pause: 'Pause college tracking? No new terms or check-ins will be expected until you resume.',
-      end: 'End college tracking? Your history will be preserved and you can start a new cycle later.',
-    }
-    if (prompts[action] && !window.confirm(prompts[action])) return
+    if (lifecycleRequestRef.current) return
+    lifecycleRequestRef.current = true
     setLifecyclePending(true)
     setError('')
     try {
@@ -318,7 +318,7 @@ function CollegeDashboard() {
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: '{}',
       })
-      const payload = await response.json()
+      const payload = await response.json().catch(() => ({}))
       if (!response.ok) throw new Error(payload.message || 'Unable to update college tracking.')
       setSuccessMessage(action === 'pause' ? 'Tracking Paused' : action === 'resume' ? 'Tracking Resumed' : 'Tracking Ended')
       await waitForSuccessConfirmation()
@@ -326,8 +326,21 @@ function CollegeDashboard() {
     } catch (requestError) {
       setError(requestError.message)
     } finally {
+      lifecycleRequestRef.current = false
       setLifecyclePending(false)
     }
+  }
+
+  const confirmLifecycleAction = () => {
+    const action = pendingLifecycleAction
+    if (!action || lifecyclePending) return
+
+    setPendingLifecycleAction(null)
+    if (action === 'change') {
+      navigate('/college/setup?action=change')
+      return
+    }
+    updateLifecycle(action)
   }
 
   const handleTakeAssessment = async () => {
@@ -468,7 +481,7 @@ function CollegeDashboard() {
       </nav>
 
       <main className="max-w-[1280px] mx-auto px-4 sm:px-8 lg:px-12 py-8 lg:py-11 space-y-6">
-        {error && <div className="rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700">{error}</div>}
+        {error && <div role="alert" className="rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700">{error}</div>}
         {successMessage && <div className="rounded-2xl border border-emerald-100 bg-emerald-50/70 px-5 py-4"><SuccessConfirmation compact message={successMessage} /></div>}
 
         <section className="relative overflow-hidden rounded-[24px] border border-slate-800 bg-slate-950 p-6 text-white shadow-[0_22px_55px_-34px_rgba(15,23,42,.8)] sm:p-8">
@@ -544,11 +557,9 @@ function CollegeDashboard() {
             <button type="button" disabled={startingAssessment} onClick={handleTakeAssessment} className="inline-flex items-center gap-2 rounded-xl border border-orange-200 bg-orange-50 px-4 py-2.5 text-sm font-semibold text-orange-700 disabled:cursor-not-allowed disabled:opacity-50">
               <IconRefresh size={16} stroke={2} /> {startingAssessment ? 'Starting Assessment...' : 'Take Assessment Again'}
             </button>
-            <button type="button" disabled={lifecyclePending} onClick={() => updateLifecycle('pause')} className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-700 disabled:opacity-50">Pause Tracking</button>
-            <button type="button" onClick={() => {
-              if (window.confirm('Change programs? Your previous program history will remain unchanged, and this will not create a LearnMatch recommendation.')) navigate('/college/setup?action=change')
-            }} className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-700">Change Program</button>
-            {!programTrackingComplete && <button type="button" disabled={lifecyclePending} onClick={() => updateLifecycle('end')} className="rounded-xl border border-red-200 px-4 py-2.5 text-sm font-semibold text-red-700 disabled:opacity-50">End Tracking</button>}
+            <button type="button" disabled={lifecyclePending} onClick={() => setPendingLifecycleAction('pause')} className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-700 disabled:opacity-50">Pause Tracking</button>
+            <button type="button" disabled={lifecyclePending} onClick={() => setPendingLifecycleAction('change')} className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-700 disabled:opacity-50">Change Program</button>
+            {!programTrackingComplete && <button type="button" disabled={lifecyclePending} onClick={() => setPendingLifecycleAction('end')} className="rounded-xl border border-red-200 px-4 py-2.5 text-sm font-semibold text-red-700 disabled:opacity-50">End Tracking</button>}
           </section>
         )}
 
@@ -926,6 +937,12 @@ function CollegeDashboard() {
           </div>
         )}
       </main>
+      <ActionConfirmationModal
+        action={pendingLifecycleAction}
+        onCancel={() => setPendingLifecycleAction(null)}
+        onConfirm={confirmLifecycleAction}
+        processing={lifecyclePending}
+      />
     </div>
   )
 }
