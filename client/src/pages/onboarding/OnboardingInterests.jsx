@@ -2,9 +2,13 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import OnboardingLayout from '../../components/OnboardingLayout'
 import interestGroups, {
+  isInterestStateComplete,
   MAX_INTEREST_SELECTIONS,
-  MIN_INTEREST_SELECTIONS,
-  updateInterestSelection,
+  NO_INTERESTS_LABEL,
+  restoreInterestState,
+  timestampInterestSelection,
+  toggleNoInterests,
+  updateInterestActivity,
 } from '../../data/interestList'
 import { FieldError, RequiredMark } from '../../components/FormValidation'
 import { scrollToFirstInvalidField } from '../../utils/formValidation'
@@ -23,53 +27,71 @@ import {
 function OnboardingInterests() {
   const navigate = useNavigate()
 
-  const [selected, setSelected] = useState(() => readAssessmentSession(
+  const [interestState, setInterestState] = useState(() => restoreInterestState(readAssessmentSession(
     typeof sessionStorage === 'undefined' ? null : sessionStorage,
     ASSESSMENT_SESSION_KEYS.interests,
     { selected: [] }
-  ).selected || [])
+  ), null))
+  const { selected, noInterests } = interestState
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [selectionMessage, setSelectionMessage] = useState('')
   const [attemptLoaded, setAttemptLoaded] = useState(false)
+  const [restoreFailed, setRestoreFailed] = useState(false)
   const [saveConfirmed, setSaveConfirmed] = useState(false)
 
   useEffect(() => {
     const storage = typeof sessionStorage === 'undefined' ? null : sessionStorage
     readActiveAttempt(import.meta.env.VITE_API_URL, localStorage.getItem('token'), storage)
       .then((attempt) => {
-        if (attempt && Array.isArray(attempt.interests) && attempt.interests.length > 0) setSelected(attempt.interests)
+        const local = readAssessmentSession(storage, ASSESSMENT_SESSION_KEYS.interests, {})
+        setInterestState(restoreInterestState(local, attempt?.interests))
+        setAttemptLoaded(true)
       })
-      .catch(() => setError('Could not restore your saved assessment progress. Please refresh.'))
-      .finally(() => setAttemptLoaded(true))
+      .catch(() => {
+        setRestoreFailed(true)
+        setError('Could not restore your saved assessment progress. Please refresh.')
+      })
   }, [])
 
   useEffect(() => {
     writeAssessmentSession(
       typeof sessionStorage === 'undefined' ? null : sessionStorage,
       ASSESSMENT_SESSION_KEYS.interests,
-      { selected }
+      interestState
     )
-    if (!attemptLoaded) return
-    const timer = setTimeout(() => {
-      saveActiveAttemptDraft(import.meta.env.VITE_API_URL, localStorage.getItem('token'), sessionStorage, { interests_json: selected })
-        .catch(() => console.warn('Interest draft autosave will retry on the next change.'))
-    }, 250)
-    return () => clearTimeout(timer)
-  }, [attemptLoaded, selected])
+  }, [interestState])
+
+  const isComplete = isInterestStateComplete(interestState)
+
+  const saveSelection = (result) => {
+    const nextState = timestampInterestSelection(result, interestState)
+    setInterestState(nextState)
+    writeAssessmentSession(sessionStorage, ASSESSMENT_SESSION_KEYS.interests, nextState)
+    // Start saving before Back/step navigation can unmount this screen.
+    saveActiveAttemptDraft(import.meta.env.VITE_API_URL, localStorage.getItem('token'), sessionStorage, { interests_json: nextState })
+      .catch(() => setError('Your latest answers are saved on this device, but autosave failed. Use Next to retry saving before leaving.'))
+    if (isInterestStateComplete(result)) setError('')
+  }
 
   const toggleInterest = (name) => {
-    const result = updateInterestSelection(selected, name)
+    const result = updateInterestActivity(interestState, name)
     setSelectionMessage(
       result.maxReached ? `You can select up to ${MAX_INTEREST_SELECTIONS} interests.` : ''
     )
-    setSelected(result.selected)
-    if (result.selected.length >= MIN_INTEREST_SELECTIONS) setError('')
+    saveSelection(result)
+  }
+
+  const toggleNone = () => {
+    const result = toggleNoInterests(interestState)
+    saveSelection(result)
+    setSelectionMessage('')
   }
 
  const handleNext = async () => {
-  if (selected.length < MIN_INTEREST_SELECTIONS) {
-    setError(`Please select at least ${MIN_INTEREST_SELECTIONS} interests.`)
+  if (!attemptLoaded || submitting) return
+  if (!isComplete) {
+    setError('Select at least one activity or check No interests or hobbies.')
     scrollToFirstInvalidField(['interests'])
     return
   }
@@ -78,13 +100,14 @@ function OnboardingInterests() {
   const token = localStorage.getItem('token')
 
   try {
+    await saveActiveAttemptDraft(import.meta.env.VITE_API_URL, token, sessionStorage, { interests_json: interestState })
     const response = await fetch(`${import.meta.env.VITE_API_URL}/api/interests`, {
       method: 'POST',
       headers: assessmentHeaders(sessionStorage, {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`,
       }),
-      body: JSON.stringify({ interests: selected }),
+      body: JSON.stringify({ interests: interestState }),
     })
     const data = await response.json()
 
@@ -114,14 +137,14 @@ function OnboardingInterests() {
   return (
     <OnboardingLayout
       currentStep={2}
-      isComplete={selected.length >= MIN_INTEREST_SELECTIONS && !submitting}
+      isComplete={attemptLoaded && isComplete && !submitting}
       stickyChrome
       onNext={handleNext}
       nextLabel={submitting ? 'Saving...' : 'Next'}
       navigationStatus={(
         <div role="status" className="text-xs leading-tight">
           <p className="text-gray-500">
-            {selected.length} / {MAX_INTEREST_SELECTIONS} selected
+            {selected.length} / {MAX_INTEREST_SELECTIONS} activities selected
           </p>
           {selectionMessage && (
             <p className="mt-1 text-amber-700">
@@ -142,7 +165,7 @@ function OnboardingInterests() {
             </div>
             <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900 mb-2">Interests & Hobbies <RequiredMark /></h2>
             <p className="max-w-xl text-gray-500 text-sm leading-relaxed">
-              Choose at least 3 interests that genuinely describe you. You can select up to 10.
+              Choose at least one activity that fits you, or check No interests or hobbies. You can select up to 10 activities. You do not need to select activities in every category.
             </p>
           </div>
           <div className="w-full rounded-2xl border border-orange-100 bg-orange-50/70 px-4 py-3 sm:w-44 sm:shrink-0">
@@ -159,9 +182,20 @@ function OnboardingInterests() {
           </div>
         </div>
 
+        {!attemptLoaded && !restoreFailed && <p role="status" className="mb-4 text-sm text-gray-500">Restoring your answers...</p>}
         <div data-validation-field="interests" aria-invalid={error ? 'true' : undefined} aria-describedby={error ? 'interests-error' : undefined} className="space-y-5 mb-10">
+          <label className="flex items-center gap-3 rounded-2xl border border-gray-200 bg-gray-50 p-4 text-sm font-medium text-gray-900">
+            <input
+              type="checkbox"
+              checked={noInterests}
+              onChange={toggleNone}
+              disabled={!attemptLoaded || submitting}
+              className="h-5 w-5 accent-orange-500"
+            />
+            {NO_INTERESTS_LABEL}
+          </label>
           {interestGroups.map((group, groupIndex) => (
-            <section key={group.group} className="rounded-3xl border border-gray-100 bg-white p-4 sm:p-6 shadow-[0_16px_40px_-34px_rgba(15,23,42,0.5)]">
+            <section key={group.group} aria-labelledby={`interest-category-${groupIndex}`} className="rounded-3xl border border-gray-100 bg-white p-4 sm:p-6 shadow-[0_16px_40px_-34px_rgba(15,23,42,0.5)]">
               <div className="mb-4 flex items-center gap-3">
                 <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-sm font-bold ${
                   groupIndex % 3 === 0
@@ -173,7 +207,7 @@ function OnboardingInterests() {
                   {String(groupIndex + 1).padStart(2, '0')}
                 </span>
                 <div>
-                  <h3 className="text-sm font-bold text-gray-900">{group.group}</h3>
+                  <h3 id={`interest-category-${groupIndex}`} className="text-sm font-bold text-gray-900">{group.group}</h3>
                   <p className="text-xs text-gray-400">Choose any that feel like you</p>
                 </div>
               </div>
@@ -184,9 +218,10 @@ function OnboardingInterests() {
                     <button
                       key={item.name}
                       type="button"
+                      disabled={!attemptLoaded || submitting || noInterests}
                       onClick={() => toggleInterest(item.name)}
                       aria-pressed={isChecked}
-                      className={`group flex min-h-12 items-center gap-3 text-left px-3.5 py-3 rounded-2xl border text-sm font-medium transition-all ${
+                      className={`group flex min-h-12 items-center gap-3 text-left px-3.5 py-3 rounded-2xl border text-sm font-medium transition-all disabled:cursor-not-allowed disabled:opacity-50 ${
                         isChecked
                           ? 'bg-orange-500 text-white border-orange-500 shadow-md shadow-orange-100 -translate-y-px'
                           : 'bg-gray-50/70 text-gray-700 border-gray-200 hover:border-orange-300 hover:bg-orange-50/50 hover:text-orange-800'
@@ -205,6 +240,7 @@ function OnboardingInterests() {
                     </button>
                   )
                 })}
+
               </div>
             </section>
           ))}

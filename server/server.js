@@ -14,7 +14,7 @@ import {
 } from './middleware/loginRateLimiters.js'
 import publicCourseRoutes from './routes/publicCourseRoutes.js'
 import directionsRoutes from './routes/directionsRoutes.js'
-import { validateInterestSubmission } from './services/interestSubmissionService.js'
+import { getSelectedInterestNames, normalizeInterestResponse, validateInterestSubmission } from './services/interestSubmissionService.js'
 import { validatePersonalitySubmission } from './services/personalitySubmissionService.js'
 import { calculateMbtiResult } from './services/mbtiScoringService.js'
 import {
@@ -161,7 +161,7 @@ app.patch('/api/assessment-attempts/current', authenticateToken, async (req, res
   const body = req.body || {}
   const draft = {
     ...(body.interests_json !== undefined || body.interests !== undefined
-      ? { interests: body.interests_json ?? body.interests }
+      ? { interests: body.interests_json !== undefined ? body.interests_json : body.interests }
       : {}),
     ...(body.skill_questions !== undefined || body.skillQuestions !== undefined
       ? { skill_questions: body.skill_questions ?? body.skillQuestions }
@@ -174,7 +174,10 @@ app.patch('/api/assessment-attempts/current', authenticateToken, async (req, res
       : {}),
   }
   if (!Object.keys(draft).length) return res.status(400).json({ message: 'Provide at least one supported assessment draft field.' })
-  if (draft.interests !== undefined && !Array.isArray(draft.interests)) return res.status(400).json({ message: 'interests_json must be an array.' })
+  if (draft.interests !== undefined) {
+    const message = validateInterestSubmission(draft.interests, { draft: true })
+    if (message) return res.status(400).json({ message })
+  }
   if (draft.skill_questions !== undefined && !Array.isArray(draft.skill_questions)) return res.status(400).json({ message: 'skill_questions must be an array.' })
   if (draft.skill_answers !== undefined && !Array.isArray(draft.skill_answers)) return res.status(400).json({ message: 'skill_answers must be an array.' })
   if (draft.personality_answers !== undefined && (!draft.personality_answers || typeof draft.personality_answers !== 'object' || Array.isArray(draft.personality_answers))) return res.status(400).json({ message: 'personality_answers must be an object.' })
@@ -230,7 +233,10 @@ app.post('/api/interests', authenticateToken, async (req, res) => {
     if (attemptId) {
       const saved = await updateAttempt(pool, userId, attemptId, 'interests', interests)
       if (!saved) return res.status(409).json({ message: 'Your assessment session needs to be refreshed. Please return to Personal Factors and continue again.' })
-      return res.json({ message: 'Interests saved for this assessment attempt', count: interests.length })
+      return res.json({ message: 'Interests saved for this assessment attempt', count: getSelectedInterestNames(interests).length })
+    }
+    if (!Array.isArray(interests)) {
+      return res.status(409).json({ message: 'Please continue this assessment in its active attempt so your category answers can be saved.' })
     }
     await pool.query('DELETE FROM INTEREST_RESPONSE WHERE user_id = ?', [userId])
 
@@ -353,7 +359,7 @@ app.get('/api/results', authenticateToken, async (req, res) => {
     console.error('Results fetch error:', error)
 
     if (error instanceof RecommendationInputError) {
-      return res.status(400).json({ message: error.message })
+      return res.status(400).json({ message: error.message, code: error.code })
     }
     if (error instanceof RecommendationDataError) {
       return res.status(500).json({ message: error.message })
@@ -453,10 +459,18 @@ app.get('/api/dashboard/status', authenticateToken, async (req, res) => {
     )
 
     const isCollegePhase = checkins.length > 0
+    const [completedAttempts] = await pool.query(
+      `SELECT interests FROM ASSESSMENT_ATTEMPT
+       WHERE user_id = ? AND status = 'COMPLETED'
+       ORDER BY attempt_id DESC LIMIT 1`, [userId]
+    )
+    const savedInterestState = parseAttemptJson(completedAttempts[0]?.interests, null)
+    const hasCategoryAnswers = savedInterestState && !Array.isArray(savedInterestState)
+      && !validateInterestSubmission(savedInterestState)
 
     res.json({
       hasProfile: profileCount.count > 0,
-      hasInterests: interestCount.count > 0,
+      hasInterests: interestCount.count > 0 || Boolean(hasCategoryAnswers),
       hasSkills: skillCount.count > 0,
       hasPersonality: personalityCount.count > 0,
       isCollegePhase,
@@ -543,11 +557,24 @@ app.get('/api/interests', authenticateToken, async (req, res) => {
   const userId = req.user.userId
 
   try {
+    const attemptId = requestedAttemptId(req)
+    if (attemptId) {
+      const attempt = await getOwnedAttempt(pool, userId, attemptId)
+      if (!attempt) return res.status(404).json({ message: 'Assessment attempt not found.' })
+      const state = parseAttemptJson(attempt.interests, null)
+      return res.json({ interests: getSelectedInterestNames(state), noInterests: normalizeInterestResponse(state)?.noInterests === true })
+    }
     const [rows] = await pool.query(
       'SELECT interest_name FROM INTEREST_RESPONSE WHERE user_id = ?',
       [userId]
     )
-    res.json({ interests: rows.map((r) => r.interest_name) })
+    const [attempts] = await pool.query(
+      `SELECT interests FROM ASSESSMENT_ATTEMPT
+       WHERE user_id = ? AND status = 'COMPLETED'
+       ORDER BY attempt_id DESC LIMIT 1`, [userId]
+    )
+    const state = parseAttemptJson(attempts[0]?.interests, null)
+    res.json({ interests: rows.map((r) => r.interest_name), noInterests: normalizeInterestResponse(state)?.noInterests === true })
   } catch (error) {
     console.error('Interests fetch error:', error)
     res.status(500).json({ message: 'Server error fetching interests' })
@@ -627,6 +654,7 @@ app.post('/api/mbti', authenticateToken, async (req, res) => {
         const attempt = await getOwnedAttempt(connection, userId, attemptId, { forUpdate: true })
         const personalFactors = parseAttemptJson(attempt?.personal_factors, null) || await ensureAttemptPersonalFactors(connection, userId, attemptId)
         const interests = parseAttemptJson(attempt?.interests, [])
+        const selectedInterestNames = getSelectedInterestNames(interests)
         const skillAnswers = parseAttemptJson(attempt?.skill_answers, [])
         const attemptForValidation = personalFactors && !attempt?.personal_factors
           ? { ...attempt, personal_factors: personalFactors }
@@ -636,7 +664,7 @@ app.post('/api/mbti', authenticateToken, async (req, res) => {
           return res.status(400).json({ message: 'Complete every assessment section before submitting Personality.' })
         }
         await connection.query('DELETE FROM INTEREST_RESPONSE WHERE user_id = ?', [userId])
-        for (const interest of interests) await connection.query('INSERT INTO INTEREST_RESPONSE (user_id, interest_name) VALUES (?, ?)', [userId, interest])
+        for (const interest of selectedInterestNames) await connection.query('INSERT INTO INTEREST_RESPONSE (user_id, interest_name) VALUES (?, ?)', [userId, interest])
         // Compatibility for attempts whose Academic Skills result was finalized
         // before SKILL_RESPONSE persistence moved out of the Personality flow.
         await ensureFinalizedSkillResponses(connection, userId, skillAnswers)

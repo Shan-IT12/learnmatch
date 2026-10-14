@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import OnboardingLayout from '../../components/OnboardingLayout'
-import PersonalFactorsForm, { difficultyLevels, validatePersonalFactors } from '../../components/PersonalFactorsForm'
+import PersonalFactorsForm, { difficultyLevels, impactOptions, validatePersonalFactors } from '../../components/PersonalFactorsForm'
 import { buildProfilePayload, deriveFactorApplicability, PERSONAL_FACTOR_KEYS } from '../../utils/profilePersonalFactors'
 import { scrollToFirstInvalidField } from '../../utils/formValidation'
 import SuccessConfirmation from '../../components/SuccessConfirmation'
@@ -11,11 +11,11 @@ import { assessmentHeaders, beginAssessmentAttempt, getAssessmentAttemptId } fro
 const emptyProfile = { username: '', physical_accessibility_areas: [], physical_accessibility_difficulties: {}, factor_physical_impact: '', factor_health_impact: '', factor_financial_impact: '', factor_family_impact: '', factor_work_impact: '' }
 const emptyApplicability = Object.fromEntries(PERSONAL_FACTOR_KEYS.map((factor) => [factor, '']))
 const parseJson = (value, fallback) => { if (value && typeof value === 'object') return value; try { return JSON.parse(value) } catch { return fallback } }
-const impactLabels = { 1: 'No impact', 2: 'Slight impact', 3: 'Moderate impact', 4: 'High impact' }
+const impactLabels = Object.fromEntries(impactOptions)
 const factorLabels = { physical: 'Physical / Accessibility', health: 'Health', financial: 'Financial', family: 'Family Responsibilities', work: 'Work Responsibilities' }
 const summarizeFactor = (formData, applicability, factor) => {
   if (!applicability[factor]) return 'Incomplete'
-  if (factor === 'physical' && applicability.physical === 'no') return 'No'
+  if (applicability[factor] === 'no') return 'No'
   return impactLabels[Number(formData[`factor_${factor}_impact`])] || 'Incomplete'
 }
 

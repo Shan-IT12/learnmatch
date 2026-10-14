@@ -1,3 +1,5 @@
+import { validateInterestSubmission } from './interestSubmissionService.js'
+
 export const ATTEMPT_HEADER = 'x-assessment-attempt-id'
 
 export function requestedAttemptId(req) {
@@ -177,7 +179,7 @@ export function hasCompletePersonalityPrerequisites(attempt) {
   return Boolean(
     attempt &&
     personalFactors &&
-    interests.length >= 3 &&
+    (Array.isArray(interests) ? interests.length >= 3 : !validateInterestSubmission(interests)) &&
     skillQuestions.length === 30 &&
     skillAnswers.length === 30 &&
     skillResult &&

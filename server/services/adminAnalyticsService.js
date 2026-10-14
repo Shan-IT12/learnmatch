@@ -15,6 +15,7 @@ const COMPLETION_STATUS_SQL = assessmentStatusSql({
   interestCount: 'interest_stats.interest_count',
   skillCount: 'skill_stats.skill_count',
   personalityCount: 'personality_stats.personality_count',
+  completedAttemptCount: "(SELECT COUNT(*) FROM ASSESSMENT_ATTEMPT attempt WHERE attempt.user_id = account.user_id AND attempt.status = 'COMPLETED')",
 })
 
 const SKILL_DOMAIN_REQUIREMENTS_SQL = SKILL_DOMAINS

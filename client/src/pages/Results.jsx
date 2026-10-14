@@ -109,6 +109,7 @@ function Results() {
   const [recommendations, setRecommendations] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [rankingPending, setRankingPending] = useState(false)
   const [retryCount, setRetryCount] = useState(0)
   const [assessment, setAssessment] = useState({ interests: [], domainScores: {}, mbti: null, profile: null })
   const [returnDestination, setReturnDestination] = useState(SUMMARY_DASHBOARD_DESTINATION)
@@ -127,6 +128,7 @@ function Results() {
     const loadRecommendations = async () => {
       setLoading(true)
       setError('')
+      setRankingPending(false)
       let requestTimedOut = false
       const timeoutId = window.setTimeout(() => {
         requestTimedOut = true
@@ -149,6 +151,7 @@ function Results() {
         }
 
         if (response.status === 400) {
+          setRankingPending(data.code === 'MISSING_INTEREST_SCORING_POLICY')
           setError(
             data.message || 'Please complete all required assessments before viewing recommendations.'
           )
@@ -263,8 +266,9 @@ function Results() {
         {loading ? (
           <RecommendationsLoadingState />
         ) : error ? (
-          <div className="bg-red-50 text-red-600 px-4 py-3 rounded-xl text-sm mb-6">
+          <div role="status" className={`${rankingPending ? 'bg-blue-50 text-blue-900' : 'bg-red-50 text-red-600'} px-4 py-3 rounded-xl text-sm mb-6`}>
             <p>{error}</p>
+            {!rankingPending && (
             <button
               type="button"
               onClick={() => setRetryCount((count) => count + 1)}
@@ -272,6 +276,7 @@ function Results() {
             >
               Try again
             </button>
+            )}
           </div>
         ) : recommendations.length === 0 ? (
           <div className="text-center text-gray-500 text-sm py-12">

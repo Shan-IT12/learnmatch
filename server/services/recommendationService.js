@@ -97,9 +97,11 @@ export function buildStudentDomainScores(skillResponses) {
 
 export function buildStudentRiasecVector(interestNames) {
   if (!Array.isArray(interestNames) || interestNames.length === 0) {
-    throw new RecommendationInputError(
-      'At least one selected interest is required to generate recommendations.'
+    const error = new RecommendationInputError(
+      'Your assessment answers are saved. No listed activity matched your interests, so course ranking is not available yet. LearnMatch needs an approved scoring policy for assessments without activity interests. You do not need to select activities that do not fit you.'
     )
+    error.code = 'MISSING_INTEREST_SCORING_POLICY'
+    throw error
   }
 
   const vector = Object.fromEntries(RIASEC_DIMENSIONS.map((dimension) => [dimension, 0]))

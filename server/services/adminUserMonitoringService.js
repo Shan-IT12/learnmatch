@@ -6,6 +6,7 @@ const ASSESSMENT_STATUS_SQL = assessmentStatusSql({
   interestCount: 'interest_stats.interest_count',
   skillCount: 'skill_stats.skill_count',
   personalityCount: 'personality_stats.personality_count',
+  completedAttemptCount: "(SELECT COUNT(*) FROM ASSESSMENT_ATTEMPT attempt WHERE attempt.user_id = u.user_id AND attempt.status = 'COMPLETED')",
 })
 
 const ALIGNMENT_STATUS_SQL = `CASE
@@ -192,7 +193,8 @@ export async function getAdminUserDetail(database, userId) {
             (SELECT COUNT(*) FROM PROFILE WHERE user_id = u.user_id) AS profile_count,
             (SELECT COUNT(*) FROM INTEREST_RESPONSE WHERE user_id = u.user_id) AS interest_count,
             (SELECT COUNT(*) FROM SKILL_RESPONSE WHERE user_id = u.user_id) AS skill_count,
-            (SELECT COUNT(*) FROM PERSONALITY_ASSESSMENT WHERE user_id = u.user_id) AS personality_count
+            (SELECT COUNT(*) FROM PERSONALITY_ASSESSMENT WHERE user_id = u.user_id) AS personality_count,
+            (SELECT COUNT(*) FROM ASSESSMENT_ATTEMPT WHERE user_id = u.user_id AND status = 'COMPLETED') AS completed_attempt_count
      FROM USER_ACCOUNT u
      LEFT JOIN PROFILE profile ON profile.user_id = u.user_id
      WHERE u.user_id = ?
@@ -306,6 +308,7 @@ export async function getAdminUserDetail(database, userId) {
     interestCount: Number(account.interest_count),
     skillCount: Number(account.skill_count),
     personalityCount: Number(account.personality_count),
+    completedAttemptCount: Number(account.completed_attempt_count || 0),
   }
   const latestSkills = skillRows[0] || { answer_count: 0, correct_count: 0 }
   const alignment = alignmentRows[0] || {}
@@ -335,7 +338,7 @@ export async function getAdminUserDetail(database, userId) {
       status: getAssessmentStatus(counts),
       components: {
         profile: counts.profileCount > 0,
-        interests: counts.interestCount >= 3,
+        interests: counts.interestCount >= 3 || counts.completedAttemptCount > 0,
         skills: counts.skillCount >= 30,
         personality: counts.personalityCount > 0,
       },

@@ -10,10 +10,11 @@ export function getAssessmentStatus({
   interestCount = 0,
   skillCount = 0,
   personalityCount = 0,
+  completedAttemptCount = 0,
 }) {
   const completed = (
     Number(profileCount) >= ASSESSMENT_COMPLETION_REQUIREMENTS.profiles
-    && Number(interestCount) >= ASSESSMENT_COMPLETION_REQUIREMENTS.interests
+    && (Number(interestCount) >= ASSESSMENT_COMPLETION_REQUIREMENTS.interests || Number(completedAttemptCount) > 0)
     && Number(skillCount) >= ASSESSMENT_COMPLETION_REQUIREMENTS.skills
     && Number(personalityCount) >= ASSESSMENT_COMPLETION_REQUIREMENTS.personalities
   )
@@ -29,6 +30,7 @@ export function assessmentStatusSql({
   interestCount = '0',
   skillCount = '0',
   personalityCount = '0',
+  completedAttemptCount = '0',
 } = {}) {
   const profile = `COALESCE(${profileCount}, 0)`
   const interest = `COALESCE(${interestCount}, 0)`
@@ -37,7 +39,7 @@ export function assessmentStatusSql({
 
   return `CASE
     WHEN ${profile} >= ${ASSESSMENT_COMPLETION_REQUIREMENTS.profiles}
-     AND ${interest} >= ${ASSESSMENT_COMPLETION_REQUIREMENTS.interests}
+     AND (${interest} >= ${ASSESSMENT_COMPLETION_REQUIREMENTS.interests} OR COALESCE(${completedAttemptCount}, 0) > 0)
      AND ${skill} >= ${ASSESSMENT_COMPLETION_REQUIREMENTS.skills}
      AND ${personality} >= ${ASSESSMENT_COMPLETION_REQUIREMENTS.personalities}
       THEN 'Completed'

@@ -13,7 +13,7 @@ export const difficultyLevels = [
   ['a_lot_of_difficulty', 'A lot of difficulty'],
   ['cannot_do', 'Cannot do it at all'],
 ]
-export const impactOptions = [[1, 'No impact'], [2, 'Slight impact'], [3, 'Moderate impact'], [4, 'High impact']]
+export const impactOptions = [[1, 'Slight impact'], [2, 'Moderate impact'], [3, 'High impact'], [4, 'Very high impact']]
 export const factorCards = [
   { key: 'health', title: 'Health', question: 'Do you currently have health-related needs?', icon: IconHeart },
   { key: 'financial', title: 'Financial', question: 'Do you currently have financial concerns related to your studies?', icon: IconWallet },

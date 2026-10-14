@@ -25,19 +25,45 @@ export async function readActiveAttempt(apiUrl, token, storage) {
   return response.json()
 }
 
+const draftSaveQueues = new Map()
+
 export async function saveActiveAttemptDraft(apiUrl, token, storage, draft) {
-  if (!getAssessmentAttemptId(storage)) return
+  const attemptId = getAssessmentAttemptId(storage)
+  if (!attemptId) return
+  // Capture the attempt and payload now: queued writes must never move into a
+  // fresh retake or finish out of order after navigation.
+  const headers = assessmentHeaders(storage, { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` })
+  const body = JSON.stringify(draft)
+  const key = `${apiUrl}:${attemptId}`
+  const pending = (draftSaveQueues.get(key) || Promise.resolve()).catch(() => {}).then(
+    () => sendAttemptDraft(apiUrl, headers, body)
+  )
+  draftSaveQueues.set(key, pending)
+  try { await pending } finally {
+    if (draftSaveQueues.get(key) === pending) draftSaveQueues.delete(key)
+  }
+}
+
+async function sendAttemptDraft(apiUrl, headers, body) {
   for (let attempt = 0; attempt < 2; attempt += 1) {
+    let response
     try {
-      const response = await fetch(`${apiUrl}/api/assessment-attempts/current`, {
+      response = await fetch(`${apiUrl}/api/assessment-attempts/current`, {
         method: 'PATCH',
-        headers: assessmentHeaders(storage, { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }),
-        body: JSON.stringify(draft),
+        headers,
+        body,
       })
-      if (response.ok) return
-      if (response.status < 500) throw new Error('Could not save assessment progress.')
     } catch (error) {
       if (attempt === 1) throw error
+    }
+    if (response?.ok) return
+    // Validation/auth/session failures need correction; repeating the identical
+    // rejected request only produces another 400 and cannot save the draft.
+    if (response && response.status < 500) {
+      const data = await response.json().catch(() => ({}))
+      const error = new Error(data.message || 'Could not save assessment progress.')
+      error.status = response.status
+      throw error
     }
     await new Promise((resolve) => setTimeout(resolve, 300))
   }

@@ -46,8 +46,8 @@ test('representative Profile and Registration controls render required and inlin
       error: 'Please select an impact level.',
     }))
     assert.deepEqual([...profileMarkup.matchAll(/value="([1-4])"/g)].map((match) => Number(match[1])), [1, 2, 3, 4])
-    assert.match(profileMarkup, /No impact/)
-    assert.match(profileMarkup, /High impact/)
+    assert.deepEqual([...profileMarkup.matchAll(/>(Slight impact|Moderate impact|High impact|Very high impact)<\/span>/g)].map((match) => match[1]), ['Slight impact', 'Moderate impact', 'High impact', 'Very high impact'])
+    assert.doesNotMatch(profileMarkup, /No impact|>[1-4]<\/span>/)
     assert.match(profileMarkup, /aria-invalid="true"/)
     assert.match(profileMarkup, /Please select an impact level\./)
 

@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import OnboardingLayout from '../../components/OnboardingLayout'
 import AssessmentQuestionNavigation from '../../components/AssessmentQuestionNavigation'
+import SkillAnswerChoices from '../../components/SkillAnswerChoices'
+import { getSkillFigurePresentation } from '../../../../shared/skillFigureChoices'
 import { FieldError, RequiredMark } from '../../components/FormValidation'
 import { scrollToFirstInvalidField } from '../../utils/formValidation'
 import SuccessConfirmation from '../../components/SuccessConfirmation'
@@ -454,12 +456,9 @@ function OnboardingSkills() {
   const answeredCount = Object.keys(answers).length
   const questionGuide = currentQuestion.explanation || getQuestionGuide(currentQuestion)
 
-  const choiceLabels = [
-    { key: 'A', text: currentQuestion.choice_a },
-    { key: 'B', text: currentQuestion.choice_b },
-    { key: 'C', text: currentQuestion.choice_c },
-    { key: 'D', text: currentQuestion.choice_d },
-  ]
+  const figurePresentation = getSkillFigurePresentation(currentQuestion)
+  const promptImage = figurePresentation && 'promptImage' in figurePresentation
+    ? figurePresentation.promptImage : currentQuestion.image_url
 
   return (
     <OnboardingLayout currentStep={3} isComplete={answeredCount === questions.length} showFooterNavigation={false}>
@@ -498,12 +497,13 @@ function OnboardingSkills() {
 
         <div key={currentQuestion.question_id} data-validation-field="skillQuestion" className="motion-enter rounded-3xl border border-gray-200 bg-white p-5 sm:p-7 shadow-[0_18px_45px_-34px_rgba(15,23,42,0.45)] mb-7" aria-invalid={questionError ? 'true' : undefined} aria-describedby={questionError ? 'skill-question-error' : undefined}>
           {/* Question figure, if this item has one */}
-          {currentQuestion.image_url && (
-            <div className="mb-5 overflow-hidden rounded-2xl border border-gray-100 bg-gray-50 p-3">
+          {promptImage && (
+            <div className="mb-5 overflow-x-auto rounded-2xl border border-gray-100 bg-gray-50 p-3">
               <img
-                src={currentQuestion.image_url}
-                alt="Question figure"
+                src={promptImage}
+                alt={figurePresentation?.promptAlt || 'Question figure'}
                 className="mx-auto max-h-64 max-w-full object-contain"
+                style={figurePresentation?.promptMinWidth ? { minWidth: figurePresentation.promptMinWidth } : undefined}
               />
             </div>
           )}
@@ -539,31 +539,7 @@ function OnboardingSkills() {
             </div>
           )}
 
-          {/* Answer choices */}
-          <div className="space-y-2.5">
-            {choiceLabels.map((choice) => (
-              <button
-                key={choice.key}
-                type="button"
-                onClick={() => handleSelect(currentQuestion.question_id, choice.key)}
-                aria-pressed={selectedChoice === choice.key}
-                className={`group flex w-full items-center gap-3 rounded-2xl border p-3 text-left text-sm transition-all sm:p-3.5 ${
-                  selectedChoice === choice.key
-                    ? 'border-orange-500 bg-orange-50 text-gray-900 shadow-sm ring-1 ring-orange-500'
-                    : 'border-gray-200 bg-white text-gray-700 hover:border-orange-300 hover:bg-orange-50/40'
-                }`}
-              >
-                <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-xs font-bold transition ${
-                  selectedChoice === choice.key
-                    ? 'bg-orange-500 text-white shadow-sm'
-                    : 'bg-gray-100 text-gray-500 group-hover:bg-orange-100 group-hover:text-orange-700'
-                }`}>
-                  {choice.key}
-                </span>
-                <span className="min-w-0 flex-1 leading-relaxed">{choice.text}</span>
-              </button>
-            ))}
-          </div>
+          <SkillAnswerChoices question={currentQuestion} selectedChoice={selectedChoice} onSelect={handleSelect} />
           <FieldError id="skill-question-error">{questionError}</FieldError>
         </div>
 

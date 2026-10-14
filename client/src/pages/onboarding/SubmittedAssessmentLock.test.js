@@ -81,7 +81,7 @@ test('same-attempt revisits preserve local drafts when the persisted draft is st
     source('./OnboardingPersonality.jsx'),
     source('./OnboardingProfile.jsx'),
   ])
-  assert.match(interests, /attempt\.interests\.length > 0/)
+  assert.match(interests, /restoreInterestState\(local, attempt\?\.interests\)/)
   assert.doesNotMatch(interests, /setSelected\(Array\.isArray\(attempt\.interests\) \? attempt\.interests : \[\]\)/)
   assert.match(skills, /if \(attempt\.skillAnswers\?\.length\) setAnswers/)
   assert.match(personality, /Object\.keys\(attempt\.personalityAnswers\)\.length > 0/)

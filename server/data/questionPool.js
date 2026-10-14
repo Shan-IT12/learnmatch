@@ -1,3 +1,5 @@
+import { getSkillFigurePresentation } from '../../shared/skillFigureChoices.js'
+
 // dimension values: Verbal, Numerical, Abstract/Logical, Spatial, Scientific Reasoning, Practical/Applied
 const questionPool = [
   {
@@ -992,4 +994,7 @@ const questionPool = [
   }
 ];
 
-export default questionPool;
+export default questionPool.map((question) => {
+  const presentation = getSkillFigurePresentation(question)
+  return presentation ? { ...question, choice_figures: presentation.figures } : question
+});

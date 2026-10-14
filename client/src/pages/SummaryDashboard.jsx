@@ -34,6 +34,8 @@ function SummaryDashboard() {
   const [topRecommendation, setTopRecommendation] = useState(null)
   const [topCourseDetail, setTopCourseDetail] = useState(null)
   const [interests, setInterests] = useState([])
+  const [noInterests, setNoInterests] = useState(false)
+  const [rankingPendingMessage, setRankingPendingMessage] = useState('')
   const [domainScores, setDomainScores] = useState({})
   const [profile, setProfile] = useState(null)
   const [mbti, setMbti] = useState(null)
@@ -56,6 +58,7 @@ function SummaryDashboard() {
         ])
 
         const resultsData = await resultsRes.json()
+        if (resultsData.code === 'MISSING_INTEREST_SCORING_POLICY') setRankingPendingMessage(resultsData.message)
         const interestsData = await interestsRes.json()
         const quizData = await quizRes.json()
         const profileData = await profileRes.json()
@@ -71,6 +74,7 @@ function SummaryDashboard() {
         }
  
         setInterests(interestsData.interests || [])
+        setNoInterests(interestsData.noInterests === true)
         setDomainScores(quizData.domainScores || {})
         if (profileData.username) localStorage.setItem('username', profileData.username)
         setProfile(profileData.profile ? { ...profileData.profile, username: profileData.username } : null)
@@ -180,6 +184,7 @@ function SummaryDashboard() {
         </div>
  
         {/* Top recommendation preview */}
+        {rankingPendingMessage && <p role="status" className="mb-6 rounded-xl bg-blue-50 p-4 text-sm text-blue-900">{rankingPendingMessage}</p>}
         {topRecommendation && (
           <section className="relative mb-10 overflow-hidden rounded-[26px] border border-orange-200/80 bg-[#fffdf9] p-6 shadow-[0_22px_60px_-42px_rgba(120,53,15,.5)] sm:flex sm:items-center sm:justify-between sm:gap-8 sm:p-8">
             <div className="absolute inset-y-0 left-0 w-1.5 bg-gradient-to-b from-orange-400 via-orange-500 to-amber-300" aria-hidden="true" />
@@ -257,7 +262,7 @@ function SummaryDashboard() {
                   </span>
                 ))
               ) : (
-                <p className="text-sm text-gray-400">No interests recorded yet.</p>
+                <p className="text-sm text-gray-400">{noInterests ? 'No interests or hobbies.' : 'No interests recorded yet.'}</p>
               )}
             </div>
           </section>

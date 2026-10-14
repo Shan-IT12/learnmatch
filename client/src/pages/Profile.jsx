@@ -2,11 +2,12 @@ import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { IconArrowLeft, IconEdit, IconUser } from '@tabler/icons-react'
 import { deriveFactorApplicability, isPersonalFactorsComplete } from '../utils/profilePersonalFactors'
+import { impactOptions } from '../components/PersonalFactorsForm'
 
 export { ApplicabilityQuestion, ImpactOptions } from '../components/PersonalFactorsForm'
 export { UsernameField } from './ProfileEdit'
 
-const impactLabels = { 1: 'No impact', 2: 'Slight impact', 3: 'Moderate impact', 4: 'High impact' }
+const impactLabels = Object.fromEntries(impactOptions)
 const factorRows = [
   ['physical', 'Physical / Accessibility'],
   ['health', 'Health'],
@@ -18,7 +19,7 @@ const parseJsonValue = (value, fallback) => { if (value && typeof value === 'obj
 
 function summarizeFactor(profile, applicability, factor) {
   if (!profile || !applicability[factor]) return 'Not provided'
-  if (factor === 'physical' && applicability.physical === 'no') return 'No'
+  if (applicability[factor] === 'no') return 'No'
   return impactLabels[Number(profile[`factor_${factor}_impact`])] || 'Not provided'
 }
 
