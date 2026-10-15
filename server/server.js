@@ -459,13 +459,13 @@ app.get('/api/dashboard/status', authenticateToken, async (req, res) => {
     )
 
     const isCollegePhase = checkins.length > 0
-    const [completedAttempts] = await pool.query(
+    const [savedAttempts] = await pool.query(
       `SELECT interests FROM ASSESSMENT_ATTEMPT
-       WHERE user_id = ? AND status = 'COMPLETED'
+       WHERE user_id = ? AND status IN ('IN_PROGRESS', 'COMPLETED')
        ORDER BY attempt_id DESC LIMIT 1`, [userId]
     )
-    const savedInterestState = parseAttemptJson(completedAttempts[0]?.interests, null)
-    const hasCategoryAnswers = savedInterestState && !Array.isArray(savedInterestState)
+    const savedInterestState = parseAttemptJson(savedAttempts[0]?.interests, null)
+    const hasCategoryAnswers = savedInterestState
       && !validateInterestSubmission(savedInterestState)
 
     res.json({

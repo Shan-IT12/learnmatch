@@ -72,11 +72,15 @@ function Landing() {
           if (!response.ok) throw new Error('Search request failed')
           return response.json()
         })
-        .then((data) => setResults({ courses: data.courses || [] }))
+        .then((data) => {
+          if (!controller.signal.aborted) setResults({ courses: data.courses || [] })
+        })
         .catch((error) => {
           if (error.name !== 'AbortError') setResults({ courses: [] })
         })
-        .finally(() => setSearching(false))
+        .finally(() => {
+          if (!controller.signal.aborted) setSearching(false)
+        })
     }, 250)
 
     return () => {
@@ -87,8 +91,7 @@ function Landing() {
 
   const handleSearch = (event) => {
     event.preventDefault()
-    if (!query.trim()) return
-    navigate(`/courses/search?q=${encodeURIComponent(query.trim())}`)
+    navigate(query.trim() ? `/courses/search?q=${encodeURIComponent(query.trim())}` : '/courses/search')
   }
 
   return (
@@ -139,6 +142,7 @@ function Landing() {
                   onChange={(event) => {
                     setQuery(event.target.value)
                     setResults(null)
+                    setSearching(false)
                   }}
                   placeholder="Search by course, skill, or career"
                   aria-label="Search courses"
@@ -148,7 +152,8 @@ function Landing() {
                   {searching ? 'Searching…' : 'Search'}
                 </button>
               </form>
-              {results && (
+              <Link to="/courses/search" className="mt-3 inline-block text-sm font-semibold text-orange-600 hover:text-orange-700">View all courses ?</Link>
+              {query.trim() && results && (
                 <div className="absolute left-0 right-0 top-full z-50 mt-2 overflow-hidden rounded-2xl border border-orange-100 bg-white shadow-2xl">
                   {results.courses.length === 0 ? (
                     <div className="px-5 py-4 text-sm text-gray-500">No courses found for “{query}”.</div>

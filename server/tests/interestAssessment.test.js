@@ -253,3 +253,17 @@ test('server validation enforces canonical unique submissions containing 3 to 10
   assert.equal(validateInterestSubmission(currentNames.slice(0, 3)), null)
   assert.equal(validateInterestSubmission(currentNames.slice(0, 10)), null)
 })
+
+
+test('dashboard recognizes valid interests from the latest active or completed attempt', async () => {
+  const source = await readFile(new URL('../server.js', import.meta.url), 'utf8')
+  const dashboard = source.slice(source.indexOf("app.get('/api/dashboard/status'"), source.indexOf("app.get('/api/college/status'"))
+  assert.match(dashboard, /status IN \('IN_PROGRESS', 'COMPLETED'\)/)
+  assert.match(dashboard, /ORDER BY attempt_id DESC LIMIT 1/)
+  assert.match(dashboard, /!validateInterestSubmission\(savedInterestState\)/)
+  assert.match(dashboard, /hasInterests: interestCount.count > 0 \|\| Boolean\(hasCategoryAnswers\)/)
+
+  const { getNextAssessmentRoute } = await import('../../client/src/utils/assessmentNavigation.js')
+  assert.equal(getNextAssessmentRoute({ hasProfile: true, hasInterests: true, hasSkills: true, hasPersonality: false }), '/onboarding/personality')
+  assert.equal(getNextAssessmentRoute({ hasProfile: true, hasInterests: true, hasSkills: false, hasPersonality: false }), '/onboarding/skills')
+})

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { getCourseCatalogUrl } from '../utils/courseCatalog'
 import useActiveCollegePhase from '../hooks/useActiveCollegePhase'
@@ -16,21 +16,21 @@ function CourseSearch() {
   const fromDashboard = searchParams.get('source') === 'dashboard' || location.state?.entryContext === 'dashboard'
   const hasActiveCollegePhase = useActiveCollegePhase()
   const contextSearch = fromDashboard ? '?source=dashboard' : ''
+  const [input, setInput] = useState(searchParams.get('q') || '')
+  const query = input.trim()
+  const returnSearch = new URLSearchParams({ ...(query ? { q: query } : {}), ...(fromDashboard ? { source: 'dashboard' } : {}) }).toString()
   const courseDetailsState = {
     entryContext: fromDashboard ? 'dashboard' : 'public-search',
-    returnTo: `${location.pathname}${location.search}`,
+    returnTo: `${location.pathname}${returnSearch ? `?${returnSearch}` : ''}`,
   }
-  const query = searchParams.get('q')?.trim() || ''
-  const [input, setInput] = useState(query)
   const [courses, setCourses] = useState([])
   const [status, setStatus] = useState('idle')
   const [resolvedQuery, setResolvedQuery] = useState(null)
   const [sort, setSort] = useState('asc')
   const [page, setPage] = useState(1)
-  const [suggestions, setSuggestions] = useState(null)
-  const [suggestionStatus, setSuggestionStatus] = useState('idle')
-  const [showSuggestions, setShowSuggestions] = useState(false)
-  const displayStatus = !query ? 'idle' : resolvedQuery === query ? status : 'loading'
+  const resultsRef = useRef(null)
+  const paginationScrollRef = useRef(false)
+  const displayStatus = resolvedQuery === query ? status : resolvedQuery === null ? 'loading' : 'success'
   const sortedCourses = useMemo(() => [...courses].sort((left, right) => {
     const comparison = left.course_name.localeCompare(right.course_name)
     return sort === 'desc' ? -comparison : comparison
@@ -40,45 +40,25 @@ function CourseSearch() {
     sortedCourses.slice((page - 1) * COURSES_PER_PAGE, page * COURSES_PER_PAGE)
   ), [page, sortedCourses])
 
-  useEffect(() => {
-    const suggestionQuery = input.trim()
-    const controller = new AbortController()
-    if (!suggestionQuery) return () => controller.abort()
-
-    const timer = setTimeout(() => {
-      setSuggestionStatus('loading')
-      fetch(`${apiUrl}/api/public/courses/search?q=${encodeURIComponent(suggestionQuery)}&limit=6`, {
-        signal: controller.signal,
-      })
-        .then(async (response) => {
-          if (!response.ok) throw new Error('Suggestion request failed')
-          return response.json()
-        })
-        .then((data) => {
-          setSuggestions(data.courses || [])
-          setSuggestionStatus('success')
-        })
-        .catch((error) => {
-          if (error.name !== 'AbortError') {
-            setSuggestions([])
-            setSuggestionStatus('error')
-          }
-        })
-    }, 250)
-
-    return () => {
-      clearTimeout(timer)
-      controller.abort()
+  useLayoutEffect(() => {
+    if (!paginationScrollRef.current) return
+    paginationScrollRef.current = false
+    if (displayStatus === 'success' && visibleCourses.length > 0) {
+      // Scroll the actual ancestors, including the body on mobile.
+      resultsRef.current?.scrollIntoView({ block: 'start', inline: 'nearest', behavior: 'instant' })
     }
-  }, [input])
+  }, [page, displayStatus, visibleCourses])
+
+  const changePage = (nextPage) => {
+    const targetPage = Math.max(1, Math.min(pageCount, nextPage))
+    if (targetPage === page) return
+    paginationScrollRef.current = true
+    setPage(targetPage)
+  }
 
   useEffect(() => {
     document.title = query ? `${query} Courses | LearnMatch` : 'Explore Courses | LearnMatch'
     const controller = new AbortController()
-
-    if (!query) {
-      return () => controller.abort()
-    }
 
     fetch(getCourseCatalogUrl(apiUrl, query), {
       signal: controller.signal,
@@ -88,6 +68,7 @@ function CourseSearch() {
         return response.json()
       })
       .then((data) => {
+        if (controller.signal.aborted) return
         setCourses(data.courses || [])
         setStatus('success')
         setResolvedQuery(query)
@@ -99,20 +80,25 @@ function CourseSearch() {
         }
       })
 
-    return () => controller.abort()
+    return () => {
+      controller.abort()
+    }
   }, [query])
+
+  const updateSearch = (value) => {
+    setPage(1)
+    setSearchParams(
+      Object.fromEntries([
+        ...(value ? [['q', value]] : []),
+        ...(fromDashboard ? [['source', 'dashboard']] : []),
+      ]),
+      { replace: true, ...(fromDashboard ? { state: { entryContext: 'dashboard' } } : {}) }
+    )
+  }
 
   const submit = (event) => {
     event.preventDefault()
-    setPage(1)
-    setShowSuggestions(false)
-    setSearchParams(
-      Object.fromEntries([
-        ...(input.trim() ? [['q', input.trim()]] : []),
-        ...(fromDashboard ? [['source', 'dashboard']] : []),
-      ]),
-      fromDashboard ? { state: { entryContext: 'dashboard' } } : undefined
-    )
+    updateSearch(input.trim())
   }
 
   return (
@@ -139,56 +125,19 @@ function CourseSearch() {
               value={input}
               onChange={(event) => {
                 setInput(event.target.value)
-                setSuggestions(null)
-                setSuggestionStatus('idle')
-                setShowSuggestions(Boolean(event.target.value.trim()))
+                setPage(1)
               }}
-              onFocus={() => setShowSuggestions(Boolean(input.trim()))}
-              onBlur={() => setShowSuggestions(false)}
               aria-label="Search courses"
-              aria-autocomplete="list"
-              aria-expanded={showSuggestions}
               placeholder="Try BSIT, programming, teacher..."
               className="flex-1 min-w-0 px-5 py-4 outline-none text-gray-800"
             />
             <button className="bg-orange-500 text-white px-5 sm:px-7 font-medium hover:bg-orange-600">Search</button>
           </form>
 
-          {showSuggestions && (
-            <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-100 rounded-xl shadow-xl overflow-hidden z-50" role="listbox">
-              {(suggestionStatus === 'idle' || suggestionStatus === 'loading') && (
-                <div className="px-5 py-4 text-sm text-gray-400">Finding courses...</div>
-              )}
-              {suggestionStatus === 'error' && (
-                <div className="px-5 py-4 text-sm text-red-500">Course suggestions are unavailable. You can still press Search.</div>
-              )}
-              {suggestionStatus === 'success' && suggestions?.length === 0 && (
-                <div className="px-5 py-4 text-sm text-gray-400">No suggestions for "{input.trim()}"</div>
-              )}
-              {suggestionStatus === 'success' && suggestions?.length > 0 && (
-                <div className="course-suggestion-scroll">
-                  <div className="px-5 py-2 bg-gray-50 text-xs font-semibold text-gray-400 uppercase tracking-widest">Courses</div>
-                  {suggestions.map((course) => (
-                    <button
-                      type="button"
-                      role="option"
-                      aria-selected="false"
-                      key={course.course_code}
-                      onMouseDown={(event) => event.preventDefault()}
-                      onClick={() => navigate(`/courses/${course.course_code}${contextSearch}`, { state: courseDetailsState })}
-                      className="block w-full text-left px-5 py-3 border-t border-gray-50 hover:bg-orange-50 transition group"
-                    >
-                      <CourseName name={course.course_name} abbreviation={course.course_abbreviation} className="text-sm font-medium text-gray-800 transition group-hover:text-orange-600" secondaryClassName="mt-1 text-sm font-normal text-gray-500" />
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
           </div>
         </div>
 
-        <section className="motion-swap mt-9" aria-live="polite">
+        <section ref={resultsRef} className="motion-swap mt-9" aria-live="polite">
           {displayStatus === 'loading' && <p className="text-gray-500">Loading courses…</p>}
           {displayStatus === 'error' && (
             <div className="bg-red-50 border border-red-100 text-red-700 rounded-xl p-5">We couldn’t load courses. Please try again.</div>
@@ -196,15 +145,15 @@ function CourseSearch() {
           {displayStatus === 'success' && courses.length === 0 && (
             <div className="bg-white border border-gray-100 rounded-xl p-7 text-center">
               <h2 className="font-semibold text-gray-900">No courses found</h2>
-              <p className="text-sm text-gray-500 mt-1">Try a broader course, skill, or career keyword.</p>
+              <p className="text-sm text-gray-500 mt-1">{query ? 'Try a broader course, skill, or career keyword.' : 'Please check back later for available courses.'}</p>
             </div>
           )}
           {displayStatus === 'success' && courses.length > 0 && (
             <>
               <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-                <p className="text-sm text-gray-500">
+                {query && resolvedQuery === query && <p className="text-sm text-gray-500">
                   {`${courses.length} ${courses.length === 1 ? 'course' : 'courses'} found for “${query}”`}
-                </p>
+                </p>}
                 <label className="flex items-center gap-2 text-sm font-medium text-gray-600">
                   Sort
                   <select value={sort} onChange={(event) => {
@@ -221,7 +170,6 @@ function CourseSearch() {
                   <article key={course.course_code} className="flex flex-col bg-white border border-gray-100 rounded-2xl p-5 sm:p-6 shadow-sm hover:shadow-md hover:border-orange-200 transition">
                     <div className="flex flex-wrap items-center gap-2 mb-3">
                       {course.course_abbreviation && <span className="text-xs font-bold text-orange-600 bg-orange-50 px-2.5 py-1 rounded-full">{getDisplayCourseAbbreviation(course.course_name, course.course_abbreviation)}</span>}
-                      {course.cluster_category && <span className="text-xs font-medium text-gray-600 bg-gray-100 px-2.5 py-1 rounded-full">{course.cluster_category}</span>}
                     </div>
                     <CourseName as="h2" name={course.course_name} className="text-lg font-semibold text-gray-900" secondaryClassName="mt-1 text-base font-medium text-gray-500" />
                     {course.description && <p className="text-sm text-gray-500 leading-relaxed mt-2 line-clamp-2">{course.description}</p>}
@@ -235,8 +183,8 @@ function CourseSearch() {
                 <nav className="mt-7 flex flex-wrap items-center justify-between gap-3" aria-label="Course catalog pages">
                   <p className="text-sm text-gray-500">Page {page} of {pageCount}</p>
                   <div className="flex gap-2">
-                    <button type="button" onClick={() => setPage((current) => Math.max(1, current - 1))} disabled={page === 1} className="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:border-orange-300 hover:text-orange-700 disabled:cursor-not-allowed disabled:opacity-40">Previous</button>
-                    <button type="button" onClick={() => setPage((current) => Math.min(pageCount, current + 1))} disabled={page === pageCount} className="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:border-orange-300 hover:text-orange-700 disabled:cursor-not-allowed disabled:opacity-40">Next</button>
+                    <button type="button" onClick={() => changePage(page - 1)} disabled={page === 1} className="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:border-orange-300 hover:text-orange-700 disabled:cursor-not-allowed disabled:opacity-40">Previous</button>
+                    <button type="button" onClick={() => changePage(page + 1)} disabled={page === pageCount} className="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:border-orange-300 hover:text-orange-700 disabled:cursor-not-allowed disabled:opacity-40">Next</button>
                   </div>
                 </nav>
               )}

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { IconLoader2, IconSchool } from '@tabler/icons-react'
 import FeedbackPopup from '../components/FeedbackPopup'
@@ -106,6 +106,7 @@ function shouldShowRequirementsNote(profile, cluster) {
 
 function Results() {
   const navigate = useNavigate()
+  const pageRef = useRef(null)
   const [recommendations, setRecommendations] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -127,6 +128,8 @@ function Results() {
 
     const loadRecommendations = async () => {
       setLoading(true)
+      // Reset the scrolling ancestors immediately for each load, including retries.
+      pageRef.current?.scrollIntoView({ block: 'start', inline: 'nearest', behavior: 'instant' })
       setError('')
       setRankingPending(false)
       let requestTimedOut = false
@@ -239,7 +242,7 @@ function Results() {
   const personalFactorsConsidered = selectedFactors.length > 0
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div ref={pageRef} className="min-h-screen bg-gray-50">
       {/* Nav */}
       <nav className="bg-white border-b border-gray-100 px-5 sm:px-8 py-4 sm:py-5 flex justify-between items-center gap-3">
         {loading || returnDestination.path === '/college' ? (
