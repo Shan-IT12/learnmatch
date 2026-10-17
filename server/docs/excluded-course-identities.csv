@@ -1,0 +1,57 @@
+course_code,recorded_course_name,classification,canonical_or_successor_codes
+CRS020,Bachelor of Science in Civil Engineering,confirmed_duplicate,CRS021
+CRS025,Bachelor in Computer Engineering,alternative_title,CRS024
+CRS033,Bachelor of Science in Electronics Engineering,confirmed_duplicate,CRS034
+CRS035,Bachelor of Science in Elementary Education,confirmed_duplicate,CRS036
+CRS056,Bachelor of Industrial Engineering major in Industrial Engineering,malformed,CRS176
+CRS057,Bachelor of Science in Industrial Engineering with Specialization in Service Management,confirmed_duplicate,CRS058
+CRS060,Bachelor of Science in Industrial Management Engineering Minor in Service Management,historical,CRS058
+CRS077,Bachelor of Science in Medical Laboratory Science (BSMLS) / Bachelor of Science in Medical Technology (BSMT),alternative_title,CRS076
+CRS127,Bachelor of Arts major in Biology,malformed,CRS013
+CRS143,Bachelor of Science in Electronics and Communications Engineering,historical,CRS034
+CRS144,Bachelor of Science in Electronics Engineering,confirmed_duplicate,CRS034
+CRS148,Bachelor of Arts in English Language,confirmed_duplicate,CRS037
+CRS149,Bachelor of Arts in English Language,confirmed_duplicate,CRS037
+CRS150,Bachelor of Science in Education major in English,confirmed_duplicate,CRS102
+CRS151,Bachelor in English Education major in English,confirmed_duplicate,CRS102
+CRS157,Bachelor of Science in Sanitary & Environmental Engineering,alternative_title,CRS153
+CRS159,Bachelor of Science in Exercise and Sports Sciences,confirmed_duplicate,CRS109
+CRS164,Bachelor in Filipino Education major in Filipino,alternative_title,CRS163
+CRS166,Bachelor of Arts in Fine Arts,quarantine,
+CRS167,Bachelor of Science in Fisheries,confirmed_duplicate,CRS047
+CRS168,Bachelor of Science in Food Technology,confirmed_duplicate,CRS048
+CRS170,Bachelor of Science in Industrial Technology major in Garments Fashion and Design,confirmed_duplicate,CRS171
+CRS172,"Bachelor of Industrial Technology major in Garments, Fashions and Designs",confirmed_duplicate,CRS123
+CRS173,Bachelor of Science in Geodetic Engineering,confirmed_duplicate,CRS174
+CRS188,Bachelor of Cultural and Arts Education,alternative_title,CRS139
+CRS191,Bachelor of Science in Electronics and Communications Engineering major in Electronics Communication Engineering,historical,CRS034
+CRS197,Bachelor of Industrial Technology major in Fashion Design and Apparel Technology,confirmed_duplicate,CRS123
+CRS200,Bachelor of Science in Industrial Technology major in Foods,alternative_title,CRS201
+CRS205,"Bachelor of Industrial Technology major in Garment, Fashion and Design",confirmed_duplicate,CRS123
+CRS206,"Bachelor of Industrial Technology major in Garments, Fashion and Design Technology",confirmed_duplicate,CRS123
+CRS207,Bachelor of Elementary Education major in General,malformed,CRS036
+CRS211,Bachelor of Science in Civil Engineering major in Geotechnical,alternative_title,CRS175
+CRS216,Bachelor of Technology and Livelihood Education major in Home Economics,confirmed_duplicate,CRS112
+CRS219,Bachelor of Science in Human Services,alternative_title,CRS054
+CRS224,Bachelor of Science in Information and Communications Technology,alternative_title,CRS225
+CRS229,Bachelor of Science in Information Systems,confirmed_duplicate,CRS228
+CRS248,Bachelor of Science in Marine Transportation,confirmed_duplicate,CRS072
+CRS249,Bachelor of Science in Marine Transportation and Engineering,historical,CRS072; CRS244
+CRS254,Bachelor in Mathematics Education major in Mathematics,alternative_title,CRS253
+CRS256,Bachelor of Science in Mechanical Engineering,confirmed_duplicate,CRS075
+CRS264,Bachelor of Music major in Music Education,alternative_title,CRS265
+CRS267,Bachelor of Science in Nursing,confirmed_duplicate,CRS083
+CRS275,Bachelor of Science in Physical Education,historical,CRS090
+CRS276,Bachelor of Science in Physical Therapy,confirmed_duplicate,CRS091
+CRS281,Bachelor of Psychology,quarantine,
+CRS284,Bachelor of Science in Radiologic Technology,confirmed_duplicate,CRS098
+CRS290,Bachelor of Science in Secondary Education major in English,confirmed_duplicate,CRS102
+CRS292,Bachelor in Secondary Education major in English,confirmed_duplicate,CRS102
+CRS293,Bachelor of Science in Industrial Security Management,confirmed_duplicate,CRS103
+CRS295,Bachelor of Arts major in Sign Language Interpreting,malformed,CRS294
+CRS300,Bachelor of Science in Special Needs Education,confirmed_duplicate,CRS107
+CRS304,Bachelor in Sports Science,historical,CRS302
+CRS315,Bachelor of Science in Civil Engineering major in Transportation,alternative_title,CRS316
+CRS317,Bachelor of Science in Civil Engineering major in Water Resource Engineering,alternative_title,CRS318
+CRS320,Bachelor in Aviation Engineering Technology,confirmed_duplicate,CRS180
+CRS340,Bachelor of Science in Industrial Technology major in Electronics & Communications Technology,alternative_title,CRS339

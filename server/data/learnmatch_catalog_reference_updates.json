@@ -1,0 +1,510 @@
+{
+  "checked_on": "2026-10-18",
+  "method": "Official publisher program listings and identified document sections; manual research metadata only, never an admin source confirmation.",
+  "limitations": "This is not an exhaustive certification of latest applicability. The legacy CHED 2026 index was incomplete and the newer e.gov page was not text-readable. Later amendments, institution-specific curricula and specialization equivalence remain subject to review.",
+  "official_indexes_checked": [
+    "https://legacy.ched.gov.ph/2015-ched-memorandum-orders/",
+    "https://legacy.ched.gov.ph/2017-ched-memorandum-orders/",
+    "https://legacy.ched.gov.ph/2018-ched-memorandum-orders/",
+    "https://legacy.ched.gov.ph/2019-ched-memorandum-orders/",
+    "https://legacy.ched.gov.ph/2020-ched-memorandum-orders/",
+    "https://legacy.ched.gov.ph/2021-ched-memorandum-orders/",
+    "https://legacy.ched.gov.ph/2022-ched-memorandum-orders/",
+    "https://legacy.ched.gov.ph/2023-ched-memorandum-orders/",
+    "https://legacy.ched.gov.ph/2024-ched-memorandum-orders/",
+    "https://legacy.ched.gov.ph/2025-ched-memorandum-orders/",
+    "https://legacy.ched.gov.ph/2026-ched-memorandum-orders/"
+  ],
+  "references": [
+    {
+      "id": "bat-transition-2022",
+      "title": "CHED Regional XI Memorandum 001 s.2022 - BAT/DAT-BAT transition",
+      "series_year": 2022,
+      "course_codes": [
+        "CRS121"
+      ],
+      "url": "https://ro11.ched.gov.ph/wp-content/uploads/2022/10/MRD-NO.-001-S.-2022.pdf",
+      "checked_on": "2026-10-18",
+      "scope": "transition",
+      "locator": "Page 1, orientation agenda items 1-3",
+      "scope_note": "The regional memo discusses gradual phase-out of BAT/DAT-BAT and applications for BS Agriculture. It does not establish that BAT and BS Agriculture are the same program. Current BAT applicability requires review.",
+      "check_method": "Official regional memorandum text read"
+    },
+    {
+      "id": "agriculture-2021",
+      "title": "CMO 23 s.2021 - BS Agriculture",
+      "series_year": 2021,
+      "course_codes": [
+        "CRS008",
+        "CRS116",
+        "CRS118",
+        "CRS119",
+        "CRS120",
+        "CRS160",
+        "CRS161"
+      ],
+      "url": "https://legacy.ched.gov.ph/wp-content/uploads/CMO-23-s.-2021.pdf",
+      "checked_on": "2026-10-18",
+      "scope": "parent_framework",
+      "locator": "CHED 2021 index, CMO 23 entry",
+      "scope_note": "Program-level agriculture reference. This lookup does not establish every named specialization or revalidate the saved course description, duration, year levels or weights.",
+      "check_method": "Official publisher listing checked; full curriculum not revalidated"
+    },
+    {
+      "id": "manufacturing-2025",
+      "title": "CMO 16 s.2025 - BS Manufacturing Engineering",
+      "series_year": 2025,
+      "course_codes": [
+        "CRS070"
+      ],
+      "url": "https://legacy.ched.gov.ph/2025-ched-memorandum-orders/",
+      "checked_on": "2026-10-18",
+      "scope": "program",
+      "locator": "CMO 16 entry; subject specifies AY 2026-2027",
+      "scope_note": "Official listing identifies the BS Manufacturing Engineering standards effective AY 2026-2027. It is not a PSG for Manufacturing Engineering Technology. The direct PDF returned HTTP 403 during this lookup; use the official listing.",
+      "check_method": "Official publisher listing checked; full curriculum not revalidated",
+      "document_url": "https://ched.gov.ph/wp-content/uploads/CMO-16-Series-2025.pdf"
+    },
+    {
+      "id": "bet-2025",
+      "title": "CMO 20 s.2025 - Bachelor of Engineering Technology framework",
+      "series_year": 2025,
+      "course_codes": [
+        "CRS129",
+        "CRS133",
+        "CRS135",
+        "CRS138",
+        "CRS145",
+        "CRS154",
+        "CRS190",
+        "CRS194",
+        "CRS214",
+        "CRS243",
+        "CRS257",
+        "CRS258",
+        "CRS259",
+        "CRS260",
+        "CRS262",
+        "CRS263",
+        "CRS321"
+      ],
+      "url": "https://legacy.ched.gov.ph/2025-ched-memorandum-orders/",
+      "checked_on": "2026-10-18",
+      "scope": "parent_framework",
+      "locator": "CMO 20 entry",
+      "scope_note": "The listing covers the BET program framework. It does not independently establish any specific named major, specialization, curriculum or year structure.",
+      "check_method": "Official publisher listing checked; full curriculum not revalidated"
+    },
+    {
+      "id": "industrial-technology-2023",
+      "title": "CMO 13 s.2023 - Bachelor of Industrial Technology framework",
+      "series_year": 2023,
+      "course_codes": [
+        "CRS061",
+        "CRS123",
+        "CRS170",
+        "CRS171",
+        "CRS172",
+        "CRS179",
+        "CRS197",
+        "CRS199",
+        "CRS200",
+        "CRS201",
+        "CRS205",
+        "CRS206",
+        "CRS223",
+        "CRS234",
+        "CRS255",
+        "CRS279",
+        "CRS328",
+        "CRS329",
+        "CRS336",
+        "CRS337",
+        "CRS338",
+        "CRS339",
+        "CRS340",
+        "CRS341"
+      ],
+      "url": "https://legacy.ched.gov.ph/2023-ched-memorandum-orders/",
+      "checked_on": "2026-10-18",
+      "scope": "parent_framework",
+      "locator": "CMO 13 entry",
+      "scope_note": "The listed program is Bachelor of Industrial Technology (BIndTech). Applying it to a BS/Bachelor-in variant or a particular major requires identity and specialization review; this is a parent framework, not confirmation of those exact titles.",
+      "check_method": "Official publisher listing checked; full curriculum not revalidated"
+    },
+    {
+      "id": "maritime-2023",
+      "title": "Joint CHED-MARINA Circular 01 s.2023 - BSMT and BSMarE",
+      "series_year": 2023,
+      "course_codes": [
+        "CRS072",
+        "CRS244",
+        "CRS248"
+      ],
+      "url": "https://legacy.ched.gov.ph/wp-content/uploads/JCMMC-1-S.-2023-PSG.pdf",
+      "checked_on": "2026-10-18",
+      "scope": "program",
+      "locator": "PDF page 1, subject and Article I",
+      "scope_note": "The circular names BSMT and BSMarE. It does not establish a combined degree or a separately named specialization. Saved curriculum details and matching weights were not revalidated.",
+      "check_method": "Official circular text read"
+    },
+    {
+      "id": "maritime-2025",
+      "title": "MARINA Advisory 2025-39 - maritime education transition",
+      "series_year": 2025,
+      "course_codes": [
+        "CRS072",
+        "CRS244",
+        "CRS248"
+      ],
+      "url": "https://marina.gov.ph/wp-content/uploads/2025/10/MA-No.-2025-39.pdf",
+      "checked_on": "2026-10-18",
+      "scope": "implementation",
+      "locator": "Page 1, item 1.1",
+      "scope_note": "The advisory says to continue delivering BSMT and BSMarE under Joint CHED-MARINA Circular 01 s.2023 until new PSGs are issued. This is implementation guidance, not a replacement curriculum.",
+      "check_method": "Official advisory text read"
+    },
+    {
+      "id": "physics-2024",
+      "title": "CMO 13 s.2024 - Physics and Applied Physics",
+      "series_year": 2024,
+      "course_codes": [
+        "CRS012",
+        "CRS092"
+      ],
+      "url": "https://legacy.ched.gov.ph/wp-content/uploads/CMO-NO.-13-S.-2024-PSG-BS-PHYSICS-AND-BS-APPLIED-PHYSICS.pdf",
+      "checked_on": "2026-10-18",
+      "scope": "program",
+      "locator": "CHED 2024 index, CMO 13 entry",
+      "scope_note": "The official listing names BS Physics and BS Applied Physics. It is not a teacher-education PSG.",
+      "check_method": "Official CHED listing checked; scanned PDF has no independently readable text"
+    },
+    {
+      "id": "meteorology-2024",
+      "title": "CMO 3 s.2024 - BS Meteorology",
+      "series_year": 2024,
+      "course_codes": [
+        "CRS079"
+      ],
+      "url": "https://legacy.ched.gov.ph/wp-content/uploads/CMO-NO.-3-S.-2024-PSG-for-BS-Meteorology-1.pdf",
+      "checked_on": "2026-10-18",
+      "scope": "program",
+      "locator": "CHED 2024 index, CMO 3 entry",
+      "scope_note": "The official listing names BS Meteorology; saved course details and weights were not revalidated.",
+      "check_method": "Official CHED listing checked; scanned PDF has no independently readable text"
+    },
+    {
+      "id": "public-health-2024",
+      "title": "CMO 1 s.2024 - BS Public Health tracks",
+      "series_year": 2024,
+      "course_codes": [
+        "CRS097"
+      ],
+      "url": "https://legacy.ched.gov.ph/2024-ched-memorandum-orders/",
+      "checked_on": "2026-10-18",
+      "scope": "parent_framework",
+      "locator": "CMO 1 entry",
+      "scope_note": "The listing names Population and Clinical tracks. It does not select a track or establish a specific saved curriculum.",
+      "check_method": "Official CHED listing checked; full PDF unavailable in this lookup"
+    },
+    {
+      "id": "midwifery-2023",
+      "title": "CMO 3 s.2023 - BS Midwifery",
+      "series_year": 2023,
+      "course_codes": [
+        "CRS080"
+      ],
+      "url": "https://legacy.ched.gov.ph/2023-ched-memorandum-orders/",
+      "checked_on": "2026-10-18",
+      "scope": "program",
+      "locator": "CMO 3 entry; indexed PDF Article VII",
+      "scope_note": "The order is for BS Midwifery. Earlier program-transformation provisions need to be considered when reviewing legacy curricula.",
+      "check_method": "Official CHED listing and indexed PDF transition text checked"
+    },
+    {
+      "id": "pharmacy-2021",
+      "title": "CMO 25 s.2021 - BS Pharmacy",
+      "series_year": 2021,
+      "course_codes": [
+        "CRS088"
+      ],
+      "url": "https://legacy.ched.gov.ph/wp-content/uploads/CMO-No-25-series-2021-PSG-for-BS-Pharmacy.pdf",
+      "checked_on": "2026-10-18",
+      "scope": "program",
+      "locator": "PDF page 6, Article V section 8",
+      "scope_note": "The document contains BS Pharmacy curricular requirements. Saved year levels and weights have not been reconciled against it.",
+      "check_method": "Official PDF text read"
+    },
+    {
+      "id": "customs-2021",
+      "title": "CMO 30 s.2021 - BS Customs Administration",
+      "series_year": 2021,
+      "course_codes": [
+        "CRS028"
+      ],
+      "url": "https://legacy.ched.gov.ph/wp-content/uploads/CMO-30-s.-2021.pdf",
+      "checked_on": "2026-10-18",
+      "scope": "parent_framework",
+      "locator": "PDF page 2, Article IV section 5.1",
+      "scope_note": "The document names BS Customs Administration. The saved title omits Science, so equivalence requires review.",
+      "check_method": "Official PDF text read"
+    },
+    {
+      "id": "fisheries-2021",
+      "title": "CMO 33 s.2021 - BS Fisheries",
+      "series_year": 2021,
+      "course_codes": [
+        "CRS047",
+        "CRS167"
+      ],
+      "url": "https://legacy.ched.gov.ph/wp-content/uploads/CMO-33.-series-of-2021.pdf",
+      "checked_on": "2026-10-18",
+      "scope": "program",
+      "locator": "PDF page 2, Article IV section 5.1",
+      "scope_note": "The document names BS Fisheries. It does not merge duplicate records or revalidate matching profiles.",
+      "check_method": "Official PDF text read"
+    },
+    {
+      "id": "naval-2021",
+      "title": "CMO 21 s.2021 - Naval Architecture and Marine Engineering",
+      "series_year": 2021,
+      "course_codes": [
+        "CRS082"
+      ],
+      "url": "https://legacy.ched.gov.ph/2021-ched-memorandum-orders/",
+      "checked_on": "2026-10-18",
+      "scope": "program",
+      "locator": "CMO 21 entry",
+      "scope_note": "This is the separate Naval Architecture and Marine Engineering program. BSMT/BSMarE circulars must not be substituted for it.",
+      "check_method": "Official CHED listing checked"
+    },
+    {
+      "id": "forestry-2019",
+      "title": "CMO 6 s.2019 - BS Forestry",
+      "series_year": 2019,
+      "course_codes": [
+        "CRS050",
+        "CRS203"
+      ],
+      "url": "https://legacy.ched.gov.ph/wp-content/uploads/CMO-06-s.-2019-Policies-Standards-and-Guidelines-for-BS-Forestry.pdf",
+      "checked_on": "2026-10-18",
+      "scope": "parent_framework",
+      "locator": "CHED 2019 index, CMO 6 entry",
+      "scope_note": "Program-level Forestry reference. It does not establish the Forest Products Innovation Design specialization.",
+      "check_method": "Official CHED listing checked; scanned PDF has no independently readable text"
+    },
+    {
+      "id": "philosophy-2017",
+      "title": "CMO 26 s.2017 - BA Philosophy",
+      "series_year": 2017,
+      "course_codes": [
+        "CRS089"
+      ],
+      "url": "https://legacy.ched.gov.ph/2017-ched-memorandum-orders/",
+      "checked_on": "2026-10-18",
+      "scope": "program",
+      "locator": "CMO 26 entry",
+      "scope_note": "The listing identifies BA Philosophy, providing a more specific later reference than the recorded general 1997 HSC framework.",
+      "check_method": "Official CHED listing checked"
+    },
+    {
+      "id": "btled-2017",
+      "title": "CMO 78 s.2017 - Technology and Livelihood Education",
+      "series_year": 2017,
+      "course_codes": [
+        "CRS216"
+      ],
+      "url": "https://legacy.ched.gov.ph/2017-ched-memorandum-orders/",
+      "checked_on": "2026-10-18",
+      "scope": "parent_framework",
+      "locator": "CMO 78 entry",
+      "scope_note": "Program framework for BTLEd; the exact saved major and year structure require review.",
+      "check_method": "Official CHED listing checked"
+    },
+    {
+      "id": "locator-2017-38",
+      "title": "CMO 38 s.2017 - BA History",
+      "series_year": 2017,
+      "course_codes": [
+        "CRS052"
+      ],
+      "url": "https://legacy.ched.gov.ph/2017-ched-memorandum-orders/",
+      "checked_on": "2026-10-18",
+      "scope": "program",
+      "locator": "CMO 38 entry",
+      "scope_note": "The official listing identifies the program or framework named above. This is a reference locator, not a newly issued standard or validation of saved course facts.",
+      "check_method": "Official publisher listing checked; full curriculum not revalidated"
+    },
+    {
+      "id": "locator-2017-62",
+      "title": "CMO 62 s.2017 - Tourism and Hospitality Management",
+      "series_year": 2017,
+      "course_codes": [
+        "CRS053"
+      ],
+      "url": "https://legacy.ched.gov.ph/2017-ched-memorandum-orders/",
+      "checked_on": "2026-10-18",
+      "scope": "program",
+      "locator": "CMO 62 entry",
+      "scope_note": "The official listing identifies the program or framework named above. This is a reference locator, not a newly issued standard or validation of saved course facts.",
+      "check_method": "Official publisher listing checked; full curriculum not revalidated"
+    },
+    {
+      "id": "locator-2017-33",
+      "title": "CMO 33 s.2017 - Human Services",
+      "series_year": 2017,
+      "course_codes": [
+        "CRS054"
+      ],
+      "url": "https://legacy.ched.gov.ph/2017-ched-memorandum-orders/",
+      "checked_on": "2026-10-18",
+      "scope": "program",
+      "locator": "CMO 33 entry",
+      "scope_note": "The official listing identifies the program or framework named above. This is a reference locator, not a newly issued standard or validation of saved course facts.",
+      "check_method": "Official publisher listing checked; full curriculum not revalidated"
+    },
+    {
+      "id": "locator-2017-43",
+      "title": "CMO 43 s.2017 - Fine Arts and Design framework",
+      "series_year": 2017,
+      "course_codes": [
+        "CRS055"
+      ],
+      "url": "https://legacy.ched.gov.ph/2017-ched-memorandum-orders/",
+      "checked_on": "2026-10-18",
+      "scope": "parent_framework",
+      "locator": "CMO 43 entry",
+      "scope_note": "The official listing identifies the program or framework named above. This is a reference locator, not a newly issued standard or validation of saved course facts.",
+      "check_method": "Official publisher listing checked; full curriculum not revalidated"
+    },
+    {
+      "id": "locator-2017-44",
+      "title": "CMO 44 s.2017 - BS Interior Design",
+      "series_year": 2017,
+      "course_codes": [
+        "CRS063"
+      ],
+      "url": "https://legacy.ched.gov.ph/2017-ched-memorandum-orders/",
+      "checked_on": "2026-10-18",
+      "scope": "program",
+      "locator": "CMO 44 entry",
+      "scope_note": "The official listing identifies the program or framework named above. This is a reference locator, not a newly issued standard or validation of saved course facts.",
+      "check_method": "Official publisher listing checked; full curriculum not revalidated"
+    },
+    {
+      "id": "locator-2017-29",
+      "title": "CMO 29 s.2017 - BS Internal Auditing",
+      "series_year": 2017,
+      "course_codes": [
+        "CRS064"
+      ],
+      "url": "https://legacy.ched.gov.ph/2017-ched-memorandum-orders/",
+      "checked_on": "2026-10-18",
+      "scope": "program",
+      "locator": "CMO 29 entry",
+      "scope_note": "The official listing identifies the program or framework named above. This is a reference locator, not a newly issued standard or validation of saved course facts.",
+      "check_method": "Official publisher listing checked; full curriculum not revalidated"
+    },
+    {
+      "id": "locator-2017-41",
+      "title": "CMO 41 s.2017 - Journalism",
+      "series_year": 2017,
+      "course_codes": [
+        "CRS066"
+      ],
+      "url": "https://legacy.ched.gov.ph/2017-ched-memorandum-orders/",
+      "checked_on": "2026-10-18",
+      "scope": "program",
+      "locator": "CMO 41 entry",
+      "scope_note": "The official listing identifies the program or framework named above. This is a reference locator, not a newly issued standard or validation of saved course facts.",
+      "check_method": "Official publisher listing checked; full curriculum not revalidated"
+    },
+    {
+      "id": "locator-2017-45",
+      "title": "CMO 45 s.2017 - Landscape Architecture",
+      "series_year": 2017,
+      "course_codes": [
+        "CRS067"
+      ],
+      "url": "https://legacy.ched.gov.ph/2017-ched-memorandum-orders/",
+      "checked_on": "2026-10-18",
+      "scope": "program",
+      "locator": "CMO 45 entry",
+      "scope_note": "The official listing identifies the program or framework named above. This is a reference locator, not a newly issued standard or validation of saved course facts.",
+      "check_method": "Official publisher listing checked; full curriculum not revalidated"
+    },
+    {
+      "id": "locator-2017-21",
+      "title": "CMO 21 s.2017 - Literature",
+      "series_year": 2017,
+      "course_codes": [
+        "CRS069"
+      ],
+      "url": "https://legacy.ched.gov.ph/2017-ched-memorandum-orders/",
+      "checked_on": "2026-10-18",
+      "scope": "program",
+      "locator": "CMO 21 entry",
+      "scope_note": "The official listing identifies the program or framework named above. This is a reference locator, not a newly issued standard or validation of saved course facts.",
+      "check_method": "Official publisher listing checked; full curriculum not revalidated"
+    },
+    {
+      "id": "locator-2017-89",
+      "title": "CMO 89 s.2017 - BS Geodetic Engineering",
+      "series_year": 2017,
+      "course_codes": [
+        "CRS173",
+        "CRS174"
+      ],
+      "url": "https://legacy.ched.gov.ph/2017-ched-memorandum-orders/",
+      "checked_on": "2026-10-18",
+      "scope": "program",
+      "locator": "CMO 89 entry",
+      "scope_note": "The official listing identifies the program or framework named above. This is a reference locator, not a newly issued standard or validation of saved course facts.",
+      "check_method": "Official publisher listing checked; full curriculum not revalidated"
+    },
+    {
+      "id": "computing-2015",
+      "title": "CMO 25 s.2015 - CS, IS and IT programs",
+      "series_year": 2015,
+      "course_codes": [
+        "CRS026",
+        "CRS062",
+        "CRS228"
+      ],
+      "url": "https://legacy.ched.gov.ph/2015-ched-memorandum-orders/",
+      "checked_on": "2026-10-18",
+      "scope": "program",
+      "locator": "CMO 25 entry",
+      "scope_note": "The listing names BS Computer Science, BS Information Systems and BS Information Technology. No newer replacement was established in this lookup.",
+      "check_method": "Official publisher listing checked; full curriculum not revalidated"
+    },
+    {
+      "id": "library-2015",
+      "title": "CMO 24 s.2015 - Library and Information Science",
+      "series_year": 2015,
+      "course_codes": [
+        "CRS068"
+      ],
+      "url": "https://legacy.ched.gov.ph/2015-ched-memorandum-orders/",
+      "checked_on": "2026-10-18",
+      "scope": "program",
+      "locator": "CMO 24 entry",
+      "scope_note": "The official listing provides the recorded BLIS reference. Its age alone does not establish repeal or replacement.",
+      "check_method": "Official publisher listing checked; full curriculum not revalidated"
+    },
+    {
+      "id": "bat-related-agriculture-2021",
+      "title": "CMO 23 s.2021 - BS Agriculture",
+      "series_year": 2021,
+      "course_codes": [
+        "CRS121"
+      ],
+      "url": "https://legacy.ched.gov.ph/wp-content/uploads/CMO-23-s.-2021.pdf",
+      "checked_on": "2026-10-18",
+      "scope": "related_only",
+      "locator": "CHED 2021 index, CMO 23 entry",
+      "scope_note": "BS Agriculture is a separate program, supplied as transition context only. This does not replace the historical BAT source or establish course equivalence.",
+      "check_method": "Official publisher listing checked; full curriculum not revalidated"
+    }
+  ]
+}

@@ -404,19 +404,19 @@ export async function getTopCourseRecommendations(pool, userId) {
     pool.query(
       `SELECT course_id, course_code, course_name, course_abbreviation, cluster_category
        FROM COURSE
-       WHERE is_active = 1`,
+       WHERE is_active = 1 AND is_draft = 0`,
     ),
     pool.query(
       `SELECT csp.course_id, csp.skill_domain, csp.weight
        FROM COURSE_SKILL_PROFILE csp
        JOIN COURSE c ON c.course_id = csp.course_id
-       WHERE c.is_active = 1`,
+       WHERE c.is_active = 1 AND c.is_draft = 0`,
     ),
     pool.query(
       `SELECT crp.course_id, crp.riasec_type, crp.weight
        FROM COURSE_RIASEC_PROFILE crp
        JOIN COURSE c ON c.course_id = crp.course_id
-       WHERE c.is_active = 1`,
+       WHERE c.is_active = 1 AND c.is_draft = 0`,
     ),
   ])
 

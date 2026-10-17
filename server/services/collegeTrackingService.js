@@ -1,5 +1,5 @@
 import { generateMismatchExplanation } from './collegeMismatchExplanationService.js'
-import { getPublicCourse } from './publicCourseService.js'
+import { getPublicCourse, getAvailablePublicCourse } from './publicCourseService.js'
 import { isCurrentIndependentCourse } from './courseIdentityService.js'
 import { ACADEMIC_CALENDARS, getTermDefinition, resolveActiveCalendarTerm, resolveCalendarTerm } from './academicCalendar.js'
 
@@ -427,9 +427,9 @@ export function calculateNextAcademicStage(yearLevel, semester, programDurationY
   )
 }
 
-function validateYearWithinProgram(yearLevel, courseCode, resolveCourse = getPublicCourse) {
+async function validateYearWithinProgram(yearLevel, courseCode, resolveCourse = getPublicCourse, database = null) {
   validateChoice(yearLevel, YEAR_LEVELS, 'year level')
-  const course = resolveCourse(courseCode)
+  const course = await resolveCourse(courseCode) || (database ? await getAvailablePublicCourse(courseCode, database) : null)
   const duration = Number(course?.program_duration_years)
   const year = Number(String(yearLevel).match(/\d+/)?.[0])
   if (!Number.isInteger(duration) || !Number.isInteger(year) || year > duration) {
@@ -483,14 +483,14 @@ export async function createCollegeSetup(
   try {
     await connection.beginTransaction()
     const [courses] = await connection.query(
-      'SELECT course_id, course_code, course_name FROM COURSE WHERE course_id = ? AND is_active = 1',
+      'SELECT course_id, course_code, course_name FROM COURSE WHERE course_id = ? AND is_active = 1 AND is_draft = 0',
       [normalizedCourseId]
     )
     if (courses.length === 0 || !isCurrentIndependentCourse(courses[0].course_code)) {
       throw new CollegeTrackingError('The selected course is unavailable or inactive.', 'COURSE_UNAVAILABLE', 404)
     }
 
-    validateYearWithinProgram(yearLevel, courses[0].course_code, resolveCourse)
+    await validateYearWithinProgram(yearLevel, courses[0].course_code, resolveCourse, connection)
 
     let cycle = await getActiveCycle(connection, userId, { forUpdate: true })
     if (cycle && Number(cycle.course_id) !== normalizedCourseId) {
@@ -593,7 +593,7 @@ async function insertLifecycleTerm(connection, userId, cycleId, course, input, r
     throw new CollegeTrackingError('Select a valid term for the academic calendar.', 'INVALID_TERM')
   }
   const academicYear = validateCurrentOrFutureAcademicYear(input.academicYear)
-  validateYearWithinProgram(input.yearLevel, course.course_code, resolveCourse)
+  await validateYearWithinProgram(input.yearLevel, course.course_code, resolveCourse, connection)
   const timing = resolveTimingInput(input, academicYear)
   const [existing] = await connection.query(
     `SELECT term_id FROM COLLEGE_TERM
@@ -732,7 +732,7 @@ export async function changeCollegeProgram(pool, userId, termInput, resolveCours
       throw new CollegeTrackingError('Select a different program.', 'SAME_PROGRAM', 409)
     }
     const [courses] = await connection.query(
-      'SELECT course_id, course_code, course_name FROM COURSE WHERE course_id = ? AND is_active = 1',
+      'SELECT course_id, course_code, course_name FROM COURSE WHERE course_id = ? AND is_active = 1 AND is_draft = 0',
       [courseId]
     )
     if (courses.length === 0 || !isCurrentIndependentCourse(courses[0].course_code)) {
@@ -1288,7 +1288,7 @@ export async function startNextSemester(pool, userId, termInput = {}, resolveCou
       )
     }
 
-    const course = resolveCourse(latest.course_code)
+    const course = await resolveCourse(latest.course_code) || await getAvailablePublicCourse(latest.course_code, connection)
     if (!course?.program_duration_years) {
       throw new CollegeTrackingError('The program roadmap is unavailable.', 'ROADMAP_UNAVAILABLE', 409)
     }
@@ -1308,7 +1308,7 @@ export async function startNextSemester(pool, userId, termInput = {}, resolveCou
       if (!confirmedTerm || confirmedTerm.calendarType === 'legacy') {
         throw new CollegeTrackingError('Select a valid next term.', 'INVALID_TERM')
       }
-      validateYearWithinProgram(termInput.nextYearLevel, latest.course_code, resolveCourse)
+      await validateYearWithinProgram(termInput.nextYearLevel, latest.course_code, () => course)
       if (termInput.nextYearLevel === latest.year_level && termInput.nextSemester === latest.semester) {
         throw new CollegeTrackingError(
           'The next academic stage must differ from the completed term.',

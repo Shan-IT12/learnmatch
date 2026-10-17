@@ -10,7 +10,8 @@ import {
 
 const databaseWithActiveCodes = (...courseCodes) => ({
   query: async (sql) => {
-    assert.equal(sql, 'SELECT course_code FROM COURSE WHERE is_active = 1')
+    if (sql.includes('JOIN COURSE_PUBLICATION')) return [[]]
+    assert.equal(sql, 'SELECT course_code FROM COURSE WHERE is_active = 1 AND is_draft = 0')
     return [courseCodes.map((course_code) => ({ course_code }))]
   },
 })

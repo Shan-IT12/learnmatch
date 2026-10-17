@@ -25,14 +25,14 @@ const getReviewedCoordinates = (uii) => {
 
 export async function getSchoolsForCourse(courseCode, database = pool) {
   const normalizedCode = normalizeCourseCode(courseCode)
-  if (!/^CRS\d{3}$/.test(normalizedCode)) return null
+  if (!/^CRS\d{3,7}$/.test(normalizedCode)) return null
   const resolvedCourseCodes = resolveCanonicalCourseIds(normalizedCode)
   if (resolvedCourseCodes.length !== 1) return null
 
   const [courseRows] = await database.query(
     `SELECT course_id, course_code, course_name, course_abbreviation
      FROM COURSE
-     WHERE course_code = ? AND is_active = 1`,
+     WHERE course_code = ? AND is_active = 1 AND is_draft = 0`,
     [resolvedCourseCodes[0]]
   )
 

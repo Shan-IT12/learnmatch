@@ -47,7 +47,7 @@ const publicCourse = (course, includeDetails = false) => {
   }
 
   if (includeDetails) {
-    const enrichment = enrichmentByCourseId.get(course.course_id)
+    const enrichment = enrichmentByCourseId.get(course.course_id) || course
     result.obtainable_skills = course.obtainable_skills || []
     result.career_paths = course.career_paths || []
     result.program_duration_years = enrichment.program_duration_years
@@ -58,7 +58,7 @@ const publicCourse = (course, includeDetails = false) => {
   return result
 }
 
-const indexedCourses = courses.map((course) => ({
+const indexCourse = (course) => ({
   course,
   code: normalize(course.course_id),
   abbreviation: normalize(course.course_abbreviation),
@@ -67,7 +67,8 @@ const indexedCourses = courses.map((course) => ({
   description: normalize(course.course_description),
   skills: normalize((course.obtainable_skills || []).join(' ')),
   careers: normalize((course.career_paths || []).join(' ')),
-}))
+})
+const indexedCourses = courses.map(indexCourse)
 const currentIndexedCourses = indexedCourses.filter(({ course }) => (
   isCurrentIndependentCourse(course.course_id)
 ))
@@ -86,23 +87,25 @@ function fieldScore(field, phrase, tokens, weight) {
   return score
 }
 
-export function searchPublicCourses(query, { limit = currentIndexedCourses.length, courseCodes = null } = {}) {
+export function searchPublicCourses(query, { limit, courseCodes = null, additionalCourses = [] } = {}) {
+  const extra = additionalCourses.filter((course) => !enrichmentByCourseId.has(course.course_id)).map(indexCourse)
+  const available = [...currentIndexedCourses, ...extra].filter(({ course }) => isCurrentIndependentCourse(course.course_id))
   const phrase = normalize(query)
   const normalizedLimit = Math.max(0, Math.min(
-    Number(limit) || currentIndexedCourses.length,
-    currentIndexedCourses.length
+    Number(limit) || available.length,
+    available.length
   ))
   if (!phrase) {
-    return currentIndexedCourses
+    return available
       .filter(({ course }) => !courseCodes || courseCodes.has(course.course_id))
       .sort((left, right) => left.course.course_name.localeCompare(right.course.course_name))
       .slice(0, normalizedLimit)
       .map(({ course }) => publicCourse(course))
   }
 
-  const hasKnownExactAbbreviation = indexedCourses.some(({ abbreviation }) => abbreviation === phrase)
+  const hasKnownExactAbbreviation = [...indexedCourses, ...extra].some(({ abbreviation }) => abbreviation === phrase)
   if (hasKnownExactAbbreviation) {
-    return currentIndexedCourses
+    return available
       .filter(({ course, abbreviation }) => (
         abbreviation === phrase && (!courseCodes || courseCodes.has(course.course_id))
       ))
@@ -116,7 +119,7 @@ export function searchPublicCourses(query, { limit = currentIndexedCourses.lengt
   )]
   if (tokens.length === 0) return []
 
-  return currentIndexedCourses
+  return available
     .filter(({ course }) => !courseCodes || courseCodes.has(course.course_id))
     .map((item) => {
       const score =
@@ -151,14 +154,39 @@ export function getPublicCourseCount() {
 
 export async function getActivePublicCourseCodes(database = pool) {
   const [rows] = await database.query(
-    'SELECT course_code FROM COURSE WHERE is_active = 1'
+    'SELECT course_code FROM COURSE WHERE is_active = 1 AND is_draft = 0'
   )
   return new Set(rows.map(({ course_code }) => course_code))
 }
 
 export async function searchAvailablePublicCourses(query, options = {}, database = pool) {
-  const activeCourseCodes = await getActivePublicCourseCodes(database)
-  return searchPublicCourses(query, { ...options, courseCodes: activeCourseCodes })
+  const [activeCourseCodes, published] = await Promise.all([getActivePublicCourseCodes(database), publishedCourses(database)])
+  return searchPublicCourses(query, { ...options, additionalCourses: published, courseCodes: activeCourseCodes })
+}
+
+// Only explicitly published new records supplement the unchanged bundled catalog.
+export function publishedCatalogRecord(row) {
+  return {
+    course_id: row.course_code, course_name: row.course_name,
+    course_abbreviation: row.course_abbreviation, parent_cluster: row.cluster_category,
+    course_description: row.description,
+    obtainable_skills: String(row.obtainable_skills || '').split(',').map((skill) => skill.trim()).filter(Boolean),
+    program_duration_years: row.program_duration_years,
+    year_levels: typeof row.year_levels === 'string' ? JSON.parse(row.year_levels) : row.year_levels,
+    career_paths: (row.careers || []).map(career => career.job_title),
+    career_opportunities: (row.careers || []).map(career => ({ career_id: career.opportunity_id, career_title: career.job_title,
+      philippines_description: career.description || '', estimated_monthly_salary_php: career.salary_range ? { display: career.salary_range } : null })),
+  }
+}
+async function publishedCourses(database, courseCode = null) {
+  const [rows] = await database.query(
+    `SELECT c.* FROM COURSE c JOIN COURSE_PUBLICATION p ON p.course_id = c.course_id
+     WHERE c.is_active = 1 AND c.is_draft = 0${courseCode ? ' AND c.course_code = ?' : ''}`,
+    courseCode ? [courseCode] : [])
+  const eligible = rows.filter((row) => !enrichmentByCourseId.has(row.course_code) && isCurrentIndependentCourse(row.course_code))
+  if (!eligible.length) return []
+  const [careers] = await database.query(`SELECT * FROM CAREER_OPPORTUNITY WHERE course_id IN (${eligible.map(() => '?').join(',')}) ORDER BY opportunity_id ASC`, eligible.map(row => row.course_id))
+  return eligible.map(row => publishedCatalogRecord({ ...row, careers: careers.filter(career => Number(career.course_id) === Number(row.course_id)) }))
 }
 
 export async function getAvailablePublicCourse(courseCode, database = pool) {
@@ -166,7 +194,10 @@ export async function getAvailablePublicCourse(courseCode, database = pool) {
   if (resolvedCourseCodes.length !== 1) return null
 
   const course = getPublicCourse(resolvedCourseCodes[0])
-  if (!course) return null
+  if (!course) {
+    const published = await publishedCourses(database, resolvedCourseCodes[0])
+    return published.length === 1 ? publicCourse(published[0], true) : null
+  }
 
   const activeCourseCodes = await getActivePublicCourseCodes(database)
   return activeCourseCodes.has(course.course_code) ? course : null

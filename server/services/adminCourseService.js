@@ -1,5 +1,5 @@
 import { PARENT_CLUSTERS, RIASEC_DIMENSIONS, SKILL_DOMAINS } from '../config/recommendationConfig.js'
-import { isCurrentIndependentCourse } from './courseIdentityService.js'
+import { getCourseIdentityRecord, isCurrentIndependentCourse } from './courseIdentityService.js'
 
 const reasonMessages = Object.freeze({
   MISSING_COURSE_CODE: 'Missing stable course code',
@@ -86,7 +86,8 @@ export async function getCourseRecommendationReadiness(database, courseId) {
 export async function getAdminCourses(database) {
   const [[courses], [skillRows], [riasecRows]] = await Promise.all([
     database.query(
-      `SELECT course_id, course_code, course_name, course_abbreviation, program_type, cluster_category, psced_group, is_active
+      `SELECT course_id, course_code, course_name, course_abbreviation, program_type, cluster_category, psced_group, is_active, is_draft,
+              EXISTS(SELECT 1 FROM COURSE_PUBLICATION p WHERE p.course_id = COURSE.course_id) AS is_published_new
        FROM COURSE
        ORDER BY course_name ASC`
     ),
@@ -98,6 +99,7 @@ export async function getAdminCourses(database) {
 
   return courses.map((course) => ({
     ...course,
+    catalog_identity: getCourseIdentityRecord(course.course_code),
     recommendation_readiness: evaluateRecommendationReadiness(
       course,
       skillsByCourse.get(Number(course.course_id)) || [],
@@ -111,6 +113,16 @@ export async function setCourseActiveStatus(database, courseId, isActive) {
     const error = new TypeError('is_active must be a boolean')
     error.code = 'INVALID_COURSE_STATUS'
     throw error
+  }
+
+  if (isActive) {
+    const [courses] = await database.query('SELECT is_draft FROM COURSE WHERE course_id = ?', [courseId])
+    if (!courses.length) return false
+    if (Number(courses[0].is_draft) === 1) {
+      const error = new Error('Draft courses cannot be activated in this phase.')
+      error.code = 'DRAFT_COURSE'
+      throw error
+    }
   }
 
   const [result] = await database.query(

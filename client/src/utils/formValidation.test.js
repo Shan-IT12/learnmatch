@@ -7,8 +7,9 @@ test('scrolls to and focuses only the first invalid field', () => {
   const calls = []
   const input = { focus: (options) => calls.push(['focus', options]) }
   const container = {
+    closest: () => null,
     matches: () => false,
-    querySelector: () => input,
+    querySelector: selector => selector === '[data-draft-disclosure]' ? null : input,
     scrollIntoView: (options) => calls.push(['scroll', options]),
   }
   const originalWindow = globalThis.window

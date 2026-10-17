@@ -91,6 +91,7 @@ test('deactivate and reactivate update only is_active without deleting a row', a
   const database = {
     query: async (sql, values) => {
       calls.push({ sql, values })
+      if (sql.startsWith('SELECT is_draft')) return [[{ is_draft: 0 }]]
       return [{ affectedRows: 1 }]
     },
   }
@@ -99,6 +100,7 @@ test('deactivate and reactivate update only is_active without deleting a row', a
   assert.equal(await setCourseActiveStatus(database, 17, true), true)
   assert.deepEqual(calls, [
     { sql: 'UPDATE COURSE SET is_active = ? WHERE course_id = ?', values: [0, 17] },
+    { sql: 'SELECT is_draft FROM COURSE WHERE course_id = ?', values: [17] },
     { sql: 'UPDATE COURSE SET is_active = ? WHERE course_id = ?', values: [1, 17] },
   ])
   assert.ok(calls.every(({ sql }) => !/DELETE/i.test(sql)))
@@ -127,11 +129,40 @@ test('admin hard-delete route is disabled and status route requires admin authen
     serverSource,
     /app\.patch\('\/api\/admin\/courses\/:id\/status', authenticateAdmin/
   )
-  assert.match(serverSource, /VALUES \(\?, \?, \?, \?, \?, \?, 0\)/)
+  assert.match(serverSource, /saveCourseDraft\(pool, req.body, courseId, req.admin.adminId\)/)
+  assert.match(serverSource, /error.code === 'DRAFT_COURSE'/)
   assert.match(serverSource, /Course is not recommendation-ready and cannot be activated/)
   assert.match(serverSource, /res\.status\(422\)/)
-  assert.match(serverSource, /Object\.hasOwn\(req\.body, 'program_type'\)/)
-  assert.match(serverSource, /program_type = CASE WHEN \? THEN \? ELSE program_type END/)
-  assert.match(serverSource, /Object\.hasOwn\(req\.body, 'psced_group'\)/)
-  assert.match(serverSource, /psced_group = CASE WHEN \? THEN \? ELSE psced_group END/)
+})
+
+test('even a complete draft cannot be activated; legacy records still can', async () => {
+  let writes = 0
+  const database = { query: async (sql) => {
+    if (sql.startsWith('SELECT')) return [[{ is_draft: 1 }]]
+    writes++
+    return [{ affectedRows: 1 }]
+  } }
+  await assert.rejects(setCourseActiveStatus(database, 1400, true), { code: 'DRAFT_COURSE' })
+  assert.equal(writes, 0)
+})
+
+
+test('admin listing exposes registry classification without removing records or altering readiness and active flags', async () => {
+  const rows = [{ course_id: 20, course_code: 'CRS020', cluster_category: 'ENGINEERING / STEM CLUSTER', is_active: 0 }, { course_id: 21, course_code: 'CRS021', cluster_category: 'ENGINEERING / STEM CLUSTER', is_active: 1 }, { course_id: 428, course_code: 'CRS428', cluster_category: 'BUSINESS CLUSTER', is_active: 1, is_published_new: 1 }]
+  const before = structuredClone(rows)
+  const database = { query: async sql => {
+    assert.ok(sql.startsWith('SELECT'))
+    if (sql.includes('FROM COURSE_SKILL_PROFILE')) return [rows.flatMap(course => validSkills.map(row => ({ ...row, course_id: course.course_id })))]
+    if (sql.includes('FROM COURSE_RIASEC_PROFILE')) return [rows.flatMap(course => validRiasec.map(row => ({ ...row, course_id: course.course_id })))]
+    return [structuredClone(rows)]
+  } }
+  const result = await getAdminCourses(database)
+  assert.equal(result.length, 3)
+  assert.equal(result[0].catalog_identity.status, 'confirmed_duplicate')
+  assert.equal(result[0].catalog_identity.canonical_course_id, 'CRS021')
+  assert.equal(result[0].recommendation_readiness.ready, false)
+  assert.equal(result[1].catalog_identity, null)
+  assert.equal(result[2].catalog_identity, null)
+  assert.equal(result[2].recommendation_readiness.ready, true)
+  assert.deepEqual(rows, before)
 })

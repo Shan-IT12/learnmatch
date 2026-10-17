@@ -30,7 +30,7 @@ function CourseEnrichmentSections({ course, compact = false }) {
               <h3 className="text-sm font-semibold text-gray-900">{career.career_title}</h3>
               <p className="text-sm font-medium text-orange-600 mt-1">{career.estimated_monthly_salary_php?.display}</p>
               <p className="text-sm text-gray-600 leading-6 mt-3">{career.philippines_description}</p>
-              <p className="text-xs text-gray-400 mt-3 pt-3 border-t border-gray-100">Reference year: {career.reference_year}</p>
+              {career.reference_year && <p className="text-xs text-gray-400 mt-3 pt-3 border-t border-gray-100">Reference year: {career.reference_year}</p>}
             </article>
           ))}
         </div>

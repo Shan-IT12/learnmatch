@@ -1,0 +1,45 @@
+LearnMatch skill/RIASEC relevance rubric - relevant reference excerpts
+
+Source: LearnMatch_Course_Matching_Profile_Master_Prompt(1).pdf
+Original PDF SHA-256: 6c45ea99f1fe6ee84a00cf70470afbe10bbdbd5b14e5436966deab49baa058b5
+Only the relevant skill/RIASEC guidance is reproduced here.
+The source document is not evidence that any particular historical profile was
+created using it, or that a reviewer approved an existing assignment.
+
+PDF page 2: SKILL RELEVANCE LEVELS (numeric conversion continues on page 3)
+HIGH = A core, dominant, or strongly required characteristic.
+MEDIUM = Frequently relevant but not the main focus.
+LOW = Present but secondary or minor.
+NOT_RELEVANT = No meaningful evidence.
+HIGH = 3; MEDIUM = 2; LOW = 1; NOT_RELEVANT = 0.
+
+Pages 2-3: use the existing six LearnMatch skill domains. Base relevance on the
+course description, obtainable skills and career paths. Do not assign HIGH solely
+because a course belongs to a cluster. Do not force all six domains to be relevant.
+
+PDF page 3: RIASEC definitions
+R - Realistic: hands-on activities, tools, equipment, technical operations,
+practical work, building, repairing, operating systems or equipment.
+I - Investigative: analysis, research, scientific thinking, problem-solving,
+logical investigation, experimentation, and discovery.
+A - Artistic: creativity, design, artistic expression, content creation,
+creative work, and innovation.
+S - Social: helping people, teaching, counseling, communication,
+service-oriented work, and working closely with people.
+E - Enterprising: leadership, management, persuasion, business,
+entrepreneurship, sales, and decision-making.
+C - Conventional: organization, documentation, records, procedures,
+data management, structured systems, and administrative work.
+
+PDF page 3: RIASEC RELEVANCE LEVELS
+HIGH = Dominant or core characteristic.
+MEDIUM = Frequently relevant.
+LOW = Secondary or minor characteristic.
+NOT_RELEVANT = No meaningful evidence.
+HIGH = 3; MEDIUM = 2; LOW = 1; NOT_RELEVANT = 0.
+Only assign dimensions supported by the provided course data; explain the evidence.
+
+Current implementation note (not an instruction from the PDF): selected skill
+domains require weights 1-3; leave unsupported skill domains unselected. RIASEC
+requires all six entries, using 0 for no meaningful supporting evidence.
+No scoring or validation change is made by this reference.

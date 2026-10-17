@@ -13,6 +13,9 @@ import {
   adminLoginIpRateLimiter,
 } from './middleware/loginRateLimiters.js'
 import publicCourseRoutes from './routes/publicCourseRoutes.js'
+import { createDraftSourceRouter } from './routes/draftSourceRoutes.js'
+import { createSourceCheckRouter } from './routes/sourceCheckRoutes.js'
+import { DraftSourceError } from './services/draftSourceService.js'
 import directionsRoutes from './routes/directionsRoutes.js'
 import { getSelectedInterestNames, normalizeInterestResponse, validateInterestSubmission } from './services/interestSubmissionService.js'
 import { validatePersonalitySubmission } from './services/personalitySubmissionService.js'
@@ -22,16 +25,18 @@ import {
   getCourseRecommendationReadiness,
   setCourseActiveStatus,
 } from './services/adminCourseService.js'
+import { saveCourseDraft, CourseDraftError, courseDraftOptions, requireStandaloneCareerEditable } from './services/courseDraftService.js'
+import { createCoursePublicationRouter } from './routes/coursePublicationRoutes.js'
 import { getAdminDashboard } from './services/adminDashboardService.js'
 import { getAdminAnalytics } from './services/adminAnalyticsService.js'
 import { getAdminFeedback, getAdminFeedbackDetail } from './services/adminFeedbackService.js'
 import { getAdminUserDetail, getAdminUsers } from './services/adminUserMonitoringService.js'
 import { normalizeCourseSearchQuery, searchActiveCollegeCourses } from './services/collegeCourseSearchService.js'
 import { getPublicCourse } from './services/publicCourseService.js'
+import { getCatalogCourseReferences } from './services/catalogCourseReferenceService.js'
 import {
   positiveInteger,
   validateCareer,
-  validateCourse,
   validateFeedback,
   validateSkillQuiz,
 } from './services/requestValidationService.js'
@@ -90,11 +95,16 @@ app.use(helmet({
   },
 }))
 app.use(cors(corsOptions()))
+// Source receipts carry bounded excerpts and exact-content confirmation snapshots.
+app.use(['/api/admin/courses', '/api/admin/course-sources'], express.json({ limit: '512kb' }))
 app.use(express.json({ limit: '100kb' }))
 
 app.use('/api/auth', authRoutes)
 app.use('/api/profile', profileRoutes)
 app.use('/api/public/courses', publicCourseRoutes)
+app.use('/api/admin/courses/:courseId/sources', createDraftSourceRouter(pool, authenticateAdmin))
+app.use('/api/admin/course-sources', createSourceCheckRouter(authenticateAdmin, undefined, pool))
+app.use('/api/admin/courses/:courseId/publication', createCoursePublicationRouter(pool, authenticateAdmin))
 app.use('/api/public/directions', directionsRoutes)
 
 app.post('/api/assessment-attempts', authenticateToken, async (req, res) => {
@@ -191,7 +201,14 @@ app.patch('/api/assessment-attempts/current', authenticateToken, async (req, res
   }
 })
 
-app.listen(PORT, () => {
+app.listen(PORT, (error) => {
+  if (error) {
+    console.error(error.code === 'EADDRINUSE'
+      ? `Cannot start server: port ${PORT} is already in use. Stop the existing backend before running node server.js again.`
+      : `Cannot start server (${error.code || 'LISTEN_ERROR'}).`)
+    process.exitCode = 1
+    return
+  }
   console.log(`Server running on http://localhost:${PORT}`)
 })
 
@@ -620,7 +637,7 @@ app.get('/api/quiz/results', authenticateToken, async (req, res) => {
 app.get('/api/courses/:id', async (req, res) => {
   try {
     const [rows] = await pool.query(
-      'SELECT course_id, course_name, description, cluster_category FROM COURSE WHERE course_id = ?',
+      'SELECT course_id, course_name, description, cluster_category FROM COURSE WHERE course_id = ? AND is_active = 1 AND is_draft = 0',
       [req.params.id]
     )
     if (rows.length === 0) {
@@ -832,7 +849,7 @@ app.get('/api/admin/users/:userId', authenticateAdmin, async (req, res) => {
 app.get('/api/admin/courses', authenticateAdmin, async (req, res) => {
   try {
     const courses = await getAdminCourses(pool)
-    res.json({ courses })
+    res.json({ courses, draftOptions: courseDraftOptions })
   } catch (error) {
     console.error('Admin courses fetch error:', error)
     res.status(500).json({ message: 'Server error fetching courses' })
@@ -860,11 +877,24 @@ app.get('/api/admin/courses/:id', authenticateAdmin, async (req, res) => {
       ? getPublicCourse(courseRows[0].course_code)
       : null
 
+    const [[skillProfile], [riasecProfile]] = await Promise.all([
+      pool.query('SELECT skill_domain, weight, evidence FROM COURSE_SKILL_PROFILE WHERE course_id = ? ORDER BY skill_domain', [req.params.id]),
+      pool.query('SELECT riasec_type, weight, evidence FROM COURSE_RIASEC_PROFILE WHERE course_id = ? ORDER BY riasec_type', [req.params.id]),
+    ])
+    const course = courseRows[0]
+    const [publication] = await pool.query('SELECT * FROM COURSE_PUBLICATION WHERE course_id = ?', [req.params.id])
+    // Legacy duration remains sourced from canonical enrichment until explicitly saved.
+    const storedYears = typeof course.year_levels === 'string' ? JSON.parse(course.year_levels) : course.year_levels
     res.json({
-      course: courseRows[0],
+      course: { ...course, program_duration_years: course.program_duration_years ?? canonicalCourse?.program_duration_years ?? null,
+        year_levels: storedYears ?? canonicalCourse?.year_levels ?? [] },
+      skillProfile,
+      riasecProfile,
       careers: careerRows,
       canonicalCareers: canonicalCourse?.career_opportunities || [],
+      catalogReferences: Number(course.is_draft) !== 1 && !publication[0] ? getCatalogCourseReferences(course.course_code) : null,
       recommendationReadiness: readiness,
+      publication: publication[0] || null,
     })
   } catch (error) {
     console.error('Admin course detail fetch error:', error)
@@ -872,58 +902,21 @@ app.get('/api/admin/courses/:id', authenticateAdmin, async (req, res) => {
   }
 })
 
-// Create a new course
-app.post('/api/admin/courses', authenticateAdmin, async (req, res) => {
-  const validation = validateCourse(req.body)
-  if (!validation.valid) return res.status(400).json({ message: validation.message })
-  const { course_name, program_type, cluster_category, psced_group, description, obtainable_skills } = validation.value
-
+// Course writes are atomic; new records always remain inactive drafts.
+const saveAdminCourse = (creating) => async (req, res) => {
+  const courseId = creating ? null : positiveInteger(req.params.id)
+  if (!creating && !courseId) return res.status(400).json({ message: 'Invalid course ID.' })
   try {
-    const [result] = await pool.query(
-      `INSERT INTO COURSE (course_name, program_type, cluster_category, psced_group, description, obtainable_skills, is_active)
-       VALUES (?, ?, ?, ?, ?, ?, 0)`,
-      [course_name, program_type || null, cluster_category, psced_group || null, description || null, obtainable_skills || null]
-    )
-    const readiness = await getCourseRecommendationReadiness(pool, result.insertId)
-    res.status(201).json({
-      message: 'Course created successfully as inactive',
-      courseId: result.insertId,
-      recommendationReadiness: readiness,
-    })
+    const result = await saveCourseDraft(pool, req.body, courseId, req.admin.adminId)
+    res.status(creating ? 201 : 200).json({ ...result, message: creating ? 'Course saved as an inactive draft.' : 'Course updated successfully.' })
   } catch (error) {
-    console.error('Admin course create error:', error)
-    res.status(500).json({ message: 'Server error creating course' })
+    if (error instanceof CourseDraftError || error instanceof DraftSourceError) return res.status(error.status).json({ message: error.message, ...error.details })
+    console.error('Admin course save error:', error)
+    res.status(500).json({ message: 'Server error saving course.' })
   }
-})
-
-// Update an existing course
-app.put('/api/admin/courses/:id', authenticateAdmin, async (req, res) => {
-  const courseId = positiveInteger(req.params.id)
-  const validation = validateCourse(req.body)
-  if (!courseId || !validation.valid) return res.status(400).json({ message: validation.message || 'Invalid course ID.' })
-  const { course_name, program_type, cluster_category, psced_group, description, obtainable_skills } = validation.value
-  const hasProgramType = Object.hasOwn(req.body, 'program_type')
-  const hasPscedGroup = Object.hasOwn(req.body, 'psced_group')
-
-  try {
-    await pool.query(
-      `UPDATE COURSE
-       SET course_name = ?,
-           program_type = CASE WHEN ? THEN ? ELSE program_type END,
-           cluster_category = ?,
-           psced_group = CASE WHEN ? THEN ? ELSE psced_group END,
-           description = ?, obtainable_skills = ?
-       WHERE course_id = ?`,
-      [course_name, hasProgramType, program_type || null, cluster_category, hasPscedGroup, psced_group || null,
-       description || null, obtainable_skills || null, courseId]
-    )
-    const readiness = await getCourseRecommendationReadiness(pool, courseId)
-    res.json({ message: 'Course updated successfully', recommendationReadiness: readiness })
-  } catch (error) {
-    console.error('Admin course update error:', error)
-    res.status(500).json({ message: 'Server error updating course' })
-  }
-})
+}
+app.post('/api/admin/courses', authenticateAdmin, saveAdminCourse(true))
+app.put('/api/admin/courses/:id', authenticateAdmin, saveAdminCourse(false))
 
 // Activate or deactivate a course without deleting its catalog row
 app.patch('/api/admin/courses/:id/status', authenticateAdmin, async (req, res) => {
@@ -949,6 +942,7 @@ app.patch('/api/admin/courses/:id/status', authenticateAdmin, async (req, res) =
       is_active: req.body.is_active,
     })
   } catch (error) {
+    if (error.code === 'DRAFT_COURSE') return res.status(422).json({ message: error.message })
     if (error.code === 'INVALID_COURSE_STATUS') {
       return res.status(400).json({ message: error.message })
     }
@@ -1012,6 +1006,7 @@ app.post('/api/admin/courses/:id/careers', authenticateAdmin, async (req, res) =
   const { job_title, salary_range, description } = validation.value
 
   try {
+    await requireStandaloneCareerEditable(pool, { courseId })
     const [result] = await pool.query(
       `INSERT INTO CAREER_OPPORTUNITY (course_id, job_title, salary_range, description)
        VALUES (?, ?, ?, ?)`,
@@ -1019,6 +1014,7 @@ app.post('/api/admin/courses/:id/careers', authenticateAdmin, async (req, res) =
     )
     res.status(201).json({ message: 'Career opportunity added', opportunityId: result.insertId })
   } catch (error) {
+    if (error instanceof CourseDraftError) return res.status(error.status).json({ message: error.message })
     console.error('Admin career create error:', error)
     res.status(500).json({ message: 'Server error adding career opportunity' })
   }
@@ -1031,12 +1027,14 @@ app.put('/api/admin/careers/:careerId', authenticateAdmin, async (req, res) => {
   const { job_title, salary_range, description } = validation.value
 
   try {
+    await requireStandaloneCareerEditable(pool, { careerId })
     await pool.query(
       `UPDATE CAREER_OPPORTUNITY SET job_title = ?, salary_range = ?, description = ? WHERE opportunity_id = ?`,
       [job_title, salary_range, description, careerId]
     )
     res.json({ message: 'Career opportunity updated' })
   } catch (error) {
+    if (error instanceof CourseDraftError) return res.status(error.status).json({ message: error.message })
     console.error('Admin career update error:', error)
     res.status(500).json({ message: 'Server error updating career opportunity' })
   }
@@ -1046,9 +1044,11 @@ app.delete('/api/admin/careers/:careerId', authenticateAdmin, async (req, res) =
   const careerId = positiveInteger(req.params.careerId)
   if (!careerId) return res.status(400).json({ message: 'Invalid career ID.' })
   try {
+    await requireStandaloneCareerEditable(pool, { careerId })
     await pool.query('DELETE FROM CAREER_OPPORTUNITY WHERE opportunity_id = ?', [careerId])
     res.json({ message: 'Career opportunity deleted' })
   } catch (error) {
+    if (error instanceof CourseDraftError) return res.status(error.status).json({ message: error.message })
     console.error('Admin career delete error:', error)
     res.status(500).json({ message: 'Server error deleting career opportunity' })
   }
