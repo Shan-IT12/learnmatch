@@ -2,7 +2,7 @@ import crypto from 'node:crypto'
 import { validateCourse } from './requestValidationService.js'
 import { evaluateRecommendationReadiness } from './adminCourseService.js'
 import { validateDraftInput } from './courseDraftService.js'
-import { COURSE_SOURCE_FIELDS } from '../../shared/courseSourceFields.js'
+import { COURSE_SOURCE_FIELDS } from '../shared/courseSourceFields.js'
 import { validateAdminCourseSource } from './sourcePublisherPolicy.js'
 import { captureDraftReviewFields, revisionMap, sourceContext, stableJson, parseJson } from './draftSourceService.js'
 

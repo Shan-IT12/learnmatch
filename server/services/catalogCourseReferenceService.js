@@ -1,5 +1,5 @@
 import fs from 'node:fs'
-import { catalogReferenceHref } from '../../shared/catalogReferenceFields.js'
+import { catalogReferenceHref } from '../shared/catalogReferenceFields.js'
 
 export const CATALOG_REFERENCE_FILES = [
   { file: 'learnmatch_courses_final_342_with_ids.json', label: 'Course catalog' },

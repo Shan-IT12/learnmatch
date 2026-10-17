@@ -1,5 +1,5 @@
 import { validateAdminCourseSource, checkedSourceOriginError } from './sourcePublisherPolicy.js'
-import { sourceClaimsBinding, sourceAnalysisBinding, sourceAnalysisFields } from '../../shared/pendingSourceReview.js'
+import { sourceClaimsBinding, sourceAnalysisBinding, sourceAnalysisFields } from '../shared/pendingSourceReview.js'
 import { DraftSourceError, captureDraftReviewFields, revisionMap, sourceContext, appendSourceReview, stableJson } from './draftSourceService.js'
 import { readSourceReceipt, sourceDigest } from './sourceCheckService.js'
 

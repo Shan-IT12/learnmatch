@@ -3,8 +3,8 @@ import rateLimit from 'express-rate-limit'
 import { checkUnsavedSource, confirmUnsavedSource } from '../services/sourceCheckService.js'
 import { DraftSourceError, draftSourceCheckSnapshot } from '../services/draftSourceService.js'
 import { approvedSourceUrlError } from '../services/sourcePublisherPolicy.js'
-import { COURSE_SOURCE_FIELDS } from '../../shared/courseSourceFields.js'
-import { SOURCE_CHECK_DEADLINE_MS } from '../../shared/sourceCheckTiming.js'
+import { COURSE_SOURCE_FIELDS } from '../shared/courseSourceFields.js'
+import { SOURCE_CHECK_DEADLINE_MS } from '../shared/sourceCheckTiming.js'
 import { sourceAiRuntimeConfiguration } from '../services/sourceAiAnalysisService.js'
 
 export function createSourceCheckRouter(authenticateAdmin, checker = checkUnsavedSource, database = null) {

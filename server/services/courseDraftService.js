@@ -4,7 +4,7 @@ import { SKILL_DOMAINS, RIASEC_DIMENSIONS } from '../config/recommendationConfig
 import { captureDraftReviewFields, bumpDraftReviewFields } from './draftSourceService.js'
 import { validateSourceBundle, persistSourceBundle } from './sourceBundlePersistenceService.js'
 import { sourcePublisherConfiguration } from './sourcePublisherPolicy.js'
-import { validateCareerOpportunities } from '../../shared/courseCareerFields.js'
+import { validateCareerOpportunities } from '../shared/courseCareerFields.js'
 
 export const courseDraftOptions = { skill_domains: SKILL_DOMAINS, riasec_dimensions: RIASEC_DIMENSIONS, max_duration_years: 5, career_opportunities_supported: true, get source_url_policy() { return sourcePublisherConfiguration() } }
 

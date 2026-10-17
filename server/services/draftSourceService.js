@@ -1,7 +1,7 @@
 import crypto from 'node:crypto'
-import { COURSE_SOURCE_FIELDS } from '../../shared/courseSourceFields.js'
+import { COURSE_SOURCE_FIELDS } from '../shared/courseSourceFields.js'
 import { validateAdminCourseSource, checkedSourceOriginError } from './sourcePublisherPolicy.js'
-import { sourceAnalysisBinding } from '../../shared/pendingSourceReview.js'
+import { sourceAnalysisBinding } from '../shared/pendingSourceReview.js'
 
 export class DraftSourceError extends Error {
   constructor(message, status = 400, details = {}) { super(message); this.status = status; this.details = details }

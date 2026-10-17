@@ -1,4 +1,4 @@
-import { getSkillFigurePresentation } from '../../shared/skillFigureChoices.js'
+import { getSkillFigurePresentation } from '../shared/skillFigureChoices.js'
 
 // dimension values: Verbal, Numerical, Abstract/Logical, Spatial, Scientific Reasoning, Practical/Applied
 const questionPool = [

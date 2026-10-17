@@ -1,4 +1,4 @@
-import { parseApprovedSourceHosts, sourceUrlError, validateApprovedCourseSource, EMPTY_SOURCE_HOSTS } from '../../shared/sourceUrlPolicy.js'
+import { parseApprovedSourceHosts, sourceUrlError, validateApprovedCourseSource, EMPTY_SOURCE_HOSTS } from '../shared/sourceUrlPolicy.js'
 
 // Exact hostnames only: subdomains require their own explicit configuration entry.
 export function approvedPublisherHosts(env = process.env) {
