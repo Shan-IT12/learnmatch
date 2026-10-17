@@ -327,7 +327,7 @@ function ManageCourses() {
     }
   }
 
-  useEffect(() => {
+  const loadCourseList = useEffectEvent(() => {
     if (!adminToken) {
       navigate('/admin/login')
       return
@@ -353,7 +353,8 @@ function ManageCourses() {
     }
 
     loadCourses()
-  }, [adminToken, navigate])
+  })
+  useEffect(() => { loadCourseList() }, [adminToken])
 
   const openNewCourseForm = () => {
     const saved = readNewCourseDraftSession(sessionStorage, draftSessionKey, emptyCourseForm)
@@ -603,7 +604,9 @@ function ManageCourses() {
                   <div className="relative flex-1 min-w-0">
                     <IconSearch size={18} stroke={1.75} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
                     <input
-                      type="search"
+                      type="text"
+                      role="searchbox"
+                      enterKeyHint="search"
                       value={search}
                       onChange={(event) => updateListFilters({ search: event.target.value })}
                       placeholder="Search courses..."
