@@ -1,3 +1,4 @@
+import HeaderBrand from '../components/HeaderBrand'
 import { Link } from 'react-router-dom'
 
 function PublicHeader({ activeCollegePhase = false, showDashboard = false }) {
@@ -7,21 +8,21 @@ function PublicHeader({ activeCollegePhase = false, showDashboard = false }) {
   const homePath = dashboardNavigation ? '/dashboard' : '/'
 
   return (
-    <nav className="border-b border-gray-100 bg-white">
-      <div className="max-w-7xl mx-auto flex justify-between items-center px-5 sm:px-10 py-5">
+    <nav className="lm-site-header border-b border-gray-100 bg-white">
+      <div className="lm-header-inner max-w-7xl mx-auto flex justify-between items-center px-5 sm:px-10 py-5">
         {suppressGenericNavigation ? (
-          <span className="text-xl font-bold tracking-tight text-gray-900">Learn<span className="text-orange-500">Match</span></span>
+          <span className="text-xl font-bold tracking-tight text-gray-900"><HeaderBrand /></span>
         ) : (
-          <Link to={homePath} className="text-xl font-bold tracking-tight text-gray-900">Learn<span className="text-orange-500">Match</span></Link>
+          <Link to={homePath} className="text-xl font-bold tracking-tight text-gray-900"><HeaderBrand /></Link>
         )}
         <div className="flex items-center gap-2">
           {!isAuthenticated && (
-            <Link to="/login" className="text-sm text-gray-500 hover:text-gray-900 px-3 sm:px-4 py-2">
+            <Link to="/login" className="lm-action">
               Log In
             </Link>
           )}
-          {!isAuthenticated && <Link to="/register" className="text-sm bg-orange-500 text-white px-3 sm:px-4 py-2.5 rounded-lg hover:bg-orange-600 font-medium">Get Started</Link>}
-          {!suppressGenericNavigation && dashboardNavigation && <Link to="/dashboard" className="text-sm bg-orange-500 text-white px-3 sm:px-4 py-2.5 rounded-lg hover:bg-orange-600 font-medium">Dashboard</Link>}
+          {!isAuthenticated && <Link to="/register" className="lm-header-primary">Get Started</Link>}
+          {!suppressGenericNavigation && dashboardNavigation && <Link to="/dashboard" className="lm-header-primary">Dashboard</Link>}
         </div>
       </div>
     </nav>

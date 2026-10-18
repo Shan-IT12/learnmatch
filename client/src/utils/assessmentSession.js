@@ -25,6 +25,24 @@ export async function readActiveAttempt(apiUrl, token, storage) {
   return response.json()
 }
 
+// Recover a missing browser session before allowing structured interest answers.
+// Existing attempt IDs retain their normal ownership/status checks.
+export async function restoreInterestAttempt(apiUrl, token, storage) {
+  if (!getAssessmentAttemptId(storage)) {
+    const response = await fetch(`${apiUrl}/api/assessment-attempts/recover`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    const data = await response.json()
+    if (!response.ok || !Number.isSafeInteger(data.attemptId) || data.attemptId <= 0) {
+      throw new Error(data.message || 'Could not restore your assessment session.')
+    }
+    // Keep local interest answers while attaching the recovered attempt.
+    storage?.setItem(ASSESSMENT_SESSION_KEYS.attemptId, String(data.attemptId))
+  }
+  return readActiveAttempt(apiUrl, token, storage)
+}
+
 const draftSaveQueues = new Map()
 
 export async function saveActiveAttemptDraft(apiUrl, token, storage, draft) {

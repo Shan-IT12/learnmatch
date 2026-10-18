@@ -1,3 +1,9 @@
+function explanationBreakdown(recommendation) {
+  return recommendation.interests_available === false
+    ? { ...recommendation.score_breakdown, interest_match: null }
+    : recommendation.score_breakdown
+}
+
 const FACTOR_LABELS = {
   skill_match: 'skills',
   interest_match: 'interests',
@@ -9,6 +15,7 @@ const MAX_OUTPUT_TOKENS = 800
 
 function strongestFactors(scoreBreakdown = {}) {
   return Object.entries(FACTOR_LABELS)
+    .filter(([key]) => scoreBreakdown[key] !== null)
     .map(([key, label]) => ({ label, score: Number(scoreBreakdown[key]) }))
     .filter(({ score }) => Number.isFinite(score))
     .sort((left, right) => right.score - left.score)
@@ -18,17 +25,18 @@ function strongestFactors(scoreBreakdown = {}) {
 function developmentFactor(scoreBreakdown = {}) {
   return Object.entries(FACTOR_LABELS)
     .filter(([key]) => key !== 'personal_factor_match')
+    .filter(([key]) => scoreBreakdown[key] !== null)
     .map(([key, label]) => ({ label, score: Number(scoreBreakdown[key]) }))
     .filter(({ score }) => Number.isFinite(score))
     .sort((left, right) => left.score - right.score)[0] || null
 }
 
 export function buildDeterministicExplanation(recommendation) {
-  const factors = strongestFactors(recommendation.score_breakdown)
+  const factors = strongestFactors(explanationBreakdown(recommendation))
   const evidence = factors.length
     ? factors.map(({ label, score }) => `${label} (${score}%)`).join(' and ')
     : `the recorded ${recommendation.match_score}% compatibility score`
-  const development = developmentFactor(recommendation.score_breakdown)
+  const development = developmentFactor(explanationBreakdown(recommendation))
   const developmentSentence = development
     ? `As you explore this option, you can continue developing your ${development.label}.`
     : ''
@@ -96,8 +104,8 @@ export async function generateRecommendationExplanations(
       course_name: recommendation.course_name,
       cluster_category: recommendation.cluster_category,
       match_score: recommendation.match_score,
-      strongest_alignment_factors: strongestFactors(recommendation.score_breakdown),
-      area_to_develop: developmentFactor(recommendation.score_breakdown),
+      strongest_alignment_factors: strongestFactors(explanationBreakdown(recommendation)),
+      area_to_develop: developmentFactor(explanationBreakdown(recommendation)),
     }))
 
     const response = await fetchImpl('https://api.openai.com/v1/responses', {

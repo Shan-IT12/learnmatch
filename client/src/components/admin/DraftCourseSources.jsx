@@ -1,3 +1,4 @@
+import SkeletonContent, { SkeletonBlock } from '../../components/SkeletonContent'
 import { sourceReportHeading } from '../../utils/draftSourceCheckForm'
 import SourceAnalysisDetails from './SourceAnalysisDetails'
 import SourceEvidenceExcerpts from './SourceEvidenceExcerpts'
@@ -116,7 +117,7 @@ export default function DraftCourseSources({ courseId, adminToken, courseDirty, 
   if (readOnly) return <DraftDisclosure title="Sources" defaultOpen><div className="space-y-4">
     <p className="text-sm text-gray-600">Saved source confirmations are separate from matching-profile review and publication. Use Edit Draft to change a reference or record a missing source confirmation.</p>
     {error && <p role="alert" className="text-sm text-red-600">{error}</p>}
-    {loading && <p className="text-sm">Loading sources...</p>}
+    {loading && <SkeletonContent label="Loading sources..."><div className="space-y-4">{[1, 2].map(item => <div key={item} className="rounded-xl border border-gray-200 p-4"><SkeletonBlock className="h-4 w-2/3" /><SkeletonBlock className="mt-3 h-3 w-1/2" /><div className="mt-4 flex gap-2"><SkeletonBlock className="h-6 w-24" /><SkeletonBlock className="h-6 w-20" /></div></div>)}</div></SkeletonContent>}
     {!loading && !error && <SavedSupportCoverage sources={validSources} />}
     {!loading && !currentSources.length && <p className="text-sm text-gray-500">No saved sources.</p>}
     {currentSources.map(source => <DraftDisclosure key={source.source_id} level="h3" title={source.title} summary={<div className="space-y-2"><p className="text-sm">{labels[source.review_status]}</p><p className="text-sm">{source.review_status === 'confirmed' ? 'Confirmed support only' : 'Saved selections'}: {sourceSupportLabels(source)}.</p>{source.checks?.[0] && <>{!source.checks[0].current && <p className="text-sm text-amber-800">Previous automated check: this result is not current for the saved revision.</p>}<SourceCheckReport report={source.checks[0].report} sourceUrlPolicy={sourceUrlPolicy} summaryOnly /></>}</div>} actions={<a href={validateCourseSource(source).errors.url ? undefined : source.url} target="_blank" rel="noopener noreferrer" className="text-sm text-orange-700 underline">Open Source</a>}>
@@ -139,7 +140,7 @@ export default function DraftCourseSources({ courseId, adminToken, courseDirty, 
     {allowChecking && <ReopenedDraftSourceCheck key={checkKey} sources={analysisSources} form={form} courseId={courseId} adminToken={adminToken} sourceUrlPolicy={sourceUrlPolicy} onUnauthorized={onUnauthorized} onWorkingChange={onWorkingChange} hasUnsavedChanges={courseDirty || Boolean(editor)} saving={busy || loading} />}
     {error && <p role="alert" className="mt-3 text-sm text-red-600">{error}</p>}
     <button type="button" disabled={!courseId || busy || loading || Boolean(editor) || currentSources.length >= 3} onClick={() => { setEditor({ ...blankSource }); setErrors({}); setError('') }} className="mt-4 rounded-lg bg-orange-500 px-4 py-2 text-sm text-white disabled:opacity-50">Add Source</button>
-    {loading && <p className="mt-3 text-sm">Loading sources...</p>}
+    {loading && <SkeletonContent label="Loading sources..."><div className="space-y-4">{[1, 2].map(item => <div key={item} className="rounded-xl border border-gray-200 p-4"><SkeletonBlock className="h-4 w-2/3" /><SkeletonBlock className="mt-3 h-3 w-1/2" /><div className="mt-4 flex gap-2"><SkeletonBlock className="h-6 w-24" /><SkeletonBlock className="h-6 w-20" /></div></div>)}</div></SkeletonContent>}
     {editor && <div className="mt-4 space-y-3 rounded-xl border border-gray-200 p-4">
       <h3 className="font-medium">{editor.source_id ? 'Edit source' : 'Add source'}</h3>
       {['title', 'url', 'notes'].map((key) => <label key={key} className="block text-sm">{key === 'url' ? 'URL' : key === 'title' ? 'Title' : 'Notes (optional)'}{key !== 'notes' && <RequiredMark />}

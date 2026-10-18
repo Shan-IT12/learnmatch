@@ -214,7 +214,7 @@ test('no interests or a single activity satisfies Personality prerequisites with
   assert.equal(getAssessmentStatus({ profileCount: 1, interestCount: 0, skillCount: 30, personalityCount: 1, completedAttemptCount: 1 }), 'Completed')
 })
 
-test('no interests reuses the existing ranking block without writing recommendation snapshots', async () => {
+test('unanswered interests block recommendation snapshots', async () => {
   const database = { query: async (sql) => {
     assert.match(sql, /^\s*SELECT/)
     if (sql.includes('FROM PERSONALITY_ASSESSMENT')) return [[{ assessment_id: 88, mbti_type: 'INTJ' }]]
@@ -222,7 +222,7 @@ test('no interests reuses the existing ranking block without writing recommendat
     return [[]]
   }, getConnection: async () => { throw new Error('Must not write recommendation snapshots') } }
   await assert.rejects(() => getOrCreateSavedRecommendations(database, 7), (error) => {
-    assert.equal(error.code, 'MISSING_INTEREST_SCORING_POLICY')
+    assert.equal(error.code, 'INCOMPLETE_INTERESTS')
     return true
   })
   assert.deepEqual(buildStudentRiasecVector(getSelectedInterestNames({ selected: ['Photography'], noInterests: false })), buildStudentRiasecVector(['Photography']))
@@ -255,13 +255,13 @@ test('server validation enforces canonical unique submissions containing 3 to 10
 })
 
 
-test('dashboard recognizes valid interests from the latest active or completed attempt', async () => {
+test('dashboard preserves completed interests when a newer retake draft exists', async () => {
   const source = await readFile(new URL('../server.js', import.meta.url), 'utf8')
   const dashboard = source.slice(source.indexOf("app.get('/api/dashboard/status'"), source.indexOf("app.get('/api/college/status'"))
   assert.match(dashboard, /status IN \('IN_PROGRESS', 'COMPLETED'\)/)
-  assert.match(dashboard, /ORDER BY attempt_id DESC LIMIT 1/)
+  assert.match(dashboard, /ORDER BY \(status = 'COMPLETED'\) DESC, attempt_id DESC LIMIT 1/)
   assert.match(dashboard, /!validateInterestSubmission\(savedInterestState\)/)
-  assert.match(dashboard, /hasInterests: interestCount.count > 0 \|\| Boolean\(hasCategoryAnswers\)/)
+  assert.match(dashboard, /hasInterests: hasCompletedAssessment \|\| interestCount.count > 0 \|\| Boolean\(hasCategoryAnswers\)/)
 
   const { getNextAssessmentRoute } = await import('../../client/src/utils/assessmentNavigation.js')
   assert.equal(getNextAssessmentRoute({ hasProfile: true, hasInterests: true, hasSkills: true, hasPersonality: false }), '/onboarding/personality')

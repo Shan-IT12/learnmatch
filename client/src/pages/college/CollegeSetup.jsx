@@ -1,3 +1,5 @@
+import HeaderBrand from '../../components/HeaderBrand'
+import SkeletonContent, { SkeletonBlock } from '../../components/SkeletonContent'
 import { useState, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { IconCalendarEvent, IconSchool, IconSearch } from '@tabler/icons-react'
@@ -107,7 +109,7 @@ export function ResumeProgramCard({ course, loading = false }) {
   return (
     <div aria-label="Current Program" className="rounded-2xl border border-orange-200 bg-orange-50 px-4 py-4">
       <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-orange-600">Current Program</p>
-      {loading ? <p className="mt-2 text-base font-semibold text-gray-900">Loading your existing program...</p> : <CourseName name={course?.course_name || 'Program unavailable'} className="mt-2 block text-base font-semibold text-gray-900" secondaryClassName="mt-0.5 text-sm font-medium text-gray-600" />}
+      <SkeletonContent loading={loading} label="Loading your existing program..."><CourseName name={loading ? 'Your existing enrolled program' : course?.course_name || 'Program unavailable'} className="mt-2 block text-base font-semibold text-gray-900" secondaryClassName="mt-0.5 text-sm font-medium text-gray-600" /></SkeletonContent>
       {!loading && <p className="mt-1 text-sm text-gray-600">You’re resuming tracking for your existing program.</p>}
     </div>
   )
@@ -397,7 +399,7 @@ function CollegeSetup() {
       {/* Nav */}
       <nav className="relative z-10 mx-auto flex max-w-[1440px] items-center justify-between gap-4 px-5 py-5 sm:px-8 lg:px-10">
         <span className="text-xl font-bold tracking-tight">
-          Learn<span className="text-orange-500">Match</span>
+          <HeaderBrand />
         </span>
         <button
           onClick={() => navigate('/dashboard')}
@@ -472,7 +474,7 @@ function CollegeSetup() {
 
             {/* Search results dropdown */}
             {searchStatus === 'loading' && !selectedCourse && (
-              <p className="mt-2 text-xs text-gray-400">Finding courses...</p>
+              <SkeletonContent label="Finding courses..."><div className="mt-2 rounded-xl border border-orange-100 bg-white shadow-lg">{[1, 2, 3].map(item => <div key={item} className="border-b border-gray-100 px-4 py-3 last:border-0"><SkeletonBlock className="h-4 w-2/3" /><SkeletonBlock className="mt-2 h-3 w-24" /></div>)}</div></SkeletonContent>
             )}
             {searchStatus === 'success' && courses.length > 0 && !selectedCourse && (
               <div className="course-suggestion-scroll mt-2 w-full rounded-xl border border-orange-100 bg-white shadow-lg">

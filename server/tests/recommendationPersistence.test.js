@@ -382,3 +382,20 @@ test('explanations are attached without changing generated rank or scores', asyn
     ]
   )
 })
+
+
+test('saved no-interest snapshots retain their scoring basis after refresh', async () => {
+  const database = { query: async sql => {
+    if (sql.includes('FROM RECOMMENDATION_ITEM')) return [savedRows.map(row => ({
+      ...row, interest_match: 0,
+      attempt_interests: JSON.stringify({ selected: [], noInterests: true }),
+    }))]
+    return [[{ recommendation_id: 42, assessment_id: 11 }]]
+  } }
+  const saved = await getSavedRecommendationForAssessment(database, 7, 11)
+  assert.equal(saved.recommendations.length, 3)
+  for (const result of saved.recommendations) {
+    assert.equal(result.interests_available, false)
+    assert.doesNotMatch(result.ai_narrative, /developing your interests/)
+  }
+})

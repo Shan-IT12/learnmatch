@@ -1,3 +1,4 @@
+import HeaderBrand from '../components/HeaderBrand'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { IconEye, IconEyeOff, IconShieldLock } from '@tabler/icons-react'
@@ -60,7 +61,7 @@ function AdminLogin() {
             <IconShieldLock size={22} stroke={1.75} className="text-orange-500" />
           </div>
           <span className="text-xl font-bold text-gray-900">
-            Learn<span className="text-orange-500">Match</span>
+            <HeaderBrand />
           </span>
           <p className="text-xs text-orange-600 mt-1 font-semibold tracking-widest uppercase">Admin Portal</p>
         </div>

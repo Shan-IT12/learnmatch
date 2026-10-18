@@ -23,6 +23,13 @@ const shapes = {
 
 export const SKILL_FIGURE_ITEMS = [
   {
+    itemNumber: '3.1', dimension: 'Abstract/Logical',
+    questionText: 'Look at the figure. Three circles are followed by a blank, then three triangles. What shape completes the blank?',
+    texts: ['Triangle', 'Circle', 'Square', 'Diamond'],
+    figures: [shapes.triangle, shapes.circle, shapes.square, shapes.diamond],
+    promptAlt: 'Three outline circles, a blank, then three outline triangles.',
+  },
+  {
     itemNumber: '3.3', dimension: 'Abstract/Logical',
     questionText: 'Look at the figure. Each shape gains one more side than the last: Triangle → Square → Pentagon → ___. Which shape completes the sequence?',
     texts: ['Hexagon', 'Circle', 'Triangle', 'Octagon'],

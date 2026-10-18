@@ -1,3 +1,5 @@
+import SkeletonContent, { SkeletonBlock } from '../components/SkeletonContent'
+import { coursePlaceholder } from '../data/loadingPlaceholders'
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useParams } from 'react-router-dom'
 import { IconAlertCircle, IconArrowLeft, IconBook2, IconMapPin, IconRoute, IconSchool } from '@tabler/icons-react'
@@ -24,7 +26,7 @@ function SchoolLocator() {
   const source = new URLSearchParams(location.search).get('source')
   const fromDashboard = source === 'dashboard'
   const resultsContext = hasActiveCollegePhase || source === 'results' || location.state?.source === 'results'
-  const [result, setResult] = useState(null)
+  const [savedResult, setResult] = useState(null)
   const [status, setStatus] = useState('loading')
   const [retryCount, setRetryCount] = useState(0)
   const [resolvedCourseCode, setResolvedCourseCode] = useState(null)
@@ -32,6 +34,7 @@ function SchoolLocator() {
   const [directions, setDirections] = useState({ status: 'idle' })
   const [coverageResetKey, setCoverageResetKey] = useState(0)
   const displayStatus = resolvedCourseCode === courseCode ? status : 'loading'
+  const result = displayStatus === 'loading' ? { course: coursePlaceholder, location_scope: 'San Jose del Monte', schools: [1, 2].map(school_id => ({ school_id, school_name: 'School and institution name', address: 'School address and location', ownership: 'Private', latitude: 14.82, longitude: 121.06 })) } : savedResult
 
   useEffect(() => {
     const controller = new AbortController()
@@ -130,22 +133,13 @@ function SchoolLocator() {
   return (
     <div className="min-h-screen bg-[#fcfaf7] text-gray-900">
       <PublicHeader activeCollegePhase={hasActiveCollegePhase} showDashboard={fromDashboard} />
-      <main className="max-w-6xl mx-auto px-5 sm:px-8 lg:px-10 py-8 sm:py-12">
+      <SkeletonContent loading={displayStatus === 'loading'} label="Finding schools in San Jose del Monte..."><main className="max-w-6xl mx-auto px-5 sm:px-8 lg:px-10 py-8 sm:py-12">
         {hasActiveCollegePhase === null ? (
           <span className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-400" aria-live="polite">Resolving return destination…</span>
         ) : (
-          <Link to={backNavigation.path} state={backNavigation.state} className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-orange-600 transition">
+          <Link to={backNavigation.path} state={backNavigation.state} className="lm-action">
             <IconArrowLeft size={17} stroke={2} /> {backNavigation.label}
           </Link>
-        )}
-
-        {displayStatus === 'loading' && (
-          <section className="motion-swap mt-8 bg-white border border-gray-100 rounded-3xl p-8 sm:p-12 shadow-sm" aria-live="polite">
-            <div className="h-3 w-28 bg-orange-100 rounded-full animate-pulse" />
-            <div className="h-8 max-w-xl bg-gray-100 rounded-xl animate-pulse mt-5" />
-            <div className="h-4 max-w-2xl bg-gray-100 rounded-lg animate-pulse mt-4" />
-            <p className="text-sm text-gray-400 mt-7">Finding schools in San Jose del Monte...</p>
-          </section>
         )}
 
         {displayStatus === 'error' && (
@@ -171,7 +165,7 @@ function SchoolLocator() {
           </section>
         )}
 
-        {displayStatus === 'success' && result && (
+        {(displayStatus === 'success' || displayStatus === 'loading') && result && (
           <>
             <header className="mt-8 rounded-3xl border border-orange-200 bg-gradient-to-br from-orange-50 via-orange-100 to-amber-50 p-7 sm:p-10 overflow-hidden relative">
               <div className="absolute -right-12 -top-16 w-56 h-56 rounded-full border-[34px] border-white/35" aria-hidden="true" />
@@ -207,6 +201,7 @@ function SchoolLocator() {
                 <div className="mb-5">
                   <div><p className="text-xs font-semibold uppercase tracking-[0.16em] text-orange-600">Available matches</p><h2 className="text-xl sm:text-2xl font-bold mt-1">{result.schools.length} {result.schools.length === 1 ? 'school' : 'schools'} available</h2></div>
                 </div>
+                {displayStatus === 'loading' ? <section className="mt-7"><div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between"><div><p className="text-xs font-semibold uppercase tracking-[0.16em]">School map</p><h2 className="mt-1 text-xl font-bold sm:text-2xl">Reviewed school locations</h2><p className="mt-1 text-sm">The outlined area shows LearnMatch school coverage.</p></div><SkeletonBlock className="h-9 w-44" /></div><SkeletonBlock className="school-locator-map w-full rounded-2xl" /></section> : (
                 <SchoolLocatorMap
                   schools={result.schools}
                   selectedSchoolId={selectedSchoolId}
@@ -215,6 +210,7 @@ function SchoolLocator() {
                   coverageResetKey={coverageResetKey}
                   onRecenterCoverage={() => setCoverageResetKey((key) => key + 1)}
                 />
+                )}
                 <div className="motion-swap min-h-0" aria-live="polite">
                   {directions.status === 'loading' && (
                     <div className="mt-4 rounded-2xl border border-blue-100 bg-blue-50 px-5 py-4 text-sm text-blue-800">
@@ -248,7 +244,7 @@ function SchoolLocator() {
                             <button
                               type="button"
                               onClick={() => showSchoolOnMap(school.school_id)}
-                              className="inline-flex items-center gap-1.5 text-sm font-semibold text-orange-700 hover:text-orange-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500"
+                              className="lm-action"
                             >
                               <IconMapPin size={17} stroke={1.8} /> Show on map
                             </button>
@@ -272,7 +268,7 @@ function SchoolLocator() {
             )}
           </>
         )}
-      </main>
+      </main></SkeletonContent>
     </div>
   )
 }

@@ -1,7 +1,12 @@
+import HeaderBrand from '../components/HeaderBrand'
+import SkeletonContent from '../components/SkeletonContent'
+import { coursePlaceholder, recommendationPlaceholders } from '../data/loadingPlaceholders'
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import CourseEnrichmentSections from '../components/CourseEnrichmentSections'
 import CourseName from '../components/CourseName'
+import { CourseDescription, CourseSkills } from '../components/CareerPathExpandable'
+import { IconArrowDown, IconArrowUpRight, IconBook2, IconBriefcase, IconRoute, IconSparkles } from '@tabler/icons-react'
 import useActiveCollegePhase from '../hooks/useActiveCollegePhase'
 import {
   cameFromCareerPathChooser,
@@ -23,16 +28,18 @@ function CareerPath() {
   const [recommendations, setRecommendations] = useState(() => (
     Array.isArray(passedRecommendations) ? passedRecommendations : []
   ))
-  const [course, setCourse] = useState(null)
+  const [savedCourse, setCourse] = useState(null)
   const [status, setStatus] = useState(
     courseCode || !Array.isArray(passedRecommendations) ? 'loading' : 'success'
   )
 
+  const course = status === 'loading' ? coursePlaceholder : savedCourse
+
   const topRecommendations = useMemo(() => (
-    [...recommendations]
+    [...(status === 'loading' ? recommendationPlaceholders : recommendations)]
       .sort((left, right) => left.rank_position - right.rank_position)
       .slice(0, 3)
-  ), [recommendations])
+  ), [recommendations, status])
 
   useEffect(() => {
     const controller = new AbortController()
@@ -106,23 +113,22 @@ function CareerPath() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white border-b border-gray-100 px-6 sm:px-8 py-5 flex justify-between items-center">
+      <nav className="lm-site-header relative z-20 bg-white/95 backdrop-blur border-b border-gray-100 px-6 sm:px-8 py-5 flex justify-between items-center gap-4">
         {hasActiveCollegePhase === false ? (
-          <button onClick={() => navigate('/dashboard')} className="text-lg font-bold text-gray-900 hover:opacity-80 transition">Learn<span className="text-orange-500">Match</span></button>
+          <button onClick={() => navigate('/dashboard')} className="text-lg font-bold text-gray-900 hover:opacity-80 transition"><HeaderBrand /></button>
         ) : (
-          <span className="text-lg font-bold text-gray-900">Learn<span className="text-orange-500">Match</span></span>
+          <span className="text-lg font-bold text-gray-900"><HeaderBrand /></span>
         )}
-        <button onClick={courseCode ? backToSelector : () => navigate(returnDestination.path)} disabled={hasActiveCollegePhase === null} className="text-sm text-gray-500 hover:text-gray-900 transition disabled:cursor-wait disabled:opacity-50">
+        <button onClick={courseCode ? backToSelector : () => navigate(returnDestination.path)} disabled={hasActiveCollegePhase === null} className="lm-action disabled:cursor-wait disabled:opacity-50">
           ← {courseCode && cameFromCareerPaths && !hasActiveCollegePhase ? 'Back to Career Paths' : returnDestination.label}
         </button>
       </nav>
 
-      <main className="max-w-[1320px] mx-auto px-5 sm:px-10 lg:px-14 py-10 sm:py-14">
-        {status === 'loading' && <p className="text-sm text-gray-400">{courseCode ? 'Loading course roadmap…' : 'Loading your recommendations…'}</p>}
+      <SkeletonContent loading={status === 'loading'} label="Loading career path..."><main className="max-w-[1320px] mx-auto px-5 sm:px-10 lg:px-14 py-10 sm:py-14">
         {status === 'error' && <p className="bg-red-50 border border-red-100 text-red-700 rounded-xl p-5">We couldn’t load this information. Please try again.</p>}
         {status === 'not-found' && <p className="bg-white border border-gray-100 rounded-xl p-5 text-gray-600">This course is unavailable or inactive.</p>}
 
-        {!courseCode && status === 'success' && (
+        {!courseCode && (status === 'success' || status === 'loading') && (
           <section className="mx-auto max-w-6xl">
             <header className="mb-8 max-w-3xl sm:mb-10">
               <p className="text-xs font-bold uppercase tracking-[0.18em] text-orange-500">Your recommendations</p>
@@ -215,22 +221,37 @@ function CareerPath() {
           </section>
         )}
 
-        {courseCode && status === 'success' && course && (
+        {courseCode && (status === 'success' || status === 'loading') && course && (
           <>
-            <CourseName as="h1" name={course.course_name} abbreviation={course.course_abbreviation} className="text-2xl sm:text-3xl font-bold text-gray-900 mt-1 mb-1" secondaryClassName="mt-1 text-base font-medium text-gray-500" />
-            <p className="text-sm text-gray-600 leading-7 mb-8 max-w-4xl">{course.description}</p>
-
-            <section className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm mb-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Obtainable skills</h2>
-              <div className="flex flex-wrap gap-2">
-                {course.obtainable_skills.map((skill) => <span key={skill} className="text-xs px-3 py-1.5 rounded-full bg-orange-50 text-orange-700 font-medium">{skill}</span>)}
+            <header className="relative mb-7 overflow-hidden rounded-[28px] border border-orange-100 bg-white shadow-[0_20px_60px_-45px_rgba(120,53,15,.35)]">
+              <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(251,146,60,.12),transparent_60%)]" />
+              <div className="relative grid gap-8 p-6 sm:p-9 lg:grid-cols-[minmax(0,1fr)_15rem] lg:gap-12 lg:p-10">
+                <div className="min-w-0">
+                  <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-orange-100 bg-orange-50 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.16em] text-orange-700"><IconRoute size={14} stroke={1.8} /> Your career explorer</div>
+                  <CourseName as="h1" name={course.course_name} abbreviation={course.course_abbreviation} className="max-w-4xl text-2xl font-bold leading-tight tracking-tight text-gray-950 sm:text-3xl lg:text-4xl" secondaryClassName="mt-2 text-lg font-medium tracking-normal text-gray-500" />
+                  <CourseDescription key={course.course_code} text={course.description} />
+                  <div className="mt-6 flex flex-wrap gap-3">
+                    <a href="#program-roadmap" className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-orange-500 px-5 py-3 text-xs font-semibold text-white shadow-sm shadow-orange-200 hover:bg-orange-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500">Explore the roadmap <IconArrowDown size={15} /></a>
+                    <a href="#career-opportunities" className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-3 text-xs font-semibold text-gray-600 hover:border-orange-200 hover:text-orange-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500">Discover careers <IconArrowUpRight size={15} /></a>
+                  </div>
+                </div>
+                <aside className="relative hidden flex-col justify-between overflow-hidden rounded-2xl bg-slate-950 lg:flex p-6 text-white">
+                  <div aria-hidden="true" className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full border-[22px] border-white/5" />
+                  <div className="relative"><IconBook2 size={25} stroke={1.4} className="mb-5 text-orange-400" /><p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-400">Your potential journey</p><p className="mt-2 text-3xl font-bold tracking-tight">{course.program_duration_years ? <>{course.program_duration_years}<span className="ml-2 text-lg font-medium text-slate-300">years</span></> : 'Explore'}</p><p className="mt-2 text-xs leading-5 text-slate-400">From the classroom to the possibilities ahead.</p></div>
+                  <div className="relative mt-6 flex items-center gap-2 border-t border-white/10 pt-4 text-xs text-slate-300"><IconBriefcase size={15} className="text-orange-400" />{course.career_opportunities?.length || 0} career {course.career_opportunities?.length === 1 ? 'opportunity' : 'opportunities'}</div>
+                </aside>
               </div>
+            </header>
+
+            <section className="mb-10 flex flex-col gap-5 rounded-2xl border border-gray-200/80 bg-white px-5 py-5 sm:px-7 lg:flex-row lg:items-center lg:gap-8" aria-labelledby="career-skills-heading">
+              <div className="flex shrink-0 items-center gap-3"><span className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50 text-orange-600"><IconSparkles size={20} stroke={1.6} /></span><div><p className="text-[10px] font-bold uppercase tracking-wide text-gray-400">Along the way</p><h2 id="career-skills-heading" className="mt-0.5 text-sm font-bold text-gray-900">Skills you can build</h2></div></div>
+              <CourseSkills key={course.course_code} skills={course.obtainable_skills || []} />
             </section>
 
-            <CourseEnrichmentSections course={course} />
+            <CourseEnrichmentSections key={course.course_code} course={course} />
           </>
         )}
-      </main>
+      </main></SkeletonContent>
     </div>
   )
 }

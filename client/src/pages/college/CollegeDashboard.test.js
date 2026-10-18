@@ -47,7 +47,7 @@ test('check-in progress is based on phase progression and omits calendar progres
 
     assert.match(markup, /2 of 3 check-ins completed/)
     assert.match(markup, />66%</)
-    assert.match(markup, /Current phase: <strong>Mid/)
+    assert.match(markup, /Last completed: <strong>Mid/)
     assert.match(markup, /Next: <strong>End Check-in/)
     assert.doesNotMatch(markup, /Term calendar progress/)
     assert.match(markup, /aria-valuenow="66"/)

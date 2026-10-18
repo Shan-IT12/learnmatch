@@ -194,7 +194,11 @@ export async function updateAttempt(database, userId, attemptId, field, value) {
     `UPDATE ASSESSMENT_ATTEMPT SET ${field} = ? WHERE attempt_id = ? AND user_id = ? AND status = 'IN_PROGRESS'`,
     [JSON.stringify(value), attemptId, userId]
   )
-  return result.affectedRows === 1
+  if (result.affectedRows === 1) return true
+  // Autosave may already contain this exact payload. An unchanged active row
+  // is a successful save, while completed or foreign attempts remain rejected.
+  const attempt = await getOwnedAttempt(database, userId, attemptId)
+  return attempt?.status === 'IN_PROGRESS'
 }
 
 

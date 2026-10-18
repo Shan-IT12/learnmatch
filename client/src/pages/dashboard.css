@@ -1,0 +1,8 @@
+.dashboard-option { transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease; }
+.dashboard-next-step { transition: border-color 180ms ease, background-color 180ms ease; }
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .dashboard-option:hover { transform: translateY(-3px); border-color: #fdba74; box-shadow: 0 16px 32px -26px rgba(154, 52, 18, .45); }
+  .dashboard-illustration { animation: dashboard-float 6s ease-in-out infinite; }
+}
+@keyframes dashboard-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+@media (prefers-reduced-motion: reduce) { .dashboard-option, .dashboard-next-step { transition: none; } }

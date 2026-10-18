@@ -1,3 +1,5 @@
+import { normalizeInterestResponse } from './interestSubmissionService.js'
+import { parseAttemptJson } from './assessmentAttemptService.js'
 import {
   INTEREST_RIASEC_MAP,
   PRIMARY_INTEREST_CONTRIBUTION,
@@ -95,12 +97,13 @@ export function buildStudentDomainScores(skillResponses) {
   return domainScores
 }
 
-export function buildStudentRiasecVector(interestNames) {
+export function buildStudentRiasecVector(interestNames, { noInterests = false } = {}) {
+  if (Array.isArray(interestNames) && interestNames.length === 0 && noInterests === true) return null
   if (!Array.isArray(interestNames) || interestNames.length === 0) {
     const error = new RecommendationInputError(
-      'Your assessment answers are saved. No listed activity matched your interests, so course ranking is not available yet. LearnMatch needs an approved scoring policy for assessments without activity interests. You do not need to select activities that do not fit you.'
+      'Select at least one activity or check No interests or hobbies before viewing recommendations.'
     )
-    error.code = 'MISSING_INTEREST_SCORING_POLICY'
+    error.code = 'INCOMPLETE_INTERESTS'
     throw error
   }
 
@@ -198,7 +201,7 @@ export function scoreAndRankClusters({
 }) {
   const clusterScores = PARENT_CLUSTERS.map((parentCluster) => {
     const skillScore = calculateClusterSkillScore(studentDomainScores, parentCluster)
-    const interestScore = calculateClusterInterestScore(studentRiasecVector, parentCluster)
+    const interestScore = studentRiasecVector === null ? null : calculateClusterInterestScore(studentRiasecVector, parentCluster)
     const personalityScore = calculatePersonalityScore(mbtiType, parentCluster)
     const personalFactorScore = calculatePersonalFactorScore(personalFactorResponses, parentCluster)
     const clusterScore = calculateClusterScore(
@@ -335,6 +338,7 @@ function buildCourseRiasecVector(course, profile) {
 
 function shapeRecommendation(course) {
   return {
+    interests_available: course.scoreBreakdown.interestMatch !== null,
     rank_position: course.rankPosition,
     course_id: course.course_id,
     course_code: course.course_code,
@@ -344,7 +348,7 @@ function shapeRecommendation(course) {
     match_score: toDisplayPercent(course.finalScore),
     score_breakdown: {
       skill_match: toDisplayPercent(course.scoreBreakdown.skillMatch),
-      interest_match: toDisplayPercent(course.scoreBreakdown.interestMatch),
+      interest_match: toDisplayPercent(course.scoreBreakdown.interestMatch ?? 0),
       personality_match: toDisplayPercent(course.scoreBreakdown.personalityMatch),
       personal_factor_match: toDisplayPercent(course.scoreBreakdown.personalFactorMatch),
     },
@@ -421,8 +425,19 @@ export async function getTopCourseRecommendations(pool, userId) {
   ])
 
   const studentDomainScores = buildStudentDomainScores(skillResponses)
+  let noInterests = false
+  if (interestRows.length === 0 && personalityRows[0]) {
+    const [attempts] = await pool.query(
+      `SELECT interests FROM ASSESSMENT_ATTEMPT
+       WHERE user_id = ? AND personality_assessment_id = ? AND status = 'COMPLETED'
+       ORDER BY attempt_id DESC LIMIT 1`,
+      [userId, personalityRows[0].assessment_id]
+    )
+    const response = normalizeInterestResponse(parseAttemptJson(attempts[0]?.interests))
+    noInterests = response?.noInterests === true && response?.selected?.length === 0
+  }
   const studentRiasecVector = buildStudentRiasecVector(
-    interestRows.map((row) => row.interest_name)
+    interestRows.map((row) => row.interest_name), { noInterests }
   )
 
   if (personalityRows.length === 0) {
@@ -486,7 +501,7 @@ export async function getTopCourseRecommendations(pool, userId) {
       studentDomainScores,
       courseSkillProfile
     )
-    const courseInterestMatch = calculateRiasecCosineSimilarity(
+    const courseInterestMatch = studentRiasecVector === null ? null : calculateRiasecCosineSimilarity(
       studentRiasecVector,
       courseRiasecVector
     )

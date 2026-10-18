@@ -8,7 +8,7 @@ import { Buffer } from 'node:buffer'
 import react from '@vitejs/plugin-react'
 import { ASSESSMENT_SESSION_KEYS } from '../../utils/assessmentSession.js'
 
-test('Interests renders one global checkbox above categories and no category-answer requirement', async () => {
+test('Interests waits for saved progress with a skeleton before exposing editable answers', async () => {
   let state = { selected: [], noInterests: true }
   const originalSessionStorage = Object.getOwnPropertyDescriptor(globalThis, 'sessionStorage')
   const originalLocalStorage = Object.getOwnPropertyDescriptor(globalThis, 'localStorage')
@@ -24,20 +24,16 @@ test('Interests renders one global checkbox above categories and no category-ans
     const { default: Interests } = await import(`data:text/javascript;base64,${Buffer.from(code).toString('base64')}`)
     const render = () => renderToStaticMarkup(React.createElement(MemoryRouter, null, React.createElement(Interests)))
     const markup = render().replace(/<!-- -->/g, '')
+    assert.match(markup, /aria-busy="true"/)
+    assert.match(markup, /Loading your interests/)
+    assert.match(markup, /class="layout-skeleton" aria-hidden="true" inert=""/)
     assert.equal([...markup.matchAll(/type="checkbox"/g)].length, 1)
-    assert.match(markup, /<input[^>]*type="checkbox"[^>]*checked=""/)
-    assert.equal([...markup.matchAll(/<button[^>]*aria-pressed="true"/g)].length, 0)
-    assert.match(markup, /No interests or hobbies/)
-    assert.doesNotMatch(markup, /Wala sa|None of these|categories answered/)
-    assert.ok(markup.indexOf('type="checkbox"') < markup.indexOf('<section'))
-    assert.match(markup, /0 \/ 10/)
-    assert.doesNotMatch(markup, /Your answer can be saved|approved scoring policy|bg-blue-50/)
-    assert.match(markup, /You do not need to select activities in every category/)
+    assert.match(markup, /Creative &amp; Arts/)
+    assert.match(markup, /grid sm:grid-cols-2 gap-2.5/)
+    assert.match(markup, /disabled=""/)
     state = { selected: [], noInterests: false }
-    const unanswered = render()
-    assert.equal([...unanswered.matchAll(/aria-pressed="true"/g)].length, 0)
-    assert.doesNotMatch(unanswered, /Your answer can be saved/)
-    assert.doesNotMatch(unanswered, /<input[^>]*type="checkbox"[^>]*checked=""/)
+    assert.match(render(), /Loading your interests/)
+
   } finally {
     if (originalSessionStorage) Object.defineProperty(globalThis, 'sessionStorage', originalSessionStorage)
     else delete globalThis.sessionStorage

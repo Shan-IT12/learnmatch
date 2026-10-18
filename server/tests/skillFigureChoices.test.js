@@ -17,8 +17,8 @@ test('figure presentation preserves every original question and all answer lette
   })
 })
 
-test('only the ten reviewed figure items receive visual choices', async () => {
-  assert.deepEqual(SKILL_FIGURE_ITEMS.map((item) => item.itemNumber), ['3.3', '3.6', '3.8', '3.10', '3.13', '4.1', '4.5', '4.7', '4.10', '4.11'])
+test('the eleven figure items receive visual choices in the original option order', async () => {
+  assert.deepEqual(SKILL_FIGURE_ITEMS.map((item) => item.itemNumber), ['3.1', '3.3', '3.6', '3.8', '3.10', '3.13', '4.1', '4.5', '4.7', '4.10', '4.11'])
   for (const item of SKILL_FIGURE_ITEMS) {
     const question = questionPool.find((q) => q.item_number === item.itemNumber)
     assert.equal(getSkillFigurePresentation({ ...question, question_id: 98765 }), item)
@@ -33,14 +33,14 @@ test('only the ten reviewed figure items receive visual choices', async () => {
       assert.doesNotMatch(figure.description, /correct|answer|rotat|mirror|clockwise/i)
     }
   }
-  for (const itemNumber of ['3.1', '4.2', '4.4', '4.8', '4.14', '4.15']) {
+  for (const itemNumber of ['4.2', '4.4', '4.8', '4.14', '4.15']) {
     assert.equal(getSkillFigurePresentation(questionPool.find((q) => q.item_number === itemNumber)), null)
   }
 })
 
 test('existing saved A-D selections retain their question IDs and scoring', () => {
-  const expected = ['A', 'A', 'D', 'A', 'C', 'A', 'B', 'A', 'C', 'D']
-  const expectedFigures = ['hexagon', 'circle', 'arrow-left', 'filled-square', 'triangle', 'f-a', 'pyramid', 'square', 'rectangle', 'circle']
+  const expected = ['B', 'A', 'A', 'D', 'A', 'C', 'A', 'B', 'A', 'C', 'D']
+  const expectedFigures = ['circle', 'hexagon', 'circle', 'arrow-left', 'filled-square', 'triangle', 'f-a', 'pyramid', 'square', 'rectangle', 'circle']
   const questions = SKILL_FIGURE_ITEMS.map((item, index) => ({ ...questionPool.find((q) => q.item_number === item.itemNumber), question_id: 1000 + index }))
   assert.deepEqual(questions.map((q) => q.correct_answer), expected)
   questions.forEach((question, index) => {
@@ -50,6 +50,6 @@ test('existing saved A-D selections retain their question IDs and scoring', () =
   const saved = questions.map((q) => ({ question_id: q.question_id, selected_option: q.correct_answer }))
   const restored = JSON.parse(JSON.stringify(saved))
   const result = scoreSkillAnswers(restored, questions)
-  assert.equal(result.correctCount, 10)
+  assert.equal(result.correctCount, 11)
   assert.deepEqual(result.scoredAnswers.map(({ is_correct, ...answer }) => answer), saved)
 })

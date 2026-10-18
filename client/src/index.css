@@ -127,3 +127,36 @@ button, input, select, textarea { max-width: 100%; }
     min-height: 18rem;
   }
 }
+
+
+/* Shared secondary actions: visible before hover, with keyboard and touch states. */
+.lm-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .5rem;
+  min-height: 2.5rem;
+  max-width: 100%;
+  padding: .6rem .9rem;
+  border: 1px solid #fed7aa;
+  border-radius: .75rem;
+  background: #fff7ed;
+  color: #9a3412;
+  font-size: .8125rem;
+  font-weight: 600;
+  line-height: 1.4;
+  text-align: center;
+  text-decoration: none;
+  box-shadow: 0 1px 2px rgb(15 23 42 / .04);
+  cursor: pointer;
+  transition: background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+.lm-action:not(:disabled):hover { background: #ffedd5; border-color: #fb923c; color: #7c2d12; box-shadow: 0 3px 8px -4px rgb(234 88 12 / .25); }
+.lm-action:focus-visible { outline: 2px solid #f97316; outline-offset: 3px; }
+.lm-action:disabled { cursor: not-allowed; opacity: .5; box-shadow: none; }
+.lm-action svg { flex-shrink: 0; }
+.lm-action-danger { border-color: #fecaca; background: #fff1f2; color: #be123c; }
+.lm-action-danger:not(:disabled):hover { border-color: #fda4af; background: #ffe4e6; color: #9f1239; }
+.lm-action-selected { border-color: #f97316; background: #f97316; color: white; }
+.lm-action-selected:not(:disabled):hover { border-color: #ea580c; background: #ea580c; color: white; }
+@media (prefers-reduced-motion: reduce) { .lm-action { transition: none; } }

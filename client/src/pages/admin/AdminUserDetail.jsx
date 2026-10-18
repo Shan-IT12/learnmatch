@@ -1,3 +1,4 @@
+import SkeletonContent from '../../components/SkeletonContent'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import {
@@ -77,8 +78,15 @@ function ComponentState({ label, complete, detail }) {
 function AdminUserDetail() {
   const { userId } = useParams()
   const navigate = useNavigate()
-  const [user, setUser] = useState(null)
+  const [savedUser, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
+  const user = loading ? {
+    account: { displayName: 'Student account name', email: 'student@example.com', username: 'username', status: 'Active', registeredAt: '2026-01-01T00:00:00Z' },
+    profile: { fullName: 'Student account name' },
+    assessment: { status: 'Assessment status', components: { profile: true, interests: true, skills: true, personality: true }, interestCount: 5, skillScore: { correct: 20, total: 30, percent: 67 }, mbtiType: 'INTP', personalityTakenAt: '2026-01-01T00:00:00Z' },
+    recommendation: { available: true, generatedAt: '2026-01-01T00:00:00Z', courses: [1, 2, 3].map(rank => ({ rank, courseId: rank, courseName: 'Recommended course name', matchPercent: 80 })) },
+    tracking: { started: true, course: { courseName: 'Current enrolled program' }, lifecycleStatus: 'active', academicYear: '2026-2027', yearLevel: '1st Year', semester: '1st Semester', timingMode: 'manual', datesSource: 'manual', completedCheckins: 1, latestAlignmentPercent: 70 },
+  } : savedUser
   const [error, setError] = useState('')
 
   useEffect(() => {
@@ -115,13 +123,9 @@ function AdminUserDetail() {
     <div className="min-h-screen bg-[#fcfaf7]">
       <AdminHeader currentPage="users" />
       <main className="mx-auto max-w-6xl px-5 py-8 sm:px-8 sm:py-10">
-        <button type="button" onClick={() => navigate('/admin/users')} className="mb-6 inline-flex items-center gap-1.5 rounded-md text-sm font-medium text-slate-500 hover:text-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500">
+        <button type="button" onClick={() => navigate('/admin/users')} className="lm-action mb-6">
           <IconArrowLeft size={16} stroke={2} /> Back to Users
         </button>
-
-        {loading && (
-          <div className="rounded-xl border border-orange-100 bg-white py-20 text-center shadow-sm"><p className="text-sm text-slate-500">Loading user details…</p></div>
-        )}
 
         {!loading && error && (
           <div className="rounded-xl border border-red-200 bg-red-50 px-5 py-5 text-red-700" role="alert">
@@ -130,8 +134,8 @@ function AdminUserDetail() {
           </div>
         )}
 
-        {!loading && user && (
-          <div className="space-y-6">
+        {user && (
+          <SkeletonContent loading={loading} label="Loading user details..."><div className="space-y-6">
             <div className="flex flex-col justify-between gap-4 border-b border-slate-200 pb-6 sm:flex-row sm:items-end">
               <div>
                 <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-orange-600">Student Account</p>
@@ -211,7 +215,7 @@ function AdminUserDetail() {
                 <div className="flex items-center gap-3 text-sm text-slate-500"><IconClipboardCheck size={19} className="text-slate-400" /> Tracking not started.</div>
               )}
             </SectionCard>
-          </div>
+          </div></SkeletonContent>
         )}
       </main>
     </div>

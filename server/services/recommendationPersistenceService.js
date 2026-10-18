@@ -1,3 +1,5 @@
+import { normalizeInterestResponse } from './interestSubmissionService.js'
+import { parseAttemptJson } from './assessmentAttemptService.js'
 import {
   RecommendationDataError,
   RecommendationInputError,
@@ -19,7 +21,9 @@ function toNormalizedScore(displayPercent, label) {
 }
 
 function shapeSavedRecommendation(row) {
+  const interestResponse = normalizeInterestResponse(parseAttemptJson(row.attempt_interests))
   const recommendation = {
+    interests_available: !(interestResponse?.noInterests === true && interestResponse?.selected?.length === 0),
     rank_position: row.rank_position,
     course_id: row.course_id,
     course_code: row.course_code,
@@ -97,9 +101,14 @@ async function getRecommendationItems(database, recommendationId, activeOnly = f
     `SELECT ri.rank_position, ri.match_score, ri.skill_match, ri.interest_match,
             ri.personality_match, ri.personal_factor_match, ri.ai_narrative,
             c.course_id, c.course_code, c.course_name, c.course_abbreviation,
-            c.cluster_category
+            c.cluster_category, a.interests AS attempt_interests
      FROM RECOMMENDATION_ITEM ri
      JOIN COURSE c ON c.course_id = ri.course_id
+     JOIN RECOMMENDATION r ON r.recommendation_id = ri.recommendation_id
+     LEFT JOIN ASSESSMENT_ATTEMPT a ON a.attempt_id = (
+       SELECT MAX(attempt_id) FROM ASSESSMENT_ATTEMPT
+       WHERE user_id = r.user_id AND personality_assessment_id = r.assessment_id AND status = 'COMPLETED'
+     )
      WHERE ri.recommendation_id = ?${activeOnly ? ' AND c.is_active = 1' : ''}
      ORDER BY ri.rank_position ASC`,
     [recommendationId]

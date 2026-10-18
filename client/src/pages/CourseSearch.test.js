@@ -14,7 +14,7 @@ test('Course Explorer supports searching, sorting, and pagination without browse
   assert.match(source, /<option value="desc">Z–A<\/option>/)
   assert.match(source, /fetch\(getCourseCatalogUrl\(apiUrl, query\)/)
   assert.match(source, /const COURSES_PER_PAGE = 18/)
-  assert.match(source, /visibleCourses\.map/)
+  assert.match(source, /recommendationPlaceholders : visibleCourses\)\.map/)
   assert.doesNotMatch(source, /course\.cluster_category/)
   assert.match(source, /View course details/)
   assert.match(source, /Page \{page\} of \{pageCount\}/)

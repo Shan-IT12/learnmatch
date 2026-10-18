@@ -1,3 +1,4 @@
+import HeaderBrand from '../components/HeaderBrand'
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { FieldError, RequiredMark } from '../components/FormValidation'
@@ -97,14 +98,14 @@ function Feedback() {
     return (
       <div className="relative min-h-screen overflow-hidden bg-[#fcfbf9] text-gray-900">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(251,146,60,0.08),transparent_30%),radial-gradient(circle_at_100%_35%,rgba(196,181,253,0.07),transparent_28%)]" />
-        <nav className="relative z-10 flex items-center justify-between gap-3 border-b border-white/80 bg-white/85 px-4 py-4 shadow-[0_1px_12px_rgba(15,23,42,0.03)] backdrop-blur-md sm:px-8 lg:px-14">
+        <nav className="lm-site-header relative z-10 flex items-center justify-between gap-3 border-b border-white/80 bg-white/85 px-4 py-4 shadow-[0_1px_12px_rgba(15,23,42,0.03)] backdrop-blur-md sm:px-8 lg:px-14">
           <button
             onClick={() => navigate(dashboardPath)}
             className="text-lg font-bold tracking-tight text-gray-900 transition hover:opacity-75"
           >
-            Learn<span className="text-orange-500">Match</span>
+            <HeaderBrand />
           </button>
-          <button onClick={() => navigate(dashboardPath)} className="inline-flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-xs font-medium text-gray-500 transition hover:bg-gray-50 hover:text-gray-900 sm:text-sm">
+          <button onClick={() => navigate(dashboardPath)} className="lm-action">
             <IconArrowLeft size={16} stroke={2} /> Back to Dashboard
           </button>
         </nav>
@@ -125,16 +126,16 @@ function Feedback() {
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#fcfbf9] text-gray-900">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(251,146,60,0.08),transparent_30%),radial-gradient(circle_at_100%_35%,rgba(196,181,253,0.07),transparent_28%)]" />
-      <nav className="relative z-10 flex items-center justify-between gap-3 border-b border-white/80 bg-white/85 px-4 py-4 shadow-[0_1px_12px_rgba(15,23,42,0.03)] backdrop-blur-md sm:px-8 lg:px-14">
+      <nav className="lm-site-header relative z-10 flex items-center justify-between gap-3 border-b border-white/80 bg-white/85 px-4 py-4 shadow-[0_1px_12px_rgba(15,23,42,0.03)] backdrop-blur-md sm:px-8 lg:px-14">
         <button
           onClick={() => navigate(dashboardPath)}
           className="text-lg font-bold tracking-tight text-gray-900 transition hover:opacity-75"
         >
-          Learn<span className="text-orange-500">Match</span>
+          <HeaderBrand />
         </button>
         <button
           onClick={() => navigate(dashboardPath)}
-          className="inline-flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-xs font-medium text-gray-500 transition hover:bg-gray-50 hover:text-gray-900 sm:text-sm"
+          className="lm-action"
         >
           <IconArrowLeft size={16} stroke={2} /> Back to Dashboard
         </button>

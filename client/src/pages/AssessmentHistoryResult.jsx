@@ -1,6 +1,8 @@
+import HeaderBrand from '../components/HeaderBrand'
+import SkeletonContent from '../components/SkeletonContent'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { IconArrowLeft, IconBrain, IconLoader2, IconLock } from '@tabler/icons-react'
+import { IconArrowLeft, IconBrain, IconLock } from '@tabler/icons-react'
 import CourseName from '../components/CourseName'
 
 const breakdownLabels = {
@@ -108,13 +110,16 @@ function AssessmentHistoryResult() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <nav className="flex items-center justify-between border-b border-gray-100 bg-white px-5 py-4 sm:px-8">
-        <button onClick={() => navigate('/dashboard')} className="text-lg font-bold text-gray-900">Learn<span className="text-orange-500">Match</span></button>
-        <button onClick={() => navigate('/assessment-history')} className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900"><IconArrowLeft size={16} /> Back to Assessment History</button>
+      <nav className="lm-site-header flex items-center justify-between border-b border-gray-100 bg-white px-5 py-4 sm:px-8">
+        <button onClick={() => navigate('/dashboard')} className="text-lg font-bold text-gray-900"><HeaderBrand /></button>
+        <button onClick={() => navigate('/assessment-history')} className="lm-action"><IconArrowLeft size={16} /> Back to Assessment History</button>
       </nav>
       <main className="mx-auto max-w-5xl px-5 py-8 sm:px-8 sm:py-12">
         {loading ? (
-          <div className="flex min-h-64 items-center justify-center" role="status"><div className="text-center"><IconLoader2 className="mx-auto animate-spin text-orange-500" size={28} /><p className="mt-3 text-sm text-gray-500">Loading saved result...</p></div></div>
+          <SkeletonContent label="Loading saved result..."><HistoricalResultContent result={{
+            attempt_number: 1, generated_at: '2026-01-01T00:00:00Z', mbti: { type: 'INTP' },
+            recommendations: [1, 2, 3].map(rank_position => ({ rank_position, course_name: 'Recommended course name', match_score: 80, ai_narrative: 'The saved explanation of your course recommendation and assessment results.', score_breakdown: { skill_match: 70, interest_match: 70, personality_match: 70, personal_factor_match: 50 } })),
+          }} /></SkeletonContent>
         ) : error ? (
           <div className="rounded-3xl border border-red-100 bg-red-50 px-6 py-10 text-center" role="alert"><p className="text-sm font-medium text-red-700">{error}</p><button type="button" onClick={() => { setLoading(true); setError(''); setRetryCount((count) => count + 1) }} className="mt-4 rounded-xl bg-white px-4 py-2 text-sm font-semibold text-red-700 shadow-sm">Try again</button></div>
         ) : result ? <HistoricalResultContent result={result} /> : null}

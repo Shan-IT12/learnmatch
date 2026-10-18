@@ -1,0 +1,15 @@
+.layout-skeleton { pointer-events: none; user-select: none; }
+.layout-skeleton *, .layout-skeleton *::before, .layout-skeleton *::after { color: transparent !important; text-shadow: none !important; caret-color: transparent !important; }
+.layout-skeleton svg, .layout-skeleton img { visibility: hidden; }
+.layout-skeleton :is(p, h1, h2, h3, h4, dt, dd, legend, label, a, button, input, select, textarea, th, td, li, span):not(:has(:is(p, h1, h2, h3, h4, dt, dd, legend, label, a, button, input, select, textarea, th, td, li, span))) {
+  background-image: linear-gradient(#e5e7eb, #e5e7eb) !important;
+  background-size: min(100%, 28rem) .7em;
+  background-repeat: no-repeat;
+  background-position: left center;
+  border-color: #e5e7eb !important;
+}
+.layout-skeleton :is(button, input, select, textarea) { background-color: #f3f4f6 !important; box-shadow: none !important; }
+@media (prefers-reduced-motion: no-preference) {
+  .layout-skeleton, .skeleton-block { animation: skeleton-pulse 2s ease-in-out infinite; }
+}
+@keyframes skeleton-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .55; } }

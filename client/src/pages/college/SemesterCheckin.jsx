@@ -1,6 +1,8 @@
+import HeaderBrand from '../../components/HeaderBrand'
+import './collegeDashboard.css'
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { IconArrowRight, IconCircleCheck } from '@tabler/icons-react'
+import { IconArrowRight, IconCircleCheck, IconSparkles, IconBulb, IconLoader2 } from '@tabler/icons-react'
 import { checkinQuestions, checkinScale } from '../../data/checkinQuestions'
 import { FieldError, RequiredMark } from '../../components/FormValidation'
 import { scrollToFirstInvalidField } from '../../utils/formValidation'
@@ -23,8 +25,8 @@ export function CheckinResult({ result, courseName, termLabel, phase, onBack = (
   const statusStyle = RESULT_STYLES[result.status] || 'border-gray-200 bg-gray-50 text-gray-700'
   return (
     <div className="min-h-screen bg-slate-50">
-      <nav className="border-b border-gray-100 bg-white px-4 py-4 sm:px-8 sm:py-5">
-        <span className="text-lg font-bold">Learn<span className="text-orange-500">Match</span></span>
+      <nav className="lm-site-header border-b border-gray-100 bg-white px-4 py-4 sm:px-8 sm:py-5">
+        <span className="text-lg font-bold"><HeaderBrand /></span>
       </nav>
       <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
         <header className="mb-6 text-center">
@@ -51,14 +53,18 @@ export function CheckinResult({ result, courseName, termLabel, phase, onBack = (
             </div>
           </div>
 
-          <div className="grid gap-6 p-5 sm:p-7 lg:grid-cols-2">
-            <article className="rounded-2xl border border-gray-100 bg-slate-50 p-5">
-              <h2 className="text-sm font-bold text-gray-900">What your result means</h2>
-              <p className="mt-3 text-sm leading-7 text-gray-600">{result.feedback}</p>
+          <div className="space-y-5 p-5 sm:p-8">
+            <article aria-labelledby="checkin-insight-title" className="relative overflow-hidden rounded-[20px] border border-orange-200 bg-gradient-to-br from-orange-50 via-white to-amber-50/60 p-5 sm:p-7">
+              <div aria-hidden="true" className="absolute inset-y-0 left-0 w-1 bg-orange-500" />
+              <div className="mb-5 flex items-center gap-3">
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-orange-100 bg-white text-orange-600 shadow-sm"><IconSparkles size={23} stroke={1.7} /></span>
+                <div><p className="mb-1 text-xs font-bold uppercase tracking-widest text-orange-700">Your check-in insight</p><h2 id="checkin-insight-title" className="text-xl font-bold tracking-tight text-gray-950 sm:text-2xl">What your result means</h2></div>
+              </div>
+              <p className="max-w-[68ch] whitespace-pre-line text-base leading-8 text-slate-700 sm:text-lg sm:leading-9">{result.feedback}</p>
             </article>
-            <article className="rounded-2xl border border-orange-100 bg-orange-50/60 p-5">
-              <h2 className="text-sm font-bold text-gray-900">What you can do next</h2>
-              <p className="mt-3 text-sm leading-7 text-gray-600">{result.recommendation}</p>
+            <article className="rounded-[20px] border border-gray-200 bg-slate-50/70 p-5 sm:p-7">
+              <div className="mb-4 flex items-center gap-3"><span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-orange-600 shadow-sm"><IconBulb size={22} stroke={1.7} /></span><h2 className="text-lg font-bold text-gray-950 sm:text-xl">What you can do next</h2></div>
+              <p className="max-w-[68ch] whitespace-pre-line text-base leading-8 text-slate-700 sm:text-lg">{result.recommendation}</p>
             </article>
           </div>
         </section>
@@ -77,10 +83,10 @@ export function AnsweredProgress({ answeredCount }) {
   return (
     <div className="mt-6" aria-label={`${answeredCount} of 5 answered`}>
       <div className="mb-2 flex items-center justify-between text-xs font-semibold">
-        <span className="text-slate-300">Your progress</span>
-        <span className="text-orange-300">{answeredCount} of 5 answered</span>
+        <span className="text-slate-600">Your progress</span>
+        <span className="text-orange-700">{answeredCount} of 5 answered</span>
       </div>
-      <div className="h-2 overflow-hidden rounded-full bg-slate-800">
+      <div role="progressbar" aria-label="Questions answered" aria-valuemin={0} aria-valuemax={5} aria-valuenow={answeredCount} className="h-2 overflow-hidden rounded-full bg-gray-100">
         <div className="h-full rounded-full bg-gradient-to-r from-orange-500 to-amber-400 transition-[width] duration-300" style={{ width: `${answeredCount * 20}%` }} />
       </div>
     </div>
@@ -89,11 +95,17 @@ export function AnsweredProgress({ answeredCount }) {
 
 export function CheckinHeader({ courseName, termLabel, phase, answeredCount }) {
   return (
-    <header className="mb-6 overflow-hidden rounded-[24px] border border-slate-800 bg-slate-950 px-5 py-6 text-white shadow-[0_22px_55px_-36px_rgba(15,23,42,.85)] sm:px-7 sm:py-7">
-      <p className="text-xs font-bold uppercase tracking-[0.18em] text-orange-400">Term Check-in</p>
-      <div className="mt-3 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div><CourseName as="h1" name={courseName} className="text-2xl font-bold tracking-tight sm:text-3xl" secondaryClassName="mt-1 text-sm font-medium text-slate-300 sm:text-base" /><div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-slate-300">{termLabel && <span>{termLabel}</span>}{termLabel && <span aria-hidden="true">•</span>}<span className="rounded-full border border-orange-400/40 bg-orange-400/10 px-2.5 py-1 font-semibold text-orange-200">{phase} Phase</span></div></div>
-        <p className="max-w-md text-sm leading-relaxed text-slate-400">Answer based on your current experience in this term. Choose the response that feels most accurate for you right now.</p>
+    <header className="college-panel mb-7">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p className="college-eyebrow !mb-0">Term Check-in</p>
+        <span className="rounded-full border border-orange-200 bg-orange-50 px-3 py-1.5 text-xs font-semibold text-orange-700">{phase} Phase</span>
+      </div>
+      <h1 className="mt-4 text-3xl font-bold tracking-tight text-gray-950 sm:text-4xl">How is your term going?</h1>
+      <p className="mt-3 max-w-2xl text-base leading-7 text-gray-500">Take a moment to reflect on your experience. Choose how true each statement feels for you right now.</p>
+      <div className="mt-6 rounded-2xl border border-gray-100 bg-gray-50/80 p-4 sm:p-5">
+        <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-400">Your program</p>
+        <CourseName as="h2" name={courseName} className="text-base font-semibold leading-7 text-gray-800 sm:text-lg" secondaryClassName="mt-1 text-sm font-normal leading-6 text-gray-500" />
+        {termLabel && <p className="mt-2 text-sm font-medium text-orange-700">{termLabel}</p>}
       </div>
       <AnsweredProgress answeredCount={answeredCount} />
     </header>
@@ -104,26 +116,28 @@ export function CheckinQuestionCard({ question, selectedValue, onSelect = () => 
   const fieldName = `checkin_${question.number}`
   const errorId = `${fieldName}-error`
   return (
-    <fieldset data-validation-field={fieldName} className={`rounded-2xl border bg-white p-4 shadow-sm sm:p-5 ${error ? 'border-red-300' : 'border-gray-100'}`} aria-invalid={error ? 'true' : undefined} aria-describedby={error ? errorId : undefined}>
+    <div data-validation-field={fieldName} className={`rounded-[24px] border bg-white p-5 shadow-[0_8px_28px_-24px_rgba(15,23,42,.22)] transition-colors sm:p-7 ${error ? 'border-red-300' : selectedValue !== undefined ? 'border-orange-200' : 'border-gray-200'}`}>
+    <fieldset className="m-0 min-w-0 border-0 p-0" aria-invalid={error ? 'true' : undefined} aria-describedby={error ? errorId : undefined}>
       <legend className="w-full px-0">
         <span className="flex items-start gap-3">
-          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-orange-50 text-xs font-bold text-orange-600">{question.number}</span>
-          <span className="pt-0.5 text-sm font-semibold leading-relaxed text-gray-900 sm:text-base">{question.text} <RequiredMark /></span>
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-orange-50 text-xs font-bold text-orange-600">{question.number}</span>
+          <span className="pt-0.5 text-base font-semibold leading-7 text-gray-900 sm:text-lg">{question.text} <RequiredMark /></span>
         </span>
       </legend>
-      <div className="mt-4 grid grid-cols-5 gap-2" role="radiogroup" aria-label={`Question ${question.number} response`}>
+      <div className="mt-5 grid grid-cols-5 gap-2 sm:gap-3" role="radiogroup" aria-label={`Question ${question.number} response`}>
         {checkinScale.map((choice) => (
-          <label key={choice.value} className={`group flex min-h-12 cursor-pointer items-center justify-center rounded-xl border text-sm font-bold transition focus-within:ring-4 focus-within:ring-orange-100 ${selectedValue === choice.value ? 'border-orange-500 bg-orange-500 text-white shadow-sm' : 'border-gray-200 bg-white text-gray-600 hover:border-orange-300 hover:bg-orange-50'}`} title={choice.label}>
+          <label key={choice.value} className={`group flex min-h-14 cursor-pointer items-center justify-center rounded-xl border text-sm font-bold transition focus-within:ring-4 focus-within:ring-orange-100 ${selectedValue === choice.value ? 'border-orange-500 bg-orange-500 text-white shadow-sm' : 'border-gray-200 bg-white text-gray-600 hover:border-orange-300 hover:bg-orange-50'}`} title={choice.label}>
             <input className="sr-only" type="radio" name={`question-${question.number}`} value={choice.value} checked={selectedValue === choice.value} onChange={() => onSelect(question.number, choice.value)} required />
             {choice.value}<span className="sr-only"> — {choice.label}</span>
           </label>
         ))}
       </div>
       <FieldError id={errorId}>{error}</FieldError>
-      <div className="mt-2 grid grid-cols-3 gap-2 text-[10px] leading-tight text-gray-400 sm:text-xs">
+      <div className="mt-2 grid grid-cols-3 gap-2 text-xs leading-5 text-gray-500">
         <span>{checkinScale[0].label}</span><span className="text-center">{checkinScale[2].label}</span><span className="text-right">{checkinScale[4].label}</span>
       </div>
     </fieldset>
+    </div>
   )
 }
 
@@ -267,13 +281,13 @@ function SemesterCheckin() {
   const answeredCount = questions.filter(({ number }) => answers[number] !== undefined).length
   return (
     <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white border-b border-gray-100 px-8 py-5 flex justify-between items-center">
+      <nav className="lm-site-header bg-white border-b border-gray-100 px-8 py-5 flex justify-between items-center">
         <span className="text-lg font-bold">
-          Learn<span className="text-orange-500">Match</span>
+          <HeaderBrand />
         </span>
         <button
           onClick={() => navigate('/college')}
-          className="text-sm text-gray-500 hover:text-gray-900 transition"
+          className="lm-action"
         >
           ← Back
         </button>
@@ -288,22 +302,24 @@ function SemesterCheckin() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} noValidate className="motion-stagger space-y-4">
+        <div className="mb-4 flex items-center justify-between gap-3 px-1"><h2 className="text-lg font-bold text-gray-900">Your experience</h2><span className="text-sm text-gray-500">5 questions</span></div>
+        <form onSubmit={handleSubmit} noValidate aria-busy={submitting} className="motion-stagger space-y-5">
           {questions.map((question) => <CheckinQuestionCard key={question.number} question={question} selectedValue={answers[question.number]} onSelect={handleSelect} error={fieldErrors[question.number]} />)}
 
           {phase === 'End' && <EndPhaseGwaField value={gwa} onChange={(event) => setGwa(event.target.value)} />}
 
           <div className="sticky bottom-3 flex flex-col gap-3 rounded-2xl border border-gray-200 bg-white/95 p-4 shadow-[0_16px_40px_-20px_rgba(15,23,42,.45)] backdrop-blur sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="text-sm font-semibold text-gray-900">{answeredCount} of 5 answered</p>
-              <p className="text-xs text-gray-500">Complete all questions before submitting.</p>
+            <div role="status" aria-live="polite" aria-atomic="true" className="flex items-center gap-3">
+              {submitting && <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-50 text-orange-600"><IconLoader2 aria-hidden="true" size={24} className="animate-spin motion-reduce:animate-none" /></span>}
+              <div><p className="text-sm font-semibold text-gray-900">{submitting ? 'Preparing your check-in result...' : `${answeredCount} of 5 answered`}</p>
+              <p className="mt-1 text-sm text-gray-500">{submitting ? 'Saving your answers and preparing your personalized feedback. Please wait.' : answeredCount === 5 ? 'All questions answered. Your check-in is ready to submit.' : 'Complete all questions before submitting.'}</p></div>
             </div>
             <button
               type="submit"
               disabled={submitting}
-              className="inline-flex min-h-12 items-center justify-center rounded-xl bg-orange-500 px-7 text-sm font-semibold text-white transition hover:bg-orange-600 focus:outline-none focus:ring-4 focus:ring-orange-200 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-500"
+              className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-xl bg-orange-500 px-7 text-sm font-semibold text-white transition hover:bg-orange-600 focus:outline-none focus:ring-4 focus:ring-orange-200 disabled:cursor-wait disabled:bg-orange-100 disabled:text-orange-800"
             >
-              {submitting ? 'Submitting...' : 'Submit Check-in'}
+              {submitting && <IconLoader2 aria-hidden="true" size={18} className="animate-spin motion-reduce:animate-none" />}{submitting ? 'Processing...' : 'Submit Check-in'}
             </button>
           </div>
         </form>

@@ -1,0 +1,17 @@
+.college-panel { padding: 1.5rem; border: 1px solid #e5e7eb; border-radius: 24px; background: white; box-shadow: 0 8px 28px -24px rgba(15, 23, 42, .22); }
+.college-heading { font-size: 1.5rem; line-height: 1.3; font-weight: 750; letter-spacing: -.025em; color: #0f172a; }
+.college-eyebrow { margin-bottom: .5rem; font-size: 11px; font-weight: 700; line-height: 1.5; letter-spacing: .14em; text-transform: uppercase; color: #ea580c; }
+.college-view-button { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; min-height: 44px; border: 1px solid transparent; border-radius: 12px; padding: .65rem 1rem; font-size: 14px; font-weight: 600; color: #64748b; transition: color 160ms ease, background-color 160ms ease, box-shadow 160ms ease; }
+.college-view-button[aria-selected="true"] { background: white; border-color: #e5e7eb; box-shadow: 0 2px 4px -2px rgba(15, 23, 42, .12); color: #c2410c; }
+.college-view-button:hover { color: #c2410c; background: #fff7ed; }
+.college-view-button:focus-visible { outline: 2px solid #f97316; outline-offset: 2px; }
+.college-year-button { transition: background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease; }
+.college-management > summary::-webkit-details-marker { display: none; }
+.college-management > summary { list-style: none; }
+@media (min-width: 640px) { .college-panel { padding: 2rem; } }
+@media (hover: hover) and (prefers-reduced-motion: no-preference) { .college-year-button:hover { transform: translateY(-2px); } }
+@media (prefers-reduced-motion: reduce) { .college-view-button, .college-year-button { transition: none; } }
+@media (max-width: 479px) { .college-view-button { padding: .6rem .7rem; font-size: 12px; gap: .35rem; } }
+
+.college-next-action { border-color: #fed7aa; background: linear-gradient(135deg, #fff7ed, #fffaf4 70%, #ffedd5); }
+[role="tabpanel"][id^="college-panel-"]:focus-visible { outline: 2px solid #fb923c; outline-offset: 4px; border-radius: 20px; }

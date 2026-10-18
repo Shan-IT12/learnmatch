@@ -1,3 +1,4 @@
+import SkeletonContent from '../../components/SkeletonContent'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
@@ -195,7 +196,7 @@ function AdminUsers() {
 
           <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4">
             <p className="text-sm text-slate-500">{loading ? 'Loading users…' : `${pagination.total.toLocaleString()} registered ${pagination.total === 1 ? 'user' : 'users'}`}</p>
-            {hasFilters && <button type="button" onClick={clearFilters} className="text-sm font-semibold text-orange-600 hover:text-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500">Clear filters</button>}
+            {hasFilters && <button type="button" onClick={clearFilters} className="lm-action">Clear filters</button>}
           </div>
         </section>
 
@@ -203,16 +204,13 @@ function AdminUsers() {
           <div className="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">{error}</div>
         )}
 
-        {loading ? (
-          <div className="rounded-xl border border-orange-100 bg-white py-16 text-center shadow-sm">
-            <p className="text-sm text-slate-500">Loading user accounts…</p>
-          </div>
-        ) : users.length === 0 ? (
+        <SkeletonContent loading={loading} label="Loading user accounts...">
+        {!loading && users.length === 0 ? (
           <div className="rounded-xl border border-orange-100 bg-white px-6 py-14 text-center shadow-sm">
             <IconUserSearch size={30} stroke={1.6} className="mx-auto text-slate-400" />
             <h2 className="mt-3 text-lg font-semibold text-slate-900">{hasFilters ? 'No users match these filters' : 'No registered users yet'}</h2>
             <p className="mt-1 text-sm text-slate-500">{hasFilters ? 'Try changing your search or filter selections.' : 'Registered student accounts will appear here.'}</p>
-            {hasFilters && <button type="button" onClick={clearFilters} className="mt-5 text-sm font-semibold text-orange-600 hover:text-orange-700">Clear filters</button>}
+            {hasFilters && <button type="button" onClick={clearFilters} className="lm-action mt-5">Clear filters</button>}
           </div>
         ) : (
           <>
@@ -235,7 +233,7 @@ function AdminUsers() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
-                  {users.map((user) => (
+                  {(loading ? [1, 2, 3, 4, 5].map(userId => ({ userId, username: 'username', accountStatus: 'Active', assessmentStatus: 'Completed', recommendationStatus: 'Available', trackingStatus: 'Active', latestAlignment: 'Aligned', registeredAt: '2026-01-01T00:00:00Z' })) : users).map((user) => (
                     <tr key={user.userId} className="transition hover:bg-orange-50/30">
                       <td className="px-5 py-4 align-top">
                         <p className="font-bold tabular-nums text-slate-950">#{user.userId}</p>
@@ -258,7 +256,7 @@ function AdminUsers() {
             </div>
 
             <div className="grid gap-4 lg:hidden">
-              {users.map((user) => (
+              {(loading ? [1, 2, 3, 4, 5].map(userId => ({ userId, username: 'username', accountStatus: 'Active', assessmentStatus: 'Completed', recommendationStatus: 'Available', trackingStatus: 'Active', latestAlignment: 'Aligned', registeredAt: '2026-01-01T00:00:00Z' })) : users).map((user) => (
                 <article key={user.userId} className="rounded-xl border border-orange-100 bg-white p-5 shadow-sm">
                   <div className="flex items-start justify-between gap-4 border-b border-slate-100 pb-4">
                     <div className="min-w-0">
@@ -294,6 +292,7 @@ function AdminUsers() {
             </nav>
           </>
         )}
+        </SkeletonContent>
       </main>
     </div>
   )

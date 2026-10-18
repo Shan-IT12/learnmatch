@@ -8,6 +8,7 @@ import {
 } from '../services/recommendationEngine.js'
 import {
   RecommendationInputError,
+  getTopCourseRecommendations,
   buildClusterRiasecVector,
   buildCourseRecommendationSelection,
   buildPersonalFactorResponses,
@@ -310,4 +311,45 @@ test('the same student inputs produce the same cluster and course rankings', () 
   }
 
   assert.deepEqual(createRankings(), createRankings())
+})
+
+
+test('explicit no interests produces proportional cluster and course scores; blank answers stay incomplete', async () => {
+  assert.equal(buildStudentRiasecVector([], { noInterests: true }), null)
+  assert.throws(() => buildStudentRiasecVector([]), { code: 'INCOMPLETE_INTERESTS' })
+  const clusters = scoreAndRankClusters({
+    studentDomainScores: Object.fromEntries(SKILL_DOMAINS.map(domain => [domain, 1])),
+    studentRiasecVector: null, mbtiType: 'INTJ', personalFactorResponses: null,
+  })
+  const business = clusters.find(row => row.cluster_category === 'BUSINESS CLUSTER')
+  assert.ok(Math.abs(business.clusterScore - (0.35 + 0.30 + 0.10 * 0.5) / 0.75) < 1e-12)
+  assert.equal(business.interestScore, null)
+  const courses = clusters.slice(0, 3).map((row, index) => ({
+    course_id: index + 1, course_code: `CRS00${index + 1}`,
+    course_name: `Course ${index + 1}`, cluster_category: row.cluster_category,
+  }))
+  let explicit = true
+  const pool = { query: async sql => {
+    if (sql.includes('FROM SKILL_RESPONSE')) return [SKILL_DOMAINS.flatMap(dimension => Array.from({ length: 5 }, () => ({ dimension, is_correct: 1 }))) ]
+    if (sql.includes('FROM INTEREST_RESPONSE')) return [[]]
+    if (sql.includes('FROM PERSONALITY_ASSESSMENT')) return [[{ assessment_id: 99, mbti_type: 'INTJ' }]]
+    if (sql.includes('FROM ASSESSMENT_ATTEMPT')) {
+      assert.match(sql, /personality_assessment_id = \?/)
+      return [[{ interests: JSON.stringify({ selected: [], noInterests: explicit }) }]]
+    }
+    if (sql.includes('FROM PROFILE')) return [[{}]]
+    if (sql.includes('FROM COURSE_SKILL_PROFILE')) return [courses.map(course => ({ course_id: course.course_id, skill_domain: 'Verbal', weight: 1 }))]
+    if (sql.includes('FROM COURSE_RIASEC_PROFILE')) return [courses.flatMap(course => ['R','I','A','S','E','C'].map(riasec_type => ({ course_id: course.course_id, riasec_type, weight: 1 })))]
+    if (sql.includes('FROM COURSE')) return [courses]
+    throw new Error(sql)
+  } }
+  const results = await getTopCourseRecommendations(pool, 7)
+  assert.equal(results.length, 3)
+  for (const result of results) {
+    assert.equal(result.interests_available, false)
+    assert.equal(result.score_breakdown.interest_match, 0)
+    assert.equal(result.match_score, toDisplayPercent(clusters.find(row => row.cluster_category === result.cluster_category).clusterScore))
+  }
+  explicit = false
+  await assert.rejects(() => getTopCourseRecommendations(pool, 7), { code: 'INCOMPLETE_INTERESTS' })
 })

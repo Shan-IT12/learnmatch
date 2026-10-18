@@ -1,6 +1,7 @@
+import HeaderBrand from '../components/HeaderBrand'
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { IconLoader2, IconSchool } from '@tabler/icons-react'
+import { IconLoader2, IconSchool, IconSparkles, IconArrowUpRight } from '@tabler/icons-react'
 import FeedbackPopup from '../components/FeedbackPopup'
 import CourseName from '../components/CourseName'
 import { getAssessmentReturnDestination, SUMMARY_DASHBOARD_DESTINATION } from '../utils/assessmentReturnDestination'
@@ -25,10 +26,11 @@ function RecommendationCardSkeleton({ index }) {
         <div className="mb-5 h-2 w-full animate-pulse rounded-full bg-gray-100">
           <div className={`h-2 rounded-full bg-orange-200 ${index === 0 ? 'w-4/5' : index === 1 ? 'w-3/4' : 'w-2/3'}`} />
         </div>
-        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_17rem]">
-          <div className="rounded-2xl border border-orange-100 bg-orange-50/60 p-4 sm:p-5">
-            <div className="h-3 w-32 animate-pulse rounded-full bg-orange-200/80" />
-            <div className="mt-3 space-y-2.5">
+        <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_17rem]">
+          <div className="relative overflow-hidden rounded-2xl border border-orange-200 bg-gradient-to-br from-orange-50 via-orange-50/60 to-amber-50/70 p-5 sm:p-6">
+            <div className="absolute inset-y-0 left-0 w-1 bg-orange-300" />
+            <div className="mb-4 flex items-center gap-3"><div className="h-10 w-10 shrink-0 animate-pulse rounded-xl bg-orange-200" /><div className="h-5 w-48 max-w-full animate-pulse rounded-lg bg-orange-200/80" /></div>
+            <div className="space-y-4">
               <div className="h-3 w-full animate-pulse rounded-full bg-orange-100" />
               <div className="h-3 w-11/12 animate-pulse rounded-full bg-orange-100" />
               <div className="h-3 w-3/4 animate-pulse rounded-full bg-orange-100" />
@@ -244,21 +246,23 @@ function Results() {
   return (
     <div ref={pageRef} className="min-h-screen bg-gray-50">
       {/* Nav */}
-      <nav className="bg-white border-b border-gray-100 px-5 sm:px-8 py-4 sm:py-5 flex justify-between items-center gap-3">
+      <nav className="lm-site-header bg-white border-b border-gray-100 px-5 sm:px-8 py-4 sm:py-5 flex justify-between items-center gap-3">
         {loading || returnDestination.path === '/college' ? (
-          <span className="text-lg font-bold text-gray-900">Learn<span className="text-orange-500">Match</span></span>
+          <span className="text-lg font-bold text-gray-900"><HeaderBrand /></span>
         ) : (
-          <button onClick={() => navigate(returnDestination.path)} className="text-lg font-bold text-gray-900 hover:opacity-80 transition">Learn<span className="text-orange-500">Match</span></button>
+          <button onClick={() => navigate(returnDestination.path)} className="text-lg font-bold text-gray-900 hover:opacity-80 transition"><HeaderBrand /></button>
         )}
         {!loading && (
-          <button onClick={() => navigate(returnDestination.path)} className="text-sm text-gray-500 hover:text-gray-900 transition">{returnDestination.label}</button>
+          <button onClick={() => navigate(returnDestination.path)} className="lm-action">{returnDestination.label}<IconArrowUpRight size={16} aria-hidden="true" /></button>
         )}
       </nav>
 
-      <div className="max-w-5xl mx-auto px-5 sm:px-8 py-8 sm:py-12">
+      <div className="max-w-6xl mx-auto px-5 sm:px-8 py-8 sm:py-12">
         <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900 mb-2">Your Recommended Courses</h1>
         <p className="text-gray-500 text-sm mb-6">
-          Based on your skills, interests, and profile, here are your top matches.
+          {recommendations[0]?.interests_available === false
+            ? 'These recommendations are based on your skills, personality, and personal factors because you selected no activity interests.'
+            : 'Based on your skills, interests, and profile, here are your top matches.'}
         </p>
         {returnDestination.path === '/college' && (
           <p className="mb-6 rounded-xl border border-orange-100 bg-orange-50 px-4 py-3 text-sm text-orange-900">
@@ -294,7 +298,7 @@ function Results() {
                 <h2 id="assessment-snapshot-title" className="mt-0.5 font-bold text-gray-900">The inputs considered in your matches</h2>
               </div>
               {returnDestination.path !== '/college' && (
-                <button type="button" onClick={() => navigate('/dashboard/summary')} className="text-left text-xs font-semibold text-orange-600 hover:text-orange-700 sm:text-right">
+                <button type="button" onClick={() => navigate('/dashboard/summary')} className="lm-action">
                   Open Full Summary →
                 </button>
               )}
@@ -364,19 +368,23 @@ function Results() {
                   />
                 </div>
 
-                <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_17rem]">
+                <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_17rem]">
                   {rec.ai_narrative && (
-                    <div className="rounded-2xl border border-orange-100 bg-orange-50/70 px-4 py-4 sm:px-5">
-                      <p className="text-xs font-bold uppercase tracking-wide text-orange-700 mb-2">Why this course fits you</p>
-                      <p className="text-sm text-gray-700 leading-6">{rec.ai_narrative}</p>
-                    </div>
+                    <section aria-labelledby={`course-fit-${rec.rank_position}`} className="relative overflow-hidden rounded-2xl border border-orange-200 bg-gradient-to-br from-orange-50 via-orange-50/60 to-amber-50/70 p-5 shadow-[0_8px_24px_-18px_rgba(234,88,12,.45)] sm:p-6">
+                      <div aria-hidden="true" className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-orange-400 to-orange-500" />
+                      <div className="mb-4 flex items-center gap-3">
+                        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-500 text-white shadow-sm shadow-orange-200"><IconSparkles size={21} stroke={1.8} aria-hidden="true" /></span>
+                        <h3 id={`course-fit-${rec.rank_position}`} className="text-base font-bold leading-snug tracking-tight text-gray-950 sm:text-lg">Why this course fits you</h3>
+                      </div>
+                      <p className="text-sm leading-7 text-gray-800 sm:text-[15px]">{rec.ai_narrative}</p>
+                    </section>
                   )}
                   {rec.score_breakdown && (
                     <div className="grid grid-cols-2 gap-2">
                       {Object.entries(breakdownLabels).map(([key, label]) => (
                         <div key={key} className="rounded-xl border border-gray-100 bg-gray-50 px-3 py-2.5">
                           <p className="text-[11px] text-gray-400">{label}</p>
-                          <p className="text-sm font-bold text-gray-800">{rec.score_breakdown[key]}%</p>
+                          <p className="text-sm font-bold text-gray-800">{key === 'interest_match' && rec.interests_available === false ? 'Not used' : `${rec.score_breakdown[key]}%`}</p>
                         </div>
                       ))}
                     </div>
@@ -391,7 +399,7 @@ function Results() {
                 <div className="flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-gray-100 bg-gray-50/60 px-5 py-3.5 sm:px-6">
                 <button
                 onClick={() => navigate(`/results/career-path/${encodeURIComponent(rec.course_code)}`, { state: { recommendations, source: 'results' } })}
-                className="text-sm font-medium text-orange-500 hover:text-orange-600 transition inline-flex items-center gap-1"
+                className="lm-action"
               >
                 View Career Path →
               </button>

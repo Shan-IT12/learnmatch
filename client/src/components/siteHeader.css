@@ -1,0 +1,46 @@
+.lm-site-header {
+  min-height: 84px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-block: 1rem;
+  border-bottom: 1px solid #eeeae4;
+  background: rgb(255 255 255 / .94);
+  box-shadow: 0 4px 24px -20px rgb(15 23 42 / .25);
+  backdrop-filter: blur(16px);
+}
+.lm-site-header:has(> .lm-header-inner) { padding: 0; }
+.lm-header-inner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; min-height: 84px; width: 100%; }
+.lm-brand { display: inline-flex; align-items: center; gap: .75rem; text-align: left; vertical-align: middle; }
+.lm-brand-symbol { display: flex; align-items: center; justify-content: center; width: 42px; height: 42px; flex-shrink: 0; color: white; border-radius: 14px; border: 1px solid #fb923c; background: linear-gradient(145deg, #fb923c, #f97316 65%, #ea580c); box-shadow: 0 5px 12px -6px rgb(234 88 12 / .6), inset 0 1px 0 rgb(255 255 255 / .3); }
+.lm-brand-text { display: flex; flex-direction: column; gap: .2rem; }
+.lm-brand-name { font-size: 23px; line-height: 1.15; font-weight: 800; letter-spacing: -.65px; color: #0f172a; }
+.lm-brand-name > span { color: #f97316; }
+.lm-brand-caption { font-size: 11px; font-weight: 500; letter-spacing: .055em; line-height: 1.3; color: #94a3b8; }
+.lm-header-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: .6rem; }
+.lm-header-account { display: inline-flex; align-items: center; gap: .65rem; padding-right: 1.25rem; margin-right: .25rem; border-right: 1px solid #e5e7eb; }
+.lm-account-avatar { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; border: 3px solid white; background: #ffedd5; color: #c2410c; font-size: 11px; font-weight: 700; box-shadow: 0 0 0 1px #fed7aa; }
+.lm-account-text { display: flex; flex-direction: column; gap: .2rem; text-align: left; }
+.lm-account-label { font-size: 12px; line-height: 1.3; color: #64748b; }
+.lm-account-text strong { max-width: 10rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; font-weight: 650; line-height: 1.2; color: #334155; }
+.lm-site-header .lm-action { min-height: 40px; background: white; border-color: #e5e7eb; color: #64748b; border-radius: 12px; font-size: 14px; gap: .5rem; }
+.lm-site-header .lm-action:hover { background: #fff7ed; border-color: #fed7aa; color: #c2410c; }
+.lm-site-header .lm-action-danger { background: #fff1f2; border-color: #ffe4e6; color: #e11d48; }
+.lm-site-header .lm-action-danger:hover { background: #ffe4e6; border-color: #fecdd3; color: #be123c; }
+.lm-site-header .lm-action-selected { background: #fff7ed; border-color: #fed7aa; color: #c2410c; box-shadow: inset 0 -2px 0 #f97316; }
+.lm-header-primary { display: inline-flex; align-items: center; justify-content: center; min-height: 40px; gap: .5rem; border: 1px solid #f97316; border-radius: 12px; padding: .65rem 1rem; background: #f97316; color: white; font-size: 14px; font-weight: 600; box-shadow: 0 4px 10px -6px rgb(234 88 12 / .5); }
+.lm-header-primary:hover { background: #ea580c; border-color: #ea580c; }
+.lm-header-primary:focus-visible, .lm-site-header .lm-brand:focus-visible { outline: 2px solid #fb923c; outline-offset: 4px; }
+@media (max-width: 767px) { .lm-header-account { display: none; } }
+@media (max-width: 479px) {
+  .lm-site-header, .lm-header-inner { gap: .75rem; }
+  .lm-brand-symbol { width: 36px; height: 36px; border-radius: 12px; }
+  .lm-brand { gap: .5rem; }
+  .lm-brand-name { font-size: 21px; }
+  .lm-brand-caption { display: none; }
+  .lm-header-actions { width: 100%; justify-content: flex-end; gap: .5rem; }
+  .lm-site-header .lm-action, .lm-header-primary { font-size: 13px; padding: .6rem .75rem; }
+}

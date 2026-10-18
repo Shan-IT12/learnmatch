@@ -1,3 +1,4 @@
+import HeaderBrand from '../components/HeaderBrand'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { IconEye, IconEyeOff } from '@tabler/icons-react'
@@ -172,7 +173,7 @@ function Register() {
 
       <nav className="relative z-10 mx-auto flex max-w-[1440px] items-center justify-between gap-3 px-5 py-5 sm:px-8 lg:px-10">
         <Link to="/" className="text-xl font-bold tracking-tight text-gray-900">
-          Learn<span className="text-orange-500">Match</span>
+          <HeaderBrand />
         </Link>
         <div className="flex items-center gap-2">
           <span className="hidden text-sm text-gray-400 sm:inline">Already have an account?</span>

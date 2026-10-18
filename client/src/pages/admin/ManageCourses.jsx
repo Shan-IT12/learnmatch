@@ -1,3 +1,5 @@
+import SkeletonContent from '../../components/SkeletonContent'
+import { recommendationPlaceholders } from '../../data/loadingPlaceholders'
 import { useState, useEffect, useMemo, useCallback, useRef, useEffectEvent } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { IconPlus, IconEye, IconArrowLeft, IconSearch, IconX } from '@tabler/icons-react'
@@ -564,10 +566,10 @@ function ManageCourses() {
         <AdminHeader currentPage="courses" />
 
         <main className="max-w-6xl mx-auto px-5 sm:px-8 py-10 sm:py-12">
-          <button type="button" onClick={() => navigate('/admin')} className="text-sm text-gray-500 hover:text-orange-600 transition mb-6 focus:outline-none focus:ring-2 focus:ring-orange-500 rounded">
+          <button type="button" onClick={() => navigate('/admin')} className="lm-action mb-6">
             ← Back to Dashboard
           </button>
-          {draftsView && <button type="button" onClick={() => navigate(courseListLocation())} className="mb-6 ml-5 rounded text-sm text-gray-500 hover:text-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500"><IconArrowLeft className="mr-1 inline" size={16} /> Back to Courses</button>}
+          {draftsView && <button type="button" onClick={() => navigate(courseListLocation())} className="lm-action mb-6 ml-5"><IconArrowLeft className="mr-1 inline" size={16} /> Back to Courses</button>}
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 mb-8">
             <div>
               <h1 className="text-3xl font-bold text-gray-900 mb-1">{draftsView ? 'Saved Drafts' : archivedView ? 'Archived Course Identities' : 'Manage Courses'}</h1>
@@ -593,11 +595,7 @@ function ManageCourses() {
             </div>
           )}
 
-          {loading ? (
-            <div className="bg-white border border-orange-100 rounded-2xl shadow-sm">
-              <p className="text-center text-gray-500 text-sm py-12">Loading courses...</p>
-            </div>
-          ) : (
+          <SkeletonContent loading={loading} label="Loading courses...">
             <>
               <div className="bg-white border border-orange-100 rounded-2xl p-4 sm:p-5 shadow-sm mb-5">
                 <div className="flex flex-col lg:flex-row gap-3">
@@ -673,7 +671,7 @@ function ManageCourses() {
                     <button
                       type="button"
                       onClick={clearFilters}
-                      className="text-sm font-medium text-orange-600 hover:text-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 rounded"
+                      className="lm-action"
                     >
                       Clear filters
                     </button>
@@ -682,19 +680,19 @@ function ManageCourses() {
               </div>
 
               <p className="mb-5 text-sm text-gray-600">{catalogCounts.original} original independent programs - {catalogCounts.published} published additions - {catalogCounts.drafts} saved drafts</p>
-              {visibleCourses.length === 0 ? (
+              {!loading && visibleCourses.length === 0 ? (
                 <div className="bg-white border border-orange-100 rounded-2xl p-10 text-center shadow-sm">
                   <h2 className="text-lg font-semibold text-gray-900">{draftsView ? 'No saved drafts found.' : 'No courses found.'}</h2>
                   <p className="text-sm text-gray-500 mt-2">{draftsView ? 'Use Add Course and Save Draft to create a saved draft, or adjust your filters.' : 'Try changing your search or filters.'}</p>
                   <button
                     type="button"
                     onClick={clearFilters}
-                    className="mt-5 text-sm font-medium text-orange-600 hover:text-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 rounded"
+                    className="lm-action mt-5"
                   >
                     Clear filters
                   </button>
                 </div>
-              ) : clusterFilter === 'all' ? (
+              ) : loading ? (<CourseTable courses={recommendationPlaceholders} />) : clusterFilter === 'all' ? (
                 <div className="space-y-8">
                   {groupedCourses.map(([cluster, clusterCourses]) => (
                     <section key={cluster} aria-labelledby={`cluster-${cluster}`}>
@@ -713,14 +711,14 @@ function ManageCourses() {
                 </div>
               ) : (
                 <CourseTable
-                  courses={visibleCourses}
+                  courses={loading ? recommendationPlaceholders : visibleCourses}
                   openEditCourseForm={goToCourse}
                   handleStatusChange={handleStatusChange}
                   updatingStatusId={updatingStatusId}
                 />
               )}
             </>
-          )}
+          </SkeletonContent>
         </main>
       </div>
     )
@@ -729,7 +727,7 @@ function ManageCourses() {
   if (editingCourseId && !savedDraftEditing) return <div className="min-h-screen bg-orange-50/40">
     <AdminHeader currentPage="courses" />
     <main className="mx-auto w-full max-w-6xl space-y-5 px-5 py-10 sm:px-8">
-      <button type="button" onClick={backToList} className="inline-flex items-center gap-1.5 text-sm text-gray-600 hover:text-orange-700"><IconArrowLeft size={16} /> {draftsView ? 'Back to Drafts' : 'Back to Courses'}</button>
+      <button type="button" onClick={backToList} className="lm-action"><IconArrowLeft size={16} /> {draftsView ? 'Back to Drafts' : 'Back to Courses'}</button>
       {error && <p role="alert" className="text-sm text-red-600">{error}</p>}
       <SavedDraftCourseView form={courseForm} courseCode={editingCourseCode} publication={publication} catalog={!editingDraft && !publication} active={editingCourseActive} canonicalCareers={canonicalCareers} identityNotice={archivedCourseLabel(courses.find(course => Number(course.course_id) === Number(editingCourseId)) || {})} onEdit={() => setSavedDraftEditing(true)} onReview={() => {
         document.getElementById('saved-publication')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -747,13 +745,13 @@ function ManageCourses() {
       <AdminHeader currentPage="courses" />
 
       <main className="mx-auto w-full max-w-6xl px-5 py-10 sm:px-8 sm:py-12">
-        <button type="button" onClick={() => navigate('/admin')} className="text-sm text-gray-500 hover:text-orange-600 transition mb-5 focus:outline-none focus:ring-2 focus:ring-orange-500 rounded">
+        <button type="button" onClick={() => navigate('/admin')} className="lm-action mb-5">
           ← Back to Dashboard
         </button>
         <button
           type="button"
           onClick={editingCourseId ? backToSavedCourse : backToList}
-          className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-orange-600 transition mb-6 focus:outline-none focus:ring-2 focus:ring-orange-500 rounded"
+          className="lm-action mb-6"
         >
           <IconArrowLeft size={16} stroke={2} /> {editingCourseId ? 'Back to Course' : draftsView ? 'Back to Drafts' : 'Back to Courses'}
         </button>

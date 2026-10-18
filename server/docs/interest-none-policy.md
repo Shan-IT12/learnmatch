@@ -1,4 +1,4 @@
-# Global no-interest answer and pending scoring decision
+# Global no-interest answer and proportional scoring
 
 New Interests responses use the existing `ASSESSMENT_ATTEMPT.interests` JSON
 column: `{ selected: [activity names], noInterests: boolean, updatedAt }`.
@@ -19,11 +19,18 @@ The checkbox never enters `INTEREST_RESPONSE` or the RIASEC map. Completed
 attempts remain completion evidence even with zero activity responses. The
 Summary displays the global no-interest answer.
 
-The existing no-interest ranking handling is retained:
-`MISSING_INTEREST_SCORING_POLICY` blocks recommendation generation and snapshot
-writes when no activity interests are available. Results and Summary explain
-that ranking is pending. WSM weights, RIASEC contributions, zero-vector math,
-and historical recommendation snapshots are unchanged.
+The approved no-interest policy excludes interests and normalizes the remaining
+weights proportionally per cluster for both cluster selection and course ranking:
 
-Remaining decision: the panel/project owner must approve the missing-interest
-scoring policy before ranking assessments without activity-interest signals.
+`score = (skills * Ws + personality * Wp + personalFactors * Wf) / (1 - Wi)`
+
+This applies only when the completed attempt linked to the personality assessment
+explicitly records `noInterests: true` and an empty selected list. Blank or missing
+responses remain incomplete. Responses with activities retain the original scoring.
+
+The API returns `interests_available: false`, including on saved snapshots. The
+existing non-null interest-match snapshot column stores zero as an unused
+placeholder; it contributes nothing to scoring and is displayed as Not used.
+Explanations exclude it from strengths and development suggestions. Results explain
+that recommendations use skills, personality, and personal factors. Historical
+snapshots are not recalculated or rewritten. No database migration is required.

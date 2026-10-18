@@ -1,3 +1,4 @@
+import SkeletonContent from '../../components/SkeletonContent'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import OnboardingLayout from '../../components/OnboardingLayout'
@@ -20,7 +21,7 @@ import {
   readAssessmentSession,
   writeAssessmentSession,
   assessmentHeaders,
-  readActiveAttempt,
+  restoreInterestAttempt,
   saveActiveAttemptDraft,
 } from '../../utils/assessmentSession'
 
@@ -42,7 +43,7 @@ function OnboardingInterests() {
 
   useEffect(() => {
     const storage = typeof sessionStorage === 'undefined' ? null : sessionStorage
-    readActiveAttempt(import.meta.env.VITE_API_URL, localStorage.getItem('token'), storage)
+    restoreInterestAttempt(import.meta.env.VITE_API_URL, localStorage.getItem('token'), storage)
       .then((attempt) => {
         const local = readAssessmentSession(storage, ASSESSMENT_SESSION_KEYS.interests, {})
         setInterestState(restoreInterestState(local, attempt?.interests))
@@ -124,8 +125,8 @@ function OnboardingInterests() {
     setSaveConfirmed(true)
     await waitForSuccessConfirmation()
     navigate('/onboarding/skills')
-  } catch {
-    setError('Cannot connect to server. Please try again.')
+  } catch (requestError) {
+    setError(requestError.message || 'Cannot connect to server. Please try again.')
     setSubmitting(false)
   }
 }
@@ -154,7 +155,7 @@ function OnboardingInterests() {
         </div>
       )}
     >
-      <div className="max-w-3xl mx-auto px-5 sm:px-8 pt-8 sm:pt-12 pb-16">
+      <SkeletonContent loading={!attemptLoaded && !restoreFailed} label="Loading your interests..."><div className="max-w-3xl mx-auto px-5 sm:px-8 pt-8 sm:pt-12 pb-16">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between mb-8">
           <div>
             <div className="inline-flex items-center gap-2 rounded-full bg-orange-50 px-3 py-1.5 text-xs font-semibold text-orange-700 mb-3">
@@ -182,7 +183,6 @@ function OnboardingInterests() {
           </div>
         </div>
 
-        {!attemptLoaded && !restoreFailed && <p role="status" className="mb-4 text-sm text-gray-500">Restoring your answers...</p>}
         <div data-validation-field="interests" aria-invalid={error ? 'true' : undefined} aria-describedby={error ? 'interests-error' : undefined} className="space-y-5 mb-10">
           <label className="flex items-center gap-3 rounded-2xl border border-gray-200 bg-gray-50 p-4 text-sm font-medium text-gray-900">
             <input
@@ -247,7 +247,7 @@ function OnboardingInterests() {
           <FieldError id="interests-error">{error}</FieldError>
         </div>
 
-      </div>
+      </div></SkeletonContent>
     </OnboardingLayout>
   )
 }

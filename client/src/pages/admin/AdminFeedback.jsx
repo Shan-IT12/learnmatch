@@ -219,7 +219,7 @@ function AdminFeedback() {
                           <td className="px-5 py-4"><Rating value={item.rating} /></td>
                           <td className="px-5 py-4"><p className="line-clamp-2 break-words leading-5 text-slate-600">{item.commentPreview || 'No additional comment.'}</p></td>
                           <td className="px-5 py-4 text-xs leading-5 text-slate-500">{formatDate(item.submittedAt)}</td>
-                          <td className="px-5 py-4"><Link to={`/admin/feedback/${item.feedbackId}`} className="font-semibold text-orange-600 hover:text-orange-700 hover:underline">View</Link></td>
+                          <td className="px-5 py-4"><Link to={`/admin/feedback/${item.feedbackId}`} className="lm-action">View</Link></td>
                         </tr>
                       ))}
                     </tbody>
@@ -232,7 +232,7 @@ function AdminFeedback() {
                       <div className="flex items-start justify-between gap-3"><div><p className="text-xs font-semibold uppercase tracking-wide text-slate-400">User ID</p><p className="mt-1 font-semibold tabular-nums text-slate-900">#{item.user.userId}</p></div><Rating value={item.rating} /></div>
                       <div className="mt-4 flex flex-wrap items-center gap-2"><span className="rounded-md border border-orange-100 bg-orange-50 px-2 py-1 text-xs font-medium text-orange-700">{item.category}</span><span className="text-xs text-slate-400">{formatDate(item.submittedAt)}</span></div>
                       <p className="mt-4 line-clamp-3 break-words text-sm leading-6 text-slate-600">{item.commentPreview || 'No additional comment.'}</p>
-                      <Link to={`/admin/feedback/${item.feedbackId}`} className="mt-4 inline-flex text-sm font-semibold text-orange-600 hover:text-orange-700 hover:underline">View feedback</Link>
+                      <Link to={`/admin/feedback/${item.feedbackId}`} className="lm-action mt-4">View feedback</Link>
                     </article>
                   ))}
                 </section>

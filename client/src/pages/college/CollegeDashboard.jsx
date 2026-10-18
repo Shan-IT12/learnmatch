@@ -1,3 +1,10 @@
+import CollegeProgramRoadmap from '../../components/CollegeProgramRoadmap'
+import './collegeDashboard.css'
+import LogoutButton from '../../components/LogoutButton'
+import { IconLogout, IconMessageCircle } from '@tabler/icons-react'
+import HeaderBrand, { HeaderAccount } from '../../components/HeaderBrand'
+import { collegePlaceholder, coursePlaceholder } from '../../data/loadingPlaceholders'
+import SkeletonContent from '../../components/SkeletonContent'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import CourseName from '../../components/CourseName'
@@ -7,8 +14,11 @@ import { waitForSuccessConfirmation } from '../../utils/successConfirmation'
 import {
   IconAlertTriangle,
   IconArrowRight,
-  IconBook2,
   IconCalendar,
+  IconChevronDown,
+  IconHistory,
+  IconLayoutDashboard,
+  IconSettings,
   IconChartLine,
   IconCircleCheck,
   IconClipboardCheck,
@@ -27,7 +37,6 @@ import {
   getNextCheckinPhase,
   hasDisplayableGwa,
   parseYearNumber,
-  summarizeRoadmapOverview,
 } from '../../utils/collegeTrackingView'
 import { FieldError, RequiredMark } from '../../components/FormValidation'
 import { scrollToFirstInvalidField } from '../../utils/formValidation'
@@ -45,12 +54,6 @@ const STATUS_LABELS = {
   'On Track': 'Going Well',
   Monitor: 'Keep an Eye On',
   'Needs Attention': 'Support Recommended',
-}
-
-function formatTermPhase(phase) {
-  if (phase === 'NOT_STARTED') return 'Not Started Yet'
-  if (phase === 'ENDED') return 'Term Ended'
-  return phase
 }
 
 function statusStyle(status) {
@@ -83,8 +86,12 @@ function AlignmentTrendChart({ records }) {
   })
 
   return (
-    <div className="overflow-x-auto" aria-label="Alignment percentage trend">
-      <svg viewBox="0 0 600 180" className="min-w-[520px] w-full h-[180px]" role="img">
+    <div aria-label="Alignment percentage trend">
+      <div className="grid grid-cols-3 gap-2 sm:hidden">{CHECKIN_PHASES.map(phase => {
+        const record = records.find(item => item.phase === phase)
+        return <div key={phase} className="rounded-xl border border-gray-100 bg-gray-50 px-2 py-4 text-center"><p className="text-xs font-medium text-gray-500">{phase}</p><p className="mt-2 text-lg font-bold text-orange-600">{record ? `${record.alignmentPercent}%` : '-'}</p><p className="mt-1 text-[10px] text-gray-400">{record ? 'Alignment' : 'No result'}</p></div>
+      })}</div>
+      <svg viewBox="0 0 600 180" className="hidden h-auto max-h-56 w-full sm:block" role="img" aria-label="Alignment across Early, Mid and End check-ins">
         {[25, 50, 75, 100].map((value) => {
           const y = 138 - value * 0.92
           return (
@@ -123,11 +130,11 @@ export function CheckinProgress({ completedPhases = [], phaseStates = [], nextPh
   const completedCount = completed.length
   const furthestCompletedIndex = Math.max(-1, ...completed.map((phase) => CHECKIN_PHASES.indexOf(phase)))
   const progressPercent = [0, 33, 66, 100][furthestCompletedIndex + 1]
-  const currentPhase = completed.at(-1) || nextPhase || 'Early'
+  const currentPhase = completed.at(-1) || null
   const nextPhaseIndex = CHECKIN_PHASES.indexOf(nextPhase)
 
   return (
-    <section aria-label="Term check-in progress" className="mx-auto mb-8 max-w-4xl rounded-2xl border border-orange-100 bg-gradient-to-br from-orange-50 to-white p-5 shadow-sm sm:p-7">
+    <section aria-label="Term check-in progress" className="college-panel h-full">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-xs font-bold uppercase tracking-[0.16em] text-orange-600">Term Check-in Progress</p>
@@ -156,7 +163,7 @@ export function CheckinProgress({ completedPhases = [], phaseStates = [], nextPh
         })}
       </div>
       <div className="mt-5 flex flex-wrap gap-x-5 gap-y-1 border-t border-orange-100 pt-4 text-sm">
-        <p className="font-medium text-gray-700">Current phase: <strong>{currentPhase}</strong></p>
+        <p className="font-medium text-gray-700">Last completed: <strong>{currentPhase || 'None yet'}</strong></p>
         <p className="font-medium text-gray-700">Next: <strong>{nextPhase ? `${nextPhase} Check-in` : 'Term complete'}</strong></p>
       </div>
     </section>
@@ -170,10 +177,12 @@ function CollegeDashboard() {
 
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [collegeInfo, setCollegeInfo] = useState(null)
+  const [savedCollegeInfo, setCollegeInfo] = useState(null)
+  const collegeInfo = loading ? collegePlaceholder : savedCollegeInfo
   const [checkinStatus, setCheckinStatus] = useState(null)
   const [history, setHistory] = useState([])
-  const [courseRoadmap, setCourseRoadmap] = useState(null)
+  const [savedCourseRoadmap, setCourseRoadmap] = useState(null)
+  const courseRoadmap = loading ? coursePlaceholder : savedCourseRoadmap
   const [startingCheckin, setStartingCheckin] = useState(false)
   const [advancingSemester, setAdvancingSemester] = useState(false)
   const [showNextSemesterForm, setShowNextSemesterForm] = useState(false)
@@ -189,9 +198,12 @@ function CollegeDashboard() {
   const [lifecyclePending, setLifecyclePending] = useState(false)
   const [nextTermErrors, setNextTermErrors] = useState({})
   const [startingAssessment, setStartingAssessment] = useState(false)
+  const [activeView, setActiveView] = useState('overview')
+  const viewButtonsRef = useRef([])
   const [showFullHistory, setShowFullHistory] = useState(false)
   const [successMessage, setSuccessMessage] = useState('')
   const [pendingLifecycleAction, setPendingLifecycleAction] = useState(null)
+  const [pendingEarlyPhase, setPendingEarlyPhase] = useState(null)
   const lifecycleRequestRef = useRef(false)
 
   useEffect(() => {
@@ -266,7 +278,6 @@ function CollegeDashboard() {
   const latestAlignment = latestResult?.alignmentPercent ?? null
   const currentYearNumber = parseYearNumber(collegeInfo?.yearLevel)
   const roadmapYears = courseRoadmap?.year_levels || []
-  const currentRoadmapYear = roadmapYears.find(({ year }) => Number(year) === currentYearNumber)
   const checkinCardIsActionable = Boolean(nextCheckinPhase) && checkinStatus?.state !== 'complete'
   const currentCalendarTerm = resolveCalendarTerm(collegeInfo || {})
   const nextAcademicStage = getNextAcademicStage(
@@ -284,18 +295,24 @@ function CollegeDashboard() {
     if (nextAcademicStage?.yearLevel === collegeInfo?.yearLevel) return collegeInfo.academicYear
     return `${Number(match[1]) + 1}-${Number(match[2]) + 1}`
   }, [collegeInfo, nextAcademicStage])
-  const displayedTrackingPhase = collegeInfo?.expectedPhase || collegeInfo?.initialTrackingPhase
-  const timingHeading = collegeInfo?.timingEstimated
-    ? 'Estimated Semester Progress'
-    : collegeInfo?.timingAvailable
-      ? 'Semester Progress'
-      : collegeInfo?.timingMode === 'phase_only'
-        ? 'Current Tracking Phase'
-        : 'Semester Timing'
-  const timingValue = collegeInfo?.timingAvailable
-    ? `${collegeInfo.semesterProgress}%`
-    : displayedTrackingPhase || 'Not set'
   const lifecycleStatus = collegeInfo?.lifecycleStatus || 'active'
+  const dashboardViews = [
+    { id: 'overview', label: 'Overview', icon: IconLayoutDashboard },
+    ...(lifecycleStatus === 'active' ? [{ id: 'roadmap', label: 'Course Roadmap', icon: IconRoute }] : []),
+    { id: 'history', label: 'History', icon: IconHistory },
+  ]
+  const visibleView = dashboardViews.some(view => view.id === activeView) ? activeView : 'overview'
+  const handleViewKey = (event, index) => {
+    let next
+    if (event.key === 'ArrowRight') next = (index + 1) % dashboardViews.length
+    else if (event.key === 'ArrowLeft') next = (index - 1 + dashboardViews.length) % dashboardViews.length
+    else if (event.key === 'Home') next = 0
+    else if (event.key === 'End') next = dashboardViews.length - 1
+    else return
+    event.preventDefault()
+    setActiveView(dashboardViews[next].id)
+    viewButtonsRef.current[next]?.focus()
+  }
   const nextTermAcademicYears = getAcademicYearOptions(nextSemesterAcademicYear || nextAcademicYear)
   const nextTermActionLabel = nextAcademicStage && nextAcademicStage.yearLevel === collegeInfo?.yearLevel
     ? `Start ${nextAcademicStage.semester}`
@@ -362,7 +379,14 @@ function CollegeDashboard() {
     }
   }
 
-  const handleStartCheckin = async (phase = null) => {
+  const handleStartCheckin = async (phase = null, confirmedEarly = false) => {
+    const phases = ['Early', 'Mid', 'End']
+    const scheduledPhase = checkinStatus?.expectedPhase || checkinStatus?.currentPhase
+    const aheadOfSchedule = phases.indexOf(phase) > phases.indexOf(scheduledPhase) && phases.includes(scheduledPhase)
+    if (!confirmedEarly && (checkinStatus?.earlyCheckin || aheadOfSchedule || checkinStatus?.state === 'not_due')) {
+      setPendingEarlyPhase(phase)
+      return
+    }
     if (checkinStatus?.state === 'pending' && (!phase || phase === checkinStatus.phase)) {
       navigate('/college/checkin')
       return
@@ -375,7 +399,10 @@ function CollegeDashboard() {
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ phase }),
       })
-      if (response.ok) navigate('/college/checkin')
+      if (response.ok) {
+        setPendingEarlyPhase(null)
+        navigate('/college/checkin')
+      }
       else setError('We could not start the next check-in. Please try again.')
     } catch {
       setError('We could not start the next check-in. Please try again.')
@@ -441,103 +468,47 @@ function CollegeDashboard() {
     navigate('/login')
   }
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-slate-50" aria-label="Loading College Dashboard">
-        <div className="h-[73px] border-b border-gray-100 bg-white" />
-        <main className="mx-auto max-w-[1280px] space-y-6 px-4 py-8 sm:px-8 lg:px-12">
-          <div className="h-56 animate-pulse rounded-[24px] bg-slate-200" />
-          <div className="motion-stagger grid gap-6 lg:grid-cols-3">
-            {[0, 1, 2].map((item) => <div key={item} className="h-48 animate-pulse rounded-[20px] bg-white" />)}
-          </div>
-          <div className="h-72 animate-pulse rounded-[20px] bg-white" />
-        </main>
-      </div>
-    )
-  }
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <nav className="bg-white border-b border-gray-100 px-4 sm:px-8 lg:px-14 py-[18px] flex justify-between items-center">
+      <nav className="lm-site-header bg-white border-b border-gray-100 px-4 sm:px-8 lg:px-14 py-[18px] flex justify-between items-center">
         <button onClick={() => navigate('/college')} className="text-lg font-bold text-gray-900 hover:opacity-80 transition">
-          Learn<span className="text-orange-500">Match</span>
+          <HeaderBrand />
         </button>
-        <div className="flex items-center gap-3 sm:gap-4">
-          <span className="hidden sm:inline text-sm text-gray-500">
-            Welcome, <strong className="text-gray-900">{username}</strong>
-          </span>
-          <button onClick={() => navigate('/feedback', { state: { entryContext: 'college' } })} className="text-sm text-gray-500 hover:text-gray-900 transition">
-            Feedback
+        <div className="lm-header-actions flex items-center gap-3 sm:gap-4">
+          <HeaderAccount username={username} />
+          <button onClick={() => navigate('/feedback', { state: { entryContext: 'college' } })} className="lm-action"><IconMessageCircle size={16} stroke={1.7} aria-hidden="true" /> Feedback
           </button>
           {lifecycleStatus !== 'active' && (
-            <button onClick={() => navigate('/college')} className="text-sm text-gray-500 hover:text-gray-900 transition">
+            <button onClick={() => navigate('/college')} className="lm-action">
               Dashboard
             </button>
           )}
-          <button onClick={handleLogout} className="rounded-lg px-2.5 py-2 text-sm font-medium text-gray-500 transition hover:bg-red-50 hover:text-red-600">
-            Logout
-          </button>
+          <LogoutButton onConfirm={handleLogout} className="lm-action lm-action-danger"><IconLogout size={16} stroke={1.7} aria-hidden="true" /> Logout
+          </LogoutButton>
         </div>
       </nav>
 
-      <main className="max-w-[1280px] mx-auto px-4 sm:px-8 lg:px-12 py-8 lg:py-11 space-y-6">
+      <SkeletonContent loading={loading} label="Loading CollegeDashboard..."><main className="max-w-[1280px] mx-auto px-4 sm:px-8 lg:px-12 py-8 lg:py-11 space-y-6">
         {error && <div role="alert" className="rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700">{error}</div>}
         {successMessage && <div className="rounded-2xl border border-emerald-100 bg-emerald-50/70 px-5 py-4"><SuccessConfirmation compact message={successMessage} /></div>}
 
-        <section className="relative overflow-hidden rounded-[24px] border border-slate-800 bg-slate-950 p-6 text-white shadow-[0_22px_55px_-34px_rgba(15,23,42,.8)] sm:p-8">
-          <div className="pointer-events-none absolute inset-y-0 left-0 w-1.5 bg-gradient-to-b from-orange-400 via-orange-500 to-amber-300" />
-          <div className="grid lg:grid-cols-[1.5fr_1fr] gap-8 items-end">
-            <div>
-              <p className="mb-2 text-sm font-semibold text-orange-400">Career Alignment Tracking</p>
-              <span className="mb-3 inline-flex rounded-full border border-slate-700 bg-slate-900 px-3 py-1 text-xs font-semibold text-slate-200">
-                Tracking status: {lifecycleStatus === 'active' ? 'Active' : lifecycleStatus === 'paused' ? 'Paused' : 'Ended / Archived'}
-              </span>
-              <CourseName as="h1" name={collegeInfo?.courseName} className="text-2xl font-bold text-white sm:text-3xl" secondaryClassName="mt-1 text-sm font-medium text-slate-300 sm:text-base" />
-              <p className="mt-2 text-sm text-slate-300">
-                {[collegeInfo?.yearLevel, collegeInfo?.semester].filter(Boolean).join(' • ')}
-              </p>
-              {collegeInfo?.academicYear && <p className="mt-1 text-sm text-slate-300">AY {collegeInfo.academicYear.replace('-', '–')}</p>}
-              <p className="mt-5 max-w-2xl text-sm leading-relaxed text-slate-400">
-                See where you are in your course roadmap and how your alignment develops through each term check-in.
-              </p>
-            </div>
-            <div className="grid gap-4 sm:grid-cols-2 sm:gap-6 lg:border-l lg:border-slate-700 lg:pl-8">
-              <div>
-                <p className="text-xs font-bold uppercase tracking-wide text-orange-300">Academic / Program</p>
-                <p className="mt-2 text-xs text-slate-400">{timingHeading}</p>
-                <p className="mt-1 text-lg font-bold text-white">{timingValue}</p>
-                {collegeInfo?.timingAvailable && (
-                  <p className="mt-1 text-sm text-slate-300">
-                    {collegeInfo.timingEstimated ? 'Estimated Current Phase' : 'Current Phase'}: {formatTermPhase(collegeInfo.expectedPhase)}
-                  </p>
-                )}
-                {collegeInfo?.semesterStartDate && collegeInfo?.semesterEndDate && (
-                  <div className="mt-2 space-y-1 text-xs text-slate-300">
-                    <p><span className="text-slate-500">Starts:</span> {formatCheckinDate(collegeInfo.semesterStartDate)}</p>
-                    <p><span className="text-slate-500">Ends:</span> {formatCheckinDate(collegeInfo.semesterEndDate)}</p>
-                    {collegeInfo.timingEstimated && <p className="text-slate-500">Dates are approximate.</p>}
-                  </div>
-                )}
-              </div>
-              <div>
-                <p className="text-xs font-bold uppercase tracking-wide text-orange-300">Career Alignment</p>
-                <p className="mt-2 text-lg font-bold text-white">
-                  {lifecycleStatus === 'paused' ? 'Paused' : lifecycleStatus === 'ended' ? 'Ended / Archived' : latestResult ? statusLabel(latestResult.status) : 'No check-in yet'}
-                </p>
-                <p className="mt-1 text-sm text-slate-300">{latestAlignment === null ? 'Complete your first check-in' : `${latestAlignment}% aligned`}</p>
-              </div>
-            </div>
+        <header className="college-panel relative overflow-hidden">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(251,146,60,.08),transparent_65%)]" aria-hidden="true" />
+          <div className="relative flex flex-col justify-between gap-5 sm:flex-row sm:items-start">
+            <div className="min-w-0"><p className="college-eyebrow">College dashboard</p><CourseName as="h1" name={collegeInfo?.courseName} className="max-w-3xl text-2xl font-bold leading-tight tracking-tight text-gray-950 sm:text-3xl" secondaryClassName="mt-2 text-base font-medium text-gray-500" /><div className="mt-4 flex flex-wrap items-center gap-2 text-sm text-gray-600">{[collegeInfo?.yearLevel, collegeInfo?.semester, collegeInfo?.academicYear ? `AY ${collegeInfo.academicYear}` : null].filter(Boolean).map(label => <span key={label} className="rounded-lg border border-gray-200/80 bg-white/80 px-3 py-1.5">{label}</span>)}</div></div>
+            <span className={`inline-flex w-fit shrink-0 items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold ${lifecycleStatus === 'active' ? 'border-emerald-100 bg-emerald-50 text-emerald-700' : 'border-gray-200 bg-gray-50 text-gray-600'}`}><span className={`h-1.5 w-1.5 rounded-full ${lifecycleStatus === 'active' ? 'bg-emerald-500' : 'bg-gray-400'}`} />Tracking status: {lifecycleStatus === 'active' ? 'Active' : lifecycleStatus === 'paused' ? 'Paused' : 'Ended / Archived'}</span>
           </div>
-          {collegeInfo?.timingMode === 'manual' && (
-            <div className="mt-5 flex flex-col gap-3 rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-              <p className="text-sm text-slate-300">Semester timing not set. You can still complete your check-ins in order.</p>
-              <button type="button" onClick={() => navigate('/college/setup')} className="text-sm font-semibold text-orange-400 hover:text-orange-300">Add semester schedule</button>
-            </div>
-          )}
-        </section>
+          <div className="relative mt-6 border-t border-gray-100 pt-4"><p className="text-sm leading-6 text-gray-500">Career Alignment Tracking</p><p className="text-sm leading-6 text-gray-600">Follow your course experience, complete your next check-in, and see your progress over time.</p></div>
+        </header>
 
-        {lifecycleStatus !== 'active' ? (
-          <section className="rounded-[20px] border border-orange-200 bg-orange-50 p-6 sm:p-8">
+        <div className="inline-flex max-w-full flex-wrap gap-1 rounded-2xl border border-gray-200/70 bg-gray-100/80 p-1.5" role="tablist" aria-label="College dashboard sections">
+          {dashboardViews.map((view, index) => { const ViewIcon = view.icon; return <button key={view.id} ref={element => { viewButtonsRef.current[index] = element }} id={`college-view-${view.id}`} type="button" role="tab" aria-selected={visibleView === view.id} aria-controls={`college-panel-${view.id}`} tabIndex={visibleView === view.id ? 0 : -1} onClick={() => setActiveView(view.id)} onKeyDown={event => handleViewKey(event, index)} className="college-view-button"><ViewIcon size={17} stroke={1.7} aria-hidden="true" />{view.label}</button> })}
+        </div>
+
+        <div id="college-panel-overview" role="tabpanel" tabIndex={0} aria-labelledby="college-view-overview" hidden={visibleView !== 'overview'} className="space-y-6">
+          {lifecycleStatus !== 'active' ? (
+<section className="rounded-[20px] border border-orange-200 bg-orange-50 p-6 sm:p-8">
             <p className="text-xs font-bold uppercase tracking-[0.16em] text-orange-700">{lifecycleStatus === 'paused' ? 'Paused Tracking' : 'Previous Tracking / History'}</p>
             <h2 className="mt-1 text-xl font-bold text-gray-900">{lifecycleStatus === 'paused' ? 'College tracking is paused' : 'Ended / Archived'}</h2>
             <p className="mt-2 text-sm text-gray-600">Your completed terms and Career Alignment history remain available. No check-ins are currently due.</p>
@@ -552,253 +523,25 @@ function CollegeDashboard() {
               {lifecycleStatus === 'paused' ? lifecyclePending ? 'Resuming...' : 'Resume Tracking' : 'Start a New Tracking Cycle'}
             </button>
           </section>
-        ) : (
-          <section className="flex flex-wrap gap-2 rounded-[20px] border border-gray-100 bg-white p-4 shadow-sm">
-            <button type="button" disabled={startingAssessment} onClick={handleTakeAssessment} className="inline-flex items-center gap-2 rounded-xl border border-orange-200 bg-orange-50 px-4 py-2.5 text-sm font-semibold text-orange-700 disabled:cursor-not-allowed disabled:opacity-50">
-              <IconRefresh size={16} stroke={2} /> {startingAssessment ? 'Starting Assessment...' : 'Take Assessment Again'}
-            </button>
-            <button type="button" disabled={lifecyclePending} onClick={() => setPendingLifecycleAction('pause')} className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-700 disabled:opacity-50">Pause Tracking</button>
-            <button type="button" disabled={lifecyclePending} onClick={() => setPendingLifecycleAction('change')} className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-700 disabled:opacity-50">Change Program</button>
-            {!programTrackingComplete && <button type="button" disabled={lifecyclePending} onClick={() => setPendingLifecycleAction('end')} className="rounded-xl border border-red-200 px-4 py-2.5 text-sm font-semibold text-red-700 disabled:opacity-50">End Tracking</button>}
-          </section>
-        )}
-
-        {lifecycleStatus === 'active' && <>
-        <section className="bg-white rounded-[20px] shadow-sm p-5 sm:p-8">
-          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-6">
-            <div>
-              <div className="flex items-center gap-2 text-orange-600 mb-1">
-                <IconRoute size={19} stroke={1.8} />
-                <p className="text-base font-semibold">Course Roadmap</p>
-              </div>
-              <h2 className="text-2xl font-bold text-gray-900">You are here in your program</h2>
-            </div>
-            {courseRoadmap?.program_duration_years && (
-              <span className="self-start rounded-full bg-orange-50 text-orange-700 border border-orange-100 px-3 py-1.5 text-xs font-semibold">
-                {courseRoadmap.program_duration_years}-year program
-              </span>
-            )}
-          </div>
-
-          <CheckinProgress
-            completedPhases={checkinStatus?.completedPhases || []}
-            phaseStates={checkinStatus?.phaseStates || []}
-            nextPhase={checkinStatus?.nextExpectedPhase || null}
-          />
-
-          {roadmapYears.length > 0 ? (
-            <div className="relative">
-              <div className="hidden sm:block absolute left-8 right-8 top-7 h-0.5 bg-gray-200" />
-              <div
-                className="relative grid gap-5 sm:grid-cols-2 lg:grid-cols-[repeat(var(--roadmap-years),minmax(0,1fr))]"
-                style={{ '--roadmap-years': roadmapYears.length }}
-              >
-                {roadmapYears.map((yearLevel) => {
-                  const year = Number(yearLevel.year)
-                  const isCompleted = currentYearNumber !== null && year < currentYearNumber
-                  const isCurrent = year === currentYearNumber
-                  return (
-                    <article
-                      key={year}
-                      className={`rounded-xl p-4 relative ${
-                        isCurrent
-                          ? 'bg-orange-50 ring-2 ring-orange-400'
-                          : isCompleted
-                            ? 'bg-emerald-50'
-                            : 'bg-gray-50'
-                      }`}
-                    >
-                      <div className={`w-14 h-14 rounded-full flex items-center justify-center font-bold text-sm border-4 border-white shadow-sm ${
-                        isCurrent ? 'bg-orange-500 text-white' : isCompleted ? 'bg-emerald-500 text-white' : 'bg-gray-100 text-gray-500'
-                      }`}>
-                        {isCompleted ? '✓' : year}
-                      </div>
-                      <div className="mt-4">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <h3 className="font-bold text-gray-900">{yearLevel.label || `Year ${year}`}</h3>
-                        </div>
-                        <p className={`text-sm font-medium mt-1 ${isCurrent ? 'text-orange-700' : isCompleted ? 'text-emerald-700' : 'text-gray-500'}`}>
-                          {isCurrent ? `Current · ${collegeInfo?.semester}` : isCompleted ? '✓ Completed' : 'Upcoming'}
-                        </p>
-                        {isCurrent && (
-                          <div className="mt-4 rounded-lg bg-white px-3 py-3">
-                            <p className="text-sm font-semibold text-gray-800">{collegeInfo?.semester}</p>
-                            {checkinStatus?.progressionEligible && (
-                              <div className="mt-3 pt-3 border-t border-gray-100">
-                                <p className="text-sm font-semibold text-emerald-700">
-                                  {checkinStatus.semesterTrackingCompleted ? 'Term tracking completed' : 'All alignment check-ins completed'}
-                                </p>
-                                {collegeInfo?.semester === '2nd Semester' && (
-                                  <p className="text-sm font-semibold text-gray-900 mt-1">{collegeInfo.yearLevel} completed</p>
-                                )}
-                                {nextAcademicStage?.programCompleted ? (
-                                  <div className="mt-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2">
-                                    <p className="text-sm font-bold text-emerald-800">Program Tracking Complete</p>
-                                    <p className="mt-1 text-xs text-emerald-700">You completed the final regular term in this program.</p>
-                                  </div>
-                                ) : nextAcademicStage || institutionDependentTerm ? (
-                                  <>
-                                    <p className="text-sm text-gray-500 mt-2">Next:</p>
-                                    <p className="text-sm font-semibold text-gray-900">
-                                      {nextAcademicStage
-                                        ? `${nextAcademicStage.yearLevel} · ${nextAcademicStage.semester}`
-                                        : 'Confirmation required for this institution-dependent term'}
-                                    </p>
-                                  </>
-                                ) : null}
-                              </div>
-                            )}
-                          </div>
-                        )}
-                        <p className="text-sm leading-relaxed text-gray-600 mt-4">{summarizeRoadmapOverview(yearLevel.overview)}</p>
-                      </div>
-                    </article>
-                  )
-                })}
-              </div>
-              {currentRoadmapYear && (
-                <div className="mt-6 rounded-xl bg-orange-50 p-5 sm:p-6 flex gap-4">
-                  <IconBook2 size={22} className="text-orange-600 shrink-0" stroke={1.8} />
-                  <div>
-                    <p className="font-semibold text-gray-900">What to develop now</p>
-                    <p className="text-sm leading-relaxed text-gray-600 mt-2">{currentRoadmapYear.overview}</p>
-                  </div>
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="rounded-2xl bg-gray-50 px-5 py-8 text-center text-sm text-gray-500">
-              The roadmap for this course is currently unavailable.
-            </div>
-          )}
-        </section>
-
-        <section className="bg-white rounded-[20px] shadow-sm p-5 sm:p-8">
-          <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 mb-6">
-            <div>
-              <div className="flex items-center gap-2 text-orange-600 mb-1">
-                <IconChartLine size={19} stroke={1.8} />
-                <p className="text-base font-semibold">Alignment Journey</p>
-              </div>
-              <h2 className="text-2xl font-bold text-gray-900">{collegeInfo?.semester} check-ins</h2>
-              <p className="text-sm text-gray-500 mt-1">Your stored Early, Mid, and End results show how alignment changes over time.</p>
-            </div>
-              <div className="rounded-xl bg-gray-50 px-4 py-3 min-w-0 sm:min-w-[220px]">
-              <p className="text-sm text-gray-500">Current trend</p>
-              {trend.direction === 'insufficient' ? (
-                <p className="text-sm font-semibold text-gray-600 mt-1">More check-ins needed</p>
-              ) : (
-                <div className="flex items-center gap-2 mt-1">
-                  {trend.direction === 'improving' && <IconTrendingUp size={20} className="text-emerald-600" />}
-                  {trend.direction === 'declining' && <IconTrendingDown size={20} className="text-red-600" />}
-                  {trend.direction === 'stable' && <IconChartLine size={20} className="text-blue-600" />}
-                  <p className="text-sm font-semibold capitalize text-gray-800">
-                    {trend.direction}{trend.delta !== 0 && ` · ${trend.delta > 0 ? '+' : ''}${trend.delta} points`}
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-4">
-            {CHECKIN_PHASES.map((phase) => {
-              const record = currentSemesterRecords.find((item) => item.phase === phase)
-              const phaseState = checkinStatus?.phaseStates?.find((item) => item.phase === phase)?.state || 'upcoming'
-              const isAvailable = phaseState === 'available' || phaseState === 'available_early' || phaseState === 'missed_available'
-              const isInitialAvailable = currentSemesterRecords.length === 0 && phaseState === 'available' && phase === collegeInfo?.initialTrackingPhase
-              const stateLabel = phaseState === 'not_recorded'
-                ? 'Not recorded'
-                : phaseState === 'missed_available'
-                  ? 'Missed / Still available'
-                  : phaseState === 'available_early'
-                    ? 'Current · available early'
-                  : phaseState === 'available'
-                    ? isInitialAvailable ? 'Start here / Available now' : 'Available now'
-                    : 'Upcoming'
-              return (
-                <article key={phase} className={`rounded-xl p-5 ${record ? 'bg-gray-50' : isAvailable ? 'bg-orange-50' : 'bg-gray-50/60'}`}>
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <p className="text-sm text-gray-500 font-medium">{phase} check-in</p>
-                      {record ? (
-                        <p className="text-3xl font-bold text-gray-950 mt-2">{record.alignmentPercent}%</p>
-                      ) : (
-                        <p className="text-lg font-semibold text-gray-500 mt-2">{stateLabel}</p>
-                      )}
-                    </div>
-                    <div className={`w-9 h-9 rounded-full flex items-center justify-center ${record ? 'bg-orange-100 text-orange-600' : 'bg-white text-gray-400 border border-gray-200'}`}>
-                      {record ? <IconCircleCheck size={19} /> : <IconCalendar size={18} />}
-                    </div>
-                  </div>
-                  {record ? (
-                    <>
-                      <span className={`inline-flex border rounded-full px-2.5 py-1 text-[10px] font-bold mt-4 ${statusStyle(record.status)}`}>{statusLabel(record.status)}</span>
-                      <p className="text-xs text-gray-400 mt-3">{formatCheckinDate(record.checkinDate) || 'Completion date unavailable'}</p>
-                    </>
-                  ) : (
-                    <div className="mt-4">
-                      <p className="text-xs text-gray-400">No stored result for this phase.</p>
-                    </div>
-                  )}
-                </article>
-              )
-            })}
-          </div>
-
-          {currentSemesterRecords.length > 0 ? (
-            <div className="mt-6 rounded-xl bg-slate-50 p-3 sm:p-5">
-              <AlignmentTrendChart records={currentSemesterRecords} />
-              {currentSemesterRecords.length === 1 && (
-                <p className="text-xs text-gray-500 text-center pb-2">One result is shown. Complete another phase to see a trend.</p>
-              )}
-            </div>
-          ) : (
-            <div className="mt-6 rounded-2xl bg-orange-50 border border-orange-100 p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <div>
-                <p className="font-semibold text-gray-900">Start your alignment journey</p>
-                <p className="text-sm text-gray-600 mt-1">Your first completed check-in will establish the starting point for this term.</p>
-              </div>
-            </div>
-          )}
-        </section>
-
-        <div className="grid lg:grid-cols-[1.2fr_0.8fr] gap-6">
-          <section id="latest-alignment-insight" className="bg-white rounded-[20px] shadow-sm p-5 sm:p-7">
-            <div className="flex items-center gap-2 text-orange-600 mb-2">
-              <IconSparkles size={18} stroke={1.8} />
-              <h2 className="text-lg font-bold text-gray-900">Latest Alignment Insight</h2>
-            </div>
-            {latestResult ? (
-              <div className="mt-4">
-                <div className="flex flex-wrap items-center gap-3">
-                  <span className={`inline-flex border rounded-full px-3 py-1.5 text-xs font-bold ${statusStyle(latestResult.status)}`}>{statusLabel(latestResult.status)}</span>
-                  <span className="text-sm font-semibold text-gray-700">{latestAlignment}% aligned</span>
-                </div>
-                <p className="text-sm text-gray-600 leading-relaxed mt-4">{latestResult.feedback}</p>
-                <p className="text-sm text-gray-700 leading-relaxed mt-3 font-medium">{latestResult.recommendation}</p>
-                <p className="text-[11px] text-gray-400 mt-4">This insight explains your deterministic result; it does not determine your status.</p>
-              </div>
-            ) : (
-              <p className="text-sm text-gray-500 mt-4">Complete your first check-in to receive an alignment status and supporting insight.</p>
-            )}
-          </section>
-
-          <section className={`rounded-[24px] p-6 border transition ${checkinCardIsActionable ? 'border-orange-200 bg-orange-50' : 'border-gray-100 bg-white'}`}>
-            <IconClipboardCheck size={24} stroke={1.7} className={checkinCardIsActionable ? 'text-orange-500' : 'text-gray-400'} />
-            <p className="font-bold text-gray-900 mt-4">
+          ) : (<>
+            <div className="grid gap-5 lg:grid-cols-[1.5fr_1fr]">
+<section className={`college-panel h-full ${checkinCardIsActionable ? 'college-next-action' : ''}`}>
+            <p className="college-eyebrow">Your next step</p><IconClipboardCheck size={28} stroke={1.7} className={checkinCardIsActionable ? 'text-orange-500' : 'text-gray-400'} />
+            <h2 className="mt-4 text-2xl font-bold tracking-tight text-gray-950">
               {checkinStatus?.state === 'pending' && `Your ${nextCheckinPhase} check-in is ready`}
-              {checkinStatus?.state === 'due' && `Your ${nextCheckinPhase} check-in is ready`}
+              {checkinStatus?.state === 'due' && (checkinStatus?.earlyCheckin ? `Your ${nextCheckinPhase} check-in is ahead of schedule` : `Your ${nextCheckinPhase} check-in is ready`)}
               {checkinStatus?.state === 'not_due' && `Next up: ${nextCheckinPhase} check-in`}
               {checkinStatus?.state === 'complete' && 'All check-ins completed this term'}
-            </p>
-            <p className="text-sm text-gray-500 leading-relaxed mt-2">
+              {!checkinStatus && 'Your term check-ins'}
+            </h2>
+            <p className="mt-3 text-base leading-7 text-gray-600">
               {checkinCardIsActionable ? 'Take about a minute to record how your course experience feels right now.' : 'Your completed results remain available in your alignment history.'}
             </p>
             {checkinStatus?.earlyCheckin && checkinCardIsActionable && (
               <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs leading-relaxed text-amber-800">You can check in now, but LearnMatch recommends completing this check-in during the {nextCheckinPhase}-term period.</p>
             )}
             {checkinCardIsActionable && (
-              <button onClick={() => handleStartCheckin(nextCheckinPhase)} disabled={startingCheckin} className="mt-5 inline-flex items-center gap-2 bg-gray-950 text-white px-5 py-3 rounded-xl text-sm font-semibold disabled:opacity-50">
+              <button onClick={() => handleStartCheckin(nextCheckinPhase)} disabled={startingCheckin} className="mt-6 inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-orange-500 px-6 py-3 text-sm font-semibold text-white shadow-sm shadow-orange-200 hover:bg-orange-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500 disabled:opacity-50">
                 {startingCheckin ? 'Starting...' : checkinStatus?.state === 'pending' ? 'Continue Check-in' : 'Start Check-in'} <IconArrowRight size={16} />
               </button>
             )}
@@ -820,8 +563,8 @@ function CollegeDashboard() {
               </div>
             )}
           </section>
-        </div>
-
+              <CheckinProgress completedPhases={checkinStatus?.completedPhases || []} phaseStates={checkinStatus?.phaseStates || []} nextPhase={checkinStatus?.nextExpectedPhase || null} />
+            </div>
         {showNextSemesterForm && (
           <section id="next-term-setup" className="rounded-[20px] border border-orange-100 bg-white p-5 shadow-sm sm:p-8">
             <div className="max-w-3xl">
@@ -884,12 +627,88 @@ function CollegeDashboard() {
           </section>
         )}
 
-        </>}
+            <div className="grid gap-4">
+              <section className="college-panel !p-5"><p className="mb-3 flex items-center gap-2 text-xs font-semibold text-gray-500"><IconChartLine size={17} className="text-orange-500" />Latest alignment</p><p className="text-2xl font-bold text-gray-950">{latestAlignment === null ? 'No result yet' : `${latestAlignment}%`}</p><p className="mt-2 text-sm text-gray-500">{latestResult ? statusLabel(latestResult.status) : 'Complete a check-in to see your result.'}</p></section>
 
-        <section className="bg-white rounded-[20px] shadow-sm p-5 sm:p-7">
+            </div>
+
+            <section id="latest-alignment-insight" className="college-panel scroll-mt-6">
+              <p className="college-eyebrow">Understand your result</p><h2 className="college-heading">Latest alignment insight</h2>
+              {latestResult ? <><div className="mt-4 flex flex-wrap items-center gap-3"><span className={`inline-flex rounded-full border px-3 py-1.5 text-xs font-bold ${statusStyle(latestResult.status)}`}>{statusLabel(latestResult.status)}</span><span className="text-sm font-semibold text-gray-700">{latestAlignment}% aligned</span></div><div className="mt-5 grid gap-5 md:grid-cols-2"><div className="rounded-2xl bg-gray-50 p-5"><p className="mb-2 text-xs font-bold uppercase tracking-wide text-gray-500">What this means</p><p className="text-base leading-7 text-gray-600">{latestResult.feedback}</p></div><div className="rounded-2xl border border-orange-100 bg-orange-50/50 p-5"><p className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-orange-700"><IconSparkles size={16} />Suggested next step</p><p className="text-base leading-7 text-gray-700">{latestResult.recommendation}</p></div></div></> : <p className="mt-4 text-base leading-7 text-gray-500">Your first check-in will show how your current course experience aligns with you.</p>}
+            </section>
+
+            <section className="college-panel">
+              <div className="mb-5 flex flex-wrap items-start justify-between gap-4"><div><p className="college-eyebrow">Your progress over time</p><h2 className="college-heading">Alignment trend</h2><p className="mt-2 text-sm leading-6 text-gray-500">Compare your check-ins within this term.</p></div><span className="rounded-xl border border-gray-100 bg-gray-50 px-3 py-2 text-sm font-medium text-gray-600">{trend.direction === 'insufficient' ? 'More check-ins needed' : <>{trend.direction === 'improving' ? <IconTrendingUp size={17} className="mr-2 inline text-emerald-600" /> : trend.direction === 'declining' ? <IconTrendingDown size={17} className="mr-2 inline text-red-500" /> : <IconChartLine size={17} className="mr-2 inline" />}<span className="capitalize">{trend.direction}</span>{trend.delta !== 0 && ` (${trend.delta > 0 ? '+' : ''}${trend.delta} points)`}</>}</span></div>
+              {currentSemesterRecords.length > 0 ? <><AlignmentTrendChart records={currentSemesterRecords} />{currentSemesterRecords.length === 1 && <p className="mt-2 text-sm text-gray-500">Complete another phase to see how your alignment changes.</p>}</> : <p className="rounded-2xl bg-gray-50 p-5 text-sm leading-6 text-gray-500">Your trend will appear after your first completed check-in.</p>}
+              <details className="college-management mt-5 overflow-hidden rounded-2xl border border-gray-200"><summary className="flex cursor-pointer items-center justify-between gap-3 p-4 text-sm font-semibold text-gray-700 focus-visible:outline-2 focus-visible:outline-orange-500">View Early, Mid and End results<IconChevronDown size={17} /></summary><div className="border-t border-gray-100 p-4">
+          <div className="grid md:grid-cols-3 gap-4">
+            {CHECKIN_PHASES.map((phase) => {
+              const record = currentSemesterRecords.find((item) => item.phase === phase)
+              const phaseState = checkinStatus?.phaseStates?.find((item) => item.phase === phase)?.state || 'upcoming'
+              const isAvailable = phaseState === 'available' || phaseState === 'available_early' || phaseState === 'missed_available'
+              const isInitialAvailable = currentSemesterRecords.length === 0 && phaseState === 'available' && phase === collegeInfo?.initialTrackingPhase
+              const stateLabel = phaseState === 'not_recorded'
+                ? 'Not recorded'
+                : phaseState === 'missed_available'
+                  ? 'Missed / Still available'
+                  : phaseState === 'available_early'
+                    ? 'Current · available early'
+                  : phaseState === 'available'
+                    ? isInitialAvailable ? 'Start here / Available now' : 'Available now'
+                    : 'Upcoming'
+              return (
+                <article key={phase} className={`rounded-xl p-5 ${record ? 'bg-gray-50' : isAvailable ? 'bg-orange-50' : 'bg-gray-50/60'}`}>
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-sm text-gray-500 font-medium">{phase} check-in</p>
+                      {record ? (
+                        <p className="text-3xl font-bold text-gray-950 mt-2">{record.alignmentPercent}%</p>
+                      ) : (
+                        <p className="text-lg font-semibold text-gray-500 mt-2">{stateLabel}</p>
+                      )}
+                    </div>
+                    <div className={`w-9 h-9 rounded-full flex items-center justify-center ${record ? 'bg-orange-100 text-orange-600' : 'bg-white text-gray-400 border border-gray-200'}`}>
+                      {record ? <IconCircleCheck size={19} /> : <IconCalendar size={18} />}
+                    </div>
+                  </div>
+                  {record ? (
+                    <>
+                      <span className={`inline-flex border rounded-full px-2.5 py-1 text-[10px] font-bold mt-4 ${statusStyle(record.status)}`}>{statusLabel(record.status)}</span>
+                      <p className="text-xs text-gray-400 mt-3">{formatCheckinDate(record.checkinDate) || 'Completion date unavailable'}</p>
+                    </>
+                  ) : (
+                    <div className="mt-4">
+                      <p className="text-xs text-gray-400">No stored result for this phase.</p>
+                    </div>
+                  )}
+                </article>
+              )
+            })}
+          </div>
+
+
+              </div></details>
+            </section>
+        {latestResult?.status === 'Needs Attention' && (
+          <div className="rounded-2xl border border-red-100 bg-red-50 px-5 py-4 flex gap-3">
+            <IconAlertTriangle size={20} className="text-red-500 shrink-0" />
+            <p className="text-sm text-red-700">Your latest result suggests that additional support may help. Consider discussing the insight above with an adviser or someone you trust.</p>
+          </div>
+        )}
+
+          </>)}
+        </div>
+
+        {lifecycleStatus === 'active' && <div id="college-panel-roadmap" role="tabpanel" tabIndex={0} aria-labelledby="college-view-roadmap" hidden={visibleView !== 'roadmap'}>
+          <CollegeProgramRoadmap key={collegeInfo?.courseCode} years={roadmapYears} currentYear={currentYearNumber} currentTerm={collegeInfo?.semester} duration={courseRoadmap?.program_duration_years} />
+          {programTrackingComplete && <div className="mt-5 rounded-2xl border border-emerald-100 bg-emerald-50 p-5"><p className="font-bold text-emerald-800">Program Tracking Complete</p><p className="mt-2 text-sm text-emerald-700">You completed the final regular term in this program.</p></div>}
+        </div>}
+
+        <div id="college-panel-history" role="tabpanel" tabIndex={0} aria-labelledby="college-view-history" hidden={visibleView !== 'history'}>
+        <section className="college-panel">
           <div className="flex items-center gap-2 text-gray-500 mb-2">
             <IconCalendar size={18} stroke={1.8} />
-            <h2 className="text-lg font-bold text-gray-900">{showFullHistory ? 'Full Check-in History' : 'Check-in History'}</h2>
+            <h2 className="college-heading">{showFullHistory ? 'Full Check-in History' : 'Check-in History'}</h2>
           </div>
           <p className="text-sm text-gray-500 mb-5">Every completed check-in appears here, newest first, including your current term.</p>
           {displayedHistory.length === 0 ? (
@@ -930,13 +749,33 @@ function CollegeDashboard() {
           )}
         </section>
 
-        {latestResult?.status === 'Needs Attention' && (
-          <div className="rounded-2xl border border-red-100 bg-red-50 px-5 py-4 flex gap-3">
-            <IconAlertTriangle size={20} className="text-red-500 shrink-0" />
-            <p className="text-sm text-red-700">Your latest result suggests that additional support may help. Consider discussing the insight above with an adviser or someone you trust.</p>
-          </div>
-        )}
-      </main>
+
+        </div>
+
+        <details className="college-management group overflow-hidden rounded-2xl border border-gray-200 bg-white">
+          <summary className="flex cursor-pointer items-center justify-between gap-4 p-5 outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-orange-500 sm:px-7"><span className="flex items-center gap-3"><span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gray-100 text-gray-500"><IconSettings size={20} stroke={1.6} /></span><span><span className="block text-sm font-semibold text-gray-900">Manage tracking</span><span className="mt-1 block text-xs text-gray-500">Assessment and program settings</span></span></span><IconChevronDown size={18} className="shrink-0 text-gray-400 transition-transform group-open:rotate-180" /></summary>
+          {lifecycleStatus === 'active' ? (
+<section className="flex flex-wrap gap-3 border-t border-gray-100 px-5 py-5 sm:px-7">
+            <button type="button" disabled={startingAssessment} onClick={handleTakeAssessment} className="inline-flex items-center gap-2 rounded-xl border border-orange-200 bg-orange-50 px-4 py-2.5 text-sm font-semibold text-orange-700 disabled:cursor-not-allowed disabled:opacity-50">
+              <IconRefresh size={16} stroke={2} /> {startingAssessment ? 'Starting Assessment...' : 'Take Assessment Again'}
+            </button>
+            <button type="button" disabled={lifecyclePending} onClick={() => setPendingLifecycleAction('pause')} className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-700 disabled:opacity-50">Pause Tracking</button>
+            <button type="button" disabled={lifecyclePending} onClick={() => setPendingLifecycleAction('change')} className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-700 disabled:opacity-50">Change Program</button>
+            {!programTrackingComplete && <button type="button" disabled={lifecyclePending} onClick={() => setPendingLifecycleAction('end')} className="rounded-xl border border-red-200 px-4 py-2.5 text-sm font-semibold text-red-700 disabled:opacity-50">End Tracking</button>}
+          </section>
+          ) : <p className="border-t border-gray-100 p-5 text-sm text-gray-500">Use the Overview tab to resume or restart your tracking.</p>}
+          {collegeInfo?.semesterStartDate && collegeInfo?.semesterEndDate && <div className="border-t border-gray-100 px-5 py-4 text-sm leading-7 text-gray-600 sm:px-7"><p className="font-semibold text-gray-900">Term schedule</p><p>{formatCheckinDate(collegeInfo.semesterStartDate)} to {formatCheckinDate(collegeInfo.semesterEndDate)}</p>{collegeInfo.timingEstimated && <p className="text-xs text-gray-500">Dates are approximate.</p>}</div>}
+          {collegeInfo?.timingMode === 'manual' && lifecycleStatus === 'active' && <div className="border-t border-gray-100 px-5 py-4 sm:px-7"><p className="mb-3 text-sm text-gray-500">No term schedule set. You can still complete your check-ins in order.</p><button type="button" onClick={() => navigate('/college/setup')} className="lm-action">Add semester schedule</button></div>}
+        </details>
+      </main></SkeletonContent>
+      <ActionConfirmationModal
+        action={pendingEarlyPhase ? 'earlyCheckin' : null}
+        description={`Your next check-in is ${pendingEarlyPhase}. ${checkinStatus?.expectedPhase || checkinStatus?.currentPhase ? `Your term is currently in the ${checkinStatus.expectedPhase || checkinStatus.currentPhase} phase. ` : ''}We recommend waiting until the ${pendingEarlyPhase} phase so your answers reflect that part of the term. Would you still like to continue early?`}
+        onCancel={() => setPendingEarlyPhase(null)}
+        onConfirm={() => handleStartCheckin(pendingEarlyPhase, true)}
+        processing={startingCheckin}
+        error={pendingEarlyPhase ? error : ''}
+      />
       <ActionConfirmationModal
         action={pendingLifecycleAction}
         onCancel={() => setPendingLifecycleAction(null)}

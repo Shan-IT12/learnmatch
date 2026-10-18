@@ -156,17 +156,18 @@ export function calculateClusterScore(
 ) {
   requireCluster(parentCluster)
   requireNormalizedScore(skillScore, 'skillScore')
-  requireNormalizedScore(interestScore, 'interestScore')
+  if (interestScore !== null) requireNormalizedScore(interestScore, 'interestScore')
   requireNormalizedScore(personalityScore, 'personalityScore')
   requireNormalizedScore(personalFactorScore, 'personalFactorScore')
 
   const weights = CLUSTER_WSM_WEIGHTS[parentCluster]
 
   return clampNormalizedScore(
-    skillScore * weights.skillsWeight
-    + interestScore * weights.interestsWeight
+    (skillScore * weights.skillsWeight
+    + (interestScore ?? 0) * weights.interestsWeight
     + personalityScore * weights.personalityWeight
-    + personalFactorScore * weights.personalFactorsWeight
+    + personalFactorScore * weights.personalFactorsWeight)
+    / (interestScore === null ? 1 - weights.interestsWeight : 1)
   )
 }
 

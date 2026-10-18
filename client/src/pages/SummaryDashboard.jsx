@@ -1,9 +1,14 @@
-import { useEffect, useState } from 'react'
+import LogoutButton from '../components/LogoutButton'
+import { IconLogout, IconMessageCircle, IconUserCircle } from '@tabler/icons-react'
+import HeaderBrand, { HeaderAccount } from '../components/HeaderBrand'
+import SkeletonContent from '../components/SkeletonContent'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { IconArrowRight, IconRefresh, IconSchool, IconHistory, IconUser, IconHeart, IconBrain, IconShieldCheck, IconStar } from '@tabler/icons-react'
 import { beginAssessmentAttempt } from '../utils/assessmentSession'
 import { getDimensionResults, MBTI_TYPE_CONTENT } from '../data/mbtiResultContent'
 import CourseName from '../components/CourseName'
+import ActionConfirmationModal from '../components/ActionConfirmationModal'
 
 const personalFactorLabels = {
   factor_physical_impact: 'Physical / accessibility',
@@ -31,14 +36,18 @@ function SummaryDashboard() {
   const username = localStorage.getItem('username')
 
   const [loading, setLoading] = useState(true)
-  const [topRecommendation, setTopRecommendation] = useState(null)
-  const [topCourseDetail, setTopCourseDetail] = useState(null)
+  const [showRetakeConfirmation, setShowRetakeConfirmation] = useState(false)
+  const [startingRetake, setStartingRetake] = useState(false)
+  const [retakeError, setRetakeError] = useState('')
+  const retakePendingRef = useRef(false)
+  const [savedTopRecommendation, setTopRecommendation] = useState(null)
+  const [savedTopCourseDetail, setTopCourseDetail] = useState(null)
   const [interests, setInterests] = useState([])
   const [noInterests, setNoInterests] = useState(false)
   const [rankingPendingMessage, setRankingPendingMessage] = useState('')
-  const [domainScores, setDomainScores] = useState({})
-  const [profile, setProfile] = useState(null)
-  const [mbti, setMbti] = useState(null)
+  const [savedDomainScores, setDomainScores] = useState({})
+  const [savedProfile, setProfile] = useState(null)
+  const [savedMbti, setMbti] = useState(null)
 
   useEffect(() => {
     if (!token) {
@@ -97,25 +106,35 @@ function SummaryDashboard() {
   }
 
   const handleRetake = async () => {
-    const response = await fetch(`${apiUrl}/api/assessment-attempts`, {
-      method: 'POST', headers: { Authorization: `Bearer ${token}` },
-    })
-    const data = await response.json()
-    if (!response.ok) return
-    beginAssessmentAttempt(sessionStorage, data.attemptId)
-    navigate('/onboarding/profile')
+    if (!showRetakeConfirmation || retakePendingRef.current) return
+    retakePendingRef.current = true
+    setStartingRetake(true)
+    setRetakeError('')
+    try {
+      const response = await fetch(`${apiUrl}/api/assessment-attempts`, {
+        method: 'POST', headers: { Authorization: `Bearer ${token}` },
+      })
+      const data = await response.json().catch(() => ({}))
+      if (!response.ok || !Number.isSafeInteger(data.attemptId) || data.attemptId <= 0) {
+        throw new Error(data.message || 'Could not start a new assessment. Please try again.')
+      }
+      beginAssessmentAttempt(sessionStorage, data.attemptId)
+      setShowRetakeConfirmation(false)
+      navigate('/onboarding/profile')
+    } catch (error) {
+      setRetakeError(error.message || 'Could not start a new assessment. Please try again.')
+    } finally {
+      retakePendingRef.current = false
+      setStartingRetake(false)
+    }
   }
  
-  if (loading) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-white">
-        <span className="text-2xl font-bold animate-pulse">
-          Learn<span className="text-orange-500">Match</span>
-        </span>
-        <p className="text-sm text-gray-400">Loading your summary...</p>
-      </div>
-    )
-  }
+  // Render-only placeholders never enter assessment state or persisted data.
+  const topRecommendation = loading ? { course_name: 'Recommended course name', match_score: 80 } : savedTopRecommendation
+  const topCourseDetail = loading ? { description: 'Your recommended course overview and available career opportunities.', obtainable_skills: ['Course skill', 'Course skill', 'Course skill'], career_opportunities: [{ career_title: 'Career opportunity' }, { career_title: 'Career option' }] } : savedTopCourseDetail
+  const profile = loading ? { username: 'Account username', factor_physical_impact: 4, factor_health_impact: 4, factor_financial_impact: 4, factor_family_impact: 4, factor_work_impact: 4 } : savedProfile
+  const mbti = loading ? { mbtiType: 'INTP', scores: {} } : savedMbti
+  const domainScores = loading ? Object.fromEntries(['Practical/Applied', 'Scientific Reasoning', 'Spatial', 'Abstract/Logical', 'Numerical', 'Verbal'].map(domain => [domain, { correct: 3, total: 5 }])) : savedDomainScores
  
   const checkedFactors = profile
     ? Object.entries(personalFactorLabels)
@@ -143,39 +162,34 @@ function SummaryDashboard() {
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-[#fbf8f3] text-gray-900">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-[620px] bg-[radial-gradient(circle_at_12%_15%,rgba(251,146,60,.1),transparent_27%),radial-gradient(circle_at_85%_20%,rgba(253,186,116,.08),transparent_25%),linear-gradient(115deg,rgba(255,255,255,.72),rgba(255,247,237,.2))]" />
-      <nav className="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-gray-100 px-5 sm:px-8 lg:px-14 py-4 flex flex-wrap justify-between items-center gap-3">
+      <nav className="lm-site-header sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-gray-100 px-5 sm:px-8 lg:px-14 py-4 flex flex-wrap justify-between items-center gap-3">
         <button
           onClick={() => navigate('/dashboard')}
           className="text-lg font-bold text-gray-900 hover:opacity-80 transition"
         >
-          Learn<span className="text-orange-500">Match</span>
+          <HeaderBrand />
         </button>
-        <div className="flex flex-wrap items-center justify-end gap-2 sm:gap-4">
-          <span className="hidden md:inline text-sm text-gray-500">
-            Welcome, <strong className="text-gray-900">{username}</strong>
-          </span>
+        <div className="lm-header-actions flex flex-wrap items-center justify-end gap-2 sm:gap-4">
+          <HeaderAccount username={username} />
           <button
-            onClick={() => navigate('/profile', { state: { assessmentComplete: true } })}
-            className="bg-orange-500 text-white px-4 py-2.5 rounded-xl text-xs font-medium hover:bg-orange-600 transition"
-          >
-             View Profile
+            onClick={() => navigate('/profile?returnTo=summary', { state: { assessmentComplete: true } })}
+            className="lm-header-primary"
+          ><IconUserCircle size={16} stroke={1.7} aria-hidden="true" /> View Profile
           </button>
           <button
             onClick={() => navigate('/feedback', { state: { entryContext: 'dashboard' } })}
-            className="text-sm text-gray-500 hover:text-gray-900 transition"
-          >
-            Feedback
+            className="lm-action"
+          ><IconMessageCircle size={16} stroke={1.7} aria-hidden="true" /> Feedback
           </button>
-          <button
-            onClick={handleLogout}
-            className="bg-red-50 text-red-600 px-4 py-2.5 rounded-xl text-xs font-medium hover:bg-red-100 transition"
-          >
-            Logout
-          </button>
+          <LogoutButton
+            onConfirm={handleLogout}
+            className="lm-action lm-action-danger"
+          ><IconLogout size={16} stroke={1.7} aria-hidden="true" /> Logout
+          </LogoutButton>
         </div>
       </nav>
  
-      <main className="relative z-0 mx-auto max-w-[1240px] px-5 py-8 sm:px-8 sm:py-11 lg:px-12">
+      <SkeletonContent loading={loading} label="Loading your summary..."><main className="relative z-0 mx-auto max-w-[1240px] px-5 py-8 sm:px-8 sm:py-11 lg:px-12">
 
         <div className="mb-7">
           <p className="mb-2 text-xs font-bold uppercase tracking-[0.18em] text-orange-600">Assessment Summary</p>
@@ -212,8 +226,8 @@ function SummaryDashboard() {
         </div>
  
         {/* Assessment overview */}
-        <div className="motion-stagger mb-10 grid items-start gap-5 md:grid-cols-2">
-          <div className="space-y-5">
+        <div className="motion-stagger mb-10 grid items-stretch gap-5 md:grid-cols-2">
+          <div className="flex flex-col gap-5">
           <section className="rounded-2xl border border-white/90 bg-white/78 p-5 shadow-[0_18px_48px_-40px_rgba(120,53,15,.5)] sm:p-6">
             <div className="flex items-center gap-3 mb-4">
               <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-blue-50 text-blue-600"><IconUser size={20} stroke={1.8} /></span>
@@ -249,7 +263,7 @@ function SummaryDashboard() {
             </div>
           </section>
 
-          <section className="rounded-2xl border border-white/90 bg-white/78 p-5 shadow-[0_18px_48px_-40px_rgba(120,53,15,.5)] sm:p-6">
+          <section className="flex-1 rounded-2xl border border-white/90 bg-white/78 p-5 shadow-[0_18px_48px_-40px_rgba(120,53,15,.5)] sm:p-6">
             <div className="flex items-center gap-3 mb-4"><span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-orange-50 text-orange-600"><IconHeart size={20} stroke={1.8} /></span><div><p className="text-[11px] font-semibold uppercase tracking-wide text-gray-400">Your Interests</p><p className="text-sm font-bold text-gray-900">{interests.length} selected hobbies</p></div></div>
             <div className="flex flex-wrap gap-2">
               {interests.length > 0 ? (
@@ -268,9 +282,9 @@ function SummaryDashboard() {
           </section>
           </div>
 
-          <section className="rounded-2xl border border-white/90 bg-white/78 p-5 shadow-[0_18px_48px_-40px_rgba(120,53,15,.5)] sm:p-6">
+          <section className="flex h-full flex-col rounded-2xl border border-white/90 bg-white/78 p-5 shadow-[0_18px_48px_-40px_rgba(120,53,15,.5)] sm:p-6">
             <div className="flex items-center justify-between gap-3 mb-4"><div className="flex items-center gap-3"><span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-violet-50 text-violet-600"><IconBrain size={20} stroke={1.8} /></span><div><p className="text-[11px] font-semibold uppercase tracking-wide text-gray-400">Skills Quiz</p><p className="text-sm font-bold text-gray-900">{skillTotals.total ? `${skillTotals.correct} of ${skillTotals.total} correct` : 'No result yet'}</p></div></div>{skillPercent !== null && <span className="rounded-full bg-violet-50 px-2.5 py-1 text-xs font-bold text-violet-700">{skillPercent}%</span>}</div>
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-1 flex-col justify-between gap-4">
               {Object.keys(domainScores).length > 0 ? (
                 Object.entries(domainScores).map(([domain, score]) => (
                   <div key={domain}>
@@ -302,8 +316,8 @@ function SummaryDashboard() {
         </div>
         <section className="mb-10 rounded-[26px] border border-white/90 bg-white/78 p-5 shadow-[0_20px_55px_-42px_rgba(120,53,15,.5)] sm:p-7">
           {mbti ? (
-            <div className="grid gap-6 md:grid-cols-[14rem_minmax(0,1fr)] md:items-start">
-              <div className="rounded-2xl bg-slate-950 p-5 text-white shadow-[0_16px_34px_-24px_rgba(15,23,42,.75)]"><p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Personality Type</p><p className="mt-2 text-4xl font-black tracking-[0.16em] text-orange-400">{mbti.mbtiType}</p><p className="mt-3 text-sm font-semibold leading-6 text-white">{personalityMeaning}</p></div>
+            <div className="grid items-stretch gap-6 md:grid-cols-[14rem_minmax(0,1fr)]">
+              <div className="flex h-full flex-col items-center justify-center rounded-2xl bg-slate-950 px-5 py-7 text-center text-white shadow-[0_16px_34px_-24px_rgba(15,23,42,.75)] sm:px-6"><p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Personality Type</p><p className="mt-3 text-4xl font-black tracking-[0.16em] text-orange-400">{mbti.mbtiType}</p><p className="mt-5 w-full border-t border-white/10 pt-5 text-sm font-semibold leading-6 text-slate-200">{personalityMeaning}</p></div>
               <div className="space-y-5">
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                 {personalityDimensions.map((dimension) => (
@@ -394,7 +408,7 @@ function SummaryDashboard() {
         </div>
         <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
           <button
-            onClick={handleRetake}
+            onClick={() => { setRetakeError(''); setShowRetakeConfirmation(true) }}
             className="flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-5 py-3 text-sm font-semibold text-gray-700 shadow-sm transition duration-150 hover:border-orange-200 hover:bg-orange-50 hover:text-orange-700"
           >
             <IconRefresh size={16} stroke={2} /> Retake Assessment
@@ -413,7 +427,14 @@ function SummaryDashboard() {
           </button>
         </div>
  
-      </main>
+      </main></SkeletonContent>
+      <ActionConfirmationModal
+        action={showRetakeConfirmation ? 'retake' : null}
+        processing={startingRetake}
+        error={retakeError}
+        onCancel={() => { if (!retakePendingRef.current) { setShowRetakeConfirmation(false); setRetakeError('') } }}
+        onConfirm={handleRetake}
+      />
     </div>
   )
 }

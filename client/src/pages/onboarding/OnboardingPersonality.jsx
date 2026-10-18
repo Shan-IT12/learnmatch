@@ -1,3 +1,4 @@
+import SkeletonContent from '../../components/SkeletonContent'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import OnboardingLayout from '../../components/OnboardingLayout'
@@ -162,14 +163,6 @@ function OnboardingPersonality() {
     return <OnboardingLayout currentStep={4} isComplete={false} showFooterNavigation={false}><div className="flex min-h-80 items-center justify-center"><SuccessConfirmation message="Assessment Completed" /></div></OnboardingLayout>
   }
 
-  if (checkingResult) {
-    return (
-      <OnboardingLayout currentStep={4} isComplete={false} showFooterNavigation={false}>
-        <div className="mx-auto max-w-xl px-6 py-12 text-center text-sm text-gray-500">Loading personality result...</div>
-      </OnboardingLayout>
-    )
-  }
-
   if (resultCheckFailed) {
     return (
       <OnboardingLayout currentStep={4} isComplete={false} showFooterNavigation={false}>
@@ -190,7 +183,7 @@ function OnboardingPersonality() {
   // ---------- Question screen ----------
   return (
     <OnboardingLayout currentStep={4} isComplete={answeredCount === mbtiQuestions.length} showFooterNavigation={false}>
-      <div className="max-w-3xl mx-auto px-5 sm:px-8 py-8 sm:py-12">
+      <SkeletonContent loading={checkingResult} label="Loading personality result..."><div className="max-w-3xl mx-auto px-5 sm:px-8 py-8 sm:py-12">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between mb-6">
           <div>
             <div className="inline-flex items-center gap-2 rounded-full bg-orange-50 px-3 py-1.5 text-xs font-semibold text-orange-700 mb-3">
@@ -277,7 +270,7 @@ function OnboardingPersonality() {
           onNext={handleNext}
           onSubmit={handleSubmit}
         />
-      </div>
+      </div></SkeletonContent>
     </OnboardingLayout>
   )
 }

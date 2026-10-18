@@ -1,6 +1,8 @@
+import HeaderBrand from '../components/HeaderBrand'
+import SkeletonContent from '../components/SkeletonContent'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { IconArrowLeft, IconArrowRight, IconBrain, IconHistory, IconLoader2 } from '@tabler/icons-react'
+import { IconArrowLeft, IconArrowRight, IconBrain, IconHistory } from '@tabler/icons-react'
 import { getAssessmentHistoryResultPath } from '../utils/assessmentHistory'
 import CourseName from '../components/CourseName'
 
@@ -83,15 +85,14 @@ export function HistoryListContent({ history, onView }) {
 
 export function AssessmentHistoryState({ loading, error, history, onRetry, onView }) {
   if (loading) {
-    return (
-      <div className="flex min-h-64 items-center justify-center rounded-3xl border border-orange-100 bg-white" role="status">
-        <div className="text-center">
-          <IconLoader2 className="mx-auto animate-spin text-orange-500" size={28} />
-          <p className="mt-3 text-sm font-medium text-gray-600">Loading your assessment history...</p>
-        </div>
-      </div>
-    )
+    return <SkeletonContent label="Loading your assessment history...">
+      <HistoryListContent history={[1, 2].map(attempt_number => ({
+        recommendation_id: attempt_number, attempt_number, generated_at: '2026-01-01T00:00:00Z', mbti: { type: 'INTP' },
+        recommendations: [1, 2, 3].map(rank_position => ({ rank_position, course_name: 'Recommended course name', match_score: 80 })),
+      }))} />
+    </SkeletonContent>
   }
+
   if (error) {
     return (
       <div className="rounded-3xl border border-red-100 bg-red-50 px-6 py-10 text-center" role="alert">
@@ -143,9 +144,9 @@ function AssessmentHistory() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <nav className="flex items-center justify-between border-b border-gray-100 bg-white px-5 py-4 sm:px-8">
-        <button onClick={() => navigate('/dashboard')} className="text-lg font-bold text-gray-900">Learn<span className="text-orange-500">Match</span></button>
-        <button onClick={() => navigate('/dashboard/summary')} className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900">
+      <nav className="lm-site-header flex items-center justify-between border-b border-gray-100 bg-white px-5 py-4 sm:px-8">
+        <button onClick={() => navigate('/dashboard')} className="text-lg font-bold text-gray-900"><HeaderBrand /></button>
+        <button onClick={() => navigate('/dashboard/summary')} className="lm-action">
           <IconArrowLeft size={16} /> Back to Summary
         </button>
       </nav>

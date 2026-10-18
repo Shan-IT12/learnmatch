@@ -1,3 +1,4 @@
+import SkeletonContent, { SkeletonBlock } from '../../components/SkeletonContent'
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import OnboardingLayout from '../../components/OnboardingLayout'
@@ -424,10 +425,16 @@ function OnboardingSkills() {
 
   if (loading) {
     return (
-      <OnboardingLayout currentStep={3} isComplete={false}>
-        <div className="max-w-xl mx-auto px-6 py-12 text-center text-gray-500 text-sm">
-          Loading quiz questions...
-        </div>
+      <OnboardingLayout currentStep={3} isComplete={false} showFooterNavigation={false}>
+        <SkeletonContent label="Loading quiz questions..."><div className="max-w-2xl mx-auto px-5 sm:px-8 py-8 sm:py-12">
+          <div className="mb-5 flex items-start justify-between gap-4"><div><SkeletonBlock className="mb-3 h-7 w-32" /><h2 className="text-2xl sm:text-3xl font-bold tracking-tight">Academic Skills Quiz</h2></div><SkeletonBlock className="h-14 w-20" /></div>
+          <div className="mb-7 flex items-center gap-3"><SkeletonBlock className="h-1.5 flex-1" /><SkeletonBlock className="h-3 w-24" /></div>
+          <div className="mb-7 rounded-3xl border border-gray-200 bg-white p-5 sm:p-7 shadow-sm">
+            <div className="mb-5 border-l-4 border-gray-200 pl-4"><SkeletonBlock className="mb-2 h-3 w-32" /><SkeletonBlock className="h-5 w-full" /><SkeletonBlock className="mt-2 h-5 w-2/3" /></div>
+            <div className="space-y-3">{[1, 2, 3, 4].map(item => <div key={item} className="flex min-h-14 items-center gap-3 rounded-xl border border-gray-200 px-4 py-3"><SkeletonBlock className="h-7 w-7 shrink-0" /><SkeletonBlock className="h-4 w-2/3" /></div>)}</div>
+          </div>
+          <div className="flex justify-between gap-4"><SkeletonBlock className="h-11 w-24" /><SkeletonBlock className="h-11 w-28" /></div>
+        </div></SkeletonContent>
       </OnboardingLayout>
     )
   }

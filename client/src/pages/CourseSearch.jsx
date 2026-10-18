@@ -1,3 +1,5 @@
+import SkeletonContent from '../components/SkeletonContent'
+import { recommendationPlaceholders } from '../data/loadingPlaceholders'
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { getCourseCatalogUrl } from '../utils/courseCatalog'
@@ -106,11 +108,11 @@ function CourseSearch() {
       <PublicHeader activeCollegePhase={hasActiveCollegePhase} showDashboard={fromDashboard} />
       <main className="max-w-5xl mx-auto px-5 sm:px-10 py-10 sm:py-14">
         {fromDashboard ? (
-          <button onClick={() => navigate('/dashboard')} className="text-sm font-medium text-orange-600 hover:text-orange-700 mb-6">
+          <button onClick={() => navigate('/dashboard')} className="lm-action mb-6">
             ← Back to Dashboard
           </button>
         ) : (
-          <Link to="/" className="inline-block text-sm font-medium text-orange-600 hover:text-orange-700 mb-6">
+          <Link to="/" className="lm-action mb-6">
             ← Back to Landing Page
           </Link>
         )}
@@ -137,8 +139,7 @@ function CourseSearch() {
           </div>
         </div>
 
-        <section ref={resultsRef} className="motion-swap mt-9" aria-live="polite">
-          {displayStatus === 'loading' && <p className="text-gray-500">Loading courses…</p>}
+        <SkeletonContent loading={displayStatus === 'loading'} label="Loading courses..."><section ref={resultsRef} className="motion-swap mt-9" aria-live="polite">
           {displayStatus === 'error' && (
             <div className="bg-red-50 border border-red-100 text-red-700 rounded-xl p-5">We couldn’t load courses. Please try again.</div>
           )}
@@ -148,7 +149,7 @@ function CourseSearch() {
               <p className="text-sm text-gray-500 mt-1">{query ? 'Try a broader course, skill, or career keyword.' : 'Please check back later for available courses.'}</p>
             </div>
           )}
-          {displayStatus === 'success' && courses.length > 0 && (
+          {(displayStatus === 'loading' || (displayStatus === 'success' && courses.length > 0)) && (
             <>
               <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
                 {query && resolvedQuery === query && <p className="text-sm text-gray-500">
@@ -166,14 +167,14 @@ function CourseSearch() {
                 </label>
               </div>
               <div className="motion-stagger grid gap-4">
-                {visibleCourses.map((course) => (
+                {(displayStatus === 'loading' ? recommendationPlaceholders : visibleCourses).map((course) => (
                   <article key={course.course_code} className="flex flex-col bg-white border border-gray-100 rounded-2xl p-5 sm:p-6 shadow-sm hover:shadow-md hover:border-orange-200 transition">
                     <div className="flex flex-wrap items-center gap-2 mb-3">
                       {course.course_abbreviation && <span className="text-xs font-bold text-orange-600 bg-orange-50 px-2.5 py-1 rounded-full">{getDisplayCourseAbbreviation(course.course_name, course.course_abbreviation)}</span>}
                     </div>
                     <CourseName as="h2" name={course.course_name} className="text-lg font-semibold text-gray-900" secondaryClassName="mt-1 text-base font-medium text-gray-500" />
                     {course.description && <p className="text-sm text-gray-500 leading-relaxed mt-2 line-clamp-2">{course.description}</p>}
-                    <Link to={`/courses/${course.course_code}${contextSearch}`} state={courseDetailsState} className="mt-4 inline-flex w-fit items-center text-sm font-semibold text-orange-600 hover:text-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 rounded">
+                    <Link to={`/courses/${course.course_code}${contextSearch}`} state={courseDetailsState} className="lm-action mt-4 w-fit">
                       View course details <span aria-hidden="true" className="ml-1">→</span>
                     </Link>
                   </article>
@@ -190,7 +191,7 @@ function CourseSearch() {
               )}
             </>
           )}
-        </section>
+        </section></SkeletonContent>
       </main>
     </div>
   )

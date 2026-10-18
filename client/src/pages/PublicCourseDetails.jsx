@@ -1,3 +1,5 @@
+import SkeletonContent from '../components/SkeletonContent'
+import { coursePlaceholder } from '../data/loadingPlaceholders'
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useParams } from 'react-router-dom'
 import PublicHeader from '../components/PublicHeader'
@@ -28,10 +30,11 @@ function PublicCourseDetails() {
   const resultsContext = hasActiveCollegePhase || source === 'results' || location.state?.entryContext === 'results'
   const backNavigation = getCourseOverviewBackNavigation(location.state, location.search, hasActiveCollegePhase)
   const locatorSourceSearch = resultsContext ? '?source=results' : fromDashboard ? '?source=dashboard' : '?source=public-search'
-  const [course, setCourse] = useState(null)
+  const [savedCourse, setCourse] = useState(null)
   const [status, setStatus] = useState('loading')
   const [resolvedCourseCode, setResolvedCourseCode] = useState(null)
   const displayStatus = resolvedCourseCode === courseCode ? status : 'loading'
+  const course = displayStatus === 'loading' ? coursePlaceholder : savedCourse
 
   useEffect(() => {
     const controller = new AbortController()
@@ -69,7 +72,6 @@ function PublicCourseDetails() {
     <div className="min-h-screen bg-gray-50">
       <PublicHeader activeCollegePhase={hasActiveCollegePhase} showDashboard={fromDashboard} />
       <main className="max-w-5xl mx-auto px-5 sm:px-10 py-10 sm:py-14">
-        {displayStatus === 'loading' && <p className="text-gray-500">Loading course…</p>}
         {displayStatus === 'error' && <div className="bg-red-50 border border-red-100 text-red-700 rounded-xl p-5">We couldn’t load this course. Please try again.</div>}
         {displayStatus === 'not-found' && (
           <div className="bg-white border border-gray-100 rounded-2xl p-8 text-center">
@@ -78,16 +80,16 @@ function PublicCourseDetails() {
             {hasActiveCollegePhase === null ? (
               <span className="text-sm text-gray-400">Resolving return destination…</span>
             ) : (
-              <Link to={backNavigation.path} state={backNavigation.state} className="text-orange-600 font-medium hover:text-orange-700">{backNavigation.label}</Link>
+              <Link to={backNavigation.path} state={backNavigation.state} className="lm-action">{backNavigation.label}</Link>
             )}
           </div>
         )}
-        {displayStatus === 'success' && course && (
-          <article>
+        {(displayStatus === 'success' || displayStatus === 'loading') && course && (
+          <SkeletonContent loading={displayStatus === 'loading'} label="Loading course..."><article>
             {hasActiveCollegePhase === null ? (
               <span className="text-sm text-gray-400">Resolving return destination…</span>
             ) : (
-              <Link to={backNavigation.path} state={backNavigation.state} className="text-sm text-orange-600 hover:text-orange-700">← {backNavigation.label}</Link>
+              <Link to={backNavigation.path} state={backNavigation.state} className="lm-action">← {backNavigation.label}</Link>
             )}
             <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-6 sm:p-9 mt-5">
               <div className="flex flex-wrap items-center gap-2 mb-4">
@@ -130,7 +132,7 @@ function PublicCourseDetails() {
               <div><h2 className="text-xl font-semibold text-white">Is this course right for you?</h2><p className="text-sm text-gray-400 mt-1">Get recommendations based on your skills, interests, and personality.</p></div>
               <Link to={isAuthenticated ? '/dashboard' : '/register'} className="shrink-0 text-center bg-orange-500 text-white px-5 py-3 rounded-xl font-medium hover:bg-orange-600">Take the LearnMatch Assessment</Link>
             </div>
-          </article>
+          </article></SkeletonContent>
         )}
       </main>
     </div>

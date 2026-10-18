@@ -26,6 +26,8 @@ test('Term Check-in renders compact numeric radios, progress, term context, and 
     assert.match(header, /1st Trimester/)
     assert.match(header, /Mid Phase/)
     assert.match(header, /3 of 5 answered/)
+    assert.match(header, /How is your term going\?/)
+    assert.match(header, /aria-valuenow="3"/)
 
     const question = renderToStaticMarkup(React.createElement(CheckinQuestionCard, {
       question: checkinQuestions.Mid[0],
@@ -34,6 +36,7 @@ test('Term Check-in renders compact numeric radios, progress, term context, and 
     assert.equal((question.match(/type="radio"/g) || []).length, 5)
     assert.deepEqual([...question.matchAll(/value="([1-5])"/g)].map((match) => Number(match[1])), [1, 2, 3, 4, 5])
     assert.match(question, /checked="" value="3"/)
+    assert.match(question, /<div data-validation-field="checkin_1"[^>]*><fieldset/)
     assert.match(question, /Not true for me at all/)
     assert.match(question, /Neutral \/ Not sure/)
     assert.match(question, /Completely true for me/)

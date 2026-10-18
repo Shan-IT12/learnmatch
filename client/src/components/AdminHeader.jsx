@@ -1,3 +1,5 @@
+import LogoutButton from './LogoutButton'
+import HeaderBrand from '../components/HeaderBrand'
 import { Link, useNavigate } from 'react-router-dom'
 
 function AdminHeader({ currentPage }) {
@@ -9,28 +11,24 @@ function AdminHeader({ currentPage }) {
     navigate('/')
   }
 
-  const navClass = (page) => `rounded-md px-2 py-2 text-center text-xs font-medium transition focus:outline-none focus:ring-2 focus:ring-orange-500 sm:shrink-0 sm:px-3 sm:text-sm ${
-    currentPage === page
-      ? 'bg-orange-50 text-orange-700'
-      : 'text-slate-600 hover:text-slate-950 hover:bg-slate-50'
-  }`
+  const navClass = (page) => `lm-action ${currentPage === page ? 'lm-action-selected' : ''}`
 
   return (
-    <header className="border-b border-orange-100 bg-white shadow-sm">
-      <div className="mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-3 px-5 py-4 sm:px-8 lg:px-10">
-        <Link to="/admin" className="flex items-baseline gap-2 rounded-md text-xl font-bold tracking-tight text-slate-950 focus:outline-none focus:ring-2 focus:ring-orange-500">
-          <span>Learn<span className="text-orange-500">Match</span></span>
-          <span className="text-sm font-semibold text-slate-500">Admin Portal</span>
+    <header className="lm-site-header border-b border-orange-100 bg-white shadow-sm">
+      <div className="lm-header-inner mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-3 px-5 py-4 sm:px-8 lg:px-10">
+        <Link to="/admin" className="flex items-center gap-3 rounded-md text-xl font-bold tracking-tight text-slate-950 focus:outline-none focus:ring-2 focus:ring-orange-500">
+          <span><HeaderBrand /></span>
+          <span className="hidden rounded-md border border-gray-200 bg-gray-50 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-slate-500 sm:inline">Admin Portal</span>
         </Link>
         <nav className="grid w-full min-w-0 grid-cols-3 items-center gap-1 sm:flex sm:w-auto sm:justify-end sm:gap-2" aria-label="Admin navigation">
-          <Link to="/admin" className={navClass('dashboard')}>Dashboard</Link>
-          <Link to="/admin/users" className={navClass('users')}>Users</Link>
-          <Link to="/admin/courses" className={navClass('courses')}>Manage Courses</Link>
-          <Link to="/admin/analytics" className={navClass('analytics')}>Analytics</Link>
-          <Link to="/admin/feedback" className={navClass('feedback')}>Feedback</Link>
-          <button type="button" onClick={handleLogout} className="rounded-md px-2 py-2 text-center text-xs font-medium text-slate-600 transition hover:bg-orange-50 hover:text-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 sm:shrink-0 sm:px-3 sm:text-sm">
+          <Link to="/admin" className={navClass('dashboard')} aria-current={currentPage === 'dashboard' ? 'page' : undefined}>Dashboard</Link>
+          <Link to="/admin/users" className={navClass('users')} aria-current={currentPage === 'users' ? 'page' : undefined}>Users</Link>
+          <Link to="/admin/courses" className={navClass('courses')} aria-current={currentPage === 'courses' ? 'page' : undefined}>Manage Courses</Link>
+          <Link to="/admin/analytics" className={navClass('analytics')} aria-current={currentPage === 'analytics' ? 'page' : undefined}>Analytics</Link>
+          <Link to="/admin/feedback" className={navClass('feedback')} aria-current={currentPage === 'feedback' ? 'page' : undefined}>Feedback</Link>
+          <LogoutButton type="button" onConfirm={handleLogout} className="lm-action lm-action-danger sm:shrink-0">
             Logout
-          </button>
+          </LogoutButton>
         </nav>
       </div>
     </header>

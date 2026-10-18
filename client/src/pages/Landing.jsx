@@ -98,10 +98,10 @@ function Landing() {
     <div className="min-h-screen overflow-x-hidden bg-[#fbf8f3] text-gray-900">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-[760px] bg-[radial-gradient(circle_at_13%_18%,rgba(251,146,60,.13),transparent_28%),radial-gradient(circle_at_78%_28%,rgba(253,186,116,.16),transparent_31%),linear-gradient(115deg,rgba(255,255,255,.8),rgba(255,247,237,.25))]" />
 
-      <header className="relative z-30 mx-auto flex max-w-[1440px] items-center justify-between px-5 py-5 sm:px-8 lg:px-10">
+      <header className="relative z-30 mx-auto flex max-w-[1440px] items-center justify-between gap-4 px-5 py-5 sm:px-8 lg:px-10">
         <Link to="/" className="text-xl font-bold tracking-tight text-gray-900">Learn<span className="text-orange-500">Match</span></Link>
         <div className="flex items-center gap-1.5 sm:gap-2">
-          <Link to="/login" className="rounded-xl px-3 py-2.5 text-sm font-medium text-gray-600 transition duration-150 hover:bg-white/75 hover:text-gray-900 sm:px-4">Log In</Link>
+          <Link to="/login" className="rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 transition hover:text-orange-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500 sm:px-4">Log In</Link>
           <Link to="/register" className="rounded-xl bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white shadow-[0_8px_20px_-10px_rgba(234,88,12,.85)] transition duration-150 hover:-translate-y-0.5 hover:bg-orange-600 active:translate-y-0">Get Started</Link>
         </div>
       </header>
@@ -123,7 +123,7 @@ function Landing() {
               <Link to="/register" className="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-orange-500 to-orange-600 px-6 py-3.5 text-sm font-semibold text-white shadow-[0_14px_30px_-14px_rgba(234,88,12,.8)] transition duration-150 hover:-translate-y-0.5 hover:shadow-[0_18px_34px_-14px_rgba(234,88,12,.7)] active:translate-y-0">
                 Start Assessment <IconArrowRight size={17} stroke={2} />
               </Link>
-              <Link to="/login" className="inline-flex items-center justify-center gap-1 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 transition duration-150 hover:bg-white/70 hover:text-orange-700">
+              <Link to="/login" className="lm-action">
                 Already registered? Log in <IconChevronRight size={15} />
               </Link>
             </div>
@@ -152,7 +152,7 @@ function Landing() {
                   {searching ? 'Searching…' : 'Search'}
                 </button>
               </form>
-              <Link to="/courses/search" className="mt-3 inline-block text-sm font-semibold text-orange-600 hover:text-orange-700">View all courses ?</Link>
+              <Link to="/courses/search" className="lm-action mt-3">View all courses ?</Link>
               {query.trim() && results && (
                 <div className="absolute left-0 right-0 top-full z-50 mt-2 overflow-hidden rounded-2xl border border-orange-100 bg-white shadow-2xl">
                   {results.courses.length === 0 ? (

@@ -1,0 +1,14 @@
+.career-year-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem; }
+.career-year-tab { transition: background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease; }
+.career-opportunity summary::-webkit-details-marker { display: none; }
+@media (min-width: 640px) { .career-year-grid { grid-template-columns: repeat(var(--year-count), minmax(0, 1fr)); gap: .75rem; } }
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .career-year-tab:hover { transform: translateY(-3px); box-shadow: 0 8px 18px -12px rgba(234, 88, 12, .4); }
+  .career-opportunity:hover { transform: translateY(-3px); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .career-year-content { animation: lm-enter 220ms ease-out both; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .career-year-tab, .career-opportunity, .career-opportunity svg { transition: none !important; }
+}

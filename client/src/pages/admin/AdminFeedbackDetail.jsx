@@ -1,3 +1,4 @@
+import SkeletonContent from '../../components/SkeletonContent'
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import {
@@ -35,8 +36,9 @@ function DetailField({ label, children }) {
 function AdminFeedbackDetail() {
   const { feedbackId } = useParams()
   const navigate = useNavigate()
-  const [feedback, setFeedback] = useState(null)
+  const [savedFeedback, setFeedback] = useState(null)
   const [loading, setLoading] = useState(true)
+  const feedback = loading ? { feedbackId: 1, category: 'Feedback category', rating: 4, user: { userId: 1, displayName: 'Account display name', email: 'account@example.com' }, submittedAt: '2026-01-01T00:00:00Z', comment: 'Feedback message submitted by the user. This area contains their experience and suggestions for LearnMatch.' } : savedFeedback
   const [error, setError] = useState('')
   const [notFound, setNotFound] = useState(false)
   const [retryKey, setRetryKey] = useState(0)
@@ -90,11 +92,10 @@ function AdminFeedbackDetail() {
     <div className="min-h-screen bg-[#fcfaf7]">
       <AdminHeader currentPage="feedback" />
       <main className="mx-auto max-w-5xl px-5 py-8 sm:px-8 sm:py-10">
-        <Link to="/admin/feedback" className="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-orange-700">
+        <Link to="/admin/feedback" className="lm-action mb-6">
           <IconArrowLeft size={17} /> Back to Feedback
         </Link>
 
-        {loading && <div aria-label="Loading feedback detail" className="h-96 animate-pulse rounded-xl border border-slate-200 bg-white" />}
 
         {!loading && (error || notFound) && (
           <div className="rounded-xl border border-red-200 bg-white p-8 text-center shadow-sm" role="alert">
@@ -105,8 +106,8 @@ function AdminFeedbackDetail() {
           </div>
         )}
 
-        {!loading && feedback && (
-          <article className="overflow-hidden rounded-xl border border-orange-100 bg-white shadow-sm">
+        {feedback && (
+          <SkeletonContent loading={loading} label="Loading feedback detail"><article className="overflow-hidden rounded-xl border border-orange-100 bg-white shadow-sm">
             <header className="border-b border-slate-100 px-5 py-5 sm:px-7 sm:py-6">
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-orange-600">Feedback record #{feedback.feedbackId}</p>
               <div className="mt-2 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
@@ -138,7 +139,7 @@ function AdminFeedbackDetail() {
                 View User
               </Link>
             </footer>
-          </article>
+          </article></SkeletonContent>
         )}
       </main>
     </div>

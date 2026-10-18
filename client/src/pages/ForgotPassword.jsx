@@ -1,3 +1,4 @@
+import HeaderBrand from '../components/HeaderBrand'
 import { useEffect, useState } from 'react'
 import {
   IconArrowLeft,
@@ -171,7 +172,7 @@ function ForgotPassword() {
 
       <nav className="relative z-10 mx-auto flex max-w-[1440px] items-center justify-between gap-3 px-5 py-5 sm:px-8 lg:px-10">
         <Link to="/" className="text-xl font-bold tracking-tight text-gray-900">
-          Learn<span className="text-orange-500">Match</span>
+          <HeaderBrand />
         </Link>
         <Link to="/login" className="inline-flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition duration-150 hover:border-orange-200 hover:bg-orange-50 hover:text-orange-700 active:translate-y-px">
           <IconArrowLeft size={16} stroke={2} /> Back to Login

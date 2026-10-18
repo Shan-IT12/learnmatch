@@ -477,19 +477,22 @@ app.get('/api/dashboard/status', authenticateToken, async (req, res) => {
 
     const isCollegePhase = checkins.length > 0
     const [savedAttempts] = await pool.query(
-      `SELECT interests FROM ASSESSMENT_ATTEMPT
+      `SELECT status, interests FROM ASSESSMENT_ATTEMPT
        WHERE user_id = ? AND status IN ('IN_PROGRESS', 'COMPLETED')
-       ORDER BY attempt_id DESC LIMIT 1`, [userId]
+       ORDER BY (status = 'COMPLETED') DESC, attempt_id DESC LIMIT 1`, [userId]
     )
+    // A new retake draft must not erase the dashboard's completed-assessment evidence.
+    const hasCompletedAssessment = savedAttempts[0]?.status === 'COMPLETED'
     const savedInterestState = parseAttemptJson(savedAttempts[0]?.interests, null)
     const hasCategoryAnswers = savedInterestState
       && !validateInterestSubmission(savedInterestState)
 
     res.json({
-      hasProfile: profileCount.count > 0,
-      hasInterests: interestCount.count > 0 || Boolean(hasCategoryAnswers),
-      hasSkills: skillCount.count > 0,
-      hasPersonality: personalityCount.count > 0,
+      hasCompletedAssessment,
+      hasProfile: hasCompletedAssessment || profileCount.count > 0,
+      hasInterests: hasCompletedAssessment || interestCount.count > 0 || Boolean(hasCategoryAnswers),
+      hasSkills: hasCompletedAssessment || skillCount.count > 0,
+      hasPersonality: hasCompletedAssessment || personalityCount.count > 0,
       isCollegePhase,
       collegeInfo: isCollegePhase
         ? {
