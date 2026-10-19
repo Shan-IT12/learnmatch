@@ -12,6 +12,7 @@ import {
 import { STUDENT_ACTIVE_INDEPENDENT_COURSE_COUNT } from '../constants/courseCatalog'
 import landingCoursePathway from '../assets/landing-course-pathway.png'
 import CourseName from '../components/CourseName'
+import LandingIntro from '../components/LandingIntro'
 
 const journeySteps = [
   {
@@ -95,7 +96,8 @@ function Landing() {
   }
 
   return (
-    <div className="min-h-screen overflow-x-hidden bg-[#fbf8f3] text-gray-900">
+    <div className="min-h-screen overflow-x-hidden bg-[var(--lm-landing-background)] text-gray-900">
+      <LandingIntro />
       <div className="pointer-events-none absolute inset-x-0 top-0 h-[760px] bg-[radial-gradient(circle_at_13%_18%,rgba(251,146,60,.13),transparent_28%),radial-gradient(circle_at_78%_28%,rgba(253,186,116,.16),transparent_31%),linear-gradient(115deg,rgba(255,255,255,.8),rgba(255,247,237,.25))]" />
 
       <header className="relative z-30 mx-auto flex max-w-[1440px] items-center justify-between gap-4 px-5 py-5 sm:px-8 lg:px-10">
