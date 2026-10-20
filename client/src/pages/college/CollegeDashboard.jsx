@@ -1,3 +1,4 @@
+import { clearUserAuth } from '../../utils/userAuth'
 import CollegeProgramRoadmap from '../../components/CollegeProgramRoadmap'
 import './collegeDashboard.css'
 import LogoutButton from '../../components/LogoutButton'
@@ -462,9 +463,7 @@ function CollegeDashboard() {
   }
 
   const handleLogout = () => {
-    localStorage.removeItem('token')
-    localStorage.removeItem('userId')
-    localStorage.removeItem('username')
+    clearUserAuth(localStorage)
     navigate('/login')
   }
 

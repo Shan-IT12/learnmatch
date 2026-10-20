@@ -35,7 +35,7 @@ function shapeSavedRecommendation(row) {
       skill_match: toDisplayPercent(Number(row.skill_match)),
       interest_match: toDisplayPercent(Number(row.interest_match)),
       personality_match: toDisplayPercent(Number(row.personality_match)),
-      personal_factor_match: toDisplayPercent(Number(row.personal_factor_match)),
+      personal_factor_match: row.personal_factor_match == null ? null : toDisplayPercent(Number(row.personal_factor_match)),
     },
     ai_narrative: row.ai_narrative ?? null,
   }
@@ -67,7 +67,7 @@ export function validateTopThreeRecommendations(recommendations) {
     toNormalizedScore(recommendation.score_breakdown?.skill_match, 'Skill match')
     toNormalizedScore(recommendation.score_breakdown?.interest_match, 'Interest match')
     toNormalizedScore(recommendation.score_breakdown?.personality_match, 'Personality match')
-    toNormalizedScore(recommendation.score_breakdown?.personal_factor_match, 'Personal factor match')
+    if (recommendation.score_breakdown?.personal_factor_match !== null) toNormalizedScore(recommendation.score_breakdown?.personal_factor_match, 'Personal factor match')
   }
 
   return sorted
@@ -189,7 +189,7 @@ export async function saveRecommendationSnapshot(pool, userId, assessmentId, rec
           toNormalizedScore(recommendation.score_breakdown.skill_match, 'Skill match'),
           toNormalizedScore(recommendation.score_breakdown.interest_match, 'Interest match'),
           toNormalizedScore(recommendation.score_breakdown.personality_match, 'Personality match'),
-          toNormalizedScore(recommendation.score_breakdown.personal_factor_match, 'Personal factor match'),
+          recommendation.score_breakdown.personal_factor_match === null ? null : toNormalizedScore(recommendation.score_breakdown.personal_factor_match, 'Personal factor match'),
           recommendation.ai_narrative,
           recommendation.rank_position,
         ]
@@ -299,7 +299,7 @@ export async function refreshSavedRecommendationsForLatestAssessment(
           toNormalizedScore(recommendation.score_breakdown.skill_match, 'Skill match'),
           toNormalizedScore(recommendation.score_breakdown.interest_match, 'Interest match'),
           toNormalizedScore(recommendation.score_breakdown.personality_match, 'Personality match'),
-          toNormalizedScore(recommendation.score_breakdown.personal_factor_match, 'Personal factor match'),
+          recommendation.score_breakdown.personal_factor_match === null ? null : toNormalizedScore(recommendation.score_breakdown.personal_factor_match, 'Personal factor match'),
           recommendation.ai_narrative,
           recommendation.rank_position,
         ]

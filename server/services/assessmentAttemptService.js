@@ -1,3 +1,5 @@
+import { deriveFactorApplicability } from '../shared/personalFactors.js'
+import { validateProfile } from './requestValidationService.js'
 import { validateInterestSubmission } from './interestSubmissionService.js'
 
 export const ATTEMPT_HEADER = 'x-assessment-attempt-id'
@@ -35,6 +37,7 @@ export function parseAttemptJson(value, fallback = null) {
 }
 
 const PERSONAL_FACTOR_FIELDS = Object.freeze([
+  'personal_factor_answers',
   'physical_accessibility_areas',
   'physical_accessibility_difficulties',
   'factor_physical_impact',
@@ -46,18 +49,20 @@ const PERSONAL_FACTOR_FIELDS = Object.freeze([
 
 export function buildPersonalFactorsSnapshot(profile) {
   if (!profile) return null
-  const impacts = PERSONAL_FACTOR_FIELDS.slice(2).map((field) => Number(profile[field]))
-  if (impacts.some((value) => !Number.isInteger(value) || value < 1 || value > 4)) return null
-  const areas = parseAttemptJson(profile.physical_accessibility_areas, null)
-  const difficulties = parseAttemptJson(profile.physical_accessibility_difficulties, null)
-  if (!Array.isArray(areas) || !difficulties || typeof difficulties !== 'object' || Array.isArray(difficulties)) return null
-  if (impacts[0] > 1 && areas.length === 0) return null
-  if (Object.keys(difficulties).length !== areas.length || areas.some((area) => typeof difficulties[area] !== 'string')) return null
-  return {
-    physical_accessibility_areas: areas,
-    physical_accessibility_difficulties: difficulties,
-    ...Object.fromEntries(PERSONAL_FACTOR_FIELDS.slice(2).map((field) => [field, Number(profile[field])])),
+  const states = deriveFactorApplicability(profile)
+  const candidate = {
+    username: 'snapshot_user',
+    personal_factor_answers: states,
+    physical_accessibility_areas: parseAttemptJson(profile.physical_accessibility_areas, []),
+    physical_accessibility_difficulties: parseAttemptJson(profile.physical_accessibility_difficulties, {}),
+    ...Object.fromEntries(Object.entries(states).map(([factor, state]) => [
+      `factor_${factor}_impact`, ['yes', 'legacy_unknown'].includes(state) ? Number(profile[`factor_${factor}_impact`]) : null,
+    ])),
   }
+  const validation = validateProfile(candidate)
+  if (!validation.valid) return null
+  const { username: _username, ...snapshot } = validation.value
+  return snapshot
 }
 
 export async function getProfilePersonalFactorsSnapshot(database, userId) {

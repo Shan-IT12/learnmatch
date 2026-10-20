@@ -26,6 +26,7 @@ test('skill quiz requires 30 unique positive IDs and A-D options', () => {
 test('profile validation enforces structured accessibility and impact responses', () => {
   const profile = {
     username: 'student_name',
+    personal_factor_answers: { physical: 'yes', health: 'yes', financial: 'yes', family: 'yes', work: 'yes' },
     physical_accessibility_areas: ['seeing'],
     physical_accessibility_difficulties: { seeing: 'some_difficulty' },
     factor_physical_impact: 1,
@@ -53,7 +54,7 @@ test('profile validation enforces structured accessibility and impact responses'
   assert.equal(validateProfile({ ...profile, physical_accessibility_difficulties: {} }).valid, false)
   assert.equal(validateProfile({ ...profile, physical_accessibility_difficulties: { seeing: 'no_difficulty' } }).valid, false)
   assert.equal(validateProfile({ ...profile, physical_accessibility_difficulties: { seeing: 'severe' } }).valid, false)
-  assert.equal(validateProfile({ ...profile, factor_physical_impact: 1, physical_accessibility_areas: [], physical_accessibility_difficulties: {} }).valid, true)
+  assert.equal(validateProfile({ ...profile, personal_factor_answers: { ...profile.personal_factor_answers, physical: 'no' }, factor_physical_impact: null, physical_accessibility_areas: [], physical_accessibility_difficulties: {} }).valid, true)
   assert.equal(validateProfile({ ...profile, factor_physical_impact: 2, physical_accessibility_areas: [], physical_accessibility_difficulties: {} }).valid, false)
 })
 

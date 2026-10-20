@@ -19,6 +19,7 @@ export const saveProfileWithDependencies = async (
   req.body = validation.value
   const {
     username,
+    personal_factor_answers,
     physical_accessibility_areas,
     physical_accessibility_difficulties,
     factor_physical_impact,
@@ -71,7 +72,7 @@ export const saveProfileWithDependencies = async (
     }
 
     const [existing] = await connection.query(
-      `SELECT profile_id, factor_physical_impact, factor_health_impact,
+      `SELECT profile_id, personal_factor_answers, factor_physical_impact, factor_health_impact,
               factor_financial_impact, factor_family_impact, factor_work_impact
        FROM PROFILE WHERE user_id = ?`,
       [userId]
@@ -80,26 +81,26 @@ export const saveProfileWithDependencies = async (
     if (existing.length > 0) {
       const impactValues = [
         factor_physical_impact, factor_health_impact, factor_financial_impact,
-        factor_family_impact, factor_work_impact,
+        factor_family_impact, factor_work_impact, JSON.stringify(personal_factor_answers),
       ]
       const impactFields = [
         'factor_physical_impact', 'factor_health_impact', 'factor_financial_impact',
         'factor_family_impact', 'factor_work_impact',
       ]
-      const personalFactorScoreChanged = impactFields.some(
+      const personalFactorScoreChanged = JSON.stringify(existing[0].personal_factor_answers) !== JSON.stringify(personal_factor_answers) || impactFields.some(
         (field, index) => Number(existing[0][field]) !== Number(impactValues[index])
       )
       await connection.query(
         `UPDATE PROFILE SET 
           physical_accessibility_areas = ?, physical_accessibility_difficulties = ?,
           factor_physical_impact = ?, factor_health_impact = ?, factor_financial_impact = ?,
-          factor_family_impact = ?, factor_work_impact = ?
+          factor_family_impact = ?, factor_work_impact = ?, personal_factor_answers = ?
         WHERE user_id = ?`,
         [
           JSON.stringify(physical_accessibility_areas),
           JSON.stringify(physical_accessibility_difficulties),
           factor_physical_impact, factor_health_impact, factor_financial_impact,
-          factor_family_impact, factor_work_impact, userId,
+          factor_family_impact, factor_work_impact, JSON.stringify(personal_factor_answers), userId,
         ]
       )
       const attemptId = requestedAttemptId(req)
@@ -121,8 +122,8 @@ export const saveProfileWithDependencies = async (
          factor_others_classification_status, factor_others_classification,
          physical_accessibility_areas, physical_accessibility_difficulties,
          factor_physical_impact, factor_health_impact, factor_financial_impact,
-         factor_family_impact, factor_work_impact)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+         factor_family_impact, factor_work_impact, personal_factor_answers)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         userId, null, null, null,
         false, false, false, false, false, false,
@@ -130,7 +131,7 @@ export const saveProfileWithDependencies = async (
         JSON.stringify(physical_accessibility_areas),
         JSON.stringify(physical_accessibility_difficulties),
         factor_physical_impact, factor_health_impact, factor_financial_impact,
-        factor_family_impact, factor_work_impact,
+        factor_family_impact, factor_work_impact, JSON.stringify(personal_factor_answers),
       ]
     )
     const attemptId = requestedAttemptId(req)
@@ -179,7 +180,14 @@ export const getProfileWithDependencies = async (
     }
 
     const [rows] = await database.query(
-      'SELECT * FROM PROFILE WHERE user_id = ?',
+      `SELECT profile_id, user_id, full_name, height_cm, weight_kg,
+              factor_physical, factor_health, factor_financial, factor_family,
+              factor_distance, factor_working_student,
+              physical_accessibility_areas, physical_accessibility_difficulties,
+              factor_physical_impact, factor_health_impact, factor_financial_impact,
+              factor_family_impact, factor_work_impact, created_at, updated_at,
+              personal_factor_answers
+       FROM PROFILE WHERE user_id = ?`,
       [userId]
     )
 

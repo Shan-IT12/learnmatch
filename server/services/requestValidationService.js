@@ -1,5 +1,6 @@
 import { PARENT_CLUSTERS } from '../config/recommendationConfig.js'
 import { validateUsername } from './usernameValidationService.js'
+import { PERSONAL_FACTOR_KEYS } from '../shared/personalFactors.js'
 
 export const FEEDBACK_CATEGORIES = new Set([
   'Bug Report',
@@ -94,7 +95,12 @@ export function validateProfile(body) {
     return { valid: false, field: 'username', message: usernameValidation.message }
   }
   const areas = body.physical_accessibility_areas
-  if (!Array.isArray(areas) || (areas.length === 0 && body.factor_physical_impact !== 1)) {
+  const answers = body.personal_factor_answers
+  if (!answers || typeof answers !== 'object' || Array.isArray(answers)
+    || PERSONAL_FACTOR_KEYS.some(factor => !['yes', 'no', 'unknown', 'legacy_unknown'].includes(answers[factor]))) {
+    return { valid: false, message: 'Please reload the page to use the updated personal-factor choices.' }
+  }
+  if (!Array.isArray(areas) || (areas.length === 0 && answers.physical === 'yes')) {
     return { valid: false, message: 'Select at least one physical or accessibility area when the factor applies.' }
   }
   if (
@@ -118,15 +124,22 @@ export function validateProfile(body) {
     return { valid: false, message: 'Provide one valid difficulty level for each selected area.' }
   }
 
-  for (const field of PERSONAL_FACTOR_IMPACT_FIELDS) {
-    if (!Number.isInteger(body[field]) || body[field] < 1 || body[field] > 4) {
+  if (['no', 'unknown'].includes(answers.physical) && (areas.length || difficultyAreas.length)) {
+    return { valid: false, message: 'Undisclosed physical factors must not include accessibility details.' }
+  }
+  for (const factor of PERSONAL_FACTOR_KEYS) {
+    const field = `factor_${factor}_impact`
+    if (answers[factor] === 'yes' && (!Number.isInteger(body[field]) || body[field] < 1 || body[field] > 4)) {
       return { valid: false, message: `${field} must be an integer from 1 to 4.` }
     }
+    if (['no', 'unknown'].includes(answers[factor]) && body[field] !== null) return { valid: false, message: `${field} must be empty when no impact is disclosed.` }
+    if (answers[factor] === 'legacy_unknown' && body[field] !== 1) return { valid: false, message: 'An ambiguous historical impact must remain unchanged until answered again.' }
   }
   return {
     valid: true,
     value: {
       username: usernameValidation.value,
+      personal_factor_answers: Object.fromEntries(PERSONAL_FACTOR_KEYS.map(factor => [factor, answers[factor]])),
       physical_accessibility_areas: [...areas],
       physical_accessibility_difficulties: { ...difficulties },
       ...Object.fromEntries(PERSONAL_FACTOR_IMPACT_FIELDS.map((field) => [field, body[field]])),

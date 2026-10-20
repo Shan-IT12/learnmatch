@@ -8,6 +8,7 @@ import {
 
 const baseBody = Object.freeze({
   username: 'student9',
+  personal_factor_answers: { physical: 'yes', health: 'yes', financial: 'yes', family: 'yes', work: 'yes' },
   physical_accessibility_areas: ['seeing', 'walking_climbing'],
   physical_accessibility_difficulties: {
     seeing: 'some_difficulty',
@@ -44,8 +45,10 @@ function database({
         return [accountUsername === null ? [] : [{ username: accountUsername }]]
       }
       if (sql.includes('SELECT user_id FROM USER_ACCOUNT WHERE username')) return [duplicateUsers]
-      if (sql.includes('SELECT profile_id') && sql.includes('FROM PROFILE')) return [existingProfile]
-      if (sql.includes('SELECT * FROM PROFILE')) return [existingProfile]
+      if (sql.includes('SELECT profile_id') && sql.includes('FROM PROFILE')) {
+        const columns = sql.match(/SELECT\s+([\s\S]+?)\s+FROM PROFILE/)[1].split(',').map(column => column.trim())
+        return [existingProfile.map(row => Object.fromEntries(columns.filter(column => Object.hasOwn(row, column)).map(column => [column, row[column]])))]
+      }
       if (sql.includes('FROM ASSESSMENT_ATTEMPT')) return [attempt ? [attempt] : []]
       return [{ affectedRows: 1 }]
     },
@@ -68,7 +71,7 @@ test('retake with no saved Personal Factors returns the canonical blank Profile 
 
   assert.equal(res.statusCode, 200)
   assert.deepEqual(res.body, { username: 'student9', profile: null })
-  assert.equal(db.calls.some(({ sql }) => sql.includes('SELECT * FROM PROFILE')), true)
+  assert.equal(db.calls.some(({ sql }) => sql.includes('FROM PROFILE WHERE user_id = ?')), true)
   assert.equal(db.calls.some(({ sql }) => sql.includes('FROM ASSESSMENT_ATTEMPT')), false)
 })
 
@@ -124,7 +127,7 @@ test('a new retake ignores stale attempt Personal Factors and uses the canonical
   await getProfileWithDependencies(attemptRequest(undefined, 99), res, { database: db })
 
   assert.equal(res.body.profile.factor_health_impact, 4)
-  assert.equal(db.calls.some(({ sql }) => sql.includes('SELECT * FROM PROFILE')), true)
+  assert.equal(db.calls.some(({ sql }) => sql.includes('FROM PROFILE WHERE user_id = ?')), true)
   assert.equal(db.calls.some(({ sql }) => sql.includes('FROM ASSESSMENT_ATTEMPT')), false)
 })
 
@@ -172,6 +175,32 @@ test('loads the current account username before a Profile has been created', asy
   assert.equal(res.statusCode, 200)
   assert.equal(res.body.username, 'new_student')
   assert.equal(res.body.profile, null)
+})
+
+test('profile response preserves all 21 columns and types while excluding only retired Others fields', async () => {
+  const saved = {
+    profile_id: 14, user_id: 9, full_name: 'Synthetic Name', height_cm: '170.00', weight_kg: '65.00',
+    factor_physical: 1, factor_health: 0, factor_financial: null, factor_family: 1,
+    factor_distance: 1, factor_working_student: 0,
+    factor_others: 'SYNTHETIC PRIVATE TEXT', factor_others_classification_status: 'MATCHED',
+    factor_others_classification: ['factor_health'],
+    physical_accessibility_areas: ['seeing'], physical_accessibility_difficulties: { seeing: 'some_difficulty' },
+    factor_physical_impact: 2, factor_health_impact: null, factor_financial_impact: 1,
+    factor_family_impact: 4, factor_work_impact: 3,
+    created_at: new Date('2026-01-01T00:00:00Z'), updated_at: new Date('2026-01-02T00:00:00Z'),
+    personal_factor_answers: { physical: 'yes', health: 'unknown', financial: 'yes', family: 'yes', work: 'yes' },
+  }
+  const { factor_others, factor_others_classification_status, factor_others_classification, ...expected } = saved
+  assert.ok(factor_others && factor_others_classification_status && factor_others_classification)
+  const db = database({ accountUsername: 'current_student', existingProfile: [saved] })
+  const res = response()
+  await getProfileWithDependencies({ user: { userId: 9, username: 'stale' }, query: { userId: 99 } }, res, { database: db })
+  assert.deepEqual(res.body, { username: 'current_student', profile: expected })
+  assert.equal(Object.keys(res.body.profile).length, 21)
+  const sql = db.calls[1].sql
+  assert.doesNotMatch(sql, /SELECT\s+\*|factor_others/)
+  assert.deepEqual(db.calls.map(call => call.params), [[9], [9]])
+  assert.ok(db.calls.every(call => /^SELECT/.test(call.sql)))
 })
 
 test('an unchanged username is preserved without a duplicate check or account update', async () => {
@@ -224,7 +253,7 @@ test('new profiles persist structured responses without creating a profile-only 
   assert.deepEqual(profileWrite.params.slice(13), [
     '["seeing","walking_climbing"]',
     '{"seeing":"some_difficulty","walking_climbing":"a_lot_of_difficulty"}',
-    2, 1, 3, 4, 2,
+    2, 1, 3, 4, 2, JSON.stringify(baseBody.personal_factor_answers),
   ])
   assert.equal(profileWrite.params[1], null)
 })
@@ -248,7 +277,8 @@ test('updates write only structured Profile fields and leave every legacy field 
   const { res, profileWrite } = await save({
     physical_accessibility_areas: [],
     physical_accessibility_difficulties: {},
-    factor_physical_impact: 1,
+    factor_physical_impact: null,
+    personal_factor_answers: { ...baseBody.personal_factor_answers, physical: 'no' },
   }, { existingProfile: [{ profile_id: 1 }] })
 
   assert.equal(res.statusCode, 200)
@@ -258,7 +288,7 @@ test('updates write only structured Profile fields and leave every legacy field 
   assert.doesNotMatch(profileWrite.sql, /factor_others/)
   assert.doesNotMatch(profileWrite.sql, /height_cm\s*=/)
   assert.doesNotMatch(profileWrite.sql, /weight_kg\s*=/)
-  assert.deepEqual(profileWrite.params, ['[]', '{}', 1, 1, 3, 4, 2, 9])
+  assert.deepEqual(profileWrite.params, ['[]', '{}', null, 1, 3, 4, 2, JSON.stringify({ ...baseBody.personal_factor_answers, physical: 'no' }), 9])
 })
 
 test('updating an existing Profile refreshes its saved recommendations', async () => {

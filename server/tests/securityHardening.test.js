@@ -15,6 +15,9 @@ function invokeMiddleware(token) {
     const req = { headers: { authorization: `Bearer ${token}` } }
     const res = {
       statusCode: 200,
+      setHeader(name, value) {
+        if (name === 'Cache-Control') assert.equal(value, 'no-store')
+      },
       status(code) { this.statusCode = code; return this },
       json(body) { resolve({ status: this.statusCode, body }) },
     }

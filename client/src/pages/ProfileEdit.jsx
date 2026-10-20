@@ -42,14 +42,14 @@ export default function ProfileEdit() {
         const areas = Array.isArray(rawAreas) ? rawAreas.filter((area) => area !== 'none') : []
         const rawDifficulties = parseJsonValue(data.profile.physical_accessibility_difficulties, {})
         const difficulties = Object.fromEntries(Object.entries(rawDifficulties).filter(([area, level]) => areas.includes(area) && difficultyLevels.some(([value]) => value === level)))
-        const loaded = { username: data.username || localStorage.getItem('username') || '', physical_accessibility_areas: areas, physical_accessibility_difficulties: difficulties, factor_physical_impact: data.profile.factor_physical_impact || '', factor_health_impact: data.profile.factor_health_impact || '', factor_financial_impact: data.profile.factor_financial_impact || '', factor_family_impact: data.profile.factor_family_impact || '', factor_work_impact: data.profile.factor_work_impact || '' }
+        const loaded = { personal_factor_answers: data.profile.personal_factor_answers, username: data.username || localStorage.getItem('username') || '', physical_accessibility_areas: areas, physical_accessibility_difficulties: difficulties, factor_physical_impact: data.profile.factor_physical_impact || '', factor_health_impact: data.profile.factor_health_impact || '', factor_financial_impact: data.profile.factor_financial_impact || '', factor_family_impact: data.profile.factor_family_impact || '', factor_work_impact: data.profile.factor_work_impact || '' }
         setFormData(loaded); setApplicability(deriveFactorApplicability(loaded)); setIsFirstTime(!isPersonalFactorsComplete(loaded))
       })
       .catch(() => setError('Could not load your profile.'))
       .finally(() => setLoading(false))
   }, [navigate, token])
 
-  const clearFieldError = (name) => setFieldErrors((current) => current[name] ? { ...current, [name]: undefined } : current)
+  const clearFieldError = (name) => { setError(''); setFieldErrors((current) => current[name] ? { ...current, [name]: undefined } : current) }
   const handleSubmit = async (event) => {
     event.preventDefault(); setError('')
     const errors = validatePersonalFactors(formData, applicability); const usernameError = validateUsername(formData.username)
@@ -57,7 +57,7 @@ export default function ProfileEdit() {
     if (Object.keys(errors).length) { setFieldErrors(errors); scrollToFirstInvalidField(Object.keys(errors)); return }
     setSaving(true)
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/profile`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify(buildProfilePayload(formData)) })
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/profile`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify(buildProfilePayload(formData, applicability)) })
       const data = await response.json()
       if (response.status === 401 || response.status === 403) { navigate('/login', { replace: true }); return }
       if (!response.ok) { if (data.field === 'username') { setFieldErrors((current) => ({ ...current, username: data.message || 'Username is already taken.' })); scrollToFirstInvalidField(['username']); return }; setError(data.message || 'Could not save your profile.'); return }

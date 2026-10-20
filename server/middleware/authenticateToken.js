@@ -17,6 +17,7 @@ import pool from '../config/db.js'
 import { USER_JWT_AUDIENCE, jwtVerifyOptions } from '../config/security.js'
 
 async function authenticateToken(req, res, next) {
+  res.setHeader('Cache-Control', 'no-store')
   const authHeader = req.headers['authorization']
   const token = authHeader && authHeader.split(' ')[1] // expects "Bearer <token>"
 

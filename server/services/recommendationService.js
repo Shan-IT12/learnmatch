@@ -1,3 +1,4 @@
+import { personalFactorResponses } from '../shared/personalFactors.js'
 import { normalizeInterestResponse } from './interestSubmissionService.js'
 import { parseAttemptJson } from './assessmentAttemptService.js'
 import {
@@ -18,6 +19,7 @@ import {
   calculateCourseScore,
   calculateCourseSkillMatch,
   calculatePersonalFactorScore,
+  personalFactorCoverage,
   calculatePersonalityScore,
   calculateRiasecCosineSimilarity,
   rankCourses,
@@ -25,18 +27,7 @@ import {
 import { isCurrentIndependentCourse } from './courseIdentityService.js'
 import { selectDiversifiedTopThree } from './recommendationDiversityService.js'
 export function buildPersonalFactorResponses(profile = {}) {
-  const responses = {
-    physical: Number(profile.factor_physical_impact),
-    health: Number(profile.factor_health_impact),
-    financial: Number(profile.factor_financial_impact),
-    family: Number(profile.factor_family_impact),
-    work: Number(profile.factor_work_impact),
-  }
-  // Never fabricate likelihood responses from legacy booleans or AI-derived
-  // categories. Incomplete legacy rows recalculate at the neutral PF baseline.
-  return Object.values(responses).every((value) => Number.isInteger(value) && value >= 1 && value <= 4)
-    ? responses
-    : null
+  return personalFactorResponses(profile)
 }
 
 export class RecommendationInputError extends Error {
@@ -205,7 +196,7 @@ export function scoreAndRankClusters({
     const personalityScore = calculatePersonalityScore(mbtiType, parentCluster)
     const personalFactorScore = calculatePersonalFactorScore(personalFactorResponses, parentCluster)
     const clusterScore = calculateClusterScore(
-      { skillScore, interestScore, personalityScore, personalFactorScore },
+      { skillScore, interestScore, personalityScore, personalFactorScore, personalFactorCoverage: personalFactorCoverage(personalFactorResponses) },
       parentCluster
     )
 
@@ -216,6 +207,7 @@ export function scoreAndRankClusters({
       interestScore,
       personalityScore,
       personalFactorScore,
+      personalFactorCoverage: personalFactorCoverage(personalFactorResponses),
     }
   })
 
@@ -350,7 +342,7 @@ function shapeRecommendation(course) {
       skill_match: toDisplayPercent(course.scoreBreakdown.skillMatch),
       interest_match: toDisplayPercent(course.scoreBreakdown.interestMatch ?? 0),
       personality_match: toDisplayPercent(course.scoreBreakdown.personalityMatch),
-      personal_factor_match: toDisplayPercent(course.scoreBreakdown.personalFactorMatch),
+      personal_factor_match: course.scoreBreakdown.personalFactorMatch === null ? null : toDisplayPercent(course.scoreBreakdown.personalFactorMatch),
     },
     ai_narrative: null,
   }
@@ -398,7 +390,7 @@ export async function getTopCourseRecommendations(pool, userId) {
       [userId]
     ),
     pool.query(
-      `SELECT factor_physical_impact, factor_health_impact, factor_financial_impact,
+      `SELECT personal_factor_answers, factor_physical_impact, factor_health_impact, factor_financial_impact,
               factor_family_impact, factor_work_impact
        FROM PROFILE
        WHERE user_id = ?
@@ -513,6 +505,7 @@ export async function getTopCourseRecommendations(pool, userId) {
       courseInterestMatch,
       parentClusterPersonalityScore,
       parentClusterPersonalFactorScore,
+      personalFactorCoverage: clusterScores.personalFactorCoverage,
       parentCluster: course.cluster_category,
     })
 

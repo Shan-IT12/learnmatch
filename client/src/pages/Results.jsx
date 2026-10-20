@@ -384,7 +384,7 @@ function Results() {
                       {Object.entries(breakdownLabels).map(([key, label]) => (
                         <div key={key} className="rounded-xl border border-gray-100 bg-gray-50 px-3 py-2.5">
                           <p className="text-[11px] text-gray-400">{label}</p>
-                          <p className="text-sm font-bold text-gray-800">{key === 'interest_match' && rec.interests_available === false ? 'Not used' : `${rec.score_breakdown[key]}%`}</p>
+                          <p className="text-sm font-bold text-gray-800">{rec.score_breakdown[key] === null || (key === 'interest_match' && rec.interests_available === false) ? 'Not used' : `${rec.score_breakdown[key]}%`}</p>
                         </div>
                       ))}
                     </div>

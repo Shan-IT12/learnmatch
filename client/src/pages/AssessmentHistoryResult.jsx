@@ -59,7 +59,7 @@ export function HistoricalResultContent({ result }) {
                 {Object.entries(recommendation.score_breakdown).map(([key, score]) => (
                   <div key={key} className="rounded-xl border border-gray-100 bg-gray-50 p-3">
                     <p className="text-[11px] font-semibold text-gray-500">{breakdownLabels[key]}</p>
-                    <p className="mt-1 text-lg font-bold text-gray-900">{score}%</p>
+                    <p className="mt-1 text-lg font-bold text-gray-900">{score === null ? 'Not used' : `${score}%`}</p>
                   </div>
                 ))}
               </div>

@@ -52,18 +52,20 @@ test('summary uses student accounts and the existing complete-assessment definit
   assert.doesNotMatch(summarySql, /INSERT|UPDATE|DELETE|ALTER/i)
 })
 
-test('personal-factor count is limited to completed assessments and effective scoring categories', async () => {
+test('personal-factor disclosure count retains completion and grouping and excludes retired fields', async () => {
   const database = dashboardDatabase()
   await getAdminDashboard(database)
   const sql = database.calls.find(({ sql: query }) => query.includes('AS registered_students')).sql
 
   assert.match(sql, /state\.status = 'Completed' AND COALESCE\(factors\.has_personal_factors, 0\) = 1/)
-  for (const factor of ['physical', 'health', 'financial', 'family', 'working_student']) {
-    assert.match(sql, new RegExp(`factor_${factor}`))
+  for (const factor of ['physical', 'health', 'financial', 'family', 'work']) {
+    assert.match(sql, new RegExp(`factor_${factor}_impact`))
   }
-  assert.match(sql, /factor_others_classification_status = 'MATCHED'/)
+  assert.match(sql, /WHEN 'no' THEN 1/)
+  assert.match(sql, /WHEN 'unknown' THEN 0/)
+  assert.match(sql, /WHEN 'legacy_unknown' THEN 0/)
   assert.match(sql, /GROUP BY user_id/)
-  assert.doesNotMatch(sql, /factor_distance/)
+  assert.doesNotMatch(sql, /factor_distance|factor_others|factor_working_student|profile\.factor_health\b/)
 })
 
 test('assessment completion rate is rounded and safely handles no registered students', async () => {

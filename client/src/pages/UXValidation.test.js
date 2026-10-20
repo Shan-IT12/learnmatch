@@ -34,8 +34,9 @@ test('representative Profile and Registration controls render required and inlin
       onChange: () => {},
       error: 'Please choose Yes or No.',
     }))
-    assert.deepEqual([...applicabilityMarkup.matchAll(/value="(no|yes)"/g)].map((match) => match[1]), ['no', 'yes'])
-    assert.ok((applicabilityMarkup.match(/required=""/g) || []).length === 2)
+    assert.deepEqual([...applicabilityMarkup.matchAll(/value="(no|yes|unknown)"/g)].map((match) => match[1]), ['no', 'yes', 'unknown'])
+    assert.doesNotMatch(applicabilityMarkup, /required=""/)
+    assert.match(applicabilityMarkup, /Prefer not to answer/)
     assert.match(applicabilityMarkup, /aria-invalid="true"/)
     assert.match(applicabilityMarkup, /Please choose Yes or No\./)
 

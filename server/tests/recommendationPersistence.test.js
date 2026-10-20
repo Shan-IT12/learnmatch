@@ -180,6 +180,21 @@ test('Top 3 persist in rank order and map stable course codes to canonical cours
   ])
 })
 
+test('excluded personal factors persist as NULL and reload without becoming zero', async () => {
+  const { pool, state } = createPersistencePool()
+  const recommendations = generatedRecommendations.map(rec => ({ ...rec, score_breakdown: { ...rec.score_breakdown, personal_factor_match: null } }))
+  await saveRecommendationSnapshot(pool, 7, 11, recommendations)
+  assert.ok(state.itemValues.every(values => values[6] === null))
+  const readPool = { async query(sql) {
+    if (sql.includes('FROM PERSONALITY_ASSESSMENT')) return [[{ assessment_id: 11 }]]
+    if (sql.includes('FROM RECOMMENDATION_ITEM')) return [savedRows.map(row => ({ ...row, personal_factor_match: null }))]
+    if (sql.includes('FROM RECOMMENDATION')) return [[{ recommendation_id: 99, assessment_id: 11 }]]
+    throw new Error(sql)
+  } }
+  const loaded = await getLatestSavedRecommendations(readPool, 7)
+  assert.ok(loaded.recommendations.every(rec => rec.score_breakdown.personal_factor_match === null))
+})
+
 test('snapshot validation rejects missing ranks and duplicate courses', () => {
   assert.throws(
     () => validateTopThreeRecommendations(generatedRecommendations.slice(0, 2)),

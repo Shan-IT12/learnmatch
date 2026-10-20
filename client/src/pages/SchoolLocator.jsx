@@ -1,3 +1,5 @@
+import { createPortal } from 'react-dom'
+import ActionConfirmationModal from '../components/ActionConfirmationModal'
 import SkeletonContent, { SkeletonBlock } from '../components/SkeletonContent'
 import { coursePlaceholder } from '../data/loadingPlaceholders'
 import { useEffect, useState } from 'react'
@@ -31,6 +33,7 @@ function SchoolLocator() {
   const [retryCount, setRetryCount] = useState(0)
   const [resolvedCourseCode, setResolvedCourseCode] = useState(null)
   const [selectedSchoolId, setSelectedSchoolId] = useState(null)
+  const [pendingDirections, setPendingDirections] = useState(null)
   const [directions, setDirections] = useState({ status: 'idle' })
   const [coverageResetKey, setCoverageResetKey] = useState(0)
   const displayStatus = resolvedCourseCode === courseCode ? status : 'loading'
@@ -132,6 +135,9 @@ function SchoolLocator() {
 
   return (
     <div className="min-h-screen bg-[#fcfaf7] text-gray-900">
+      {pendingDirections && createPortal(<ActionConfirmationModal action="directions"
+        onCancel={() => setPendingDirections(null)}
+        onConfirm={() => { const school = pendingDirections; setPendingDirections(null); getDirections(school) }} />, document.body)}
       <PublicHeader activeCollegePhase={hasActiveCollegePhase} showDashboard={fromDashboard} />
       <SkeletonContent loading={displayStatus === 'loading'} label="Finding schools in San Jose del Monte..."><main className="max-w-6xl mx-auto px-5 sm:px-8 lg:px-10 py-8 sm:py-12">
         {hasActiveCollegePhase === null ? (
@@ -250,7 +256,7 @@ function SchoolLocator() {
                             </button>
                             <button
                               type="button"
-                              onClick={() => getDirections(school)}
+                              onClick={() => setPendingDirections(school)}
                               disabled={directions.status === 'loading' && directions.schoolId === school.school_id}
                               className="inline-flex items-center gap-1.5 rounded-xl bg-orange-500 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-600 disabled:cursor-wait disabled:opacity-60 transition"
                             >

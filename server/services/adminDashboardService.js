@@ -1,4 +1,5 @@
 import { assessmentStatusSql } from './assessmentCompletionService.js'
+import { PERSONAL_FACTOR_KEYS } from '../shared/personalFactors.js'
 
 function toSqlDate(date) {
   return date.toISOString().slice(0, 19).replace('T', ' ')
@@ -24,26 +25,30 @@ const COMPLETION_STATUS_SQL = assessmentStatusSql({
   completedAttemptCount: "(SELECT COUNT(*) FROM ASSESSMENT_ATTEMPT attempt WHERE attempt.user_id = account.user_id AND attempt.status = 'COMPLETED')",
 })
 
-const EFFECTIVE_PERSONAL_FACTORS_SQL = `(
-  COALESCE(profile.factor_physical, 0) = 1
-  OR COALESCE(profile.factor_health, 0) = 1
-  OR COALESCE(profile.factor_financial, 0) = 1
-  OR COALESCE(profile.factor_family, 0) = 1
-  OR COALESCE(profile.factor_working_student, 0) = 1
-  OR (
-    profile.factor_others_classification_status = 'MATCHED'
-    AND (
-      JSON_CONTAINS(profile.factor_others_classification, JSON_QUOTE('factor_physical'))
-      OR JSON_CONTAINS(profile.factor_others_classification, JSON_QUOTE('factor_health'))
-      OR JSON_CONTAINS(profile.factor_others_classification, JSON_QUOTE('factor_financial'))
-      OR JSON_CONTAINS(profile.factor_others_classification, JSON_QUOTE('factor_family'))
-      OR JSON_CONTAINS(profile.factor_others_classification, JSON_QUOTE('factor_working_student'))
-    )
-  )
+// Match personalFactorResponses: No is disclosed; Yes requires impact 1–4.
+// Missing/invalid metadata falls back only to unambiguous historical impacts 2–4.
+// BINARY preserves the shared helper's case-sensitive answer interpretation.
+const EFFECTIVE_PERSONAL_FACTORS_SQL = `(${PERSONAL_FACTOR_KEYS.map((factor) => `
+  CASE BINARY JSON_UNQUOTE(JSON_EXTRACT(metadata.answers, '$.${factor}'))
+    WHEN 'no' THEN 1
+    WHEN 'yes' THEN COALESCE(profile.factor_${factor}_impact IN (1, 2, 3, 4), 0)
+    WHEN 'unknown' THEN 0
+    WHEN 'legacy_unknown' THEN 0
+    ELSE COALESCE(profile.factor_${factor}_impact IN (2, 3, 4), 0)
+  END`).join(' OR ')}
 )`
 
+// The shared helper also accepts JSON-encoded strings. Decode them for reporting
+// only, and evaluate the terminal value once (never an intermediate fallback).
 const ASSESSMENT_STATES_CTE = `
-  WITH profile_stats AS (
+  WITH RECURSIVE personal_factor_metadata AS (
+    SELECT profile_id, personal_factor_answers AS answers FROM PROFILE
+    UNION ALL
+    SELECT profile_id, JSON_EXTRACT(JSON_UNQUOTE(answers), '$')
+    FROM personal_factor_metadata
+    WHERE JSON_TYPE(answers) = 'STRING' AND JSON_VALID(JSON_UNQUOTE(answers))
+  ),
+  profile_stats AS (
     SELECT user_id, COUNT(*) AS profile_count FROM PROFILE GROUP BY user_id
   ),
   interest_stats AS (
@@ -58,6 +63,9 @@ const ASSESSMENT_STATES_CTE = `
   personal_factor_stats AS (
     SELECT user_id, MAX(${EFFECTIVE_PERSONAL_FACTORS_SQL}) AS has_personal_factors
     FROM PROFILE profile
+    JOIN personal_factor_metadata metadata ON metadata.profile_id = profile.profile_id
+    WHERE NOT (COALESCE(JSON_TYPE(metadata.answers) = 'STRING', 0)
+      AND JSON_VALID(JSON_UNQUOTE(metadata.answers)))
     GROUP BY user_id
   ),
   assessment_states AS (

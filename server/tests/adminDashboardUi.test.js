@@ -18,7 +18,7 @@ test('admin dashboard presents only the approved paper-aligned sections', () => 
   for (const heading of [
     'Registered Students',
     'Completed Assessments',
-    'Assessments with Personal Factors',
+    'Completed Students with Disclosed Personal Factors',
     'Assessment Completion Rate',
     'Top Recommended Courses',
     'Course Popularity',
@@ -42,7 +42,9 @@ test('admin dashboard presents only the approved paper-aligned sections', () => 
 
 test('personal-factor count and course popularity labels are unambiguous', () => {
   assert.match(dashboardSource, /consideredPersonalFactors\.toLocaleString\(\).*of\{' '\}/s)
-  assert.match(dashboardSource, /completedAssessments\.toLocaleString\(\).*completed assessments/s)
+  assert.match(dashboardSource, /completedAssessments\.toLocaleString\(\).*completed students/s)
+  assert.match(dashboardSource, /at least one disclosed personal-factor answer in their current profile \(Yes or No\)/)
+  assert.doesNotMatch(dashboardSource, /Assessments with Personal Factors/)
   assert.match(dashboardSource, /labels: dashboard\.coursePopularity\.map\(\(\{ courseName \}\)/)
   assert.match(dashboardSource, /fullCourseNames: dashboard\.coursePopularity\.map/)
   assert.doesNotMatch(dashboardSource, /labels: dashboard\.coursePopularity\.map\(\(\{ courseCode/)

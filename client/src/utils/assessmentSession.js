@@ -6,6 +6,12 @@ export const ASSESSMENT_SESSION_KEYS = Object.freeze({
   completedSteps: 'learnmatch:assessment:completed-steps',
 })
 
+let sessionGeneration = 0
+export function invalidateAssessmentSession() {
+  sessionGeneration += 1
+  draftSaveQueues.clear()
+}
+
 export function getAssessmentAttemptId(storage) {
   const value = Number(storage?.getItem(ASSESSMENT_SESSION_KEYS.attemptId))
   return Number.isSafeInteger(value) && value > 0 ? value : null
@@ -17,23 +23,27 @@ export function assessmentHeaders(storage, headers = {}) {
 }
 
 export async function readActiveAttempt(apiUrl, token, storage) {
+  const generation = sessionGeneration
   if (!getAssessmentAttemptId(storage)) return null
   const response = await fetch(`${apiUrl}/api/assessment-attempts/current`, {
     headers: assessmentHeaders(storage, { Authorization: `Bearer ${token}` }),
   })
   if (!response.ok) throw new Error('Could not load assessment progress.')
-  return response.json()
+  const data = await response.json()
+  return generation === sessionGeneration ? data : null
 }
 
 // Recover a missing browser session before allowing structured interest answers.
 // Existing attempt IDs retain their normal ownership/status checks.
 export async function restoreInterestAttempt(apiUrl, token, storage) {
+  const generation = sessionGeneration
   if (!getAssessmentAttemptId(storage)) {
     const response = await fetch(`${apiUrl}/api/assessment-attempts/recover`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}` },
     })
     const data = await response.json()
+    if (generation !== sessionGeneration) return null
     if (!response.ok || !Number.isSafeInteger(data.attemptId) || data.attemptId <= 0) {
       throw new Error(data.message || 'Could not restore your assessment session.')
     }
@@ -46,6 +56,7 @@ export async function restoreInterestAttempt(apiUrl, token, storage) {
 const draftSaveQueues = new Map()
 
 export async function saveActiveAttemptDraft(apiUrl, token, storage, draft) {
+  const generation = sessionGeneration
   const attemptId = getAssessmentAttemptId(storage)
   if (!attemptId) return
   // Capture the attempt and payload now: queued writes must never move into a
@@ -54,7 +65,7 @@ export async function saveActiveAttemptDraft(apiUrl, token, storage, draft) {
   const body = JSON.stringify(draft)
   const key = `${apiUrl}:${attemptId}`
   const pending = (draftSaveQueues.get(key) || Promise.resolve()).catch(() => {}).then(
-    () => sendAttemptDraft(apiUrl, headers, body)
+    () => generation === sessionGeneration ? sendAttemptDraft(apiUrl, headers, body, generation) : undefined
   )
   draftSaveQueues.set(key, pending)
   try { await pending } finally {
@@ -62,8 +73,9 @@ export async function saveActiveAttemptDraft(apiUrl, token, storage, draft) {
   }
 }
 
-async function sendAttemptDraft(apiUrl, headers, body) {
+async function sendAttemptDraft(apiUrl, headers, body, generation) {
   for (let attempt = 0; attempt < 2; attempt += 1) {
+    if (generation !== sessionGeneration) return
     let response
     try {
       response = await fetch(`${apiUrl}/api/assessment-attempts/current`, {

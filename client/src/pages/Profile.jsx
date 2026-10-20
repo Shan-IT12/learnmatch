@@ -21,7 +21,8 @@ const factorRows = [
 const parseJsonValue = (value, fallback) => { if (value && typeof value === 'object') return value; if (typeof value !== 'string') return fallback; try { return JSON.parse(value) } catch { return fallback } }
 
 function summarizeFactor(profile, applicability, factor) {
-  if (!profile || !applicability[factor]) return 'Not provided'
+  if (!profile || !applicability[factor] || applicability[factor] === 'unknown') return 'Not disclosed (not used)'
+  if (applicability[factor] === 'legacy_unknown') return 'Previous answer unclear (not used)'
   if (applicability[factor] === 'no') return 'No'
   return impactLabels[Number(profile[`factor_${factor}_impact`])] || 'Not provided'
 }

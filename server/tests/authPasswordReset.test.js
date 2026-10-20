@@ -189,6 +189,9 @@ test('normal authentication middleware rejects password-reset JWTs', async () =>
   const result = await new Promise((resolve) => {
     const response = {
       statusCode: 200,
+      setHeader(name, value) {
+        if (name === 'Cache-Control') assert.equal(value, 'no-store')
+      },
       status(code) { this.statusCode = code; return this },
       json(body) { resolve({ status: this.statusCode, body }) },
     }
@@ -212,6 +215,9 @@ test('normal authentication middleware rejects password-reset JWTs', async () =>
     const request = { headers: { authorization: `Bearer ${loginToken}` } }
     const response = {
       statusCode: 200,
+      setHeader(name, value) {
+        if (name === 'Cache-Control') assert.equal(value, 'no-store')
+      },
       status(code) { this.statusCode = code; return this },
       json(body) { resolve({ status: this.statusCode, body }) },
     }

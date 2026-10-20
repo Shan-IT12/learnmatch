@@ -2,6 +2,13 @@ import { useEffect, useRef } from 'react'
 import { IconArchive, IconArrowRight, IconArrowsExchange, IconHistory, IconLoader2, IconLogout, IconPlayerPause, IconRefresh, IconX } from '@tabler/icons-react'
 
 const ACTION_DETAILS = {
+  directions: {
+    title: 'Share your location for directions?',
+    description: 'If you continue and allow location access, LearnMatch sends your current latitude and longitude and the selected school’s coordinates to OpenRouteService (HeiGIT) to calculate a route. The map loads tiles from OpenStreetMap, which receives your IP address, browser request metadata, and the map area requested. Directions are optional; you can keep browsing schools without sharing your location.',
+    cancelLabel: 'Keep browsing schools',
+    confirmLabel: 'Continue to location permission',
+    icon: IconArrowRight,
+  },
   earlyCheckin: {
     title: 'Start this check-in early?',
     description: 'This check-in is ahead of your recommended schedule. Waiting until the recommended phase gives you more time to reflect on your experience.',
@@ -111,7 +118,7 @@ function ActionConfirmationModal({ action, onCancel, onConfirm, processing = fal
   }
 
   return (
-    <div className="motion-page fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-slate-950/50 p-4 backdrop-blur-sm sm:p-6" role="presentation">
+    <div className="motion-page fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-slate-950/50 p-4 backdrop-blur-sm sm:p-6" style={action === 'directions' ? { zIndex: 1100 } : undefined} role="presentation">
       <div
         ref={dialogRef}
         role="dialog"

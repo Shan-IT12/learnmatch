@@ -78,7 +78,7 @@ const barOptions = {
 const metricDefinitions = [
   { key: 'registeredStudents', label: 'Registered Students', icon: IconUsers, tone: 'text-orange-700 bg-orange-50' },
   { key: 'completedAssessments', label: 'Completed Assessments', icon: IconClipboardCheck, tone: 'text-emerald-700 bg-emerald-50' },
-  { key: 'consideredPersonalFactors', label: 'Assessments with Personal Factors', icon: IconChartDonut3, tone: 'text-amber-700 bg-amber-50' },
+  { key: 'consideredPersonalFactors', label: 'Completed Students with Disclosed Personal Factors', icon: IconChartDonut3, tone: 'text-amber-700 bg-amber-50' },
 ]
 
 function formatCourseChartLabel(courseName, maxLength = 26) {
@@ -266,7 +266,7 @@ function AdminDashboard() {
                       {key === 'consideredPersonalFactors' && (
                         <p className="mt-1 text-xs text-slate-400">
                           {dashboard.summary.consideredPersonalFactors.toLocaleString()} of{' '}
-                          {dashboard.summary.completedAssessments.toLocaleString()} completed assessments
+                          {dashboard.summary.completedAssessments.toLocaleString()} completed students have at least one disclosed personal-factor answer in their current profile (Yes or No).
                         </p>
                       )}
                     </div>

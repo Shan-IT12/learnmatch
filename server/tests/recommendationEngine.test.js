@@ -148,9 +148,9 @@ test('multiple relevant impacts accumulate with a floor of zero', () => {
   assert.equal(calculatePersonalFactorScore(maximumImpact, 'BUSINESS CLUSTER'), 0.3)
 })
 
-test('legacy profiles without structured responses use the neutral score', () => {
-  assert.equal(calculatePersonalFactorScore(null, 'BUSINESS CLUSTER'), 0.5)
-  assert.equal(calculatePersonalFactorScore(undefined, 'BUSINESS CLUSTER'), 0.5)
+test('unknown profiles without structured responses exclude the component', () => {
+  assert.equal(calculatePersonalFactorScore(null, 'BUSINESS CLUSTER'), null)
+  assert.equal(calculatePersonalFactorScore(undefined, 'BUSINESS CLUSTER'), null)
 })
 
 test('Other Context and legacy fields cannot change a complete structured score', () => {

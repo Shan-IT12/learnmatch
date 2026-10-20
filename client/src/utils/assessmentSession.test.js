@@ -10,6 +10,7 @@ import {
   readAssessmentSession,
   readCompletedAssessmentSteps,
   writeAssessmentSession,
+  invalidateAssessmentSession,
 } from './assessmentSession.js'
 
 function memoryStorage() {
@@ -29,6 +30,20 @@ test('assessment session preserves answers, current progress, and question order
   }
   writeAssessmentSession(storage, 'skills', state)
   assert.deepEqual(readAssessmentSession(storage, 'skills', {}), state)
+})
+
+test('a recovery response arriving after logout cannot restore another student draft', async () => {
+  const previousFetch = globalThis.fetch
+  let resolveResponse
+  globalThis.fetch = () => new Promise(resolve => { resolveResponse = resolve })
+  const storage = memoryStorage()
+  try {
+    const pending = restoreInterestAttempt('', 'old-token', storage)
+    invalidateAssessmentSession()
+    resolveResponse({ ok: true, json: async () => ({ attemptId: 41 }) })
+    assert.equal(await pending, null)
+    assert.equal(storage.getItem('learnmatch:assessment:attempt-id'), null)
+  } finally { globalThis.fetch = previousFetch }
 })
 
 test('completed assessment steps remain available after navigating backward', () => {
