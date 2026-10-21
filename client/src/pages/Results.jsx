@@ -1,4 +1,5 @@
 import HeaderBrand from '../components/HeaderBrand'
+import CompatibilityDisclaimer from '../components/CompatibilityDisclaimer'
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { IconLoader2, IconSchool, IconSparkles, IconArrowUpRight } from '@tabler/icons-react'
@@ -415,6 +416,7 @@ function Results() {
           </div>
           </>
         )}
+        <CompatibilityDisclaimer />
       </div>
       <FeedbackPopup
         promptKey={feedbackMilestoneKey}

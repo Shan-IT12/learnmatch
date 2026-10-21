@@ -1,4 +1,5 @@
 import HeaderBrand from '../components/HeaderBrand'
+import CompatibilityDisclaimer from '../components/CompatibilityDisclaimer'
 import SkeletonContent from '../components/SkeletonContent'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -67,6 +68,7 @@ export function HistoricalResultContent({ result }) {
           </article>
         ))}
       </div>
+      <CompatibilityDisclaimer />
     </>
   )
 }

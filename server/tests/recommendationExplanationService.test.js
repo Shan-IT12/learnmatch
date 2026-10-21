@@ -75,6 +75,25 @@ const openAIResponse = () => ({
   }),
 })
 
+test('explanation payload matches the notice and excludes account details and raw disclosures', async () => {
+  let payload
+  const synthetic = recommendations.map(row => ({
+    ...row, username: 'PRIVATE_SENTINEL', email: 'PRIVATE_SENTINEL',
+    answers: 'PRIVATE_SENTINEL', personal_factor_answers: 'PRIVATE_SENTINEL', factor_others: 'PRIVATE_SENTINEL',
+  }))
+  await generateRecommendationExplanations(synthetic, { apiKey: 'synthetic-key', fetchImpl: async (url, options) => {
+    assert.equal(url, 'https://api.openai.com/v1/responses')
+    payload = JSON.parse(JSON.parse(options.body).input)
+    return { ok: false }
+  } })
+  assert.equal(payload.length, 3)
+  for (const item of payload) {
+    assert.deepEqual(Object.keys(item).sort(), ['area_to_develop', 'cluster_category', 'course_name', 'match_score', 'rank_position', 'strongest_alignment_factors'])
+    for (const factor of [...item.strongest_alignment_factors, item.area_to_develop]) assert.deepEqual(Object.keys(factor).sort(), ['label', 'score'])
+  }
+  assert.doesNotMatch(JSON.stringify(payload), /PRIVATE_SENTINEL/)
+})
+
 test('deterministic explanation describes existing WSM evidence', () => {
   const narrative = buildDeterministicExplanation(recommendations[0])
   assert.match(narrative, /weighted scoring model/i)

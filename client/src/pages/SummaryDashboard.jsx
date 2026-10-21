@@ -1,4 +1,5 @@
 import { deriveFactorApplicability } from '../utils/profilePersonalFactors'
+import CompatibilityDisclaimer from '../components/CompatibilityDisclaimer'
 import { clearUserAuth } from '../utils/userAuth'
 import LogoutButton from '../components/LogoutButton'
 import { IconLogout, IconMessageCircle, IconUserCircle } from '@tabler/icons-react'
@@ -429,6 +430,7 @@ function SummaryDashboard() {
           </button>
         </div>
  
+        <CompatibilityDisclaimer />
       </main></SkeletonContent>
       <ActionConfirmationModal
         action={showRetakeConfirmation ? 'retake' : null}

@@ -20,6 +20,24 @@ const monitorResult = {
   ],
 }
 
+test('college explanation payload discloses optional GWA and dimension scores without account identifiers', async () => {
+  for (const gwa of [null, 1.75]) {
+    let payload
+    await generateMismatchExplanation({ ...monitorResult, gwa, username: 'PRIVATE_SENTINEL', email: 'PRIVATE_SENTINEL', personalFactors: 'PRIVATE_SENTINEL' }, {
+      apiKey: 'synthetic-key', fetchImpl: async (url, options) => {
+        assert.equal(url, 'https://api.openai.com/v1/responses')
+        payload = JSON.parse(JSON.parse(options.body).input)
+        return { ok: false }
+      },
+    })
+    assert.deepEqual(Object.keys(payload).sort(), ['alignment_percent', 'deterministic_status', 'dimension_scores', 'gwa', 'phase'])
+    assert.equal(payload.gwa, gwa)
+    assert.equal(payload.dimension_scores.length, 5)
+    for (const item of payload.dimension_scores) assert.deepEqual(Object.keys(item).sort(), ['dimension', 'score'])
+    assert.doesNotMatch(JSON.stringify(payload), /PRIVATE_SENTINEL/)
+  }
+})
+
 test('deterministic mismatch fallback is supportive and uses the lowest dimension', () => {
   const fallback = buildMismatchFallback(monitorResult)
   assert.match(fallback.feedback, /worth monitoring/i)

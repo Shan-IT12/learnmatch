@@ -1,4 +1,5 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, useLocation } from 'react-router-dom'
+import { useEffect, useRef } from 'react'
 import Landing from './pages/Landing'
 import Login from './pages/Login'
 import Register from './pages/Register'
@@ -33,17 +34,33 @@ import CourseSearch from './pages/CourseSearch'
 import PublicCourseDetails from './pages/PublicCourseDetails'
 import SchoolLocator from './pages/SchoolLocator'
 import PageTransition from './components/PageTransition'
+import PrivacyNotice from './pages/PrivacyNotice'
 
 
 function App() {
+  const location = useLocation()
+  const privacyBackground = location.pathname === '/privacy' ? location.state?.privacyBackground : null
+  const routeLocation = privacyBackground || location
+  const privacyTrigger = useRef(null)
+  useEffect(() => {
+    if (privacyBackground) privacyTrigger.current = location.state?.privacyTriggerId
+    else if (privacyTrigger.current) {
+      document.getElementById(privacyTrigger.current)?.focus()
+      privacyTrigger.current = null
+    }
+  }, [location, privacyBackground])
   return (
-    <PageTransition><Routes>
+    <>
+    {/* Retain the originating form in memory while its same-tab notice is shown. */}
+    <div hidden={Boolean(privacyBackground)}>
+    <PageTransition transitionLocation={routeLocation}><Routes location={routeLocation}>
       <Route path="/" element={<Landing />} />
       <Route path="/courses/search" element={<CourseSearch />} />
       <Route path="/courses/:courseCode" element={<PublicCourseDetails />} />
       <Route path="/schools/:courseCode" element={<SchoolLocator />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/privacy" element={<PrivacyNotice />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/profile" element={<Profile />} />
@@ -72,6 +89,9 @@ function App() {
       <Route path="/admin/feedback" element={<AdminRoute><AdminFeedback /></AdminRoute>} />
       <Route path="/admin/feedback/:feedbackId" element={<AdminRoute><AdminFeedbackDetail /></AdminRoute>} />
     </Routes></PageTransition>
+    </div>
+    {privacyBackground && <PrivacyNotice />}
+    </>
   )
 }
 

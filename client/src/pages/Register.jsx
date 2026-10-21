@@ -1,4 +1,5 @@
 import HeaderBrand from '../components/HeaderBrand'
+import PrivacyNoticeLink from '../components/PrivacyNoticeLink'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { IconEye, IconEyeOff } from '@tabler/icons-react'
@@ -211,6 +212,7 @@ function Register() {
                 </div>
               )}
 
+              <p className="mb-5 text-sm leading-6 text-gray-600">Read our <PrivacyNoticeLink /> to learn how LearnMatch collects, saves, and uses your information.</p>
               <form onSubmit={handleSubmit} noValidate className="space-y-4">
                 <div data-validation-field="email">
                   <label className="block text-sm font-medium text-gray-700 mb-2">Email <RequiredMark /></label>

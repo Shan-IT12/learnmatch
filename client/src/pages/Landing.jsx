@@ -13,6 +13,7 @@ import { STUDENT_ACTIVE_INDEPENDENT_COURSE_COUNT } from '../constants/courseCata
 import landingCoursePathway from '../assets/landing-course-pathway.png'
 import CourseName from '../components/CourseName'
 import LandingIntro from '../components/LandingIntro'
+import PublicFooter from '../components/PublicFooter'
 
 const journeySteps = [
   {
@@ -240,12 +241,7 @@ function Landing() {
         </section>
       </main>
 
-      <footer className="border-t border-orange-100/70 px-5 py-6 sm:px-8 lg:px-10">
-        <div className="mx-auto flex max-w-[1380px] flex-col items-center justify-between gap-2 sm:flex-row">
-          <span className="text-sm font-bold text-gray-900">Learn<span className="text-orange-500">Match</span></span>
-          <p className="text-xs text-gray-400">© 2026 LearnMatch</p>
-        </div>
-      </footer>
+      <PublicFooter />
     </div>
   )
 }
