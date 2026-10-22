@@ -1,4 +1,6 @@
 import test from 'node:test'
+import { DatabaseSync } from 'node:sqlite'
+import { getAdminDashboard } from '../services/adminDashboardService.js'
 import assert from 'node:assert/strict'
 import fs from 'node:fs'
 import jwt from 'jsonwebtoken'
@@ -41,7 +43,7 @@ function analyticsDatabase({
       if (sql.includes('assessment_states')) return [completionRows]
       if (sql.includes('ranked_skill_responses')) return [skillRows]
       if (sql.includes('ranked_personality')) return [personalityRows]
-      if (sql.includes('ranked_recommendations')) return [courseRows]
+      if (sql.includes('SELECT course.course_id')) return [courseRows]
       throw new Error(`Unexpected SQL: ${sql}`)
     },
   }
@@ -116,7 +118,7 @@ test('personality distribution counts only each student latest valid stored MBTI
   assert.match(sql, /WHERE mbti_type IN \('ISTJ'/)
 })
 
-test('top courses count only latest persisted Top 3 snapshot per student and return Top 5', async () => {
+test('all courses count every retained Top 3 snapshot without a course limit', async () => {
   const database = analyticsDatabase()
   const result = await getAdminAnalytics(database)
 
@@ -124,14 +126,11 @@ test('top courses count only latest persisted Top 3 snapshot per student and ret
     { courseId: 4, courseCode: 'BSIT', courseName: 'Information Technology', count: 3 },
     { courseId: 7, courseCode: 'BSN', courseName: 'Nursing', count: 2 },
   ])
-  const sql = database.calls.find((query) => query.includes('ranked_recommendations'))
-  assert.match(sql, /PARTITION BY user_id/)
-  assert.match(sql, /ORDER BY generated_at DESC, recommendation_id DESC/)
+  const sql = database.calls.find((query) => query.includes('SELECT course.course_id'))
+  assert.doesNotMatch(sql, /snapshot_rank|PARTITION BY|LIMIT/)
   assert.match(sql, /item\.rank_position BETWEEN 1 AND 3/)
-  assert.match(sql, /recommendation\.snapshot_rank = 1/)
   assert.match(sql, /JOIN COURSE course ON course\.course_id = item\.course_id/)
   assert.match(sql, /ORDER BY appearance_count DESC, course\.course_name ASC/)
-  assert.match(sql, /LIMIT 5/)
 })
 
 test('analytics returns safe empty collections and zero completion rate when no data exists', async () => {
@@ -191,10 +190,44 @@ test('analytics service contains only read queries and returns no private respon
   const database = analyticsDatabase()
   const result = await getAdminAnalytics(database)
 
-  assert.ok(database.calls.every((sql) => /^\s*WITH\b/i.test(sql)))
+  assert.ok(database.calls.every((sql) => /^\s*(WITH|SELECT)\b/i.test(sql)))
   assert.ok(database.calls.every((sql) => !/\b(INSERT|UPDATE|DELETE|ALTER|DROP|TRUNCATE|CREATE)\b/i.test(sql)))
   assert.doesNotMatch(
     JSON.stringify(result).toLowerCase(),
     /password|otp|token|selected_option|factor_physical|height_cm|ai_narrative|prompt/
   )
+})
+
+// Execute the actual course SQL against an isolated in-memory relational fixture.
+// No application database connection or migration is used.
+test('all 12 qualifying courses are sorted and older assessments differ from dashboard', async () => {
+  const db = new DatabaseSync(':memory:')
+  try {
+    db.exec(`CREATE TABLE COURSE (course_id INTEGER, course_code TEXT, course_name TEXT);
+      CREATE TABLE RECOMMENDATION (recommendation_id INTEGER, user_id INTEGER, generated_at TEXT);
+      CREATE TABLE RECOMMENDATION_ITEM (recommendation_id INTEGER, course_id INTEGER, rank_position INTEGER);`)
+    for (let id = 1; id <= 13; id++) {
+      db.prepare('INSERT INTO COURSE VALUES (?, ?, ?)').run(id, `C${id}`, `Course ${String(id).padStart(2, '0')}`)
+    }
+    // Four assessments from the same student retain twelve distinct courses.
+    for (let snapshot = 1; snapshot <= 4; snapshot++) {
+      db.prepare('INSERT INTO RECOMMENDATION VALUES (?, 1, ?)').run(snapshot, `2026-10-0${snapshot}`)
+      for (let rank = 1; rank <= 3; rank++) {
+        db.prepare('INSERT INTO RECOMMENDATION_ITEM VALUES (?, ?, ?)').run(snapshot, (snapshot - 1) * 3 + rank, rank)
+      }
+    }
+    db.exec(`INSERT INTO RECOMMENDATION VALUES (5, 2, '2026-10-05');
+      INSERT INTO RECOMMENDATION_ITEM VALUES (5, 2, 1), (5, 3, 2), (5, 4, 3);
+      INSERT INTO RECOMMENDATION_ITEM VALUES (5, 13, 4);`)
+    const fallback = analyticsDatabase()
+    const analytics = await getAdminAnalytics({ query: async (sql) => sql.includes('SELECT course.course_id')
+      ? [db.prepare(sql).all()] : fallback.query(sql) })
+    assert.equal(analytics.topRecommendedCourses.length, 12)
+    assert.deepEqual(analytics.topRecommendedCourses.map(({ courseId }) => courseId), [2, 3, 4, 1, 5, 6, 7, 8, 9, 10, 11, 12])
+    assert.deepEqual(analytics.topRecommendedCourses.map(({ count }) => count), [2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1])
+    const dashboard = await getAdminDashboard({ query: async (sql, values = []) =>
+      sql.includes('SELECT course.course_id') ? [db.prepare(sql).all(...values)] : [[]] })
+    assert.deepEqual(dashboard.coursePopularity.map(({ courseId }) => courseId), [2, 3, 4, 10, 11, 12])
+    assert.ok(dashboard.coursePopularity.every(({ count }) => count === 1))
+  } finally { db.close() }
 })

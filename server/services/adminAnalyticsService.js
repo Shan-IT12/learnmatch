@@ -107,26 +107,18 @@ const PERSONALITY_QUERY = `
   GROUP BY mbti_type
   ORDER BY student_count DESC, mbti_type ASC`
 
-const TOP_COURSES_QUERY = `
-  WITH ranked_recommendations AS (
-    SELECT recommendation_id, user_id,
-           ROW_NUMBER() OVER (
-             PARTITION BY user_id
-             ORDER BY generated_at DESC, recommendation_id DESC
-           ) AS snapshot_rank
-    FROM RECOMMENDATION
-  )
+// Count retained Top 3 results across every assessment snapshot, not just the
+// latest per student. Refreshes replace items, so this is not an event history.
+const ALL_COURSES_QUERY = `
   SELECT course.course_id, course.course_code, course.course_name,
          COUNT(*) AS appearance_count
-  FROM ranked_recommendations recommendation
+  FROM RECOMMENDATION recommendation
   JOIN RECOMMENDATION_ITEM item
     ON item.recommendation_id = recommendation.recommendation_id
    AND item.rank_position BETWEEN 1 AND 3
   JOIN COURSE course ON course.course_id = item.course_id
-  WHERE recommendation.snapshot_rank = 1
   GROUP BY course.course_id, course.course_code, course.course_name
-  ORDER BY appearance_count DESC, course.course_name ASC
-  LIMIT 5`
+  ORDER BY appearance_count DESC, course.course_name ASC, course.course_id ASC`
 
 function roundOneDecimal(value) {
   return Math.round(Number(value) * 10) / 10
@@ -142,7 +134,7 @@ export async function getAdminAnalytics(database) {
     database.query(COMPLETION_QUERY),
     database.query(AVERAGE_SKILLS_QUERY),
     database.query(PERSONALITY_QUERY),
-    database.query(TOP_COURSES_QUERY),
+    database.query(ALL_COURSES_QUERY),
   ])
 
   const completion = completionRows[0] || {}

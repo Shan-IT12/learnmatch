@@ -103,7 +103,7 @@ const metricDefinitions = [
 
 function wrapLabel(label, maxLength = 24) {
   const lines = []
-  for (const word of String(label).split(' ')) {
+  for (const word of String(label).split(/\s+/).flatMap((word) => word.match(new RegExp(`.{1,${maxLength}}`, 'gu')) || [])) {
     const current = lines.at(-1)
     if (!current || `${current} ${word}`.length > maxLength) lines.push(word)
     else lines[lines.length - 1] = `${current} ${word}`
@@ -165,6 +165,7 @@ function AdminAnalytics() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [retryKey, setRetryKey] = useState(0)
+  const [showAllCourses, setShowAllCourses] = useState(false)
 
   useEffect(() => {
     document.title = 'Analytics | LearnMatch Admin'
@@ -199,6 +200,17 @@ function AdminAnalytics() {
     loadAnalytics()
     return () => controller.abort()
   }, [navigate, retryKey])
+
+  const visibleCourses = useMemo(() => {
+    const courses = analytics?.topRecommendedCourses || []
+    return showAllCourses ? courses : courses.slice(0, 8)
+  }, [analytics, showAllCourses])
+  // Chart.js category rows are equally spaced: reserve room for the longest
+  // multiline label in every row, including on narrow screens.
+  const courseLabels = visibleCourses.map(({ courseName }) => wrapCourseLabel(courseName))
+  const courseChartHeight = Math.max(320, 40 + visibleCourses.length * Math.max(
+    42, ...courseLabels.map((lines) => lines.length * 16 + 16)
+  ))
 
   const chartData = useMemo(() => {
     if (!analytics) return null
@@ -236,16 +248,16 @@ function AdminAnalytics() {
         }],
       },
       courses: {
-        labels: analytics.topRecommendedCourses.map(({ courseName }) => wrapCourseLabel(courseName)),
+        labels: visibleCourses.map(({ courseName }) => wrapCourseLabel(courseName)),
         datasets: [{
-          data: analytics.topRecommendedCourses.map(({ count }) => count),
+          data: visibleCourses.map(({ count }) => count),
           backgroundColor: '#f97316',
           borderRadius: 4,
           barThickness: 22,
         }],
       },
     }
-  }, [analytics])
+  }, [analytics, visibleCourses])
 
   const completionTotal = analytics
     ? Object.values(analytics.assessmentCompletion).reduce((sum, count) => sum + count, 0)
@@ -344,15 +356,31 @@ function AdminAnalytics() {
             </div>
 
             <ChartCard
-              title="Top Recommended Courses"
-              subtitle="Most frequent courses in each student's latest persisted Top 3 recommendation snapshot"
+              title="All Recommended Courses"
+              subtitle="Course recommendation frequency across all stored student Top 3 results"
               icon={IconChartBar}
             >
-              <div className="h-80 min-w-0 sm:h-96">
-                {analytics.topRecommendedCourses.length > 0
-                  ? <Bar data={chartData.courses} options={horizontalCountOptions} />
-                  : <EmptyState>No persisted course recommendations are available yet.</EmptyState>}
-              </div>
+              {analytics.topRecommendedCourses.length > 0 ? (
+                <>
+                  <div id="all-recommended-courses" className="overflow-x-auto">
+                    <div className="relative min-w-[480px]" style={{ height: courseChartHeight }}>
+                      <Bar data={chartData.courses} options={horizontalCountOptions}
+                        aria-label={`Recommendation frequency for ${visibleCourses.length} courses`} role="img" />
+                    </div>
+                  </div>
+                  <p className="mt-3 text-sm text-slate-500" aria-live="polite">
+                    Showing {visibleCourses.length} of {analytics.topRecommendedCourses.length} recommended courses
+                  </p>
+                  {analytics.topRecommendedCourses.length > 8 && (
+                    <button type="button" aria-expanded={showAllCourses} aria-controls="all-recommended-courses"
+                      onClick={() => setShowAllCourses((expanded) => !expanded)}
+                      className="mt-3 rounded-lg border border-orange-200 bg-orange-50 px-4 py-2 text-sm font-semibold text-orange-700 hover:bg-orange-100 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2">
+                      {showAllCourses ? 'Show Less' : 'Show All Courses'}
+                    </button>
+                  )}
+                </>
+              ) : <EmptyState>No persisted course recommendations are available yet.</EmptyState>}
+
             </ChartCard>
           </div>
         )}
