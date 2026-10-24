@@ -2,8 +2,9 @@ import { clearUserAuth } from '../../utils/userAuth'
 import CollegeProgramRoadmap from '../../components/CollegeProgramRoadmap'
 import './collegeDashboard.css'
 import LogoutButton from '../../components/LogoutButton'
+import StudentAccountMenu from '../../components/StudentAccountMenu'
 import { IconLogout, IconMessageCircle } from '@tabler/icons-react'
-import HeaderBrand, { HeaderAccount } from '../../components/HeaderBrand'
+import HeaderBrand from '../../components/HeaderBrand'
 import { collegePlaceholder, coursePlaceholder } from '../../data/loadingPlaceholders'
 import SkeletonContent from '../../components/SkeletonContent'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -475,7 +476,7 @@ function CollegeDashboard() {
           <HeaderBrand />
         </button>
         <div className="lm-header-actions flex items-center gap-3 sm:gap-4">
-          <HeaderAccount username={username} />
+          <StudentAccountMenu username={username} returnTo="college" onProfile={() => navigate('/profile')} />
           <button onClick={() => navigate('/feedback', { state: { entryContext: 'college' } })} className="lm-action"><IconMessageCircle size={16} stroke={1.7} aria-hidden="true" /> Feedback
           </button>
           {lifecycleStatus !== 'active' && (

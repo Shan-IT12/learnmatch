@@ -11,6 +11,30 @@ import {
   validateTopThreeRecommendations,
 } from '../services/recommendationPersistenceService.js'
 
+test('Personal Factors refresh borrows the profile transaction without nested commit or release', async () => {
+  const writes = []
+  const connection = {
+    beginTransaction() { throw new Error('Nested transaction') },
+    commit() { throw new Error('Premature commit') },
+    rollback() { throw new Error('Outer caller owns rollback') },
+    release() { throw new Error('Outer caller owns release') },
+    async query(sql) {
+      writes.push(sql)
+      if (sql.includes('FROM PERSONALITY_ASSESSMENT')) return [[{ assessment_id: 11 }]]
+      if (sql.includes('FROM RECOMMENDATION')) return [[{ recommendation_id: 99, assessment_id: 11 }]]
+      if (sql.includes('FROM COURSE')) return [[{ course_id: 10, course_code: 'CRS001' }, { course_id: 20, course_code: 'CRS002' }, { course_id: 30, course_code: 'CRS003' }]]
+      return [{ affectedRows: 1 }]
+    },
+  }
+  const pool = { query() { throw new Error('Must read uncommitted profile transaction') }, getConnection() { throw new Error('Must not obtain another connection') } }
+  const result = await refreshSavedRecommendationsForLatestAssessment(pool, 7, async database => {
+    assert.equal(database, connection)
+    return generatedRecommendations
+  }, { transactionConnection: connection })
+  assert.equal(result.refreshed, true)
+  assert.equal(writes.filter(sql => sql.includes('INSERT INTO RECOMMENDATION_ITEM')).length, 3)
+})
+
 test('Personal Factors refresh replaces recommendation items without changing the assessment snapshot', async () => {
   const writes = []
   const connection = {

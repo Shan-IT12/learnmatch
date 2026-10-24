@@ -1,4 +1,5 @@
 import pool from '../config/db.js'
+import { isDeepStrictEqual } from 'node:util'
 import { validateProfile } from '../services/requestValidationService.js'
 import { refreshSavedRecommendationsForLatestAssessment } from '../services/recommendationPersistenceService.js'
 import { buildPersonalFactorsSnapshot, requestedAttemptId, setAttemptPersonalFactors } from '../services/assessmentAttemptService.js'
@@ -31,18 +32,20 @@ export const saveProfileWithDependencies = async (
 
   let connection = database
   let transactionStarted = false
+  let committing = false
+  let destroyed = false
+  const conflict = () => Object.assign(new Error('Profile write conflict'), { code: 'PROFILE_WRITE_CONFLICT' })
   try {
     if (typeof database.getConnection === 'function') connection = await database.getConnection()
-    if (typeof connection.beginTransaction === 'function') {
-      await connection.beginTransaction()
-      transactionStarted = true
-    }
+    if (typeof connection.beginTransaction !== 'function') throw new Error('Profile saves require a transaction')
+    await connection.beginTransaction()
+    transactionStarted = true
 
     const [accounts] = await connection.query(
-      'SELECT username FROM USER_ACCOUNT WHERE user_id = ? LIMIT 1',
+      'SELECT username, is_active FROM USER_ACCOUNT WHERE user_id = ? LIMIT 1 FOR UPDATE',
       [userId]
     )
-    if (accounts.length !== 1) {
+    if (accounts.length !== 1 || Number(accounts[0].is_active) !== 1) {
       if (transactionStarted) {
         await connection.rollback()
         transactionStarted = false
@@ -65,18 +68,25 @@ export const saveProfileWithDependencies = async (
           message: 'Username is already taken.',
         })
       }
-      await connection.query(
+      const [accountWrite] = await connection.query(
         'UPDATE USER_ACCOUNT SET username = ? WHERE user_id = ?',
         [username, userId]
       )
+      if (accountWrite.affectedRows !== 1) throw conflict()
     }
 
+    // Same parent order as deletion: account -> recommendations -> attempts -> profile.
+    // Holding the account lock serializes profile saves and deletion throughout.
+    await connection.query('SELECT recommendation_id FROM RECOMMENDATION WHERE user_id = ? FOR UPDATE', [userId])
+    await connection.query('SELECT attempt_id FROM ASSESSMENT_ATTEMPT WHERE user_id = ? FOR UPDATE', [userId])
     const [existing] = await connection.query(
       `SELECT profile_id, personal_factor_answers, factor_physical_impact, factor_health_impact,
-              factor_financial_impact, factor_family_impact, factor_work_impact
-       FROM PROFILE WHERE user_id = ?`,
+              factor_financial_impact, factor_family_impact, factor_work_impact,
+              physical_accessibility_areas, physical_accessibility_difficulties
+       FROM PROFILE WHERE user_id = ? FOR UPDATE`,
       [userId]
     )
+    if (existing.length > 1) throw conflict()
 
     if (existing.length > 0) {
       const impactValues = [
@@ -87,10 +97,11 @@ export const saveProfileWithDependencies = async (
         'factor_physical_impact', 'factor_health_impact', 'factor_financial_impact',
         'factor_family_impact', 'factor_work_impact',
       ]
-      const personalFactorScoreChanged = JSON.stringify(existing[0].personal_factor_answers) !== JSON.stringify(personal_factor_answers) || impactFields.some(
+      const json = value => typeof value === 'string' ? JSON.parse(value) : value
+      const personalFactorScoreChanged = !isDeepStrictEqual(json(existing[0].personal_factor_answers), personal_factor_answers) || impactFields.some(
         (field, index) => Number(existing[0][field]) !== Number(impactValues[index])
       )
-      await connection.query(
+      const [profileWrite] = await connection.query(
         `UPDATE PROFILE SET 
           physical_accessibility_areas = ?, physical_accessibility_difficulties = ?,
           factor_physical_impact = ?, factor_health_impact = ?, factor_financial_impact = ?,
@@ -103,19 +114,30 @@ export const saveProfileWithDependencies = async (
           factor_family_impact, factor_work_impact, JSON.stringify(personal_factor_answers), userId,
         ]
       )
+      if (profileWrite.affectedRows !== 1) {
+        // Some connections report only changed rows. A no-op is successful only
+        // when the locked existing record already equals the requested values.
+        const same = profileWrite.affectedRows === 0
+          && isDeepStrictEqual(json(existing[0].personal_factor_answers), personal_factor_answers)
+          && isDeepStrictEqual(json(existing[0].physical_accessibility_areas), physical_accessibility_areas)
+          && isDeepStrictEqual(json(existing[0].physical_accessibility_difficulties), physical_accessibility_difficulties)
+          && impactFields.every((field, index) => existing[0][field] === impactValues[index])
+        if (!same) throw conflict()
+      }
       const attemptId = requestedAttemptId(req)
       if (attemptId) await setAttemptPersonalFactors(connection, userId, attemptId, buildPersonalFactorsSnapshot(req.body))
-      if (transactionStarted) {
-        await connection.commit()
-        transactionStarted = false
-      }
+      // Refresh reads our uncommitted Personal Factors on this same connection;
+      // a refresh failure rolls back the profile instead of failing after a save.
       const refresh = personalFactorScoreChanged
-        ? await refreshRecommendations(database, userId)
+        ? await refreshRecommendations(database, userId, undefined, { transactionConnection: connection })
         : { refreshed: false }
+      committing = true
+      await connection.commit()
+      transactionStarted = false
       return res.json({ message: 'Profile updated successfully', username, recommendationsRefreshed: refresh.refreshed })
     }
 
-    await connection.query(
+    const [profileInsert] = await connection.query(
       `INSERT INTO PROFILE 
         (user_id, full_name, height_cm, weight_kg, factor_physical, factor_health, 
          factor_financial, factor_family, factor_distance, factor_working_student, factor_others,
@@ -134,18 +156,23 @@ export const saveProfileWithDependencies = async (
         factor_family_impact, factor_work_impact, JSON.stringify(personal_factor_answers),
       ]
     )
+    if (profileInsert.affectedRows !== 1 || !Number.isSafeInteger(profileInsert.insertId) || profileInsert.insertId <= 0) throw conflict()
     const attemptId = requestedAttemptId(req)
     if (attemptId) await setAttemptPersonalFactors(connection, userId, attemptId, buildPersonalFactorsSnapshot(req.body))
-    if (transactionStarted) {
-      await connection.commit()
-      transactionStarted = false
-    }
+    committing = true
+    await connection.commit()
+    transactionStarted = false
 
     res.status(201).json({ message: 'Profile saved successfully', username })
 
   } catch (error) {
+    if (committing) {
+      connection.destroy()
+      destroyed = true
+      return res.status(503).json({ code: 'PROFILE_SAVE_OUTCOME_UNKNOWN', message: 'We could not confirm whether your profile was saved. Reload your profile to check before submitting again.' })
+    }
     if (transactionStarted) {
-      try { await connection.rollback() } catch { /* preserve the original database error */ }
+      try { await connection.rollback() } catch { connection.destroy(); destroyed = true }
       transactionStarted = false
     }
     if (error?.code === 'ER_DUP_ENTRY') {
@@ -154,10 +181,13 @@ export const saveProfileWithDependencies = async (
         message: 'Username is already taken.',
       })
     }
-    console.error('Profile save error:', error)
+    if (['ER_LOCK_DEADLOCK', 'ER_LOCK_WAIT_TIMEOUT', 'PROFILE_WRITE_CONFLICT'].includes(error?.code)) {
+      return res.status(409).json({ code: 'PROFILE_SAVE_CONFLICT', message: 'Your profile was not saved because another update conflicted with it. Please reload and try again.' })
+    }
+    // Raw driver errors may contain submitted profile data or SQL parameters.
     res.status(500).json({ message: 'Server error saving profile' })
   } finally {
-    if (connection !== database && typeof connection.release === 'function') connection.release()
+    if (!destroyed && connection !== database && typeof connection.release === 'function') connection.release()
   }
 }
 

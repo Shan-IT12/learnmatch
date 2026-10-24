@@ -3,6 +3,8 @@ import cors from 'cors'
 import helmet from 'helmet'
 import dotenv from 'dotenv'
 import authRoutes from './routes/authRoutes.js'
+import { createAccountRouter } from './routes/accountRoutes.js'
+import { createProxyTrust } from './config/proxyTrust.js'
 import profileRoutes from './routes/profileRoutes.js'
 import pool from './config/db.js'
 import authenticateToken from './middleware/authenticateToken.js'
@@ -75,10 +77,9 @@ dotenv.config()
 const app = express()
 const PORT = process.env.PORT || 5000
 
-// Railway terminates public connections at one trusted reverse-proxy hop.
-// This lets IP-based security controls use the nearest proxy-provided address
-// without trusting an arbitrary client-supplied forwarding chain.
-app.set('trust proxy', 1)
+// Direct connections by default; only explicitly verified ingress peers may
+// supply a forwarded client address. Railway does not establish a fixed hop count.
+app.set('trust proxy', createProxyTrust())
 app.disable('x-powered-by')
 app.use(helmet({
   contentSecurityPolicy: {
@@ -95,6 +96,8 @@ app.use(helmet({
   },
 }))
 app.use(cors(corsOptions()))
+// Account deletion owns its bounded JSON parser and sanitized parser errors.
+app.use('/api/account', createAccountRouter(pool, authenticateToken))
 // Source receipts carry bounded excerpts and exact-content confirmation snapshots.
 app.use(['/api/admin/courses', '/api/admin/course-sources'], express.json({ limit: '512kb' }))
 app.use(express.json({ limit: '100kb' }))

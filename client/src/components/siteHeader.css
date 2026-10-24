@@ -26,6 +26,10 @@
 .lm-account-text { display: flex; flex-direction: column; gap: .2rem; text-align: left; }
 .lm-account-label { font-size: 12px; line-height: 1.3; color: #64748b; }
 .lm-account-text strong { max-width: 10rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; font-weight: 650; line-height: 1.2; color: #334155; }
+.lm-account-trigger { display: inline-flex; align-items: center; gap: .5rem; min-height: 40px; padding: .25rem; border-radius: 12px; color: #64748b; cursor: pointer; }
+.lm-account-trigger:hover { background: #fff7ed; }
+.lm-account-trigger:focus-visible { outline: 2px solid #fb923c; outline-offset: 4px; }
+.lm-account-trigger .lm-header-account { display: inline-flex; padding-right: 0; margin-right: 0; border-right: 0; }
 .lm-site-header .lm-action { min-height: 40px; background: white; border-color: #e5e7eb; color: #64748b; border-radius: 12px; font-size: 14px; gap: .5rem; }
 .lm-site-header .lm-action:hover { background: #fff7ed; border-color: #fed7aa; color: #c2410c; }
 .lm-site-header .lm-action-danger { background: #fff1f2; border-color: #ffe4e6; color: #e11d48; }
@@ -35,6 +39,7 @@
 .lm-header-primary:hover { background: #ea580c; border-color: #ea580c; }
 .lm-header-primary:focus-visible, .lm-site-header .lm-brand:focus-visible { outline: 2px solid #fb923c; outline-offset: 4px; }
 @media (max-width: 767px) { .lm-header-account { display: none; } }
+@media (max-width: 767px) { .lm-account-trigger .lm-account-text { display: none; } }
 @media (max-width: 479px) {
   .lm-site-header, .lm-header-inner { gap: .75rem; }
   .lm-brand-symbol { width: 36px; height: 36px; border-radius: 12px; }

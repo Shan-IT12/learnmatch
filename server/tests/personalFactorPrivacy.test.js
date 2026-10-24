@@ -61,14 +61,14 @@ test('historical impact 1 remains unknown even when old booleans or physical det
 
 test('profile persistence and attempt snapshots round-trip No, Yes/slight and unknown separately', async () => {
   let row
-  const db = { async query(sql, params) {
-    if (sql.includes('SELECT username FROM USER_ACCOUNT')) return [[{ username: 'synthetic_student' }]]
+  const db = { async beginTransaction() {}, async commit() {}, async rollback() {}, async query(sql, params) {
+    if (sql.startsWith('SELECT username') && sql.includes('FROM USER_ACCOUNT')) return [[{ username: 'synthetic_student', is_active: 1 }]]
     if (sql.includes('SELECT profile_id')) return [row ? [row] : []]
     if (sql.startsWith('INSERT INTO PROFILE')) {
       const columns = sql.match(/INSERT INTO PROFILE\s*\(([^)]+)\)/)[1].split(',').map(field => field.trim())
       row = Object.fromEntries(columns.map((column, index) => [column, params[index]]))
     }
-    return [{ affectedRows: 1 }]
+    return [{ affectedRows: 1, insertId: 1 }]
   } }
   const body = undisclosed()
   body.personal_factor_answers.health = 'yes'

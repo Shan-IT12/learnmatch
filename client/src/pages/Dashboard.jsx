@@ -1,6 +1,7 @@
 import LogoutButton from '../components/LogoutButton'
-import { IconLogout, IconMessageCircle, IconUserCircle } from '@tabler/icons-react'
-import HeaderBrand, { HeaderAccount } from '../components/HeaderBrand'
+import StudentAccountMenu from '../components/StudentAccountMenu'
+import { IconLogout, IconMessageCircle } from '@tabler/icons-react'
+import HeaderBrand from '../components/HeaderBrand'
 import SkeletonContent from '../components/SkeletonContent'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -79,8 +80,7 @@ function Dashboard() {
           <HeaderBrand />
         </button>
         <div className="lm-header-actions flex flex-wrap items-center gap-2 sm:gap-3">
-          <HeaderAccount username={username} />
-          <button onClick={() => navigate('/profile', { state: { entryContext: 'dashboard' } })} className="lm-header-primary"><IconUserCircle size={16} stroke={1.7} aria-hidden="true" />{hasProfile ? 'View Profile' : 'Setup Profile'}</button>
+          <StudentAccountMenu username={username} onProfile={() => navigate('/profile', { state: { entryContext: 'dashboard' } })} />
           <button onClick={() => navigate('/feedback', { state: { entryContext: 'dashboard' } })} className="lm-action"><IconMessageCircle size={16} stroke={1.7} aria-hidden="true" /> Feedback</button>
           <LogoutButton onConfirm={handleLogout} className="lm-action lm-action-danger"><IconLogout size={16} stroke={1.7} aria-hidden="true" /> Logout</LogoutButton>
         </div>

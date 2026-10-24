@@ -35,6 +35,7 @@ import PublicCourseDetails from './pages/PublicCourseDetails'
 import SchoolLocator from './pages/SchoolLocator'
 import PageTransition from './components/PageTransition'
 import PrivacyNotice from './pages/PrivacyNotice'
+import StudentSettings from './pages/StudentSettings'
 
 
 function App() {
@@ -64,6 +65,7 @@ function App() {
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/profile" element={<Profile />} />
+      <Route path="/settings" element={<StudentSettings />} />
       <Route path="/profile/edit" element={<ProfileEdit />} />
       <Route path="/onboarding/profile" element={<OnboardingProfile />} />
       <Route path="/onboarding/interests" element={<OnboardingInterests />} />

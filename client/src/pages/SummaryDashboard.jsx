@@ -2,8 +2,9 @@ import { deriveFactorApplicability } from '../utils/profilePersonalFactors'
 import CompatibilityDisclaimer from '../components/CompatibilityDisclaimer'
 import { clearUserAuth } from '../utils/userAuth'
 import LogoutButton from '../components/LogoutButton'
-import { IconLogout, IconMessageCircle, IconUserCircle } from '@tabler/icons-react'
-import HeaderBrand, { HeaderAccount } from '../components/HeaderBrand'
+import StudentAccountMenu from '../components/StudentAccountMenu'
+import { IconLogout, IconMessageCircle } from '@tabler/icons-react'
+import HeaderBrand from '../components/HeaderBrand'
 import SkeletonContent from '../components/SkeletonContent'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -173,12 +174,7 @@ function SummaryDashboard() {
           <HeaderBrand />
         </button>
         <div className="lm-header-actions flex flex-wrap items-center justify-end gap-2 sm:gap-4">
-          <HeaderAccount username={username} />
-          <button
-            onClick={() => navigate('/profile?returnTo=summary', { state: { assessmentComplete: true } })}
-            className="lm-header-primary"
-          ><IconUserCircle size={16} stroke={1.7} aria-hidden="true" /> View Profile
-          </button>
+          <StudentAccountMenu username={username} returnTo="summary" onProfile={() => navigate('/profile?returnTo=summary', { state: { assessmentComplete: true } })} />
           <button
             onClick={() => navigate('/feedback', { state: { entryContext: 'dashboard' } })}
             className="lm-action"

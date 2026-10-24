@@ -13,13 +13,13 @@ export default function PrivacyNotice() {
     <nav aria-label="Privacy page navigation" className="border-b border-gray-200 bg-white px-5 py-5 sm:px-8">
       <div className="mx-auto flex max-w-4xl flex-wrap items-center justify-between gap-4">
         <Link to="/" aria-label="LearnMatch home" className="rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2"><HeaderBrand /></Link>
-        {background ? <button type="button" onClick={returnToForm} autoFocus className="lm-action">{background.pathname === '/register' ? 'Back to registration' : 'Back to assessment'}</button> : <Link to="/" className="lm-action">Back to LearnMatch</Link>}
+        {background ? <button type="button" onClick={returnToForm} autoFocus className="lm-action">{background.pathname === '/register' ? 'Back to registration' : background.pathname === '/settings' ? 'Back to Settings' : 'Back to assessment'}</button> : <Link to="/" className="lm-action">Back to LearnMatch</Link>}
       </div>
     </nav>
     <main id="privacy-notice" className="mx-auto max-w-4xl px-5 py-8 sm:px-8 sm:py-12">
       <header className="mb-8">
         <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">LearnMatch Privacy Notice</h1>
-        <p className="mt-3 text-sm text-gray-600">Notice version 1.0 · Reviewed <time dateTime="2026-10-21">21 October 2026</time></p>
+        <p className="mt-3 text-sm text-gray-600">Notice version 1.2 · Reviewed <time dateTime="2026-10-24">24 October 2026</time></p>
         <p className="mt-5 leading-7 text-gray-700">LearnMatch is a school capstone project for senior high school and college students. The LearnMatch Research Team uses information to provide course recommendations, assessment history, and optional college alignment tracking. Thesis analysis and defense use aggregate statistics only.</p>
       </header>
       <div className="space-y-7 rounded-3xl border border-gray-200 bg-white p-5 text-sm leading-7 text-gray-700 sm:p-8 sm:text-base">
@@ -52,7 +52,9 @@ export default function PrivacyNotice() {
         </section>
         <section aria-labelledby="privacy-records">
           <h2 id="privacy-records" className="mb-3 text-lg font-bold text-gray-950">Saved records</h2>
-          <p>Retention periods have not yet been finalized. Saved histories and older profile information, including free text collected by earlier versions, have not been automatically erased. LearnMatch currently has no self-service Delete Account feature.</p>
+          <p>You can permanently delete your student account in Settings by entering your current password and explicitly confirming deletion. After confirmed success, your account, profile (including legacy fields), assessment drafts and history, answers and results, recommendations, saved courses, personal career roadmaps, college tracking records, feedback, and verification codes are removed from the active LearnMatch database. Existing student tokens can no longer access protected services.</p>
+          <p className="mt-3">Self-service deletion applies to the active LearnMatch database. It does not automatically erase backup copies, previously exported records, or information already held by external service providers. We cannot promise immediate removal or a fixed deletion deadline for those copies because their retention schedules have not been verified. Contact the LearnMatch Research Team to ask about those copies and any applicable retention obligations.</p>
+          <p className="mt-3">Information already downloaded to a device and responses to requests authorized before deletion cannot be recalled remotely. If the service cannot confirm a deletion result, do not assume that deletion succeeded or failed; contact the team to verify your account status before trying again. Automatic inactivity deletion is not enabled.</p>
         </section>
         <section aria-labelledby="privacy-contact">
           <h2 id="privacy-contact" className="mb-3 text-lg font-bold text-gray-950">Contact the LearnMatch Research Team</h2>

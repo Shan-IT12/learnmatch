@@ -2,6 +2,15 @@ import { useEffect, useRef } from 'react'
 import { IconArchive, IconArrowRight, IconArrowsExchange, IconHistory, IconLoader2, IconLogout, IconPlayerPause, IconRefresh, IconX } from '@tabler/icons-react'
 
 const ACTION_DETAILS = {
+  deleteAccount: {
+    title: 'Delete your account?',
+    description: 'This permanently deletes your account and its profiles, assessments, recommendations, feedback, saved courses, and college tracking records from the active LearnMatch database. You cannot undo this. Backups and external provider copies are not immediately erased by this action.',
+    cancelLabel: 'Keep my account',
+    confirmLabel: 'Delete Account',
+    disabledLabel: 'Delete Account',
+    destructive: true,
+    icon: IconArchive,
+  },
   directions: {
     title: 'Share your location for directions?',
     description: 'If you continue and allow location access, LearnMatch sends your current latitude and longitude and the selected school’s coordinates to OpenRouteService (HeiGIT) to calculate a route. The map loads tiles from OpenStreetMap, which receives your IP address, browser request metadata, and the map area requested. Directions are optional; you can keep browsing schools without sharing your location.',
@@ -67,7 +76,7 @@ const ACTION_DETAILS = {
   },
 }
 
-function ActionConfirmationModal({ action, onCancel, onConfirm, processing = false, error = '', confirmDisabled = false, description }) {
+function ActionConfirmationModal({ action, onCancel, onConfirm, processing = false, error = '', confirmDisabled = false, description, children }) {
   const dialogRef = useRef(null)
   const cancelButtonRef = useRef(null)
   const previousFocusRef = useRef(null)
@@ -142,6 +151,7 @@ function ActionConfirmationModal({ action, onCancel, onConfirm, processing = fal
             <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-emerald-100 bg-white text-emerald-600"><IconHistory size={18} stroke={1.8} aria-hidden="true" /></span>
             <div className="min-w-0"><p className="text-sm font-semibold leading-5 text-emerald-950">{details.noteTitle}</p><p className="mt-1.5 text-xs leading-6 text-emerald-900/75 sm:text-[13px]">{details.note}</p></div>
           </div>}
+          {children}
           {error && <p role="alert" className="mt-4 rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm leading-6 text-red-700">{error}</p>}
           <div className="mt-6 grid gap-3 sm:grid-cols-[.8fr_1.2fr]">
             <button
@@ -159,7 +169,7 @@ function ActionConfirmationModal({ action, onCancel, onConfirm, processing = fal
               disabled={processing || confirmDisabled}
               className={`order-1 inline-flex min-h-12 items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold text-white transition hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-60 sm:order-2 ${details.destructive ? 'bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 focus-visible:outline-red-500' : 'bg-orange-500 shadow-sm shadow-orange-200 hover:bg-orange-600 focus-visible:outline-orange-500'}`}
             >
-              {processing ? <><IconLoader2 size={17} className="motion-safe:animate-spin" aria-hidden="true" /> Processing...</> : <>{confirmDisabled ? 'Checking destination...' : details.confirmLabel}<IconArrowRight size={16} aria-hidden="true" /></>}
+              {processing ? <><IconLoader2 size={17} className="motion-safe:animate-spin" aria-hidden="true" /> Processing...</> : <>{confirmDisabled ? (details.disabledLabel || 'Checking destination...') : details.confirmLabel}<IconArrowRight size={16} aria-hidden="true" /></>}
             </button>
           </div>
         </div>

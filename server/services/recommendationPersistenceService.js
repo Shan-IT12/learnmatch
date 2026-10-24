@@ -255,22 +255,24 @@ export async function getOrCreateSavedRecommendations(
 export async function refreshSavedRecommendationsForLatestAssessment(
   pool,
   userId,
-  generateRecommendations = getTopCourseRecommendations
+  generateRecommendations = getTopCourseRecommendations,
+  { transactionConnection = null } = {}
 ) {
-  const assessmentId = await getPersonalityAssessmentId(pool, userId)
+  const database = transactionConnection || pool
+  const assessmentId = await getPersonalityAssessmentId(database, userId)
   if (!assessmentId) return { refreshed: false }
-  const header = await getRecommendationHeader(pool, userId, assessmentId)
+  const header = await getRecommendationHeader(database, userId, assessmentId)
   if (!header) return { refreshed: false }
 
-  const generated = validateTopThreeRecommendations(await generateRecommendations(pool, userId))
+  const generated = validateTopThreeRecommendations(await generateRecommendations(database, userId))
     .map((recommendation) => ({
       ...recommendation,
       ai_narrative: buildDeterministicExplanation(recommendation),
     }))
-  const connection = typeof pool.getConnection === 'function' ? await pool.getConnection() : pool
+  const connection = transactionConnection || (typeof pool.getConnection === 'function' ? await pool.getConnection() : pool)
   let transactionStarted = false
   try {
-    if (typeof connection.beginTransaction === 'function') {
+    if (!transactionConnection && typeof connection.beginTransaction === 'function') {
       await connection.beginTransaction()
       transactionStarted = true
     }
@@ -311,6 +313,6 @@ export async function refreshSavedRecommendationsForLatestAssessment(
     if (transactionStarted) await connection.rollback()
     throw error
   } finally {
-    if (connection !== pool && typeof connection.release === 'function') connection.release()
+    if (!transactionConnection && connection !== pool && typeof connection.release === 'function') connection.release()
   }
 }

@@ -39,10 +39,14 @@ function database({
   const calls = []
   return {
     calls,
+    async beginTransaction() { calls.push({ sql: 'BEGIN' }) },
+    async commit() { calls.push({ sql: 'COMMIT' }) },
+    async rollback() { calls.push({ sql: 'ROLLBACK' }) },
+    destroy() { calls.push({ sql: 'DESTROY' }) },
     async query(sql, params) {
       calls.push({ sql, params })
-      if (sql.includes('SELECT username FROM USER_ACCOUNT')) {
-        return [accountUsername === null ? [] : [{ username: accountUsername }]]
+      if (sql.startsWith('SELECT username') && sql.includes('FROM USER_ACCOUNT')) {
+        return [accountUsername === null ? [] : [{ username: accountUsername, is_active: 1 }]]
       }
       if (sql.includes('SELECT user_id FROM USER_ACCOUNT WHERE username')) return [duplicateUsers]
       if (sql.includes('SELECT profile_id') && sql.includes('FROM PROFILE')) {
@@ -50,7 +54,7 @@ function database({
         return [existingProfile.map(row => Object.fromEntries(columns.filter(column => Object.hasOwn(row, column)).map(column => [column, row[column]])))]
       }
       if (sql.includes('FROM ASSESSMENT_ATTEMPT')) return [attempt ? [attempt] : []]
-      return [{ affectedRows: 1 }]
+      return [{ affectedRows: 1, insertId: 1 }]
     },
   }
 }
@@ -310,6 +314,19 @@ test('updating an existing Profile refreshes its saved recommendations', async (
   assert.equal(res.statusCode, 200)
   assert.equal(res.body.recommendationsRefreshed, true)
   assert.deepEqual(refreshCalls, [{ databaseArg: db, userId: 9 }])
+})
+
+test('MySQL JSON key ordering does not refresh recommendations for unchanged Personal Factors', async () => {
+  const saved = { profile_id: 1, ...baseBody, personal_factor_answers: {
+    work: 'yes', family: 'yes', financial: 'yes', health: 'yes', physical: 'yes',
+  } }
+  const db = database({ existingProfile: [saved] })
+  const res = response()
+  await saveProfileWithDependencies({ user: { userId: 9 }, body: { ...baseBody } }, res, {
+    database: db, refreshRecommendations() { throw new Error('Unchanged factors must not refresh') },
+  })
+  assert.equal(res.statusCode, 200)
+  assert.equal(res.body.recommendationsRefreshed, false)
 })
 
 test('an invalid username returns a field-specific error and does not access the database', async () => {
