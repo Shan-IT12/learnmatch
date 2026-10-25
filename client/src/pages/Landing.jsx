@@ -201,7 +201,7 @@ function Landing() {
           <PathwayVisual />
         </section>
 
-        <section className="relative border-y border-orange-100/70 bg-white/48 px-5 py-16 sm:px-8 sm:py-20 lg:px-10">
+        <section id="how-it-works" className="relative border-y border-orange-100/70 bg-white/48 px-5 py-16 sm:px-8 sm:py-20 lg:px-10">
           <div className="mx-auto max-w-6xl">
             <div className="mx-auto max-w-2xl text-center">
               <p className="text-xs font-bold uppercase tracking-[0.18em] text-orange-500">How it works</p>

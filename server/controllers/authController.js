@@ -9,6 +9,7 @@ import {
   jwtVerifyOptions,
 } from '../config/security.js'
 import { validateUsername } from '../services/usernameValidationService.js'
+import { TERMS_VERSION, PRIVACY_NOTICE_VERSION } from '../shared/legalDocuments.js'
 
 const sendResendMail = async ({ to, subject, html }) => {
   if (!process.env.RESEND_API_KEY) {
@@ -115,6 +116,12 @@ export const registerUser = async (req, res) => {
     })
   }
 
+  if (req.body.agreementAccepted !== true || req.body.termsVersion !== TERMS_VERSION || req.body.privacyNoticeVersion !== PRIVACY_NOTICE_VERSION) {
+    return res.status(400).json({
+      message: 'Please agree to the current Terms & Conditions and acknowledge the Privacy Notice. Refresh the registration page if the documents have changed.',
+    })
+  }
+
   let userId = null
 
   try {
@@ -145,10 +152,10 @@ export const registerUser = async (req, res) => {
     const [result] = await pool.query(
       `
       INSERT INTO USER_ACCOUNT
-      (email, username, password, is_active)
-      VALUES (?, ?, ?, 0)
+      (email, username, password, is_active, terms_version, terms_accepted_at, privacy_notice_version)
+      VALUES (?, ?, ?, 0, ?, UTC_TIMESTAMP(3), ?)
       `,
-      [email, normalizedUsername, hashedPassword]
+      [email, normalizedUsername, hashedPassword, TERMS_VERSION, PRIVACY_NOTICE_VERSION]
     )
 
     userId = result.insertId

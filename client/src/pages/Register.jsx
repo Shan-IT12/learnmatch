@@ -1,12 +1,13 @@
 import HeaderBrand from '../components/HeaderBrand'
 import PrivacyNoticeLink from '../components/PrivacyNoticeLink'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { IconEye, IconEyeOff } from '@tabler/icons-react'
 import AuthJourneyPanel from '../components/AuthJourneyPanel'
 import { FieldError, RequiredMark } from '../components/FormValidation'
 import { scrollToFirstInvalidField } from '../utils/formValidation'
 import { getPostRegistrationDestination, storeUserAuth } from '../utils/userAuth'
+import { TERMS_VERSION, PRIVACY_NOTICE_VERSION } from '../../../shared/legalDocuments.js'
 import {
   USERNAME_MAX_LENGTH,
   USERNAME_MIN_LENGTH,
@@ -37,6 +38,7 @@ function Register() {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [fieldErrors, setFieldErrors] = useState({})
+  const [agreementAccepted, setAgreementAccepted] = useState(false)
 
   const [step, setStep] = useState('register')
   const [userId, setUserId] = useState(null)
@@ -45,6 +47,18 @@ function Register() {
   const [otpMessage, setOtpMessage] = useState('')
   const [verifying, setVerifying] = useState(false)
   const [resending, setResending] = useState(false)
+  const verifiedAuth = useRef(null)
+
+  useEffect(() => {
+    if (step !== 'verified') return
+    const timer = window.setTimeout(() => {
+      // Storing auth resets the session boundary, so finish the confirmation first.
+      storeUserAuth(localStorage, verifiedAuth.current)
+      verifiedAuth.current = null
+      navigate(getPostRegistrationDestination(), { replace: true })
+    }, 1200)
+    return () => window.clearTimeout(timer)
+  }, [step, navigate])
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -65,6 +79,7 @@ function Register() {
     else if (passwordError) nextErrors.password = passwordError
     if (!formData.confirmPassword) nextErrors.confirmPassword = 'Please confirm your password.'
     else if (formData.password !== formData.confirmPassword) nextErrors.confirmPassword = 'Passwords do not match.'
+    if (!agreementAccepted) nextErrors.agreement = 'Please agree to the Terms & Conditions and acknowledge the Privacy Notice.'
     if (Object.keys(nextErrors).length) { setFieldErrors(nextErrors); scrollToFirstInvalidField(Object.keys(nextErrors)); return }
     setFieldErrors({})
 
@@ -74,7 +89,7 @@ function Register() {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ ...formData, agreementAccepted, termsVersion: TERMS_VERSION, privacyNoticeVersion: PRIVACY_NOTICE_VERSION }),
       })
 
       const data = await response.json()
@@ -121,9 +136,8 @@ function Register() {
         return
       }
 
-      storeUserAuth(localStorage, data)
+      verifiedAuth.current = data
       setStep('verified')
-      navigate(getPostRegistrationDestination(), { replace: true })
     } catch {
       setOtpError('Cannot connect to server. Please try again.')
       setVerifying(false)
@@ -212,7 +226,6 @@ function Register() {
                 </div>
               )}
 
-              <p className="mb-5 text-sm leading-6 text-gray-600">Read our <PrivacyNoticeLink /> to learn how LearnMatch collects, saves, and uses your information.</p>
               <form onSubmit={handleSubmit} noValidate className="space-y-4">
                 <div data-validation-field="email">
                   <label className="block text-sm font-medium text-gray-700 mb-2">Email <RequiredMark /></label>
@@ -295,6 +308,15 @@ function Register() {
                     </button>
                   </div>
                   <FieldError id="register-confirm-error">{fieldErrors.confirmPassword}</FieldError>
+                </div>
+
+                <div data-validation-field="agreement" className="rounded-2xl border border-orange-100 bg-orange-50/50 p-4 text-sm leading-6 text-gray-700">
+                  <div className="flex items-start gap-3">
+                    <input id="registration-agreement" name="agreement" type="checkbox" required aria-required="true" checked={agreementAccepted} onChange={(event) => { setAgreementAccepted(event.target.checked); setFieldErrors(current => ({ ...current, agreement: undefined })) }} aria-invalid={fieldErrors.agreement ? 'true' : undefined} aria-describedby="registration-agreement-note registration-agreement-error" className="mt-1 size-4 shrink-0 accent-orange-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600" />
+                    <label htmlFor="registration-agreement">I agree to the <PrivacyNoticeLink to="/terms">Terms &amp; Conditions</PrivacyNoticeLink> and acknowledge the <PrivacyNoticeLink />.</label>
+                  </div>
+                  <p id="registration-agreement-note" className="mt-2 text-xs text-gray-600">Terms explain usage rules; Privacy explains how your data is handled.</p>
+                  <FieldError id="registration-agreement-error">{fieldErrors.agreement}</FieldError>
                 </div>
 
                 <button
@@ -388,17 +410,17 @@ function Register() {
           )}
 
           {step === 'verified' && (
-            <div style={{ animation: 'fadeIn 0.3s ease-out' }} className="auth-fade-in text-center">
-              <div className="w-16 h-16 rounded-full bg-green-50 flex items-center justify-center mb-6 mx-auto">
+            <div role="status" aria-live="polite" style={{ animation: 'fadeIn 0.3s ease-out' }} className="auth-fade-in text-center">
+              <div aria-hidden="true" className="success-confirmation-icon w-16 h-16 rounded-full bg-green-50 flex items-center justify-center mb-6 mx-auto">
                 <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
               <h1 className="text-3xl font-bold text-gray-900 leading-tight mb-3">
-                Account verified!
+                Account successfully created!
               </h1>
               <p className="text-base text-gray-500 leading-relaxed">
-                Taking you to your next step...
+                Email verified. Taking you to your dashboard...
               </p>
             </div>
           )}

@@ -35,12 +35,15 @@ import PublicCourseDetails from './pages/PublicCourseDetails'
 import SchoolLocator from './pages/SchoolLocator'
 import PageTransition from './components/PageTransition'
 import PrivacyNotice from './pages/PrivacyNotice'
+import Terms from './pages/Terms'
+import About from './pages/About'
+import Help from './pages/Help'
 import StudentSettings from './pages/StudentSettings'
 
 
 function App() {
   const location = useLocation()
-  const privacyBackground = location.pathname === '/privacy' ? location.state?.privacyBackground : null
+  const privacyBackground = ['/privacy', '/terms', '/about', '/help'].includes(location.pathname) ? location.state?.privacyBackground : null
   const routeLocation = privacyBackground || location
   const privacyTrigger = useRef(null)
   useEffect(() => {
@@ -50,6 +53,15 @@ function App() {
       privacyTrigger.current = null
     }
   }, [location, privacyBackground])
+  useEffect(() => {
+    if (!['/about', '/help', '/terms', '/privacy'].includes(location.pathname) && !(location.pathname === '/' && location.hash)) return
+    const frame = requestAnimationFrame(() => {
+      const target = location.hash ? document.getElementById(location.hash.slice(1)) : null
+      if (target) target.scrollIntoView()
+      else window.scrollTo(0, 0)
+    })
+    return () => cancelAnimationFrame(frame)
+  }, [location.pathname, location.hash, privacyBackground])
   return (
     <>
     {/* Retain the originating form in memory while its same-tab notice is shown. */}
@@ -62,6 +74,9 @@ function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/privacy" element={<PrivacyNotice />} />
+      <Route path="/terms" element={<Terms />} />
+      <Route path="/about" element={<About />} />
+      <Route path="/help" element={<Help />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/profile" element={<Profile />} />
@@ -92,7 +107,7 @@ function App() {
       <Route path="/admin/feedback/:feedbackId" element={<AdminRoute><AdminFeedbackDetail /></AdminRoute>} />
     </Routes></PageTransition>
     </div>
-    {privacyBackground && <PrivacyNotice />}
+    {privacyBackground && (location.pathname === '/terms' ? <Terms /> : location.pathname === '/about' ? <About /> : location.pathname === '/help' ? <Help /> : <PrivacyNotice />)}
     </>
   )
 }

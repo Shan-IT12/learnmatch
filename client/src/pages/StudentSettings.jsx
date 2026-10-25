@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
-import { IconArrowLeft, IconShieldCheck, IconTrash } from '@tabler/icons-react'
+import { IconArrowLeft, IconEye, IconEyeOff, IconShieldCheck, IconTrash } from '@tabler/icons-react'
 import HeaderBrand from '../components/HeaderBrand'
 import PrivacyNoticeLink from '../components/PrivacyNoticeLink'
 import ActionConfirmationModal from '../components/ActionConfirmationModal'
@@ -16,6 +16,7 @@ export default function StudentSettings() {
   const [attempt, setAttempt] = useState(0)
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false)
   const [currentPassword, setCurrentPassword] = useState('')
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false)
   const [confirmed, setConfirmed] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [deletionError, setDeletionError] = useState('')
@@ -26,6 +27,7 @@ export default function StudentSettings() {
     if (pendingRef.current) return
     setShowDeleteConfirmation(false)
     setCurrentPassword('')
+    setShowCurrentPassword(false)
     setConfirmed(false)
     setDeletionError('')
   }
@@ -60,6 +62,7 @@ export default function StudentSettings() {
       setDeletionError('We could not confirm the deletion result. Do not submit again yet. Contact the LearnMatch Research Team to verify your account status.')
     } finally {
       setCurrentPassword('')
+      setShowCurrentPassword(false)
       setConfirmed(false)
       pendingRef.current = false
       setDeleting(false)
@@ -104,7 +107,7 @@ export default function StudentSettings() {
           <section aria-labelledby="settings-privacy" className="rounded-3xl border border-gray-200/80 bg-white p-5 shadow-sm sm:p-7">
             <h2 id="settings-privacy" className="flex items-center gap-3 text-xl font-bold"><IconShieldCheck size={22} className="text-orange-500" aria-hidden="true" /> Privacy Notice</h2>
             <p className="mt-3 text-sm leading-6 text-gray-500">Learn how LearnMatch collects, uses, and stores your information.</p>
-            <div className="mt-4 text-sm"><PrivacyNoticeLink /></div>
+            <div className="mt-4 flex flex-wrap gap-4 text-sm"><PrivacyNoticeLink /><PrivacyNoticeLink to="/terms">Terms &amp; Conditions</PrivacyNoticeLink></div>
           </section>
           <section aria-labelledby="settings-danger" className="rounded-3xl border border-rose-200 bg-white p-5 shadow-sm sm:p-7">
             <h2 id="settings-danger" className="text-xl font-bold text-rose-700">Danger Zone</h2>
@@ -116,9 +119,15 @@ export default function StudentSettings() {
         </div>
         <ActionConfirmationModal action={showDeleteConfirmation ? 'deleteAccount' : null} onCancel={closeDeletion} onConfirm={deleteAccount} processing={deleting} error={deletionError} confirmDisabled={!currentPassword || !confirmed || outcomeUnknown}>
           <div className="mt-4 space-y-4">
-            <label className="block text-sm font-semibold text-gray-700">Current password
-              <input type="password" autoComplete="current-password" maxLength={1024} value={currentPassword} disabled={deleting || outcomeUnknown} onChange={event => setCurrentPassword(event.target.value)} className="mt-2 block w-full rounded-xl border border-gray-300 px-3 py-3 focus:outline-orange-500 disabled:opacity-60" />
-            </label>
+            <div>
+              <label htmlFor="delete-account-password" className="block text-sm font-semibold text-gray-700">Current password</label>
+              <div className="relative mt-2">
+                <input id="delete-account-password" type={showCurrentPassword ? 'text' : 'password'} autoComplete="current-password" maxLength={1024} value={currentPassword} disabled={deleting || outcomeUnknown} onChange={event => setCurrentPassword(event.target.value)} className="block w-full rounded-xl border border-gray-300 py-3 pl-3 pr-12 focus:outline-orange-500 disabled:opacity-60" />
+                <button type="button" aria-label={showCurrentPassword ? 'Hide password' : 'Show password'} aria-pressed={showCurrentPassword} aria-controls="delete-account-password" disabled={deleting || outcomeUnknown} onClick={() => setShowCurrentPassword(value => !value)} className="absolute right-1 top-1/2 flex size-10 -translate-y-1/2 items-center justify-center rounded-lg text-gray-500 hover:bg-orange-50 hover:text-orange-700 focus-visible:outline-2 focus-visible:outline-orange-500 disabled:opacity-50">
+                  {showCurrentPassword ? <IconEyeOff size={19} aria-hidden="true" /> : <IconEye size={19} aria-hidden="true" />}
+                </button>
+              </div>
+            </div>
             <label className="flex items-start gap-3 text-sm leading-6 text-gray-600"><input type="checkbox" checked={confirmed} disabled={deleting || outcomeUnknown} onChange={event => setConfirmed(event.target.checked)} className="mt-1 size-4 shrink-0 accent-rose-600" />I understand this is permanent and want to delete my account.</label>
             {outcomeUnknown && <p className="text-sm text-gray-600">Contact <a className="break-all underline" href="mailto:learnmatch1@gmail.com">learnmatch1@gmail.com</a>. Do not send your password.</p>}
           </div>

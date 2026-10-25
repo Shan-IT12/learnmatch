@@ -18,8 +18,8 @@ test('public notice, links and results copy render without changing access or fo
       const markup = render(React.createElement(PrivacyNotice))
       assert.match(markup, /<main/)
       assert.match(markup, /<h1[^>]*>LearnMatch Privacy Notice/)
-      assert.match(markup, /Notice version 1\.2/)
-      assert.match(markup, /dateTime="2026-10-24"/)
+      assert.match(markup, /Notice version 1\.3/)
+      assert.match(markup, /dateTime="2026-10-25"/)
       assert.match(markup, /href="mailto:learnmatch1@gmail.com"/)
       assert.match(markup, /Back to LearnMatch/)
       assert.match(markup, /current form does not collect an Others free-text response/)
@@ -39,15 +39,18 @@ test('public notice, links and results copy render without changing access or fo
     })
     Object.defineProperty(globalThis, 'localStorage', { configurable: true, value: { getItem: () => null } })
     Object.defineProperty(globalThis, 'sessionStorage', { configurable: true, value: { getItem: () => null } })
-    await t.test('registration opens the notice in the same tab without a form action or agreement checkbox', async () => {
+    await t.test('registration opens the notice in the same tab with an unchecked required agreement checkbox', async () => {
       const { default: Register } = await vite.ssrLoadModule('/src/pages/Register.jsx')
       const markup = render(React.createElement(Register))
       const link = markup.match(/<a[^>]*href="\/privacy"[^>]*>[\s\S]*?<\/a>/)?.[0]
       assert.ok(link)
       assert.doesNotMatch(link, /target=|opens in a new tab/)
       assert.match(link, /focus-visible:ring-2/)
-      assert.ok(markup.indexOf(link) < markup.indexOf('name="email"'))
-      assert.doesNotMatch(markup, /type="checkbox"|I agree|I consent|By registering/i)
+      assert.match(markup, /type="checkbox"/)
+      assert.match(markup, /I agree to the /)
+      assert.match(markup, /href="\/terms"/)
+      assert.doesNotMatch(markup.match(/<input[^>]*type="checkbox"[^>]*>/)?.[0] || '', /checked=""/)
+
       const { default: PublicFooter } = await vite.ssrLoadModule('/src/components/PublicFooter.jsx')
       assert.match(render(React.createElement(PublicFooter)), /href="\/privacy"/)
       const landing = await readFile(new URL('./Landing.jsx', import.meta.url), 'utf8')
