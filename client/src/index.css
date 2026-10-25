@@ -127,6 +127,15 @@ button, input, select, textarea { max-width: 100%; }
   min-height: 22rem;
 }
 
+/* Cover Chromium's fractional-pixel tile seams at browser/display zoom levels.
+   This layer uses 256px OSM tiles; the small overlap affects images only,
+   leaving Leaflet's tile positions and geographic overlays unchanged. */
+.school-locator-map .leaflet-container img.leaflet-tile {
+  width: 258px !important;
+  height: 258px !important;
+  mix-blend-mode: normal;
+}
+
 @media (max-width: 640px) {
   .school-locator-map {
     height: 18rem;

@@ -13,12 +13,12 @@ function MapController({ schools, selectedSchoolId, markerRefs, route, coverageR
   const routePoints = useMemo(() => routeLatLngs(route), [route])
 
   useEffect(() => {
-    map.fitBounds(geoJSON(sjdmBoundary).getBounds(), { padding: [32, 32], maxZoom: 13 })
+    map.fitBounds(geoJSON(sjdmBoundary).getBounds(), { padding: [32, 32], maxZoom: 13, animate: false })
   }, [coverageResetKey, map])
 
   useEffect(() => {
     if (routePoints.length > 1) {
-      map.fitBounds(routePoints, { padding: [42, 42], maxZoom: 15 })
+      map.fitBounds(routePoints, { padding: [42, 42], maxZoom: 15, animate: false })
     }
   }, [map, routePoints])
 
@@ -27,9 +27,7 @@ function MapController({ schools, selectedSchoolId, markerRefs, route, coverageR
     const selectedSchool = schools.find((school) => school.school_id === selectedSchoolId)
     if (!selectedSchool) return
 
-    map.flyTo([selectedSchool.latitude, selectedSchool.longitude], Math.max(map.getZoom(), 15), {
-      duration: 0.6,
-    })
+    map.setView([selectedSchool.latitude, selectedSchool.longitude], Math.max(map.getZoom(), 15), { animate: false })
     markerRefs.current.get(selectedSchoolId)?.openPopup()
   }, [map, markerRefs, routePoints.length, schools, selectedSchoolId])
 
@@ -70,7 +68,7 @@ function SchoolLocatorMap({
           <p className="text-[10px] font-bold uppercase tracking-wide text-orange-600">LearnMatch School Coverage</p>
           <p className="text-xs font-semibold text-gray-800">San Jose del Monte City</p>
         </div>
-        <MapContainer center={[14.82, 121.06]} zoom={13} scrollWheelZoom className="h-full w-full">
+        <MapContainer center={[14.82, 121.06]} zoom={13} zoomAnimation={false} scrollWheelZoom className="h-full w-full">
           <TileLayer
             url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -95,13 +93,13 @@ function SchoolLocatorMap({
           {plottedRoute.length > 1 && (
             <Polyline positions={plottedRoute} pathOptions={{ color: '#2563eb', weight: 5, opacity: 0.85 }} />
           )}
-          {hasValidCoordinates(userLocation) && plottedRoute.length > 1 && (
+          {hasValidCoordinates(userLocation) && (
             <CircleMarker
               center={[userLocation.latitude, userLocation.longitude]}
               radius={8}
               pathOptions={{ color: '#1d4ed8', fillColor: '#3b82f6', fillOpacity: 0.95, weight: 3 }}
             >
-              <Popup><strong>Your current location</strong></Popup>
+              <Popup><strong>Your latest reported location</strong></Popup>
             </CircleMarker>
           )}
           {plottedSchools.map((school) => (

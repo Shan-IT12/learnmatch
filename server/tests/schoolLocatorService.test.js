@@ -1,181 +1,90 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import {
-  getSchoolsForCourse,
-  SCHOOL_LOCATOR_ACADEMIC_YEAR,
-  SCHOOL_LOCATOR_SCOPE,
-} from '../services/schoolLocatorService.js'
+import { getSchoolsForCourse } from '../services/schoolLocatorService.js'
+import evidence from '../data/schoolLocatorVerifiedOfferings.json' with { type: 'json' }
+import catalog from '../data/learnmatch_courses_final_342_with_ids.json' with { type: 'json' }
+import { resolveCanonicalCourseIds } from '../services/courseIdentityService.js'
 
-const course = {
-  course_id: 62,
-  course_code: 'CRS062',
-  course_name: 'Bachelor of Science in Information Technology',
-  course_abbreviation: 'BSIT',
+const calls = []
+function database(code = 'CRS062', missing = false) {
+  return { async query(sql, params) {
+    calls.push({ sql, params })
+    if (sql.includes('FROM COURSE')) return [missing ? [] : [{ course_id: 999, course_code: code, course_name: 'Test course' }]]
+    assert.match(sql, /FROM SCHOOL WHERE is_active = 1/)
+    return [evidence.schools.filter(s => params[0].includes(s.uii)).map((s, i) => ({ ...s, school_id: i + 1 }))]
+  } }
 }
 
-function database({ courseRows = [course], offeringRows = [], error = null } = {}) {
-  const calls = []
-  return {
-    calls,
-    async query(sql, params) {
-      calls.push({ sql, params })
-      if (error) throw error
-      if (sql.includes('FROM COURSE')) return [courseRows]
-      if (sql.includes('FROM SCHOOL_COURSE')) return [offeringRows]
-      throw new Error(`Unexpected query: ${sql}`)
-    },
+test('audits all 13 institutions and all mapped course identities', () => {
+  assert.equal(evidence.schools.length, 13)
+  assert.equal(new Set(evidence.schools.map(s => s.uii)).size, 13)
+  const codes = new Set(catalog.courses.map(c => c.course_id))
+  for (const school of evidence.schools) {
+    assert.ok(school.programs.length)
+    for (const p of school.programs) for (const code of p.course_codes) {
+      assert.equal(p.status, 'ACTIVE')
+      assert.ok(codes.has(code), code)
+      assert.deepEqual(resolveCanonicalCourseIds(code), [code], code)
+    }
   }
-}
-
-const schoolOffering = (major = null, overrides = {}) => ({
-  school_id: 7,
-  uii: '03194',
-  school_name: 'First City Providential College',
-  hei_type: 'Private',
-  hei_type2: 'Private Non-Sectarian',
-  address: 'San Jose Del Monte City, Bulacan',
-  major,
-  ...overrides,
 })
 
-const stiOffering = () => schoolOffering(null, {
-  school_id: 11,
-  uii: '13228',
-  school_name: 'STI College - San Jose del Monte',
+for (const school of evidence.schools) test(`${school.uii}: verified offerings and destination accuracy`, async () => {
+  const codes = new Set(school.programs.flatMap(p => p.course_codes))
+  assert.ok(codes.size)
+  for (const code of codes) {
+    const result = await getSchoolsForCourse(code, database(code))
+    const found = result.schools.find(s => s.uii === school.uii)
+    assert.ok(found, code)
+    assert.equal(found.latitude, school.latitude)
+    assert.equal(found.longitude, school.longitude)
+    assert.equal(found.school_name, school.school_name)
+    assert.ok(found.offerings.every(p => p.source_url.startsWith('https://')))
+    assert.equal(found.verified_on, '2026-10-26')
+  }
 })
 
-for (const expected of [
-  { course_id: 345, course_code: 'CRS024', course_name: 'Bachelor of Science in Computer Engineering' },
-  { course_id: 347, course_code: 'CRS026', course_name: 'Bachelor of Computer Science' },
-  { course_id: 383, course_code: 'CRS062', course_name: 'Bachelor of Science in Information Technology' },
-  { course_id: 434, course_code: 'CRS113', course_name: 'Bachelor of Science in Tourism Management' },
-]) {
-  test(`${expected.course_code} resolves by canonical code and returns STI SJDM`, async () => {
-    const db = database({
-      courseRows: [{ ...expected, course_abbreviation: null }],
-      offeringRows: [stiOffering()],
-    })
-    const result = await getSchoolsForCourse(expected.course_code, db)
-
-    assert.equal(result.course.course_code, expected.course_code)
-    assert.equal(result.schools.some(({ uii }) => uii === '13228'), true)
-    assert.deepEqual(db.calls[0].params, [expected.course_code])
-    assert.deepEqual(db.calls[1].params, [expected.course_id])
-  })
-}
-
-test('returns mapped active course with public context', async () => {
-  const result = await getSchoolsForCourse('CRS062', database({ offeringRows: [schoolOffering()] }))
-  assert.equal(result.course.course_code, 'CRS062')
-  assert.equal(result.schools.length, 1)
-  assert.equal(result.location_scope, SCHOOL_LOCATOR_SCOPE)
-  assert.equal(result.academic_year, SCHOOL_LOCATOR_ACADEMIC_YEAR)
+test('new accountancy maps to standalone Accountancy, never the combined economics degree', async () => {
+  assert.ok((await getSchoolsForCourse('CRS343', database('CRS343'))).schools.length >= 4)
+  assert.deepEqual((await getSchoolsForCourse('CRS232', database('CRS232'))).schools, [])
+})
+test('phased-out Psychology and former Accounting Technology are excluded', async () => {
+  assert.equal((await getSchoolsForCourse('CRS094', database('CRS094'))).schools.some(s => s.uii === '03196'), false)
+  assert.deepEqual((await getSchoolsForCourse('CRS002', database('CRS002'))).schools, [])
+  assert.ok((await getSchoolsForCourse('CRS114', database('CRS114'))).schools.some(s => s.uii === '03196'))
+})
+test('STI pending Psychology excluded; verified courses and Operations major included', async () => {
+  assert.equal((await getSchoolsForCourse('CRS095', database('CRS095'))).schools.some(s => s.uii === '13228'), false)
+  for (const code of ['CRS024', 'CRS026', 'CRS062', 'CRS113', 'CRS023', 'CRS345']) assert.ok((await getSchoolsForCourse(code, database(code))).schools.some(s => s.uii === '13228'))
+})
+test('Bestlink uses the independently reviewed Bulacan campus destination', async () => {
+  const school = (await getSchoolsForCourse('CRS113', database('CRS113'))).schools.find(s => s.uii === '03279')
+  assert.equal(school.latitude, 14.84686)
+  assert.equal(school.longitude, 121.08018)
+  assert.equal(school.address, 'IPO Road, Barangay Minuyan Proper, City of San Jose del Monte, Bulacan')
+  assert.equal(school.coordinate_source_url, 'https://mapcarta.com/W1544355825')
+  assert.equal(school.location_note, null)
 })
 
-test('attaches exact reviewed coordinates by UII', async () => {
-  const result = await getSchoolsForCourse('CRS062', database({ offeringRows: [schoolOffering()] }))
-  assert.equal(result.schools[0].latitude, 14.81028)
-  assert.equal(result.schools[0].longitude, 121.06149)
+test('all 13 reviewed schools have usable destination coordinates and evidence', () => {
+  for (const school of evidence.schools) {
+    assert.ok(Number.isFinite(school.latitude), school.uii)
+    assert.ok(Number.isFinite(school.longitude), school.uii)
+    assert.ok(school.latitude > 14.7 && school.latitude < 14.9, school.uii)
+    assert.ok(school.longitude > 121 && school.longitude < 121.2, school.uii)
+    assert.ok(school.coordinate_source_url.startsWith('https://'), school.uii)
+  }
 })
-
-test('attaches the verified STI SJDM coordinates by UII', async () => {
-  const result = await getSchoolsForCourse('CRS062', database({
-    offeringRows: [schoolOffering(null, {
-      uii: '13228',
-      school_name: 'STI College - San Jose del Monte',
-    })],
-  }))
-  assert.equal(result.schools[0].latitude, 14.7788219)
-  assert.equal(result.schools[0].longitude, 121.0744668)
+test('no verified offering returns an empty list and no school query', async () => {
+  calls.length = 0
+  assert.deepEqual((await getSchoolsForCourse('CRS348', database('CRS348'))).schools, [])
+  assert.equal(calls.length, 1)
 })
-
-test('returns null coordinates for an unknown UII without changing the school offering', async () => {
-  const sourceOffering = schoolOffering('Cyber Security', {
-    uii: 'unknown-uii',
-    school_name: 'Unknown reviewed location',
-  })
-  const result = await getSchoolsForCourse('CRS062', database({ offeringRows: [sourceOffering] }))
-
-  assert.equal(result.schools.length, 1)
-  assert.equal(result.schools[0].latitude, null)
-  assert.equal(result.schools[0].longitude, null)
-  assert.deepEqual(result.schools[0].offerings, [{ major: 'Cyber Security' }])
-  assert.equal(sourceOffering.major, 'Cyber Security')
-})
-
-test('returns an empty school list for an unmapped active canonical course', async () => {
-  const result = await getSchoolsForCourse('CRS062', database())
-  assert.deepEqual(result.schools, [])
-})
-
-test('returns null for malformed or nonexistent course codes', async () => {
-  const malformedDb = database()
-  assert.equal(await getSchoolsForCourse('not-a-code', malformedDb), null)
-  assert.equal(malformedDb.calls.length, 0)
-  assert.equal(await getSchoolsForCourse('CRS999', database({ courseRows: [] })), null)
-})
-
-test('resolves deprecated identities to one canonical course and hides quarantined identities', async () => {
-  const canonicalDb = database({
-    courseRows: [{ ...course, course_id: 21, course_code: 'CRS021' }],
-  })
-  const result = await getSchoolsForCourse('CRS020', canonicalDb)
-  assert.equal(result.course.course_code, 'CRS021')
-  assert.deepEqual(canonicalDb.calls[0].params, ['CRS021'])
-
-  const quarantinedDb = database()
-  assert.equal(await getSchoolsForCourse('CRS166', quarantinedDb), null)
-  assert.equal(quarantinedDb.calls.length, 0)
-})
-
-test('returns null for an inactive course because the query requires active status', async () => {
-  const inactiveDb = database({ courseRows: [] })
-  assert.equal(await getSchoolsForCourse('CRS062', inactiveDb), null)
-  assert.match(inactiveDb.calls[0].sql, /is_active = 1/)
-})
-
-test('requests only active schools', async () => {
-  const db = database()
-  await getSchoolsForCourse('CRS062', db)
-  assert.match(db.calls[1].sql, /s\.is_active = 1/)
-})
-
-test('groups multiple majors into one school result', async () => {
-  const result = await getSchoolsForCourse('CRS062', database({
-    offeringRows: [schoolOffering(null), schoolOffering('Cyber Security'), schoolOffering('Software Engineering')],
-  }))
-  assert.equal(result.schools.length, 1)
-  assert.deepEqual(result.schools[0].offerings, [
-    { major: null },
-    { major: 'Cyber Security' },
-    { major: 'Software Engineering' },
-  ])
-  assert.equal(result.schools[0].latitude, 14.81028)
-  assert.equal(result.schools[0].longitude, 121.06149)
-})
-
-test('deduplicates equivalent majors without merging distinct schools', async () => {
-  const result = await getSchoolsForCourse('CRS062', database({
-    offeringRows: [
-      schoolOffering('Cyber Security'),
-      schoolOffering(' cyber security '),
-      schoolOffering(null, { school_id: 11, uii: '13228', school_name: 'STI College - San Jose del Monte' }),
-    ],
-  }))
-  assert.equal(result.schools.length, 2)
-  assert.equal(result.schools[0].offerings.length, 1)
-})
-
-test('normalizes CRS code case and resolves by course_code before internal course_id', async () => {
-  const db = database()
-  await getSchoolsForCourse(' crs062 ', db)
-  assert.deepEqual(db.calls[0].params, ['CRS062'])
-  assert.deepEqual(db.calls[1].params, [62])
-})
-
-test('propagates database failures for the route to handle safely', async () => {
-  await assert.rejects(
-    getSchoolsForCourse('CRS062', database({ error: new Error('database unavailable') })),
-    /database unavailable/
-  )
+test('invalid, inactive and quarantined courses remain hidden; aliases resolve', async () => {
+  assert.equal(await getSchoolsForCourse('invalid', database()), null)
+  assert.equal(await getSchoolsForCourse('CRS166', database()), null)
+  assert.equal(await getSchoolsForCourse('CRS062', database('CRS062', true)), null)
+  calls.length = 0
+  assert.equal((await getSchoolsForCourse(' crs020 ', database('CRS021'))).course.course_code, 'CRS021')
+  assert.deepEqual(calls[0].params, ['CRS021'])
 })

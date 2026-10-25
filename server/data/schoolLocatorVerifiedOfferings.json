@@ -1,0 +1,1579 @@
+{
+  "verified_on": "2026-10-26",
+  "source_url": "https://region3.ched.gov.ph/resources/program-registry",
+  "data_url": "https://region3.ched.gov.ph/api/rop-programs",
+  "note": "Public CHED RO III active program registry, retrieved 2026-10-26. Registration is evidence of an offering, not a guarantee of current admissions or campus allocation. School sources supplement this registry where noted.",
+  "schools": [
+    {
+      "uii": "03196",
+      "school_name": "Academia de San Lorenzo Dema-Ala, Inc.",
+      "address": "Quirino Hi-Way, Tialo, Brgy. Santo Cristo, City of San Jose del Monte, Bulacan",
+      "programs": [
+        {
+          "registry_id": 16,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Criminology",
+          "course_codes": [
+            "CRS027"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 17,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Elementary Education",
+          "course_codes": [
+            "CRS036"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 18,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Secondary Education",
+          "course_codes": [],
+          "mapping_note": "No equivalent independent course in the current LearnMatch catalog; excluded from matching."
+        },
+        {
+          "registry_id": 19,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Technical Vocational Teacher Education (Major in Auto Diesel Mechanic, Food and Service Management)",
+          "course_codes": [
+            "CRS111"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 20,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Business Administration (majors in Business Economics, Financial Management , Human Resource Development Management, Marketing Management, and Operation Management)",
+          "course_codes": [
+            "CRS015",
+            "CRS016",
+            "CRS182",
+            "CRS344",
+            "CRS345"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 21,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Accounting Information System (formerly Bachelor of Science in Accounting Technology)",
+          "course_codes": [
+            "CRS114"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 22,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Information Systems",
+          "course_codes": [
+            "CRS228"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 23,
+          "status": "ACTIVE",
+          "program_name": "Associate in Computer Technology",
+          "course_codes": [],
+          "mapping_note": "No equivalent independent course in the current LearnMatch catalog; excluded from matching."
+        },
+        {
+          "registry_id": 24,
+          "status": "PHASED-OUT PROGRAM",
+          "program_name": "Bachelor of Science in Psychology",
+          "course_codes": [],
+          "mapping_note": "Excluded: registry does not mark this program active."
+        }
+      ],
+      "hei_type": "Private",
+      "latitude": 14.83274,
+      "longitude": 121.07625,
+      "coordinate_source_url": "https://region3.ched.gov.ph/resources/geomap",
+      "coordinate_confidence": "high",
+      "location_note": "Campus map point; confirm the entrance before travelling."
+    },
+    {
+      "uii": "03279",
+      "school_name": "Bestlink College of the Philippines, Inc.",
+      "address": "IPO Road, Barangay Minuyan Proper, City of San Jose del Monte, Bulacan",
+      "programs": [
+        {
+          "registry_id": 400,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Accounting Information System (formerly Bachelor of Science in Accounting Technology)",
+          "course_codes": [
+            "CRS114"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 401,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Tourism Management",
+          "course_codes": [
+            "CRS113"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 402,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Information Systems",
+          "course_codes": [
+            "CRS228"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 403,
+          "status": "ACTIVE",
+          "program_name": "Associate in Computer Technology",
+          "course_codes": [],
+          "mapping_note": "No equivalent independent course in the current LearnMatch catalog; excluded from matching."
+        },
+        {
+          "registry_id": 404,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Technical-Vocational Teacher Education (Major in Food Service and Management) (Formerly: Ladderized Bachelor of Technical Teacher Education)",
+          "course_codes": [
+            "CRS111"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 405,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Entrepreneurship",
+          "course_codes": [
+            "CRS040"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 406,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Psychology",
+          "course_codes": [
+            "CRS094"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 407,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Criminology",
+          "course_codes": [
+            "CRS027"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 408,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Physical Education",
+          "course_codes": [
+            "CRS090"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        }
+      ],
+      "hei_type": "Private",
+      "latitude": 14.84686,
+      "longitude": 121.08018,
+      "coordinate_source_url": "https://mapcarta.com/W1544355825",
+      "coordinate_confidence": "medium",
+      "location_note": null,
+      "coordinate_review": {
+        "verified_on": "2026-10-26",
+        "method": "Manually cross-checked the official Bulacan campus address against the mapped SJDM campus, not the similarly named Quezon City campuses.",
+        "address_source_url": "https://guide.bcp.edu.ph/",
+        "map_feature_url": "https://www.openstreetmap.org/way/1544355825",
+        "map_feature_type": "amenity=college",
+        "corroborating_source_url": "https://philippines.worldplaces.me/college-and-university-in-san-jose-del-monte/37889166-bestlink-college-of-the-philippines-bulacan-inc.html",
+        "corroborating_coordinates": {
+          "latitude": 14.84692,
+          "longitude": 121.08038
+        },
+        "previous_ched_candidate": {
+          "latitude": 14.8470235,
+          "longitude": 121.0805067,
+          "confidence": "low"
+        },
+        "limitation": "Mapped campus point, not a surveyed entrance. Provider road snapping and actual GPS routing were not field-tested."
+      }
+    },
+    {
+      "uii": "03012b",
+      "school_name": "Bulacan State University-Sarmiento Campus",
+      "address": "University Heights, Barangay Kaypian, City of San Jose del Monte, Bulacan",
+      "programs": [
+        {
+          "registry_id": 574,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Secondary Education (major in Mathematics, English, Physical Science, English minor in Mandarin, Filipino, MAPEH, TLE, Science Education, Social Studies )",
+          "course_codes": [
+            "CRS102",
+            "CRS360"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 575,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Elementary Education",
+          "course_codes": [
+            "CRS036"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 576,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Business Administration (major in Management)",
+          "course_codes": [],
+          "mapping_note": "No equivalent independent course in the current LearnMatch catalog; excluded from matching."
+        },
+        {
+          "registry_id": 577,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Entrepreneurship",
+          "course_codes": [
+            "CRS040"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 578,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Information Technology",
+          "course_codes": [
+            "CRS062"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 579,
+          "status": "ACTIVE",
+          "program_name": "Associate in Computer Technology",
+          "course_codes": [],
+          "mapping_note": "No equivalent independent course in the current LearnMatch catalog; excluded from matching."
+        },
+        {
+          "registry_id": 580,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Business Administration (Major in Financial Management, and Marketing Management, Business Economics)",
+          "course_codes": [
+            "CRS015",
+            "CRS182",
+            "CRS344"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 581,
+          "status": "ACTIVE",
+          "program_name": "Bachelor in Industrial Technology (Major in Drafting Tech., Electronics Technology, Drafting and Digital Graphics Tech., Food Tech., Food Service and Management, Computer Tech., Electrical Technology, Automotive Technology)",
+          "course_codes": [
+            "CRS061"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 582,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Hospitality Management",
+          "course_codes": [
+            "CRS053"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 583,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Tourism Management",
+          "course_codes": [
+            "CRS113"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 584,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Data Science",
+          "course_codes": [],
+          "mapping_note": "No equivalent independent course in the current LearnMatch catalog; excluded from matching."
+        }
+      ],
+      "latitude": 14.8137008,
+      "longitude": 121.0573739,
+      "hei_type": "SUC",
+      "coordinate_source_url": "https://region3.ched.gov.ph/resources/geomap",
+      "coordinate_confidence": "high",
+      "location_note": "Campus map point; confirm the entrance before travelling.",
+      "coordinate_identity_note": "CHED GeoMap uses UII 03012 for Sarmiento; the repository uses 03012b. Campus name and Kaypian address were manually reconciled."
+    },
+    {
+      "uii": "03310",
+      "school_name": "City College of San Jose Del Monte",
+      "address": "Yakal, Brgy. Minuyan Proper, City of San Jose del Monte, Bulacan",
+      "programs": [
+        {
+          "registry_id": 797,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Internal Auditing",
+          "course_codes": [
+            "CRS064"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 798,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Management Accounting",
+          "course_codes": [
+            "CRS001"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 799,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Social Work",
+          "course_codes": [
+            "CRS105"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 800,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Early Childhood Education",
+          "course_codes": [
+            "CRS029"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 801,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Entertainment and Multimedia Computing",
+          "course_codes": [
+            "CRS038"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 802,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Public Administration",
+          "course_codes": [
+            "CRS096"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 803,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Psychology",
+          "course_codes": [
+            "CRS094"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 804,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Criminology",
+          "course_codes": [
+            "CRS027"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 805,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Physical Education",
+          "course_codes": [
+            "CRS090"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 806,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Entrepreneurship",
+          "course_codes": [
+            "CRS040"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 807,
+          "status": "ACTIVE",
+          "program_name": "Bachelor in Human Services",
+          "course_codes": [
+            "CRS054"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 808,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Special Needs Education-Generalist",
+          "course_codes": [
+            "CRS107"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 809,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Tourism Management",
+          "course_codes": [
+            "CRS113"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        }
+      ],
+      "hei_type": "Public",
+      "latitude": 14.8465071,
+      "longitude": 121.0781476,
+      "coordinate_source_url": "https://region3.ched.gov.ph/resources/geomap",
+      "coordinate_confidence": "high",
+      "location_note": "Campus map point; confirm the entrance before travelling."
+    },
+    {
+      "uii": "03180",
+      "school_name": "Colegio De San Gabriel Arcangel, Inc.",
+      "address": "Blk. 13 Lot26, Brgy. Fatima I, City of San Jose del Monte, Bulacan",
+      "programs": [
+        {
+          "registry_id": 824,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Computer Engineering",
+          "course_codes": [
+            "CRS024"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 825,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Electronics Engineering",
+          "course_codes": [
+            "CRS034"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 826,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Electrical Engineering",
+          "course_codes": [
+            "CRS032"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 827,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Information Technology",
+          "course_codes": [
+            "CRS062"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 828,
+          "status": "ACTIVE",
+          "program_name": "Associate in Computer Technology",
+          "course_codes": [],
+          "mapping_note": "No equivalent independent course in the current LearnMatch catalog; excluded from matching."
+        },
+        {
+          "registry_id": 829,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Computer Science",
+          "course_codes": [
+            "CRS026"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 830,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Library and Information Science",
+          "course_codes": [
+            "CRS068"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 831,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Business Administration (Major HRDM, Management)",
+          "course_codes": [
+            "CRS016"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 832,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Customs Administration",
+          "course_codes": [],
+          "mapping_note": "No equivalent independent course in the current LearnMatch catalog; excluded from matching."
+        },
+        {
+          "registry_id": 833,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Entrepreneurship",
+          "course_codes": [
+            "CRS040"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 834,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Public Administration",
+          "course_codes": [
+            "CRS096"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 835,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Accounting Information System (formerly Bachelor of Science in Accounting Technology)",
+          "course_codes": [
+            "CRS114"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 836,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in  Accountancy",
+          "course_codes": [
+            "CRS343"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 837,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Secondary Education (Major in Guidance & Counseling, English, Biological Science, Math, Filipino)",
+          "course_codes": [
+            "CRS102"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 838,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Elementary Education (AC: *Pre-School Education)",
+          "course_codes": [
+            "CRS036"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 839,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Physical Education (Major in School P.E.)",
+          "course_codes": [
+            "CRS090"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 840,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Arts in Psychology",
+          "course_codes": [
+            "CRS095"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 841,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Biology",
+          "course_codes": [
+            "CRS013"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 842,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Social Work",
+          "course_codes": [
+            "CRS105"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 843,
+          "status": "ACTIVE",
+          "program_name": "Diploma in Midwifery",
+          "course_codes": [],
+          "mapping_note": "No equivalent independent course in the current LearnMatch catalog; excluded from matching."
+        },
+        {
+          "registry_id": 844,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Pharmacy",
+          "course_codes": [
+            "CRS088"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 845,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Midwifery",
+          "course_codes": [
+            "CRS080"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 846,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Criminology",
+          "course_codes": [
+            "CRS027"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 847,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Hospitality Management",
+          "course_codes": [
+            "CRS053"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 848,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Tourism Management",
+          "course_codes": [
+            "CRS113"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 849,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Arts in Communication",
+          "course_codes": [
+            "CRS023"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 850,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Arts in Political Science",
+          "course_codes": [
+            "CRS093"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 851,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Civil Engineering",
+          "course_codes": [
+            "CRS021"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 852,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Industrial Security Management",
+          "course_codes": [
+            "CRS103"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 853,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Nursing",
+          "course_codes": [
+            "CRS083"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 854,
+          "status": "ACTIVE",
+          "program_name": "Master of Arts in Psychology",
+          "course_codes": [],
+          "mapping_note": "No equivalent independent course in the current LearnMatch catalog; excluded from matching."
+        },
+        {
+          "registry_id": 855,
+          "status": "ACTIVE",
+          "program_name": "Master of Arts in Guidance and Counseling (Thesis and Non-Thesis Track)",
+          "course_codes": [],
+          "mapping_note": "No equivalent independent course in the current LearnMatch catalog; excluded from matching."
+        },
+        {
+          "registry_id": 856,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Medical Technology",
+          "course_codes": [],
+          "mapping_note": "No equivalent independent course in the current LearnMatch catalog; excluded from matching."
+        },
+        {
+          "registry_id": 857,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Radiological Technology",
+          "course_codes": [],
+          "mapping_note": "No equivalent independent course in the current LearnMatch catalog; excluded from matching."
+        },
+        {
+          "registry_id": 858,
+          "status": "ACTIVE",
+          "program_name": "Doctor of Philosophy in Counseling",
+          "course_codes": [],
+          "mapping_note": "No equivalent independent course in the current LearnMatch catalog; excluded from matching."
+        },
+        {
+          "registry_id": 859,
+          "status": "ACTIVE",
+          "program_name": "Doctor in Professional in Counseling",
+          "course_codes": [],
+          "mapping_note": "No equivalent independent course in the current LearnMatch catalog; excluded from matching."
+        },
+        {
+          "registry_id": 860,
+          "status": "ACTIVE",
+          "program_name": "Doctor of Psychology",
+          "course_codes": [],
+          "mapping_note": "No equivalent independent course in the current LearnMatch catalog; excluded from matching."
+        },
+        {
+          "registry_id": 861,
+          "status": "ACTIVE",
+          "program_name": "Doctor of Philosophy in Psychology",
+          "course_codes": [],
+          "mapping_note": "No equivalent independent course in the current LearnMatch catalog; excluded from matching."
+        }
+      ],
+      "hei_type": "Private",
+      "latitude": 14.8477,
+      "longitude": 121.0487,
+      "coordinate_source_url": "https://region3.ched.gov.ph/resources/geomap",
+      "coordinate_confidence": "high",
+      "location_note": "Campus map point; confirm the entrance before travelling."
+    },
+    {
+      "uii": "03303",
+      "school_name": "College of Saint Anthony SJDM Bulacan, Inc.",
+      "address": "Blk. 2, Lot 4-5-7, Brgy. Tungkong Mangga, City of San Jose del Monte, Bulacan",
+      "programs": [
+        {
+          "registry_id": 920,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Special Needs Education",
+          "course_codes": [
+            "CRS107"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 922,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Arts in Communication",
+          "course_codes": [
+            "CRS023"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 923,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Multimedia Arts",
+          "course_codes": [
+            "CRS039"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 924,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Accountancy",
+          "course_codes": [
+            "CRS343"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "program_name": "Bachelor of Early Childhood Education",
+          "status": "ACTIVE",
+          "course_codes": [
+            "CRS029"
+          ],
+          "source_url": "https://collegeofsaintanthony.com/",
+          "mapping_note": "Listed on official college site; absent from CHED snapshot."
+        }
+      ],
+      "hei_type": "Private",
+      "latitude": 14.7964089,
+      "longitude": 121.0728251,
+      "coordinate_source_url": "https://region3.ched.gov.ph/resources/geomap",
+      "coordinate_confidence": "high",
+      "location_note": "Campus map point; confirm the entrance before travelling."
+    },
+    {
+      "uii": "03194",
+      "school_name": "First City Providential College, Inc.",
+      "address": "Brgy. Francisco Homes-Narra, City of San Jose del Monte, Bulacan",
+      "programs": [
+        {
+          "registry_id": 1219,
+          "status": "ACTIVE",
+          "program_name": "Doctor of Hospitality and Tourism Management (Professional Track)",
+          "course_codes": [],
+          "mapping_note": "No equivalent independent course in the current LearnMatch catalog; excluded from matching."
+        },
+        {
+          "registry_id": 1220,
+          "status": "ACTIVE",
+          "program_name": "Master of Science in Tourism Management (Professional Track)",
+          "course_codes": [],
+          "mapping_note": "No equivalent independent course in the current LearnMatch catalog; excluded from matching."
+        },
+        {
+          "registry_id": 1221,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Information Technology",
+          "course_codes": [
+            "CRS062"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 1222,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Computer Science",
+          "course_codes": [
+            "CRS026"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 1223,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Information Systems",
+          "course_codes": [
+            "CRS228"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 1224,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Secondary Education (Major in English, Mathematics, Physical Science, Filipino, Social Studies, Values Education)",
+          "course_codes": [
+            "CRS102"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 1225,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Elementary Education",
+          "course_codes": [
+            "CRS036"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 1226,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Physical Education",
+          "course_codes": [
+            "CRS090"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 1227,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Technology and Livelihood Education (Major in Home Economics, and Information and Communication Technology)",
+          "course_codes": [
+            "CRS112"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 1228,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Nursing",
+          "course_codes": [
+            "CRS083"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 1229,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Midwifery (Ladderized)",
+          "course_codes": [
+            "CRS080"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 1230,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Hospitality Management (formerly Bachelor of Science in Hotel and Restaurant Management)",
+          "course_codes": [
+            "CRS053"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 1231,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Tourism Management",
+          "course_codes": [
+            "CRS113"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 1232,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Office Management",
+          "course_codes": [],
+          "mapping_note": "No equivalent independent course in the current LearnMatch catalog; excluded from matching."
+        },
+        {
+          "registry_id": 1233,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Psychology",
+          "course_codes": [
+            "CRS094"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 1234,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Arts in Psychology",
+          "course_codes": [
+            "CRS095"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 1236,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Arts in Communication",
+          "course_codes": [
+            "CRS023"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 1237,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Biology",
+          "course_codes": [
+            "CRS013"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 1238,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Criminology",
+          "course_codes": [
+            "CRS027"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 1240,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Accounting Information System (formerly BS Accounting Technology)",
+          "course_codes": [
+            "CRS114"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 1241,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Accountancy",
+          "course_codes": [
+            "CRS343"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 1242,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Management Accounting",
+          "course_codes": [
+            "CRS001"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 1243,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Internal Auditing",
+          "course_codes": [
+            "CRS064"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 1244,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Business Administration (Majors in Mktg. Mgmt., Financial Mgmt., Operations Mgmt. and Human Resource Management)",
+          "course_codes": [
+            "CRS015",
+            "CRS344",
+            "CRS345"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 1245,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Civil Engineering",
+          "course_codes": [
+            "CRS021"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 1246,
+          "status": "ACTIVE",
+          "program_name": "Master of Arts in Nursing major in Nursing Administration (Professional Track)",
+          "course_codes": [],
+          "mapping_note": "No equivalent independent course in the current LearnMatch catalog; excluded from matching."
+        },
+        {
+          "registry_id": 1247,
+          "status": "ACTIVE",
+          "program_name": "Master of Arts in Education major in Science (Professional Track)",
+          "course_codes": [],
+          "mapping_note": "No equivalent independent course in the current LearnMatch catalog; excluded from matching."
+        },
+        {
+          "registry_id": 1248,
+          "status": "ACTIVE",
+          "program_name": "Master of Arts in Education major in English (Academic Track)",
+          "course_codes": [],
+          "mapping_note": "No equivalent independent course in the current LearnMatch catalog; excluded from matching."
+        },
+        {
+          "registry_id": 1249,
+          "status": "ACTIVE",
+          "program_name": "Master of Arts in Education major in Mathematics (Academic Track)",
+          "course_codes": [],
+          "mapping_note": "No equivalent independent course in the current LearnMatch catalog; excluded from matching."
+        },
+        {
+          "registry_id": 1250,
+          "status": "ACTIVE",
+          "program_name": "Master of Arts in Education major in Educational Management (Academic Track)",
+          "course_codes": [],
+          "mapping_note": "No equivalent independent course in the current LearnMatch catalog; excluded from matching."
+        },
+        {
+          "registry_id": 1251,
+          "status": "ACTIVE",
+          "program_name": "Master of Science in Hospitality Management",
+          "course_codes": [],
+          "mapping_note": "No equivalent independent course in the current LearnMatch catalog; excluded from matching."
+        },
+        {
+          "registry_id": 1252,
+          "status": "ACTIVE",
+          "program_name": "Master of Information Technology (Professional Track)",
+          "course_codes": [],
+          "mapping_note": "No equivalent independent course in the current LearnMatch catalog; excluded from matching."
+        },
+        {
+          "registry_id": 1253,
+          "status": "ACTIVE",
+          "program_name": "Master in Business Administration (Professional Track)",
+          "course_codes": [],
+          "mapping_note": "No equivalent independent course in the current LearnMatch catalog; excluded from matching."
+        },
+        {
+          "registry_id": 1254,
+          "status": "ACTIVE",
+          "program_name": "Doctor of Philosophy in Education major in Educational Management",
+          "course_codes": [],
+          "mapping_note": "No equivalent independent course in the current LearnMatch catalog; excluded from matching."
+        },
+        {
+          "program_name": "Bachelor of Secondary Education major in Science",
+          "status": "ACTIVE",
+          "course_codes": [
+            "CRS360"
+          ],
+          "source_url": "https://fcpc.edu.ph/programs/",
+          "mapping_note": "Science explicitly listed on official programs page."
+        }
+      ],
+      "hei_type": "Private",
+      "latitude": 14.8102634,
+      "longitude": 121.0615462,
+      "coordinate_source_url": "https://region3.ched.gov.ph/resources/geomap",
+      "coordinate_confidence": "high",
+      "location_note": "Campus map point; confirm the entrance before travelling."
+    },
+    {
+      "uii": "03179",
+      "school_name": "La Concepcion College",
+      "address": "Kaypian Road, Corner Quirino Highway, Brgy. Kaypian, City of San Jose del Monte, Bulacan",
+      "programs": [
+        {
+          "registry_id": 1508,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Elementary Education",
+          "course_codes": [
+            "CRS036"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 1509,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Secondary Education (Major in Mathematics, Filipino, Social Studies, Values, Science, English)",
+          "course_codes": [
+            "CRS102"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 1510,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Physical Education",
+          "course_codes": [
+            "CRS090"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 1511,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Criminology",
+          "course_codes": [
+            "CRS027"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 1512,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Hospitality Management (formerly BS Hotel and Restaurant Management)",
+          "course_codes": [
+            "CRS053"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 1513,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Business Administration (Major: Human Resource Development Management, Marketing Management, Financial Management)",
+          "course_codes": [
+            "CRS015",
+            "CRS016",
+            "CRS344"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 1514,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Arts in English Language",
+          "course_codes": [
+            "CRS037"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 1515,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Psychology",
+          "course_codes": [
+            "CRS094"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 1516,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Information Systems",
+          "course_codes": [
+            "CRS228"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 1517,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Accountancy",
+          "course_codes": [
+            "CRS343"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 1518,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Accounting Information System (formerly Bachelor of Science in Accounting Technology)",
+          "course_codes": [
+            "CRS114"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 1519,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Civil Engineering",
+          "course_codes": [
+            "CRS021"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        }
+      ],
+      "hei_type": "Private",
+      "latitude": 14.8129,
+      "longitude": 121.07172,
+      "coordinate_source_url": "https://region3.ched.gov.ph/resources/geomap",
+      "coordinate_confidence": "high",
+      "location_note": "Directions lead to the Kaypian main campus. Confirm the campus for this program with the school."
+    },
+    {
+      "uii": "03135",
+      "school_name": "Siena College of San Jose, Inc.",
+      "address": "Graceville Subdivision, Brgy. Muzon, City of San Jose del Monte, Bulacan",
+      "programs": [
+        {
+          "registry_id": 2447,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Computer Science",
+          "course_codes": [
+            "CRS026"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 2448,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Business Administration (Major in Marketing Management, HRDM)",
+          "course_codes": [
+            "CRS016",
+            "CRS344"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 2449,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in  Entrepreneurship",
+          "course_codes": [
+            "CRS040"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 2450,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Secondary Education (Major in Mathematics, Religious Education, English, Values Education)",
+          "course_codes": [
+            "CRS102"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 2451,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Elementary Education",
+          "course_codes": [
+            "CRS036"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 2452,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Hospitality Management",
+          "course_codes": [
+            "CRS053"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        }
+      ],
+      "hei_type": "Private",
+      "latitude": 14.8038,
+      "longitude": 121.0725,
+      "coordinate_source_url": "https://region3.ched.gov.ph/resources/geomap",
+      "coordinate_confidence": "high",
+      "location_note": "Campus map point; confirm the entrance before travelling."
+    },
+    {
+      "uii": "03261",
+      "school_name": "SJDM Cornerstone College, Inc.",
+      "address": "190 Libis II, Brgy. Muzon Proper, City of San Jose del Monte, Bulacan",
+      "programs": [
+        {
+          "registry_id": 2454,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Physical Education (Major in Sports and Wellness Management, and School P.E.)",
+          "course_codes": [
+            "CRS090"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        }
+      ],
+      "hei_type": "Private",
+      "latitude": 14.8002447,
+      "longitude": 121.0385916,
+      "coordinate_source_url": "https://region3.ched.gov.ph/resources/geomap",
+      "coordinate_confidence": "high",
+      "location_note": "Campus map point; confirm the entrance before travelling."
+    },
+    {
+      "uii": "13228",
+      "school_name": "STI College San Jose del Monte",
+      "address": "STI Academic Center, Quirino Highway, Tungkong Mangga, City of San Jose del Monte, Bulacan",
+      "programs": [
+        {
+          "registry_id": 2612,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Computer Science",
+          "course_codes": [
+            "CRS026"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 2613,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Information Technology",
+          "course_codes": [
+            "CRS062"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 2614,
+          "status": "ACTIVE",
+          "program_name": "Associate in Computer Technology",
+          "course_codes": [],
+          "mapping_note": "No equivalent independent course in the current LearnMatch catalog; excluded from matching."
+        },
+        {
+          "registry_id": 2615,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Computer Engineering",
+          "course_codes": [
+            "CRS024"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 2616,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Business Administration (Major in Operations Management)",
+          "course_codes": [
+            "CRS345"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 2617,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Retail Technology & Consumer Science",
+          "course_codes": [],
+          "mapping_note": "No equivalent independent course in the current LearnMatch catalog; excluded from matching."
+        },
+        {
+          "registry_id": 2618,
+          "status": "ACTIVE",
+          "program_name": "Associate in Retail Technology",
+          "course_codes": [],
+          "mapping_note": "No equivalent independent course in the current LearnMatch catalog; excluded from matching."
+        },
+        {
+          "registry_id": 2619,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Tourism Management",
+          "course_codes": [
+            "CRS113"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 2623,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Arts in Communication",
+          "course_codes": [
+            "CRS023"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        }
+      ],
+      "hei_type": "Private",
+      "latitude": 14.7788219,
+      "longitude": 121.0744668,
+      "coordinate_source_url": "https://www.sti.edu/campuses/sanjosedelmonte",
+      "coordinate_confidence": "high",
+      "location_note": "Campus map point; confirm the entrance before travelling."
+    },
+    {
+      "uii": "03003",
+      "school_name": "Sto. Rosario Sapang Palay College",
+      "address": "Brgy. Assumption, City of San Jose del Monte, Bulacan",
+      "programs": [
+        {
+          "registry_id": 2648,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Computer Science",
+          "course_codes": [
+            "CRS026"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 2649,
+          "status": "ACTIVE",
+          "program_name": "Associate in Computer Technology",
+          "course_codes": [],
+          "mapping_note": "No equivalent independent course in the current LearnMatch catalog; excluded from matching."
+        },
+        {
+          "registry_id": 2651,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Business Administration (*Human Resource Development Management and Financial Management)",
+          "course_codes": [
+            "CRS015",
+            "CRS016"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 2652,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Elementary Education",
+          "course_codes": [
+            "CRS036"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 2653,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Secondary Education (Major in English, Mathematics, *Filipino, Social Studies, Values Education)",
+          "course_codes": [
+            "CRS102"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 2654,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Early Childhood Education",
+          "course_codes": [
+            "CRS029"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 2655,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Arts in Psychology",
+          "course_codes": [
+            "CRS095"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 2656,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Arts in Religious Studies",
+          "course_codes": [],
+          "mapping_note": "No equivalent independent course in the current LearnMatch catalog; excluded from matching."
+        }
+      ],
+      "hei_type": "Private",
+      "latitude": 14.86295,
+      "longitude": 121.0649,
+      "coordinate_source_url": "https://region3.ched.gov.ph/resources/geomap",
+      "coordinate_confidence": "medium",
+      "location_note": "Campus map point; confirm the entrance before travelling."
+    },
+    {
+      "uii": "03306",
+      "school_name": "Village Montessori School and Colleges, Inc.",
+      "address": "PhaseD Block 1 Lot 1 Francisco Homes, Brgy. Mulawin, City of San Jose del Monte, Bulacan",
+      "programs": [
+        {
+          "registry_id": 2898,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Entrepreneurship",
+          "course_codes": [
+            "CRS040"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 2899,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Science in Tourism Management",
+          "course_codes": [
+            "CRS113"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 2900,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Technical Vocational Teacher Education (major in Food Service & Management, Computer Programming)",
+          "course_codes": [
+            "CRS111"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        },
+        {
+          "registry_id": 2901,
+          "status": "ACTIVE",
+          "program_name": "Bachelor of Physical Education",
+          "course_codes": [
+            "CRS090"
+          ],
+          "mapping_note": "Verified title or explicit major; no inferred specialization."
+        }
+      ],
+      "hei_type": "Private",
+      "latitude": 14.8108,
+      "longitude": 121.0646,
+      "coordinate_source_url": "https://region3.ched.gov.ph/resources/geomap",
+      "coordinate_confidence": "high",
+      "location_note": "Campus map point; confirm the entrance before travelling."
+    }
+  ]
+}

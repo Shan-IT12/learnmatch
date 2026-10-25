@@ -11,12 +11,11 @@ import CourseName from '../components/CourseName'
 import { getDisplayCourseAbbreviation } from '../utils/courseName'
 import { getSchoolLocatorBackNavigation } from '../utils/schoolLocatorNavigation'
 import {
-  directionsErrorMessage,
-  getCurrentLocation,
   hasValidCoordinates,
   routeDistanceLabel,
 } from '../utils/schoolDirections'
 import { getSchoolOwnershipLabel } from '../utils/schoolOwnership'
+import useSchoolDirections from '../hooks/useSchoolDirections'
 import useActiveCollegePhase from '../hooks/useActiveCollegePhase'
 
 const apiUrl = import.meta.env.VITE_API_URL || ''
@@ -34,7 +33,8 @@ function SchoolLocator() {
   const [resolvedCourseCode, setResolvedCourseCode] = useState(null)
   const [selectedSchoolId, setSelectedSchoolId] = useState(null)
   const [pendingDirections, setPendingDirections] = useState(null)
-  const [directions, setDirections] = useState({ status: 'idle' })
+  const { directions, tracking, trackingMessage, getDirections, resetDirections, startTracking, stopTracking } = useSchoolDirections(courseCode)
+  const [pendingTracking, setPendingTracking] = useState(false)
   const [coverageResetKey, setCoverageResetKey] = useState(0)
   const displayStatus = resolvedCourseCode === courseCode ? status : 'loading'
   const result = displayStatus === 'loading' ? { course: coursePlaceholder, location_scope: 'San Jose del Monte', schools: [1, 2].map(school_id => ({ school_id, school_name: 'School and institution name', address: 'School address and location', ownership: 'Private', latitude: 14.82, longitude: 121.06 })) } : savedResult
@@ -56,7 +56,6 @@ function SchoolLocator() {
         }
         setResult(data)
         setSelectedSchoolId(null)
-        setDirections({ status: 'idle' })
         setStatus('success')
         setResolvedCourseCode(courseCode)
         document.title = `Schools for ${getDisplayCourseAbbreviation(data.course.course_name, data.course.course_abbreviation) || data.course.course_name} | LearnMatch`
@@ -89,55 +88,25 @@ function SchoolLocator() {
 
   const showSchoolOnMap = (schoolId) => {
     setSelectedSchoolId(schoolId)
-    setDirections({ status: 'idle' })
+    resetDirections()
   }
 
-  const getDirections = async (school) => {
-    setSelectedSchoolId(school.school_id)
-    if (!hasValidCoordinates(school)) {
-      setDirections({
-        status: 'error',
-        schoolId: school.school_id,
-        message: 'Directions are unavailable because this school does not have reviewed map coordinates.',
-      })
-      return
-    }
-
-    setDirections({ status: 'loading', schoolId: school.school_id })
-    try {
-      const userLocation = await getCurrentLocation()
-      const response = await fetch(`${apiUrl}/api/public/directions`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          origin: userLocation,
-          destination: { latitude: school.latitude, longitude: school.longitude },
-        }),
-      })
-      const data = await response.json().catch(() => ({}))
-      if (!response.ok) throw new Error(data.code || 'DIRECTIONS_UNAVAILABLE')
-
-      setDirections({
-        status: 'success',
-        schoolId: school.school_id,
-        schoolName: school.school_name,
-        userLocation,
-        route: data,
-      })
-    } catch (error) {
-      setDirections({
-        status: 'error',
-        schoolId: school.school_id,
-        message: directionsErrorMessage(error.message),
-      })
-    }
+  const cancelRoute = () => {
+    resetDirections()
+    setPendingTracking(false)
+    setSelectedSchoolId(null)
+    setCoverageResetKey(key => key + 1)
   }
 
   return (
     <div className="min-h-screen bg-[#fcfaf7] text-gray-900">
       {pendingDirections && createPortal(<ActionConfirmationModal action="directions"
         onCancel={() => setPendingDirections(null)}
-        onConfirm={() => { const school = pendingDirections; setPendingDirections(null); getDirections(school) }} />, document.body)}
+        onConfirm={() => { const school = pendingDirections; setPendingDirections(null); setSelectedSchoolId(school.school_id); getDirections(school) }} />, document.body)}
+      {pendingTracking && createPortal(<ActionConfirmationModal action="directions"
+        description="Track Route uses GPS location updates while this page is visible. Only your latest position is kept in memory. This updates your map marker and detects possible route deviation; it does not provide turn-by-turn guidance or automatically recalculate routes. Stop tracking at any time."
+        onCancel={() => setPendingTracking(false)}
+        onConfirm={() => { setPendingTracking(false); startTracking() }} />, document.body)}
       <PublicHeader activeCollegePhase={hasActiveCollegePhase} showDashboard={fromDashboard} />
       <SkeletonContent loading={displayStatus === 'loading'} label="Finding schools in San Jose del Monte..."><main className="max-w-6xl mx-auto px-5 sm:px-8 lg:px-10 py-8 sm:py-12">
         {hasActiveCollegePhase === null ? (
@@ -178,21 +147,21 @@ function SchoolLocator() {
               <div className="relative max-w-3xl">
                 <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-orange-700"><IconSchool size={17} stroke={1.8} /> School Locator</div>
                 <h1 className="text-2xl sm:text-4xl font-bold leading-tight mt-4">
-                  <span className="block text-base font-semibold text-orange-800 sm:text-lg">Schools associated with</span>
+                  <span className="block text-base font-semibold text-orange-800 sm:text-lg">Verified schools for</span>
                   <CourseName name={result.course.course_name} className="mt-1 block" secondaryClassName="mt-1 text-base font-medium text-orange-900/70 sm:text-lg" />
                 </h1>
                 <div className="flex flex-wrap gap-2.5 mt-5">
                   {result.course.course_abbreviation && <span className="bg-white/80 border border-white text-gray-700 text-xs font-semibold px-3 py-1.5 rounded-full">{getDisplayCourseAbbreviation(result.course.course_name, result.course.course_abbreviation)}</span>}
                   <span className="inline-flex items-center gap-1.5 bg-white/80 border border-white text-gray-700 text-xs font-semibold px-3 py-1.5 rounded-full"><IconMapPin size={14} /> {result.location_scope}</span>
                 </div>
-                <p className="text-sm sm:text-base text-amber-950/70 leading-relaxed mt-5">Explore schools in San Jose del Monte that offer this course based on available program information.</p>
+                <p className="text-sm sm:text-base text-amber-950/70 leading-relaxed mt-5">Explore verified school offerings in San Jose del Monte. Confirm current admissions and campus availability with the school before applying.</p>
               </div>
             </header>
 
             {result.schools.length === 0 ? (
               <section className="mt-7 bg-white border border-gray-100 rounded-3xl p-8 sm:p-12 shadow-sm text-center">
                 <div className="mx-auto w-14 h-14 rounded-2xl bg-orange-50 text-orange-500 flex items-center justify-center"><IconMapPin size={28} stroke={1.7} /></div>
-                <h2 className="text-xl sm:text-2xl font-bold mt-5">No school match is currently available for this course.</h2>
+                <h2 className="text-xl sm:text-2xl font-bold mt-5">No verified SJDM school offering is currently available for this course.</h2>
                 <p className="text-sm text-gray-500 leading-6 mt-3 max-w-2xl mx-auto">This does not necessarily mean the course is unavailable in San Jose del Monte. Some school program information may not yet be available in LearnMatch.</p>
                 <div className="flex flex-col sm:flex-row justify-center gap-3 mt-7">
                   {hasActiveCollegePhase === null ? (
@@ -220,7 +189,8 @@ function SchoolLocator() {
                 <div className="motion-swap min-h-0" aria-live="polite">
                   {directions.status === 'loading' && (
                     <div className="mt-4 rounded-2xl border border-blue-100 bg-blue-50 px-5 py-4 text-sm text-blue-800">
-                      Requesting your location and calculating a driving route...
+                      Requesting your location and calculating a route...
+                      <button type="button" className="lm-action ml-3" onClick={cancelRoute}>Cancel Route</button>
                     </div>
                   )}
                   {directions.status === 'error' && (
@@ -230,8 +200,17 @@ function SchoolLocator() {
                   )}
                   {directions.status === 'success' && (
                     <div className="mt-4 rounded-2xl border border-blue-100 bg-white px-5 py-4 shadow-sm">
-                      <p className="text-sm font-semibold text-gray-900">Driving route to {directions.schoolName}</p>
+                      <p className="text-sm font-semibold text-gray-900">Route to {directions.schoolName}</p>
                       <p className="mt-2 text-sm text-gray-600">Route distance: <strong className="text-gray-900">{routeDistanceLabel(directions.route.distanceMeters)}</strong></p>
+                      <p className="mt-2 text-xs text-gray-500">Calculated route from the routing service. Live traffic and turn-by-turn navigation are not available.</p>
+                      <div className="mt-3 flex flex-wrap gap-3">
+                        <button type="button" className="lm-action" onClick={() => tracking ? stopTracking() : setPendingTracking(true)}>{tracking ? 'Stop Tracking' : 'Track Route'}</button>
+                        <button type="button" className="lm-action" onClick={() => getDirections(directions.school)}>Recalculate route</button>
+                        <button type="button" className="lm-action" onClick={cancelRoute}>Cancel Route</button>
+                      </div>
+                      {trackingMessage && <p role="status" className="mt-3 text-sm text-blue-800">{trackingMessage}</p>}
+                      {directions.userLocation.timestamp && <p className="mt-2 text-xs text-gray-500">Last GPS update: {new Date(directions.userLocation.timestamp).toLocaleTimeString()}{Number.isFinite(directions.userLocation.accuracy) ? ` · Accuracy about ${Math.round(directions.userLocation.accuracy)} m` : ''}</p>}
+                      {tracking && <p className="mt-2 text-xs text-gray-500">Tracking your latest GPS position. Tracking stops when you leave or hide this page.</p>}
                     </div>
                   )}
                 </div>
@@ -244,6 +223,8 @@ function SchoolLocator() {
                           <div className="w-11 h-11 rounded-2xl bg-orange-50 text-orange-600 flex items-center justify-center shrink-0"><IconSchool size={23} stroke={1.7} /></div>
                           <div className="min-w-0"><h3 className="font-bold text-lg leading-snug text-gray-900">{school.school_name}</h3>{ownershipLabel && <p className="text-xs text-gray-500 mt-1">{ownershipLabel}</p>}</div>
                         </div>
+                        {school.offerings?.length > 0 && <div className="mt-4 text-sm text-gray-600">{school.offerings.map((offering, index) => <p key={index} className="mt-1">{offering.program_name || result.course.course_name}{offering.major ? ` - ${offering.major}` : ''}</p>)}</div>}
+                        {school.location_note && school.location_note !== 'Campus map point; confirm the entrance before travelling.' && <p className="mt-3 text-xs text-amber-800">{school.location_note}</p>}
                         {school.address && <p className="flex items-start gap-2 text-sm text-gray-600 leading-6 mt-5"><IconMapPin size={18} stroke={1.7} className="text-orange-500 shrink-0 mt-0.5" /><span>{school.address}</span></p>}
                         {hasValidCoordinates(school) ? (
                           <div className="mt-4 flex flex-wrap items-center gap-3">
