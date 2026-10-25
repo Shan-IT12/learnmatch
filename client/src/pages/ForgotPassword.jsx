@@ -14,31 +14,14 @@ import {
 } from '@tabler/icons-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { FieldError, RequiredMark } from '../components/FormValidation'
-import { scrollToFirstInvalidField } from '../utils/formValidation'
-
-const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-
-const passwordValidationError = (password) => {
-  if (password.length < 8) return 'Password must be at least 8 characters'
-  if (!/[A-Z]/.test(password)) return 'Password must include at least one uppercase letter'
-  if (!/[0-9]/.test(password)) return 'Password must include at least one number'
-  return null
-}
+import usePasswordRecovery from '../hooks/usePasswordRecovery'
 
 function ForgotPassword() {
   const navigate = useNavigate()
-  const [step, setStep] = useState('email')
-  const [email, setEmail] = useState('')
-  const [otpCode, setOtpCode] = useState('')
-  const [resetToken, setResetToken] = useState('')
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
+  const { step, email, setEmail, otpCode, setOtpCode, password, setPassword, confirmPassword, setConfirmPassword,
+    error, message, loading, fieldErrors, setFieldErrors, requestOtp, verifyOtp, submitPassword } = usePasswordRecovery()
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [error, setError] = useState('')
-  const [message, setMessage] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [fieldErrors, setFieldErrors] = useState({})
 
   useEffect(() => {
     if (step !== 'success') return undefined
@@ -46,116 +29,6 @@ function ForgotPassword() {
     return () => clearTimeout(timeout)
   }, [navigate, step])
 
-  const requestOtp = async (event) => {
-    event?.preventDefault()
-    setError('')
-    setMessage('')
-
-    const normalizedEmail = email.trim().toLowerCase()
-    if (!isValidEmail(normalizedEmail)) {
-      setFieldErrors({ email: normalizedEmail ? 'Please enter a valid email address.' : 'Please enter your email address.' })
-      scrollToFirstInvalidField(['forgotEmail'])
-      return
-    }
-    setFieldErrors({})
-
-    setLoading(true)
-    try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/forgot-password`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: normalizedEmail }),
-      })
-      const data = await response.json()
-
-      if (!response.ok) {
-        setError(data.message || 'Unable to send a verification code. Please try again.')
-        return
-      }
-
-      setEmail(normalizedEmail)
-      setOtpCode('')
-      setMessage(data.message)
-      setStep('otp')
-    } catch {
-      setError('Cannot connect to server. Please try again.')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const verifyOtp = async (event) => {
-    event.preventDefault()
-    setError('')
-    setMessage('')
-
-    if (!/^\d{6}$/.test(otpCode)) {
-      setFieldErrors({ otpCode: 'Please enter the 6-digit code.' })
-      scrollToFirstInvalidField(['forgotOtp'])
-      return
-    }
-    setFieldErrors({})
-
-    setLoading(true)
-    try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/forgot-password/verify`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, otpCode }),
-      })
-      const data = await response.json()
-
-      if (!response.ok) {
-        setError(data.message || 'Unable to verify the code. Please try again.')
-        return
-      }
-
-      setResetToken(data.resetToken)
-      setStep('password')
-    } catch {
-      setError('Cannot connect to server. Please try again.')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const submitPassword = async (event) => {
-    event.preventDefault()
-    setError('')
-
-    const nextErrors = {}
-    const validationError = passwordValidationError(password)
-    if (!password) nextErrors.password = 'Please enter a new password.'
-    else if (validationError) nextErrors.password = validationError
-    if (!confirmPassword) nextErrors.confirmPassword = 'Please confirm your new password.'
-    else if (password !== confirmPassword) nextErrors.confirmPassword = 'Passwords do not match.'
-    if (Object.keys(nextErrors).length) { setFieldErrors(nextErrors); scrollToFirstInvalidField(Object.keys(nextErrors).map((key) => `forgot${key[0].toUpperCase()}${key.slice(1)}`)); return }
-    setFieldErrors({})
-
-    setLoading(true)
-    try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/forgot-password/reset`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ resetToken, password, confirmPassword }),
-      })
-      const data = await response.json()
-
-      if (!response.ok) {
-        setError(data.message || 'Unable to reset the password. Please try again.')
-        return
-      }
-
-      setResetToken('')
-      setPassword('')
-      setConfirmPassword('')
-      setStep('success')
-    } catch {
-      setError('Cannot connect to server. Please try again.')
-    } finally {
-      setLoading(false)
-    }
-  }
 
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-[#fbf8f3] text-gray-900">

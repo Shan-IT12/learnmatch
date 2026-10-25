@@ -6,6 +6,7 @@ import { IconEye, IconEyeOff } from '@tabler/icons-react'
 import AuthJourneyPanel from '../components/AuthJourneyPanel'
 import { FieldError, RequiredMark } from '../components/FormValidation'
 import { scrollToFirstInvalidField } from '../utils/formValidation'
+import useResendCountdown from '../hooks/useResendCountdown'
 import { getPostRegistrationDestination, storeUserAuth } from '../utils/userAuth'
 import { TERMS_VERSION, PRIVACY_NOTICE_VERSION } from '../../../shared/legalDocuments.js'
 import {
@@ -47,6 +48,9 @@ function Register() {
   const [otpMessage, setOtpMessage] = useState('')
   const [verifying, setVerifying] = useState(false)
   const [resending, setResending] = useState(false)
+  const [resendAvailableAt, setResendAvailableAt] = useState(0)
+  const resendSecondsRemaining = useResendCountdown(resendAvailableAt)
+  const resendPending = useRef(false)
   const verifiedAuth = useRef(null)
 
   useEffect(() => {
@@ -101,6 +105,7 @@ function Register() {
       }
 
       setUserId(data.userId)
+      setResendAvailableAt(Date.now() + 60000)
       setStep('otp')
       setSubmitting(false)
     } catch {
@@ -145,6 +150,8 @@ function Register() {
   }
 
   const handleResendOtp = async () => {
+    if (resendPending.current || verifying || Date.now() < resendAvailableAt) return
+    resendPending.current = true
     setOtpError('')
     setOtpMessage('')
     setResending(true)
@@ -165,10 +172,14 @@ function Register() {
       }
 
       setOtpMessage(data.message)
+      setOtpCode('')
+      setResendAvailableAt(Date.now() + 60000)
       setResending(false)
     } catch {
       setOtpError('Cannot connect to server. Please try again.')
       setResending(false)
+    } finally {
+      resendPending.current = false
     }
   }
 
@@ -389,7 +400,7 @@ function Register() {
 
                 <button
                   type="submit"
-                  disabled={verifying}
+                  disabled={verifying || resending}
                   className="w-full rounded-2xl bg-gradient-to-r from-orange-500 to-orange-600 py-3.5 text-sm font-semibold text-white shadow-[0_12px_28px_-12px_rgba(234,88,12,.8)] transition duration-150 hover:-translate-y-0.5 active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {verifying ? 'Verifying...' : 'Verify Account'}
@@ -400,10 +411,10 @@ function Register() {
                 Didn't get the code?{' '}
                 <button
                   onClick={handleResendOtp}
-                  disabled={resending}
+                  disabled={resending || verifying || resendSecondsRemaining > 0}
                   className="text-orange-500 font-medium hover:underline disabled:opacity-50"
                 >
-                  {resending ? 'Sending...' : 'Resend Code'}
+                  {resending ? 'Sending...' : resendSecondsRemaining > 0 ? `Resend Code in ${resendSecondsRemaining}s` : 'Resend Code'}
                 </button>
               </p>
             </div>

@@ -2,8 +2,10 @@ import { test, expect } from '@playwright/test'
 
 test.beforeEach(async ({ page }) => {
   page.on('pageerror', error => { throw error })
+  await page.route(url => !['127.0.0.1', 'localhost'].includes(url.hostname), route => route.abort())
   // All application API requests are synthetic and stay off production services.
   await page.route('**/api/**', route => route.fulfill({ json: {} }))
+  await page.route('**/api/account', route => route.fulfill({ json: { username: 'SyntheticStudent', email: 'synthetic@example.test' } }))
 })
 
 test('public direct routes, refresh, footer navigation and hash destinations', async ({ page }) => {
@@ -29,6 +31,7 @@ test('public direct routes, refresh, footer navigation and hash destinations', a
 })
 
 test('required agreement blocks requests; related documents preserve form, checkbox and keyboard focus', async ({ page }) => {
+  await page.clock.install()
   let requests = 0
   await page.route('**/api/auth/register', async route => {
     requests++
@@ -68,7 +71,9 @@ test('required agreement blocks requests; related documents preserve form, check
   await page.getByRole('button', { name: 'Register', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Check your email' })).toBeVisible()
   expect(requests).toBe(1)
-  await page.getByRole('button', { name: 'Resend Code' }).click()
+  await expect(page.getByRole('button', { name: /Resend Code in/ })).toBeDisabled()
+  await page.clock.fastForward(60000)
+  await page.getByRole('button', { name: 'Resend Code', exact: true }).click()
   await expect(page.getByRole('status')).toHaveText('Synthetic code resent')
   await page.getByPlaceholder('000000').fill('000000')
   await expect(page.getByPlaceholder('000000')).toHaveValue('000000')
@@ -133,3 +138,42 @@ for (const width of [360, 768, 1440]) test(`public layout fits ${width}px and sc
     if (path === '/register') await page.screenshot({ path: testInfo.outputPath(`register-${width}.png`), fullPage: true })
   }
 })
+
+for (const width of [375, 1280]) {
+  test(`registration waits 60 seconds before resending and restarts the countdown at ${width}px`, async ({ page }, testInfo) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' })
+    await page.clock.install()
+    await page.setViewportSize({ width, height: 900 })
+    let resends = 0
+    await page.route('**/api/auth/register', route => route.fulfill({ status: 201, json: { userId: 12 } }))
+    await page.route('**/api/auth/resend-otp', route => {
+      resends++
+      expect(route.request().postDataJSON()).toEqual({ userId: 12, email: 'synthetic@example.test' })
+      return route.fulfill({ json: { message: 'If the account is eligible, a new code has been sent.' } })
+    })
+    await page.route('**/api/auth/verify-otp', route => route.fulfill({ status: 400, json: { message: 'Synthetic invalid code' } }))
+    await page.goto('/register')
+    for (const [name, value] of [['email', 'synthetic@example.test'], ['username', 'synthetic_student'], ['password', 'Password1'], ['confirmPassword', 'Password1']]) await page.locator(`[name="${name}"]`).fill(value)
+    await page.getByRole('checkbox').check()
+    // Filling the form slowly must not extend the initial 60-second cooldown.
+    await page.clock.fastForward(120000)
+    await page.getByRole('button', { name: 'Register', exact: true }).click()
+    await expect(page.getByRole('button', { name: 'Resend Code in 60s', exact: true })).toBeDisabled()
+    await page.clock.fastForward(30000)
+    await expect(page.getByRole('button', { name: 'Resend Code in 30s', exact: true })).toBeDisabled()
+    expect(resends).toBe(0)
+    await page.clock.fastForward(30000)
+    await page.getByPlaceholder('000000').fill('111111')
+    await page.getByRole('button', { name: 'Resend Code', exact: true }).click()
+    await expect(page.getByRole('button', { name: 'Resend Code in 60s', exact: true })).toBeDisabled()
+    await expect(page.getByPlaceholder('000000')).toHaveValue('')
+    expect(resends).toBe(1)
+    await page.getByPlaceholder('000000').fill('123456')
+    await page.getByRole('button', { name: 'Verify Account', exact: true }).focus()
+    await page.keyboard.press('Enter')
+    await expect(page.locator('#register-otp-error')).toHaveText('Synthetic invalid code')
+    await expect(page.getByRole('button', { name: /Resend Code in/ })).toBeDisabled()
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
+    await page.screenshot({ path: testInfo.outputPath(`registration-countdown-${width}.png`), fullPage: true, animations: 'disabled' })
+  })
+}

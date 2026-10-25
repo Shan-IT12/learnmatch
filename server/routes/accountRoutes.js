@@ -18,6 +18,18 @@ export function createAccountRouter(pool, authenticateToken) {
     if (!Number.isSafeInteger(req.user.userId) || req.user.userId <= 0) return res.status(401).json({ message: 'Please sign in again.' })
     next()
   }
+  router.get('/', (_req, res, next) => { res.setHeader('Cache-Control', 'no-store'); next() }, authenticateToken, requireStudent, async (req, res) => {
+    try {
+      const [rows] = await pool.query(
+        'SELECT username, email FROM USER_ACCOUNT WHERE user_id = ? AND is_active = 1 LIMIT 1',
+        [req.user.userId]
+      )
+      if (rows.length !== 1) return res.status(401).json({ message: 'Please sign in again.' })
+      return res.json({ username: rows[0].username, email: rows[0].email })
+    } catch {
+      return res.status(503).json({ message: 'Account information is temporarily unavailable. Please try again.' })
+    }
+  })
   const accountLimit = rateLimit({ ...options, limit: 5, identifier: 'account-deletion-account', keyGenerator: req => `delete:${req.user.userId}` })
   router.delete('/', (_req, res, next) => { res.setHeader('Cache-Control', 'no-store'); next() }, serviceLimit, authenticateToken, requireStudent, accountLimit, express.json({ limit: '8kb' }), async (req, res) => {
     const origin = req.get('origin')
