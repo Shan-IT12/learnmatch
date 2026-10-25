@@ -566,10 +566,10 @@ function ManageCourses() {
         <AdminHeader currentPage="courses" />
 
         <main className="max-w-6xl mx-auto px-5 sm:px-8 py-10 sm:py-12">
-          <button type="button" onClick={() => navigate('/admin')} className="lm-action mb-6">
+          {!draftsView && <button type="button" onClick={() => navigate('/admin')} className="lm-action mb-6">
             ← Back to Dashboard
-          </button>
-          {draftsView && <button type="button" onClick={() => navigate(courseListLocation())} className="lm-action mb-6 ml-5"><IconArrowLeft className="mr-1 inline" size={16} /> Back to Courses</button>}
+          </button>}
+          {draftsView && <button type="button" onClick={() => navigate(courseListLocation())} className="lm-action mb-6"><IconArrowLeft className="mr-1 inline" size={16} /> Back to Courses</button>}
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 mb-8">
             <div>
               <h1 className="text-3xl font-bold text-gray-900 mb-1">{draftsView ? 'Saved Drafts' : archivedView ? 'Archived Course Identities' : 'Manage Courses'}</h1>
@@ -745,9 +745,6 @@ function ManageCourses() {
       <AdminHeader currentPage="courses" />
 
       <main className="mx-auto w-full max-w-6xl px-5 py-10 sm:px-8 sm:py-12">
-        <button type="button" onClick={() => navigate('/admin')} className="lm-action mb-5">
-          ← Back to Dashboard
-        </button>
         <button
           type="button"
           onClick={editingCourseId ? backToSavedCourse : backToList}
