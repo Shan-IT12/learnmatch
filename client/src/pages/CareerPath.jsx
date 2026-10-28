@@ -6,7 +6,7 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import CourseEnrichmentSections from '../components/CourseEnrichmentSections'
 import CourseName from '../components/CourseName'
 import { CourseDescription, CourseSkills } from '../components/CareerPathExpandable'
-import { IconArrowDown, IconArrowUpRight, IconBook2, IconBriefcase, IconRoute, IconSparkles } from '@tabler/icons-react'
+import { IconArrowDown, IconBook2, IconBriefcase, IconRoute, IconSparkles } from '@tabler/icons-react'
 import useActiveCollegePhase from '../hooks/useActiveCollegePhase'
 import {
   cameFromCareerPathChooser,
@@ -16,6 +16,17 @@ import {
 } from '../utils/careerPathNavigation'
 
 const apiUrl = import.meta.env.VITE_API_URL || ''
+
+function scrollToCareerSection(event) {
+  if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+  const section = document.getElementById(event.currentTarget.hash.slice(1))
+  if (!section) return
+  event.preventDefault()
+  section.scrollIntoView({
+    behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',
+    block: 'start',
+  })
+}
 
 function CareerPath() {
   const navigate = useNavigate()
@@ -231,14 +242,14 @@ function CareerPath() {
                   <CourseName as="h1" name={course.course_name} abbreviation={course.course_abbreviation} className="max-w-4xl text-2xl font-bold leading-tight tracking-tight text-gray-950 sm:text-3xl lg:text-4xl" secondaryClassName="mt-2 text-lg font-medium tracking-normal text-gray-500" />
                   <CourseDescription key={course.course_code} text={course.description} />
                   <div className="mt-6 flex flex-wrap gap-3">
-                    <a href="#program-roadmap" className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-orange-500 px-5 py-3 text-xs font-semibold text-white shadow-sm shadow-orange-200 hover:bg-orange-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500">Explore the roadmap <IconArrowDown size={15} /></a>
-                    <a href="#career-opportunities" className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-3 text-xs font-semibold text-gray-600 hover:border-orange-200 hover:text-orange-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500">Discover careers <IconArrowUpRight size={15} /></a>
+                    <a href="#program-roadmap" onClick={scrollToCareerSection} className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-orange-500 px-5 py-3 text-xs font-semibold text-white shadow-sm shadow-orange-200 hover:bg-orange-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500">Explore the roadmap <IconArrowDown size={15} /></a>
+                    <a href="#career-opportunities" onClick={scrollToCareerSection} className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-3 text-xs font-semibold text-gray-600 hover:border-orange-200 hover:text-orange-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500">Discover careers <IconArrowDown size={15} /></a>
                   </div>
                 </div>
-                <aside className="relative hidden flex-col justify-between overflow-hidden rounded-2xl bg-slate-950 lg:flex p-6 text-white">
-                  <div aria-hidden="true" className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full border-[22px] border-white/5" />
-                  <div className="relative"><IconBook2 size={25} stroke={1.4} className="mb-5 text-orange-400" /><p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-400">Your potential journey</p><p className="mt-2 text-3xl font-bold tracking-tight">{course.program_duration_years ? <>{course.program_duration_years}<span className="ml-2 text-lg font-medium text-slate-300">years</span></> : 'Explore'}</p><p className="mt-2 text-xs leading-5 text-slate-400">From the classroom to the possibilities ahead.</p></div>
-                  <div className="relative mt-6 flex items-center gap-2 border-t border-white/10 pt-4 text-xs text-slate-300"><IconBriefcase size={15} className="text-orange-400" />{course.career_opportunities?.length || 0} career {course.career_opportunities?.length === 1 ? 'opportunity' : 'opportunities'}</div>
+                <aside className="relative hidden flex-col justify-between overflow-hidden rounded-2xl border border-orange-100 bg-gradient-to-br from-orange-50 via-amber-50/70 to-white lg:flex p-6 text-gray-800">
+                  <div aria-hidden="true" className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full border-[22px] border-orange-200/25" />
+                  <div className="relative"><IconBook2 size={25} stroke={1.4} className="mb-5 text-orange-600" /><p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-orange-700">Your potential journey</p><p className="mt-2 text-3xl font-bold tracking-tight text-orange-600">{course.program_duration_years ? <>{course.program_duration_years}<span className="ml-2 text-lg font-medium text-gray-600">years</span></> : 'Explore'}</p><p className="mt-2 text-xs leading-5 text-gray-600">From the classroom to the possibilities ahead.</p></div>
+                  <div className="relative mt-6 flex items-center gap-2 border-t border-orange-200/60 pt-4 text-xs text-gray-700"><IconBriefcase size={15} className="text-orange-600" />{course.career_opportunities?.length || 0} career {course.career_opportunities?.length === 1 ? 'opportunity' : 'opportunities'}</div>
                 </aside>
               </div>
             </header>

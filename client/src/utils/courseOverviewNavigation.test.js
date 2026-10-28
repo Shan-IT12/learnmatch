@@ -67,3 +67,24 @@ test('an active College Phase always returns Course Overview to Results', () => 
     label: 'Back to Results',
   })
 })
+
+test('Summary explorer context survives refresh and returns through Course Search', () => {
+  for (const activeCollegePhase of [false, true]) {
+    assert.deepEqual(getCourseOverviewBackNavigation(undefined, '?source=summary', activeCollegePhase), {
+      path: '/courses/search?source=summary',
+      label: 'Back to Course Search',
+      state: { entryContext: 'summary' },
+    })
+  }
+})
+
+test('Summary explorer preserves the search query after visiting a course', () => {
+  assert.deepEqual(getCourseOverviewBackNavigation({
+    entryContext: 'summary',
+    returnTo: '/courses/search?q=BSIT&source=summary',
+  }), {
+    path: '/courses/search?q=BSIT&source=summary',
+    label: 'Back to Course Search',
+    state: { entryContext: 'summary' },
+  })
+})

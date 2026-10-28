@@ -32,7 +32,7 @@ test('School Locator resolves active College state independently of temporary ro
   assert.match(locator, /useActiveCollegePhase/)
   assert.match(locator, /hasActiveCollegePhase[\s\S]*?\? 'results'/)
   assert.match(locator, /Resolving return destination/)
-  assert.match(locator, /No school match is currently available for this course\./)
+  assert.match(locator, /No verified SJDM school offering is currently available for this course\./)
   assert.doesNotMatch(locator, /Explore other courses/)
   assert.match(locator, /<PublicHeader activeCollegePhase=\{hasActiveCollegePhase\}/)
   const header = await source('../components/PublicHeader.jsx')

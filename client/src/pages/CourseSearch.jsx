@@ -16,13 +16,16 @@ function CourseSearch() {
   const location = useLocation()
   const [searchParams, setSearchParams] = useSearchParams()
   const fromDashboard = searchParams.get('source') === 'dashboard' || location.state?.entryContext === 'dashboard'
+  const fromSummary = searchParams.get('source') === 'summary' || location.state?.entryContext === 'summary'
+  const entryContext = fromSummary ? 'summary' : fromDashboard ? 'dashboard' : 'public-search'
+  const dashboardPath = fromSummary ? '/dashboard/summary' : '/dashboard'
   const hasActiveCollegePhase = useActiveCollegePhase()
-  const contextSearch = fromDashboard ? '?source=dashboard' : ''
+  const contextSearch = fromSummary ? '?source=summary' : fromDashboard ? '?source=dashboard' : ''
   const [input, setInput] = useState(searchParams.get('q') || '')
   const query = input.trim()
-  const returnSearch = new URLSearchParams({ ...(query ? { q: query } : {}), ...(fromDashboard ? { source: 'dashboard' } : {}) }).toString()
+  const returnSearch = new URLSearchParams({ ...(query ? { q: query } : {}), ...((fromSummary || fromDashboard) ? { source: entryContext } : {}) }).toString()
   const courseDetailsState = {
-    entryContext: fromDashboard ? 'dashboard' : 'public-search',
+    entryContext,
     returnTo: `${location.pathname}${returnSearch ? `?${returnSearch}` : ''}`,
   }
   const [courses, setCourses] = useState([])
@@ -31,6 +34,7 @@ function CourseSearch() {
   const [sort, setSort] = useState('asc')
   const [page, setPage] = useState(1)
   const resultsRef = useRef(null)
+  const pageTopRef = useRef(null)
   const paginationScrollRef = useRef(false)
   const displayStatus = resolvedQuery === query ? status : resolvedQuery === null ? 'loading' : 'success'
   const sortedCourses = useMemo(() => [...courses].sort((left, right) => {
@@ -41,6 +45,11 @@ function CourseSearch() {
   const visibleCourses = useMemo(() => (
     sortedCourses.slice((page - 1) * COURSES_PER_PAGE, page * COURSES_PER_PAGE)
   ), [page, sortedCourses])
+
+  useLayoutEffect(() => {
+    // Reset all scroll ancestors when entering from a scrolled dashboard.
+    pageTopRef.current?.scrollIntoView({ block: 'start', inline: 'nearest', behavior: 'instant' })
+  }, [])
 
   useLayoutEffect(() => {
     if (!paginationScrollRef.current) return
@@ -92,9 +101,9 @@ function CourseSearch() {
     setSearchParams(
       Object.fromEntries([
         ...(value ? [['q', value]] : []),
-        ...(fromDashboard ? [['source', 'dashboard']] : []),
+        ...((fromSummary || fromDashboard) ? [['source', entryContext]] : []),
       ]),
-      { replace: true, ...(fromDashboard ? { state: { entryContext: 'dashboard' } } : {}) }
+      { replace: true, ...((fromSummary || fromDashboard) ? { state: { entryContext } } : {}) }
     )
   }
 
@@ -104,12 +113,12 @@ function CourseSearch() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <PublicHeader activeCollegePhase={hasActiveCollegePhase} showDashboard={fromDashboard} />
+    <div ref={pageTopRef} className="min-h-screen bg-gray-50">
+      <PublicHeader activeCollegePhase={hasActiveCollegePhase} showDashboard={fromDashboard || fromSummary} dashboardPath={dashboardPath} />
       <main className="max-w-5xl mx-auto px-5 sm:px-10 py-10 sm:py-14">
-        {fromDashboard ? (
-          <button onClick={() => navigate('/dashboard')} className="lm-action mb-6">
-            ← Back to Dashboard
+        {fromDashboard || fromSummary ? (
+          <button onClick={() => navigate(dashboardPath)} className="lm-action mb-6">
+            ← {fromSummary ? 'Back to Summary Dashboard' : 'Back to Dashboard'}
           </button>
         ) : (
           <Link to="/" className="lm-action mb-6">

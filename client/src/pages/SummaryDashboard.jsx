@@ -8,7 +8,7 @@ import HeaderBrand from '../components/HeaderBrand'
 import SkeletonContent from '../components/SkeletonContent'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { IconArrowRight, IconRefresh, IconSchool, IconHistory, IconUser, IconHeart, IconBrain, IconShieldCheck, IconStar } from '@tabler/icons-react'
+import { IconArrowRight, IconRefresh, IconSchool, IconHistory, IconUser, IconHeart, IconBrain, IconShieldCheck, IconStar, IconCompass } from '@tabler/icons-react'
 import { beginAssessmentAttempt } from '../utils/assessmentSession'
 import { getDimensionResults, MBTI_TYPE_CONTENT } from '../data/mbtiResultContent'
 import CourseName from '../components/CourseName'
@@ -316,14 +316,14 @@ function SummaryDashboard() {
         <section className="mb-10 rounded-[26px] border border-white/90 bg-white/78 p-5 shadow-[0_20px_55px_-42px_rgba(120,53,15,.5)] sm:p-7">
           {mbti ? (
             <div className="grid items-stretch gap-6 md:grid-cols-[14rem_minmax(0,1fr)]">
-              <div className="flex h-full flex-col items-center justify-center rounded-2xl bg-slate-950 px-5 py-7 text-center text-white shadow-[0_16px_34px_-24px_rgba(15,23,42,.75)] sm:px-6"><p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Personality Type</p><p className="mt-3 text-4xl font-black tracking-[0.16em] text-orange-400">{mbti.mbtiType}</p><p className="mt-5 w-full border-t border-white/10 pt-5 text-sm font-semibold leading-6 text-slate-200">{personalityMeaning}</p></div>
+              <div className="flex h-full flex-col items-center justify-center rounded-2xl border border-orange-100 bg-gradient-to-br from-orange-50 via-amber-50/70 to-white px-5 py-7 text-center shadow-[0_16px_34px_-24px_rgba(234,88,12,.25)] sm:px-6"><p className="text-[11px] font-semibold uppercase tracking-wider text-orange-700">Personality Type</p><p className="mt-3 text-4xl font-black tracking-[0.16em] text-orange-600">{mbti.mbtiType}</p><p className="mt-5 w-full border-t border-orange-200/60 pt-5 text-sm font-semibold leading-6 text-gray-700">{personalityMeaning}</p></div>
               <div className="space-y-5">
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                 {personalityDimensions.map((dimension) => (
-                    <div key={dimension.key} className="rounded-xl border border-gray-100 bg-gray-50 px-3 py-3 text-center">
-                      <p className="text-lg font-black text-gray-950">{dimension.preferred}</p>
+                    <div key={dimension.key} className="group rounded-xl border border-gray-100 bg-gray-50 px-3 py-3 text-center transition-colors duration-200 hover:border-orange-200 hover:bg-orange-50 motion-reduce:transition-none">
+                      <p className="text-lg font-black text-gray-950 transition-colors duration-200 group-hover:text-orange-600 motion-reduce:transition-none">{dimension.preferred}</p>
                       <p className="mt-0.5 text-xs font-semibold text-orange-600">{dimension.preferred === dimension.left ? dimension.leftPercent : dimension.rightPercent}%</p>
-                      <p className="mt-1 text-[10px] text-gray-500">{dimension.preferredName}</p>
+                      <p className="mt-1 text-[10px] text-gray-500 transition-colors duration-200 group-hover:text-orange-700 motion-reduce:transition-none">{dimension.preferredName}</p>
                     </div>
                 ))}
                 </div>
@@ -400,6 +400,25 @@ function SummaryDashboard() {
         )}
  
  
+        <section aria-labelledby="summary-explorer-title" className="mb-10 rounded-2xl border border-white/90 bg-white/78 p-5 shadow-[0_18px_48px_-40px_rgba(120,53,15,.5)] sm:p-6">
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between sm:gap-8">
+            <div className="flex items-start gap-3">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-orange-50 text-orange-600"><IconCompass size={20} stroke={1.8} aria-hidden="true" /></span>
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-wide text-gray-400">Course Explorer</p>
+                <h2 id="summary-explorer-title" className="mt-1 text-xl font-bold tracking-tight text-gray-950">Explore more possibilities</h2>
+                <p className="mt-2 max-w-xl text-sm leading-6 text-gray-500">Discover other programs, the skills you can develop, and possible career paths alongside your recommendations.</p>
+              </div>
+            </div>
+            <button
+              onClick={() => navigate('/courses/search?source=summary', { state: { entryContext: 'summary' } })}
+              className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl border border-orange-200 bg-white px-5 py-3 text-sm font-bold text-orange-700 shadow-sm transition hover:border-orange-300 hover:bg-orange-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500"
+            >
+              Explore Courses <IconArrowRight size={16} stroke={2} aria-hidden="true" />
+            </button>
+          </div>
+        </section>
+
         {/* Action buttons */}
         <div className="mb-5">
           <p className="text-xs font-bold uppercase tracking-[0.17em] text-orange-600">Actions</p>

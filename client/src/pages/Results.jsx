@@ -5,6 +5,10 @@ import { useNavigate } from 'react-router-dom'
 import { IconLoader2, IconSchool, IconSparkles, IconArrowUpRight } from '@tabler/icons-react'
 import FeedbackPopup from '../components/FeedbackPopup'
 import CourseName from '../components/CourseName'
+import CourseSchoolAction from '../components/CourseSchoolAction'
+import PersonalFactorExplanation from '../components/PersonalFactorExplanation'
+import { getPersonalFactorExplanation } from '../../../shared/personalFactorExplanation'
+import { MBTI_TYPE_CONTENT, getExpandedType } from '../data/mbtiResultContent'
 import { getAssessmentReturnDestination, SUMMARY_DASHBOARD_DESTINATION } from '../utils/assessmentReturnDestination'
 import { feedbackPromptKey, setActiveFeedbackPromptKey } from '../utils/feedbackPrompt'
 
@@ -72,14 +76,6 @@ function RecommendationsLoadingState() {
       </div>
     </section>
   )
-}
-
-const personalFactorLabels = {
-  factor_physical_impact: 'Physical / accessibility',
-  factor_health_impact: 'Health-related needs',
-  factor_financial_impact: 'Financial circumstances',
-  factor_family_impact: 'Family responsibilities',
-  factor_work_impact: 'Work responsibilities',
 }
 
 const physicalRelevanceClusters = new Set([
@@ -237,11 +233,13 @@ function Results() {
     { correct: 0, total: 0 }
   )
   const skillPercent = skillTotals.total ? Math.round((skillTotals.correct / skillTotals.total) * 100) : null
-  const selectedFactors = assessment.profile
-    ? Object.entries(personalFactorLabels)
-        .filter(([key]) => Number(assessment.profile[key]) > 1)
-        .map(([key, label]) => `${label}: ${assessment.profile[key]}/4`)
-    : []
+  const personalityInfo = MBTI_TYPE_CONTENT[assessment.mbti]
+  const skillHighlights = Object.entries(assessment.domainScores)
+    .filter(([, score]) => score.total > 0)
+    .sort(([, left], [, right]) => right.correct / right.total - left.correct / left.total)
+    .slice(0, 2)
+  const personalFactorDetails = getPersonalFactorExplanation(assessment.profile || {}, recommendations)
+  const selectedFactors = personalFactorDetails.map(factor => `${factor.label}: ${factor.impact}/4`)
   const personalFactorsConsidered = selectedFactors.length > 0
 
   return (
@@ -309,6 +307,10 @@ function Results() {
                 <p className="text-xs font-semibold text-gray-400">Personality type</p>
                 <p className="mt-2 text-3xl font-black tracking-[0.16em] text-orange-500">{assessment.mbti || '—'}</p>
                 <p className="mt-1 text-xs text-gray-500">Your four-letter MBTI result</p>
+                {personalityInfo && <div className="mt-3 rounded-xl bg-orange-50/60 p-3">
+                  <p className="text-xs font-semibold leading-5 text-orange-800">{getExpandedType(assessment.mbti)}</p>
+                  <p className="mt-1.5 text-xs leading-5 text-gray-600">{personalityInfo.summary}</p>
+                </div>}
               </div>
               <div className="border-b border-gray-100 p-5 sm:border-b-0 sm:border-r">
                 <div className="flex items-start justify-between gap-3">
@@ -319,16 +321,30 @@ function Results() {
                   {skillPercent !== null && <span className="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-bold text-blue-700">{skillPercent}%</span>}
                 </div>
                 <p className="mt-1 text-xs text-gray-500">Correct answers in your latest quiz</p>
+                {skillHighlights.length > 0 && <div className="mt-3">
+                  <p className="mb-2 text-[11px] font-semibold text-gray-500">Highest-scoring areas in this quiz</p>
+                  <ul className="space-y-1.5">
+                    {skillHighlights.map(([domain, score]) => <li key={domain} className="flex items-center justify-between gap-3 rounded-lg bg-blue-50/60 px-2.5 py-2 text-xs">
+                      <span className="font-medium text-gray-700">{domain}</span>
+                      <span className="shrink-0 font-semibold text-blue-700">{score.correct}/{score.total}</span>
+                    </li>)}
+                  </ul>
+                </div>}
               </div>
               <div className="p-5">
                 <p className="text-xs font-semibold text-gray-400">Personal factors</p>
                 <div className="mt-2 flex items-center gap-2">
                   <span className={`h-2.5 w-2.5 rounded-full ${personalFactorsConsidered ? 'bg-emerald-500' : 'bg-gray-300'}`} />
-                  <p className="font-bold text-gray-900">{personalFactorsConsidered ? 'Adjusted' : 'Neutral'}</p>
+                  <p className="font-bold text-gray-900">{personalFactorsConsidered ? 'Factors considered' : 'No reported impacts'}</p>
                 </div>
-                <p className="mt-1 text-xs leading-relaxed text-gray-500">
-                  {personalFactorsConsidered ? selectedFactors.join(' · ') : 'All scored responses indicate no current impact.'}
-                </p>
+                {personalFactorsConsidered ? (
+                  <div className="mt-2">
+                    <p className="text-xs text-gray-500">Your reported impacts:</p>
+                    <ul className="mt-2 space-y-1.5">
+                      {selectedFactors.map(factor => <li key={factor} className="rounded-lg bg-emerald-50 px-2.5 py-1.5 text-xs leading-5 text-emerald-800">{factor}</li>)}
+                    </ul>
+                  </div>
+                ) : <p className="mt-1 text-xs leading-relaxed text-gray-500">No reported personal impacts to show.</p>}
               </div>
             </div>
             <div className="border-t border-gray-100 px-5 py-4 sm:px-6">
@@ -339,6 +355,7 @@ function Results() {
                 )) : <span className="text-xs text-gray-400">No interests available.</span>}
               </div>
             </div>
+            <PersonalFactorExplanation factors={personalFactorDetails} />
           </section>
 
           <div className="motion-stagger space-y-5">
@@ -404,12 +421,13 @@ function Results() {
               >
                 View Career Path →
               </button>
-                  <button
+                  <CourseSchoolAction
+                    courseCode={rec.course_code}
                     onClick={() => navigate(`/schools/${encodeURIComponent(rec.course_code)}?source=results`, { state: { source: 'results' } })}
                     className="inline-flex items-center gap-1.5 rounded-lg bg-orange-500 px-3.5 py-2 text-sm font-semibold text-white shadow-sm shadow-orange-200 transition hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
                   >
                     <IconSchool size={16} stroke={2} /> Find Schools in SJDM
-                  </button>
+                  </CourseSchoolAction>
                 </div>
               </div>
             ))}

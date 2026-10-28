@@ -1,11 +1,11 @@
 import HeaderBrand from '../components/HeaderBrand'
 import { Link } from 'react-router-dom'
 
-function PublicHeader({ activeCollegePhase = false, showDashboard = false }) {
+function PublicHeader({ activeCollegePhase = false, showDashboard = false, dashboardPath = '/dashboard' }) {
   const isAuthenticated = Boolean(localStorage.getItem('token'))
   const dashboardNavigation = isAuthenticated && showDashboard && activeCollegePhase === false
   const suppressGenericNavigation = isAuthenticated && activeCollegePhase !== false
-  const homePath = dashboardNavigation ? '/dashboard' : '/'
+  const homePath = dashboardNavigation ? dashboardPath : '/'
 
   return (
     <nav className="lm-site-header border-b border-gray-100 bg-white">
@@ -22,7 +22,7 @@ function PublicHeader({ activeCollegePhase = false, showDashboard = false }) {
             </Link>
           )}
           {!isAuthenticated && <Link to="/register" className="lm-header-primary">Get Started</Link>}
-          {!suppressGenericNavigation && dashboardNavigation && <Link to="/dashboard" className="lm-header-primary">Dashboard</Link>}
+          {!suppressGenericNavigation && dashboardNavigation && <Link to={dashboardPath} className="lm-header-primary">{dashboardPath === '/dashboard/summary' ? 'Summary Dashboard' : 'Dashboard'}</Link>}
         </div>
       </div>
     </nav>

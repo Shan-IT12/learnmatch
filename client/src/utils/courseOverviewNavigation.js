@@ -7,6 +7,14 @@ const safeCourseSearchPath = (value) => (
 export function getCourseOverviewBackNavigation(state, search = '', hasActiveCollegePhase = false) {
   const source = new URLSearchParams(search).get('source')
 
+  if (state?.entryContext === 'summary' || source === 'summary') {
+    return {
+      path: state?.returnTo ? safeCourseSearchPath(state.returnTo) : '/courses/search?source=summary',
+      label: 'Back to Course Search',
+      state: { entryContext: 'summary' },
+    }
+  }
+
   if (hasActiveCollegePhase || state?.entryContext === 'results' || source === 'results') {
     return { path: '/results', label: 'Back to Results' }
   }

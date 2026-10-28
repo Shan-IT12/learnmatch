@@ -26,7 +26,8 @@ function SchoolLocator() {
   const hasActiveCollegePhase = useActiveCollegePhase()
   const source = new URLSearchParams(location.search).get('source')
   const fromDashboard = source === 'dashboard'
-  const resultsContext = hasActiveCollegePhase || source === 'results' || location.state?.source === 'results'
+  const fromSummary = source === 'summary' || location.state?.returnState?.entryContext === 'summary'
+  const resultsContext = !fromSummary && (hasActiveCollegePhase || source === 'results' || location.state?.source === 'results')
   const [savedResult, setResult] = useState(null)
   const [status, setStatus] = useState('loading')
   const [retryCount, setRetryCount] = useState(0)
@@ -81,8 +82,8 @@ function SchoolLocator() {
         }
       : {
           name: 'course-overview',
-          returnTo: `/courses/${encodeURIComponent(courseCode)}${fromDashboard ? '?source=dashboard' : source === 'public-search' ? '?source=public-search' : ''}`,
-          returnState: fromDashboard ? { entryContext: 'dashboard' } : { entryContext: 'public-search' },
+          returnTo: `/courses/${encodeURIComponent(courseCode)}${fromSummary ? '?source=summary' : fromDashboard ? '?source=dashboard' : source === 'public-search' ? '?source=public-search' : ''}`,
+          returnState: { entryContext: fromSummary ? 'summary' : fromDashboard ? 'dashboard' : 'public-search' },
         },
   )
 
@@ -107,7 +108,7 @@ function SchoolLocator() {
         description="Track Route uses GPS location updates while this page is visible. Only your latest position is kept in memory. This updates your map marker and detects possible route deviation; it does not provide turn-by-turn guidance or automatically recalculate routes. Stop tracking at any time."
         onCancel={() => setPendingTracking(false)}
         onConfirm={() => { setPendingTracking(false); startTracking() }} />, document.body)}
-      <PublicHeader activeCollegePhase={hasActiveCollegePhase} showDashboard={fromDashboard} />
+      <PublicHeader activeCollegePhase={hasActiveCollegePhase} showDashboard={fromDashboard || fromSummary} dashboardPath={fromSummary ? '/dashboard/summary' : '/dashboard'} />
       <SkeletonContent loading={displayStatus === 'loading'} label="Finding schools in San Jose del Monte..."><main className="max-w-6xl mx-auto px-5 sm:px-8 lg:px-10 py-8 sm:py-12">
         {hasActiveCollegePhase === null ? (
           <span className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-400" aria-live="polite">Resolving return destination…</span>

@@ -140,22 +140,9 @@ function OnboardingInterests() {
       currentStep={2}
       isComplete={attemptLoaded && isComplete && !submitting}
       stickyChrome
-      onNext={handleNext}
-      nextLabel={submitting ? 'Saving...' : 'Next'}
-      navigationStatus={(
-        <div role="status" className="text-xs leading-tight">
-          <p className="text-gray-500">
-            {selected.length} / {MAX_INTEREST_SELECTIONS} activities selected
-          </p>
-          {selectionMessage && (
-            <p className="mt-1 text-amber-700">
-              {selectionMessage}
-            </p>
-          )}
-        </div>
-      )}
+      showFooterNavigation={false}
     >
-      <SkeletonContent loading={!attemptLoaded && !restoreFailed} label="Loading your interests..."><div className="max-w-3xl mx-auto px-5 sm:px-8 pt-8 sm:pt-12 pb-16">
+      <SkeletonContent loading={!attemptLoaded && !restoreFailed} label="Loading your interests..."><div className="max-w-3xl mx-auto px-5 sm:px-8 pt-8 sm:pt-12 pb-8">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between mb-8">
           <div>
             <div className="inline-flex items-center gap-2 rounded-full bg-orange-50 px-3 py-1.5 text-xs font-semibold text-orange-700 mb-3">
@@ -245,6 +232,28 @@ function OnboardingInterests() {
             </section>
           ))}
           <FieldError id="interests-error">{error}</FieldError>
+        </div>
+
+        <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 sm:gap-5">
+          <button
+            type="button"
+            onClick={() => navigate('/onboarding/profile')}
+            className="min-h-11 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-600 transition hover:border-gray-300 hover:bg-gray-50 hover:text-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 sm:px-5"
+          >
+            Back
+          </button>
+          <div role="status" className="min-w-0 text-center text-xs leading-5">
+            <p className="text-gray-500">{selected.length} / {MAX_INTEREST_SELECTIONS} activities selected</p>
+            {selectionMessage && <p className="mt-1 text-amber-700">{selectionMessage}</p>}
+          </div>
+          <button
+            type="button"
+            onClick={handleNext}
+            disabled={!attemptLoaded || !isComplete || submitting}
+            className="min-h-11 rounded-xl bg-orange-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-orange-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400 disabled:shadow-none sm:px-6"
+          >
+            {submitting ? 'Saving...' : 'Next'}
+          </button>
         </div>
 
       </div></SkeletonContent>

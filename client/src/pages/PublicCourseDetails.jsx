@@ -26,10 +26,11 @@ function PublicCourseDetails() {
   const isAuthenticated = Boolean(localStorage.getItem('token'))
   const source = new URLSearchParams(location.search).get('source')
   const fromDashboard = source === 'dashboard' || location.state?.entryContext === 'dashboard'
+  const fromSummary = source === 'summary' || location.state?.entryContext === 'summary'
   const hasActiveCollegePhase = useActiveCollegePhase()
-  const resultsContext = hasActiveCollegePhase || source === 'results' || location.state?.entryContext === 'results'
+  const resultsContext = !fromSummary && (hasActiveCollegePhase || source === 'results' || location.state?.entryContext === 'results')
   const backNavigation = getCourseOverviewBackNavigation(location.state, location.search, hasActiveCollegePhase)
-  const locatorSourceSearch = resultsContext ? '?source=results' : fromDashboard ? '?source=dashboard' : '?source=public-search'
+  const locatorSourceSearch = fromSummary ? '?source=summary' : resultsContext ? '?source=results' : fromDashboard ? '?source=dashboard' : '?source=public-search'
   const [savedCourse, setCourse] = useState(null)
   const [status, setStatus] = useState('loading')
   const [resolvedCourseCode, setResolvedCourseCode] = useState(null)
@@ -70,7 +71,7 @@ function PublicCourseDetails() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <PublicHeader activeCollegePhase={hasActiveCollegePhase} showDashboard={fromDashboard} />
+      <PublicHeader activeCollegePhase={hasActiveCollegePhase} showDashboard={fromDashboard || fromSummary} dashboardPath={fromSummary ? '/dashboard/summary' : '/dashboard'} />
       <main className="max-w-5xl mx-auto px-5 sm:px-10 py-10 sm:py-14">
         {displayStatus === 'error' && <div className="bg-red-50 border border-red-100 text-red-700 rounded-xl p-5">We couldn’t load this course. Please try again.</div>}
         {displayStatus === 'not-found' && (
@@ -130,7 +131,7 @@ function PublicCourseDetails() {
             </div>
             <div className="bg-gray-900 rounded-2xl p-7 sm:p-9 mt-6 flex flex-col sm:flex-row sm:items-center justify-between gap-5">
               <div><h2 className="text-xl font-semibold text-white">Is this course right for you?</h2><p className="text-sm text-gray-400 mt-1">Get recommendations based on your skills, interests, and personality.</p></div>
-              <Link to={isAuthenticated ? '/dashboard' : '/register'} className="shrink-0 text-center bg-orange-500 text-white px-5 py-3 rounded-xl font-medium hover:bg-orange-600">Take the LearnMatch Assessment</Link>
+              <Link to={fromSummary ? '/dashboard/summary' : isAuthenticated ? '/dashboard' : '/register'} className="shrink-0 text-center bg-orange-500 text-white px-5 py-3 rounded-xl font-medium hover:bg-orange-600">{fromSummary ? 'Back to Summary Dashboard' : 'Take the LearnMatch Assessment'}</Link>
             </div>
           </article></SkeletonContent>
         )}
