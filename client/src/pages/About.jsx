@@ -26,7 +26,7 @@ export default function About() {
     <section className="mt-8 rounded-3xl border border-orange-200/70 bg-orange-50/70 p-6 leading-7 text-gray-700 sm:p-8">
       <h2 className="mb-3 text-xl font-bold text-gray-950">Reflection beyond the first recommendation</h2>
       <p>Optional college alignment tracking lets college students record a selected program and academic terms, complete check-ins, and review alignment results over time. A GWA can be provided where requested. These results support reflection; they are not an official academic evaluation.</p>
-      <p className="mt-3">For practical steps, visit the <Link to="/help" className="public-text-link">Help Center</Link>. The <Link to="/privacy" className="public-text-link">Privacy Notice</Link> explains what is saved, administrator access, research use, and data shared with service providers.</p>
+      <p className="mt-3">For practical steps, visit the <Link to="/help" target="_blank" rel="noopener noreferrer" className="public-text-link">Help Center</Link>. The <Link to="/privacy" target="_blank" rel="noopener noreferrer" className="public-text-link">Privacy Notice</Link> explains what is saved, administrator access, research use, and data shared with service providers.</p>
     </section>
   </PublicInformationLayout>
 }

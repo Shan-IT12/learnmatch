@@ -48,14 +48,16 @@ for (const width of [1280, 375]) {
     await expect(page.locator('a[href="/forgot-password"]')).toHaveCount(0)
     await expect(page.locator('main input')).toHaveCount(0)
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
-    await page.getByRole('link', { name: 'Privacy Notice', exact: true }).click()
-    await expect(page.getByRole('heading', { name: 'LearnMatch Privacy Notice' })).toBeVisible()
-    await page.getByRole('button', { name: 'Back to Settings' }).click()
-    await expect(page.getByRole('link', { name: 'Privacy Notice', exact: true })).toBeFocused()
-    await page.getByRole('link', { name: 'Terms & Conditions', exact: true }).click()
-    await expect(page.getByRole('heading', { name: 'Terms & Conditions', exact: true })).toBeVisible()
-    await page.getByRole('button', { name: 'Back to Settings' }).click()
-    await expect(page.getByRole('link', { name: 'Terms & Conditions', exact: true })).toBeFocused()
+    const settingsUrl = page.url()
+    for (const [label, title] of [['Privacy Notice', 'LearnMatch Privacy Notice'], ['Terms & Conditions', 'Terms & Conditions']]) {
+      const popupPromise = page.waitForEvent('popup')
+      await page.getByRole('link', { name: label, exact: true }).click()
+      const popup = await popupPromise
+      await expect(popup.getByRole('heading', { name: title, exact: true })).toBeVisible()
+      await expect(page).toHaveURL(settingsUrl)
+      await popup.close()
+      await expect(page.getByRole('link', { name: label, exact: true })).toBeFocused()
+    }
     const before = requests.length
     const trigger = page.getByRole('button', { name: 'Delete Account', exact: true })
     await trigger.click()

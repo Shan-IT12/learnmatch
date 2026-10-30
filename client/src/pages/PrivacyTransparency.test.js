@@ -39,12 +39,13 @@ test('public notice, links and results copy render without changing access or fo
     })
     Object.defineProperty(globalThis, 'localStorage', { configurable: true, value: { getItem: () => null } })
     Object.defineProperty(globalThis, 'sessionStorage', { configurable: true, value: { getItem: () => null } })
-    await t.test('registration opens the notice in the same tab with an unchecked required agreement checkbox', async () => {
+    await t.test('registration opens the notice in a new tab with an unchecked required agreement checkbox', async () => {
       const { default: Register } = await vite.ssrLoadModule('/src/pages/Register.jsx')
       const markup = render(React.createElement(Register))
       const link = markup.match(/<a[^>]*href="\/privacy"[^>]*>[\s\S]*?<\/a>/)?.[0]
       assert.ok(link)
-      assert.doesNotMatch(link, /target=|opens in a new tab/)
+      assert.match(link, /target="_blank"/)
+      assert.match(link, /rel="noopener noreferrer"/)
       assert.match(link, /focus-visible:ring-2/)
       assert.match(markup, /type="checkbox"/)
       assert.match(markup, /I agree to the /)
@@ -56,16 +57,13 @@ test('public notice, links and results copy render without changing access or fo
       const landing = await readFile(new URL('./Landing.jsx', import.meta.url), 'utf8')
       assert.match(landing, /<PublicFooter \/>/)
     })
-    await t.test('same-tab notice retains the originating route and offers a return to registration', async () => {
-      const markup = renderToStaticMarkup(React.createElement(MemoryRouter, { initialEntries: [{
-        pathname: '/privacy', state: { privacyBackground: { pathname: '/register', key: 'synthetic-register' } },
-      }] }, React.createElement(PrivacyNotice)))
-      assert.match(markup, /<button[^>]*>Back to registration<\/button>/)
-      const app = await readFile(new URL('../App.jsx', import.meta.url), 'utf8')
-      const transition = await readFile(new URL('../components/PageTransition.jsx', import.meta.url), 'utf8')
-      assert.match(app, /hidden=\{Boolean\(privacyBackground\)\}/)
-      assert.match(app, /<PageTransition transitionLocation=\{routeLocation\}><Routes location=\{routeLocation\}>/)
-      assert.match(transition, /const location = transitionLocation \|\| currentLocation/)
+    await t.test('public information links open separate tabs without requiring registration state', async () => {
+      const markup = render(React.createElement(PrivacyNotice))
+      assert.match(markup, /Back to LearnMatch/)
+      for (const anchor of markup.matchAll(/<a\b[^>]*href="\/(?:about|help|privacy|terms)(?:#[^"]*)?"[^>]*>/g)) {
+        assert.match(anchor[0], /target="_blank"/)
+        assert.match(anchor[0], /rel="noopener noreferrer"/)
+      }
     })
     await t.test('assessment steps retain their controls without added privacy notice panels', async () => {
       const { default: OnboardingLayout } = await vite.ssrLoadModule('/src/components/OnboardingLayout.jsx')

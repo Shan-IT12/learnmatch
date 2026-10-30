@@ -60,6 +60,7 @@ function AdminUsers() {
   const [page, setPage] = useState(1)
   const [searchInput, setSearchInput] = useState('')
   const [search, setSearch] = useState('')
+  const [reload, setReload] = useState(0)
   const [account, setAccount] = useState('')
   const [assessment, setAssessment] = useState('')
   const [tracking, setTracking] = useState('')
@@ -70,6 +71,17 @@ function AdminUsers() {
   useEffect(() => {
     document.title = 'Users | LearnMatch Admin'
   }, [])
+
+  useEffect(() => {
+    const nextSearch = searchInput.trim()
+    if (nextSearch === search) return
+    const timer = setTimeout(() => {
+      setLoading(true)
+      setPage(1)
+      setSearch(nextSearch)
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [searchInput, search])
 
   useEffect(() => {
     const controller = new AbortController()
@@ -89,6 +101,7 @@ function AdminUsers() {
         if (handleUnauthorized(response, navigate)) return
         if (!response.ok) throw new Error('Could not load registered users.')
         const data = await response.json()
+        if (controller.signal.aborted) return
         setUsers(data.users || [])
         setPagination(data.pagination || { page: 1, pageSize: PAGE_SIZE, total: 0, totalPages: 1 })
         setError('')
@@ -101,9 +114,10 @@ function AdminUsers() {
 
     loadUsers()
     return () => controller.abort()
-  }, [account, alignment, assessment, navigate, page, search, tracking])
+  }, [account, alignment, assessment, navigate, page, search, tracking, reload])
 
   const changeFilter = (setter, value) => {
+    setReload(value => value + 1)
     setLoading(true)
     setPage(1)
     setter(value)
@@ -114,9 +128,11 @@ function AdminUsers() {
     setLoading(true)
     setPage(1)
     setSearch(searchInput.trim())
+    setReload(value => value + 1)
   }
 
   const clearFilters = () => {
+    setReload(value => value + 1)
     setSearchInput('')
     setSearch('')
     setAccount('')
@@ -153,7 +169,7 @@ function AdminUsers() {
                 type="search"
                 value={searchInput}
                 onChange={(event) => setSearchInput(event.target.value)}
-                placeholder="Search by User ID or username"
+                placeholder="Search by User ID, username, or email"
                 aria-label="Search users"
                 className="w-full rounded-lg border border-slate-200 bg-white py-2.5 pl-10 pr-11 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
               />
@@ -238,6 +254,7 @@ function AdminUsers() {
                       <td className="px-5 py-4 align-top">
                         <p className="font-bold tabular-nums text-slate-950">#{user.userId}</p>
                         {user.username && <p className="mt-1 truncate text-xs font-medium text-slate-500">@{user.username}</p>}
+                        {user.email && <p className="mt-1 break-all text-xs text-slate-500">{user.email}</p>}
                       </td>
                       <td className="px-4 py-4 align-top"><StatusBadge>{user.accountStatus}</StatusBadge></td>
                       <td className="px-4 py-4 align-top">
@@ -262,6 +279,7 @@ function AdminUsers() {
                     <div className="min-w-0">
                       <p className="font-bold tabular-nums text-slate-950">User #{user.userId}</p>
                       {user.username && <p className="mt-1 truncate text-sm font-medium text-slate-700">@{user.username}</p>}
+                      {user.email && <p className="mt-1 break-all text-sm text-slate-500">{user.email}</p>}
                     </div>
                     <div className="shrink-0 text-right">
                       <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-400">Account Status</p>

@@ -61,7 +61,7 @@ export default function StudentEntryRoute({ children }) {
           <p role="alert">We couldn't verify your session. Check your connection and try again.</p>
           <button type="button" className="mt-5 rounded-xl bg-orange-500 px-6 py-3 font-semibold text-white" onClick={() => { setStatus('checking'); setAttempt(value => value + 1) }}>Retry</button>
           <nav aria-label="Public information" className="mt-6 flex flex-wrap justify-center gap-4 text-sm underline">
-            <Link to="/privacy">Privacy Notice</Link><Link to="/terms">Terms</Link><Link to="/about">About</Link><Link to="/help">Help</Link>
+            <Link to="/privacy" target="_blank" rel="noopener noreferrer">Privacy Notice</Link><Link to="/terms" target="_blank" rel="noopener noreferrer">Terms</Link><Link to="/about" target="_blank" rel="noopener noreferrer">About</Link><Link to="/help" target="_blank" rel="noopener noreferrer">Help</Link>
           </nav>
         </>}
       </div>

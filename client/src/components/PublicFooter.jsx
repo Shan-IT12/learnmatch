@@ -13,7 +13,7 @@ export default function PublicFooter() {
         </div>
         {[['Explore', [['/about', 'About LearnMatch'], ['/#how-it-works', 'How It Works']]], ['Legal', [['/terms', 'Terms & Conditions'], ['/privacy', 'Privacy Notice']]], ['Support', [['/help', 'Help Center'], ['/help#contact-support', 'Contact Support']]]].map(([group, links]) => <nav key={group} aria-label={group}>
           <h2 className="mb-2 text-xs font-bold uppercase tracking-[0.14em] text-orange-800">{group}</h2>
-          <div className="flex flex-col gap-1">{links.map(([to, label]) => <Link key={to} to={to} className={linkClass}>{label}</Link>)}</div>
+          <div className="flex flex-col gap-1">{links.map(([to, label]) => <Link key={to} to={to} target={to.startsWith('/#') ? undefined : '_blank'} rel={to.startsWith('/#') ? undefined : 'noopener noreferrer'} className={linkClass}>{label}</Link>)}</div>
         </nav>)}
       </div>
       <div className="mt-6 flex flex-wrap items-center justify-between gap-2 border-t border-orange-200/60 pt-4 text-xs text-gray-600">

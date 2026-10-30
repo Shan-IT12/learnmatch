@@ -10,7 +10,7 @@ import {
 
 function AuthJourneyPanel({ heading, supportingText }) {
   return (
-    <aside className="group relative isolate min-h-[270px] overflow-hidden rounded-[30px] border border-orange-300/35 bg-[linear-gradient(145deg,#fb923c_0%,#f97316_46%,#dc5b16_100%)] p-6 text-white shadow-[0_28px_80px_-34px_rgba(194,65,12,0.6)] sm:min-h-[330px] sm:p-8 lg:min-h-[650px] lg:p-10 xl:p-12">
+    <aside className="group relative isolate select-none min-h-[270px] overflow-hidden rounded-[30px] border border-orange-300/35 bg-[linear-gradient(145deg,#fb923c_0%,#f97316_46%,#dc5b16_100%)] p-6 text-white shadow-[0_28px_80px_-34px_rgba(194,65,12,0.6)] sm:min-h-[330px] sm:p-8 lg:min-h-[650px] lg:p-10 xl:p-12">
       <div className="pointer-events-none absolute inset-0 opacity-25 [background-image:linear-gradient(rgba(255,255,255,.16)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.16)_1px,transparent_1px)] [background-size:42px_42px] [mask-image:linear-gradient(to_bottom,black,transparent_78%)]" />
       <div className="pointer-events-none absolute -right-28 top-10 h-72 w-72 rounded-full bg-amber-200/25 blur-3xl" />
       <div className="pointer-events-none absolute -bottom-28 -left-20 h-64 w-64 rounded-full bg-red-700/20 blur-3xl" />

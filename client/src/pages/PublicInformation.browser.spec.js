@@ -20,17 +20,26 @@ test('public direct routes, refresh, footer navigation and hash destinations', a
   await page.goto('/')
   const footer = page.getByRole('contentinfo')
   for (const [name, path] of [['About LearnMatch', '/about'], ['Help Center', '/help'], ['Terms & Conditions', '/terms'], ['Privacy Notice', '/privacy']]) {
+    const popupPromise = page.waitForEvent('popup')
     await footer.getByRole('link', { name, exact: true }).click()
-    await expect(page).toHaveURL(new RegExp(`${path}$`))
+    const popup = await popupPromise
+    await expect(popup).toHaveURL(new RegExp(`${path}$`))
+    await expect(popup.locator('h1')).toBeVisible()
+    expect(await popup.evaluate(() => window.opener === null)).toBe(true)
+    await expect(page).toHaveURL(/\/$/)
+    await popup.close()
   }
+  const contactPromise = page.waitForEvent('popup')
   await footer.getByRole('link', { name: 'Contact Support', exact: true }).click()
-  await expect(page.locator('#contact-support')).toBeInViewport()
-  await expect(page.locator('#contact-support').getByRole('link', { name: 'learnmatch1@gmail.com' })).toHaveAttribute('href', 'mailto:learnmatch1@gmail.com')
+  const contact = await contactPromise
+  await expect(contact.locator('#contact-support')).toBeInViewport()
+  await expect(contact.locator('#contact-support').getByRole('link', { name: 'learnmatch1@gmail.com' })).toHaveAttribute('href', 'mailto:learnmatch1@gmail.com')
+  await contact.close()
   await footer.getByRole('link', { name: 'How It Works', exact: true }).click()
   await expect(page.locator('#how-it-works')).toBeInViewport()
 })
 
-test('required agreement blocks requests; related documents preserve form, checkbox and keyboard focus', async ({ page }) => {
+test('required agreement blocks requests; new document tabs preserve the registration form', async ({ page }) => {
   await page.clock.install()
   let requests = 0
   await page.route('**/api/auth/register', async route => {
@@ -57,16 +66,25 @@ test('required agreement blocks requests; related documents preserve form, check
   await checkbox.press('Space')
   const termsLink = page.getByRole('link', { name: 'Terms & Conditions', exact: true })
   await termsLink.focus()
+  const termsPromise = page.waitForEvent('popup')
   await termsLink.press('Enter')
-  await expect(page.getByRole('heading', { name: 'Terms & Conditions', exact: true })).toBeVisible()
-  await page.getByRole('navigation', { name: 'Public information' }).getByRole('link', { name: 'Privacy Notice', exact: true }).click()
-  await expect(page.getByRole('heading', { name: 'LearnMatch Privacy Notice' })).toBeVisible()
-  await page.getByRole('button', { name: 'Back to registration' }).click()
+  const terms = await termsPromise
+  await expect(terms.getByRole('heading', { name: 'Terms & Conditions', exact: true })).toBeVisible()
+  const privacyPromise = terms.waitForEvent('popup')
+  await terms.getByRole('navigation', { name: 'Public information' }).getByRole('link', { name: 'Privacy Notice', exact: true }).click()
+  const privacy = await privacyPromise
+  await expect(privacy.getByRole('heading', { name: 'LearnMatch Privacy Notice' })).toBeVisible()
+  await expect(page).toHaveURL(/\/register$/)
+  await privacy.close()
+  await terms.close()
   await expect(termsLink).toBeFocused()
   for (const [name, value] of [['email', 'synthetic@example.test'], ['username', 'synthetic_student'], ['password', 'Password1'], ['confirmPassword', 'Password1']]) await expect(page.locator(`[name="${name}"]`)).toHaveValue(value)
   await expect(checkbox).toBeChecked()
+  const noticePromise = page.waitForEvent('popup')
   await page.getByRole('link', { name: 'Privacy Notice', exact: true }).first().click()
-  await page.getByRole('button', { name: 'Back to registration' }).click()
+  const notice = await noticePromise
+  await expect(notice.getByRole('heading', { name: 'LearnMatch Privacy Notice' })).toBeVisible()
+  await notice.close()
   await expect(checkbox).toBeChecked()
   await page.getByRole('button', { name: 'Register', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Check your email' })).toBeVisible()
@@ -85,6 +103,7 @@ test('required agreement blocks requests; related documents preserve form, check
 test('verified registration shows success before automatically opening the dashboard', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.clock.install()
+  await page.clock.pauseAt(new Date())
   await page.route('**/api/auth/register', route => route.fulfill({ status: 201, json: { userId: 12 } }))
   await page.route('**/api/auth/verify-otp', route => route.fulfill({ json: { token: 'synthetic-verified-session', userId: 12, username: 'synthetic_student' } }))
   await page.goto('/register')
@@ -103,7 +122,7 @@ test('verified registration shows success before automatically opening the dashb
   expect(await page.evaluate(() => localStorage.getItem('token'))).toBe('synthetic-verified-session')
 })
 
-test('Help accordions work by keyboard and Settings keeps document return navigation', async ({ page }) => {
+test('Help accordions work by keyboard and Settings opens documents in a new tab', async ({ page }) => {
   await page.goto('/help')
   const summary = page.locator('summary').first()
   await summary.focus()
@@ -114,8 +133,12 @@ test('Help accordions work by keyboard and Settings keeps document return naviga
   await page.evaluate(() => localStorage.setItem('token', 'synthetic-local-session'))
   await page.goto('/settings')
   await expect(page.getByRole('heading', { name: 'Settings', exact: true })).toBeVisible()
+  const termsPromise = page.waitForEvent('popup')
   await page.getByRole('link', { name: 'Terms & Conditions', exact: true }).click()
-  await page.getByRole('button', { name: 'Back to Settings' }).click()
+  const terms = await termsPromise
+  await expect(terms.getByRole('heading', { name: 'Terms & Conditions', exact: true })).toBeVisible()
+  await terms.close()
+  await expect(page).toHaveURL(/\/settings$/)
   await expect(page.getByRole('heading', { name: 'Settings', exact: true })).toBeVisible()
   await expect(page.getByRole('link', { name: 'Terms & Conditions', exact: true })).toBeFocused()
   await expect(page.getByRole('button', { name: 'Delete Account', exact: true })).toBeVisible()

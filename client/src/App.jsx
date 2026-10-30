@@ -1,5 +1,5 @@
 import { Routes, Route, useLocation } from 'react-router-dom'
-import { useEffect, useRef } from 'react'
+import { useEffect } from 'react'
 import Landing from './pages/Landing'
 import Login from './pages/Login'
 import Register from './pages/Register'
@@ -44,16 +44,6 @@ import StudentEntryRoute from './components/StudentEntryRoute'
 
 function App() {
   const location = useLocation()
-  const privacyBackground = ['/privacy', '/terms', '/about', '/help'].includes(location.pathname) ? location.state?.privacyBackground : null
-  const routeLocation = privacyBackground || location
-  const privacyTrigger = useRef(null)
-  useEffect(() => {
-    if (privacyBackground) privacyTrigger.current = location.state?.privacyTriggerId
-    else if (privacyTrigger.current) {
-      document.getElementById(privacyTrigger.current)?.focus()
-      privacyTrigger.current = null
-    }
-  }, [location, privacyBackground])
   useEffect(() => {
     if (!['/about', '/help', '/terms', '/privacy'].includes(location.pathname) && !(location.pathname === '/' && location.hash)) return
     const frame = requestAnimationFrame(() => {
@@ -62,12 +52,9 @@ function App() {
       else window.scrollTo(0, 0)
     })
     return () => cancelAnimationFrame(frame)
-  }, [location.pathname, location.hash, privacyBackground])
+  }, [location.pathname, location.hash])
   return (
-    <>
-    {/* Retain the originating form in memory while its same-tab notice is shown. */}
-    <div hidden={Boolean(privacyBackground)}>
-    <PageTransition transitionLocation={routeLocation}><Routes location={routeLocation}>
+    <PageTransition><Routes>
       <Route path="/" element={<StudentEntryRoute><Landing /></StudentEntryRoute>} />
       <Route path="/courses/search" element={<CourseSearch />} />
       <Route path="/courses/:courseCode" element={<PublicCourseDetails />} />
@@ -107,9 +94,6 @@ function App() {
       <Route path="/admin/feedback" element={<AdminRoute><AdminFeedback /></AdminRoute>} />
       <Route path="/admin/feedback/:feedbackId" element={<AdminRoute><AdminFeedbackDetail /></AdminRoute>} />
     </Routes></PageTransition>
-    </div>
-    {privacyBackground && (location.pathname === '/terms' ? <Terms /> : location.pathname === '/about' ? <About /> : location.pathname === '/help' ? <Help /> : <PrivacyNotice />)}
-    </>
   )
 }
 

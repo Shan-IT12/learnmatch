@@ -42,6 +42,7 @@ test('user list returns monitored users with truthful derived states and paginat
   assert.deepEqual(result.users[0], {
     userId: 17,
     username: 'student17',
+    email: 'student@example.edu',
     accountStatus: 'Active',
     assessmentStatus: 'Completed',
     recommendationStatus: 'Available',
@@ -49,11 +50,12 @@ test('user list returns monitored users with truthful derived states and paginat
     latestAlignment: 'On Track',
     registeredAt: monitoredUser.created_at,
   })
-  assert.equal(Object.hasOwn(result.users[0], 'email'), false)
+  assert.equal(result.users[0].email, monitoredUser.email)
   assert.deepEqual(result.pagination, { page: 2, pageSize: 10, total: 21, totalPages: 3 })
   const listCall = database.calls.find(({ sql }) => sql.includes('ORDER BY created_at'))
   assert.deepEqual(listCall.values, [10, 10])
-  assert.doesNotMatch(listCall.sql, /u\.email|profile\.full_name/)
+  assert.match(listCall.sql, /u\.email/)
+  assert.doesNotMatch(listCall.sql, /profile\.full_name/)
 })
 
 test('search and account, assessment, tracking, and alignment filters are parameterized', async () => {
@@ -68,13 +70,13 @@ test('search and account, assessment, tracking, and alignment filters are parame
 
   const countCall = database.calls.find(({ sql }) => sql.includes('SELECT COUNT(*) AS total'))
   assert.match(countCall.sql, /CAST\(user_id AS CHAR\) LIKE \? OR username LIKE \?/)
-  assert.doesNotMatch(countCall.sql, /email LIKE/)
+  assert.match(countCall.sql, /OR email LIKE \?/)
   assert.match(countCall.sql, /is_active = \?/)
   assert.match(countCall.sql, /assessment_status = \?/)
   assert.match(countCall.sql, /tracking_started = \?/)
   assert.match(countCall.sql, /alignment_status = \?/)
   assert.deepEqual(countCall.values, [
-    '%Sample%', '%Sample%', 0, 'In Progress', 1, 'Needs Attention',
+    '%Sample%', '%Sample%', '%Sample%', 0, 'In Progress', 1, 'Needs Attention',
   ])
 
   const noCheckinDatabase = listDatabase()
@@ -82,6 +84,27 @@ test('search and account, assessment, tracking, and alignment filters are parame
   const noCheckinSql = noCheckinDatabase.calls[0].sql
   assert.match(noCheckinSql, /alignment_status IS NULL/)
   assert.match(noCheckinSql, /tracking_started = \?/)
+})
+
+test('plain and displayed User IDs use an exact parameterized ID match on both queries', async () => {
+  for (const search of ['17', '#17', '  # 17  ']) {
+    const database = listDatabase({ users: [monitoredUser] })
+    const result = await getAdminUsers(database, { search })
+    assert.equal(result.users[0].userId, 17)
+    for (const call of database.calls) {
+      assert.match(call.sql, /user_id = \? OR username LIKE \? OR email LIKE \?/)
+      assert.equal(call.values[0], '17')
+    }
+  }
+})
+
+test('username and email searches remain parameterized', async () => {
+  for (const search of ['student17', 'student@example.edu', "' OR 1=1 --"]) {
+    const database = listDatabase()
+    await getAdminUsers(database, { search })
+    assert.deepEqual(database.calls[0].values, Array(3).fill(`%${search}%`))
+    assert.equal(database.calls[0].sql.includes(search), false)
+  }
 })
 
 test('newer completed On Track check-in without AI analysis outranks an older analyzed Monitor check-in', async () => {
