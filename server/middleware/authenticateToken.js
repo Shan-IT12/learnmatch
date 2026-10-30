@@ -25,8 +25,9 @@ async function authenticateToken(req, res, next) {
     return res.status(401).json({ message: 'No token provided. Please log in.' })
   }
 
+  let decoded
   try {
-    const decoded = jwt.verify(
+    decoded = jwt.verify(
       token,
       process.env.JWT_SECRET,
       jwtVerifyOptions(USER_JWT_AUDIENCE)
@@ -37,6 +38,11 @@ async function authenticateToken(req, res, next) {
     if (!Number.isInteger(decoded.userId)) {
       return res.status(403).json({ message: 'Invalid or expired token. Please log in again.' })
     }
+  } catch {
+    return res.status(403).json({ message: 'Invalid or expired token. Please log in again.' })
+  }
+
+  try {
     const [users] = await pool.query(
       'SELECT user_id FROM USER_ACCOUNT WHERE user_id = ? AND is_active = 1 LIMIT 1',
       [decoded.userId]
@@ -47,7 +53,7 @@ async function authenticateToken(req, res, next) {
     req.user = decoded // { userId: 1, username: '...', iat: ..., exp: ... }
     return next()
   } catch {
-    return res.status(403).json({ message: 'Invalid or expired token. Please log in again.' })
+    return res.status(503).json({ message: 'Session verification is temporarily unavailable. Please try again.' })
   }
 }
 

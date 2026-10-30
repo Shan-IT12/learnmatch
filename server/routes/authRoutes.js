@@ -1,4 +1,5 @@
 import express from 'express'
+import authenticateToken from '../middleware/authenticateToken.js'
 import {
   forgotPassword,
   loginUser,
@@ -30,6 +31,11 @@ const router = express.Router()
 router.use((_req, res, next) => {
   res.setHeader('Cache-Control', 'no-store')
   next()
+})
+
+// Verify the existing student session without issuing or renewing a token.
+router.get('/session', authenticateToken, (req, res) => {
+  res.json({ userId: req.user.userId, username: req.user.username })
 })
 
 router.post(

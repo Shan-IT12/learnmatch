@@ -39,6 +39,7 @@ import Terms from './pages/Terms'
 import About from './pages/About'
 import Help from './pages/Help'
 import StudentSettings from './pages/StudentSettings'
+import StudentEntryRoute from './components/StudentEntryRoute'
 
 
 function App() {
@@ -67,11 +68,11 @@ function App() {
     {/* Retain the originating form in memory while its same-tab notice is shown. */}
     <div hidden={Boolean(privacyBackground)}>
     <PageTransition transitionLocation={routeLocation}><Routes location={routeLocation}>
-      <Route path="/" element={<Landing />} />
+      <Route path="/" element={<StudentEntryRoute><Landing /></StudentEntryRoute>} />
       <Route path="/courses/search" element={<CourseSearch />} />
       <Route path="/courses/:courseCode" element={<PublicCourseDetails />} />
       <Route path="/schools/:courseCode" element={<SchoolLocator />} />
-      <Route path="/login" element={<Login />} />
+      <Route path="/login" element={<StudentEntryRoute><Login /></StudentEntryRoute>} />
       <Route path="/register" element={<Register />} />
       <Route path="/privacy" element={<PrivacyNotice />} />
       <Route path="/terms" element={<Terms />} />
