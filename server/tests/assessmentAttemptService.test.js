@@ -4,6 +4,7 @@ import { readFile } from 'node:fs/promises'
 import { buildPersonalFactorsSnapshot, createAssessmentAttempt, ensureAttemptPersonalFactors, ensureFinalizedSkillResponses, getCurrentAttempt, getOwnedAttempt, hasCompletePersonalityPrerequisites, hasMatchingFinalizedSkillResponses, insertFinalizedSkillResponses, parseAttemptJson, requestedAttemptId, scoreSkillAnswers, updateAttempt, updateCurrentAttemptDraft } from '../services/assessmentAttemptService.js'
 
 const completeProfile = {
+  personal_factor_answers: { physical: 'yes', health: 'yes', financial: 'yes', family: 'yes', work: 'yes' },
   physical_accessibility_areas: '["seeing"]',
   physical_accessibility_difficulties: '{"seeing":"some_difficulty"}',
   factor_physical_impact: 2,
@@ -73,6 +74,21 @@ test('recovering or revisiting an attempt preserves its existing PF snapshot', a
   assert.deepEqual(await ensureAttemptPersonalFactors(database, 7, 41), saved)
   assert.equal(calls.some(({ sql }) => sql.includes('FROM PROFILE')), false)
   assert.equal(calls.some(({ sql }) => sql.startsWith('UPDATE ASSESSMENT_ATTEMPT')), false)
+})
+
+test('recovery replaces a historical unknown snapshot only with a complete profile', async () => {
+  const unknown = { ...completeProfile, personal_factor_answers: { ...completeProfile.personal_factor_answers, health: 'unknown' } }
+  for (const profile of [unknown, completeProfile]) {
+    const writes = []
+    const database = { async query(sql, params) {
+      if (sql.includes('FROM ASSESSMENT_ATTEMPT')) return [[{ attempt_id: 41, status: 'IN_PROGRESS', personal_factors: unknown }]]
+      if (sql.includes('FROM PROFILE')) return [[profile]]
+      writes.push({ sql, params }); return [{ affectedRows: 1 }]
+    } }
+    const snapshot = await ensureAttemptPersonalFactors(database, 7, 41)
+    assert.deepEqual(snapshot, buildPersonalFactorsSnapshot(profile))
+    assert.equal(writes.length, profile === completeProfile ? 1 : 0)
+  }
 })
 
 test('all in-progress sections can be persisted on the active attempt', async () => {
@@ -252,7 +268,7 @@ test('final Personality submission accepts a fully populated in-progress attempt
 test('final Personality prerequisites use exactly the six populated attempt sections', () => {
   const attempt = {
     status: 'IN_PROGRESS',
-    personal_factors: { factor_physical_impact: 1 },
+    personal_factors: buildPersonalFactorsSnapshot(completeProfile),
     interests: ['Reading', 'Music', 'Art'],
     skill_questions: Array.from({ length: 30 }, (_, index) => ({ question_id: index + 1 })),
     skill_answers: Array.from({ length: 30 }, (_, index) => ({ question_id: index + 1, selected_option: 'A' })),

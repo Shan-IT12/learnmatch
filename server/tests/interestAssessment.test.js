@@ -204,7 +204,7 @@ test('attempt persistence saves and restores the global checkbox separately from
 
 test('no interests or a single activity satisfies Personality prerequisites without inventing scores', () => {
   const attempt = {
-    personal_factors: {}, interests: JSON.stringify(noInterests),
+    personal_factors: { personal_factor_answers: { physical: 'no', health: 'no', financial: 'no', family: 'no', work: 'no' }, physical_accessibility_areas: [], physical_accessibility_difficulties: {}, factor_physical_impact: null, factor_health_impact: null, factor_financial_impact: null, factor_family_impact: null, factor_work_impact: null }, interests: JSON.stringify(noInterests),
     skill_questions: Array(30).fill({}), skill_answers: Array(30).fill({}),
     skill_result: {}, personality_answers: Object.fromEntries(Array.from({ length: 40 }, (_, index) => [index, 3])),
   }

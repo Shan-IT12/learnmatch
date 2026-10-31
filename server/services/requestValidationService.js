@@ -97,8 +97,8 @@ export function validateProfile(body) {
   const areas = body.physical_accessibility_areas
   const answers = body.personal_factor_answers
   if (!answers || typeof answers !== 'object' || Array.isArray(answers)
-    || PERSONAL_FACTOR_KEYS.some(factor => !['yes', 'no', 'unknown', 'legacy_unknown'].includes(answers[factor]))) {
-    return { valid: false, message: 'Please reload the page to use the updated personal-factor choices.' }
+    || PERSONAL_FACTOR_KEYS.some(factor => !['yes', 'no'].includes(answers[factor]))) {
+    return { valid: false, message: 'Select Yes or No for each of the five Personal Factors.' }
   }
   if (!Array.isArray(areas) || (areas.length === 0 && answers.physical === 'yes')) {
     return { valid: false, message: 'Select at least one physical or accessibility area when the factor applies.' }
@@ -124,16 +124,15 @@ export function validateProfile(body) {
     return { valid: false, message: 'Provide one valid difficulty level for each selected area.' }
   }
 
-  if (['no', 'unknown'].includes(answers.physical) && (areas.length || difficultyAreas.length)) {
-    return { valid: false, message: 'Undisclosed physical factors must not include accessibility details.' }
+  if (answers.physical === 'no' && (areas.length || difficultyAreas.length)) {
+    return { valid: false, message: 'A No answer for physical factors must not include accessibility details.' }
   }
   for (const factor of PERSONAL_FACTOR_KEYS) {
     const field = `factor_${factor}_impact`
     if (answers[factor] === 'yes' && (!Number.isInteger(body[field]) || body[field] < 1 || body[field] > 4)) {
       return { valid: false, message: `${field} must be an integer from 1 to 4.` }
     }
-    if (['no', 'unknown'].includes(answers[factor]) && body[field] !== null) return { valid: false, message: `${field} must be empty when no impact is disclosed.` }
-    if (answers[factor] === 'legacy_unknown' && body[field] !== 1) return { valid: false, message: 'An ambiguous historical impact must remain unchanged until answered again.' }
+    if (answers[factor] === 'no' && body[field] !== null) return { valid: false, message: `${field} must be empty when the answer is No.` }
   }
   return {
     valid: true,

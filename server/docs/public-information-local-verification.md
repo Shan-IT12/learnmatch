@@ -21,7 +21,7 @@ existing student records.
   stores `terms_version`, `terms_accepted_at` (database UTC time), and
   `privacy_notice_version` in the same INSERT. Client timestamps are ignored.
   The acknowledgment time is the same registration agreement event. OTP, recovery,
-  existing login, and optional Personal Factors remain separate.
+  existing login remain separate. Personal Factors now require all five Yes/No answers for assessment completion (31 October 2026).
 
 ## Privacy source and relocation
 

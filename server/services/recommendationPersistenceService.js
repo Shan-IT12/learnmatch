@@ -8,6 +8,8 @@ import {
 } from './recommendationService.js'
 import {
   buildDeterministicExplanation,
+  buildExplanationContext,
+  needsExplanationRefresh,
   generateRecommendationExplanations,
 } from './recommendationExplanationService.js'
 import { isCurrentIndependentCourse } from './courseIdentityService.js'
@@ -37,6 +39,7 @@ function shapeSavedRecommendation(row) {
       personality_match: toDisplayPercent(Number(row.personality_match)),
       personal_factor_match: row.personal_factor_match == null ? null : toDisplayPercent(Number(row.personal_factor_match)),
     },
+    explanation_context: buildExplanationContext(row),
     ai_narrative: row.ai_narrative ?? null,
   }
   recommendation.ai_narrative ||= buildDeterministicExplanation(recommendation)
@@ -101,10 +104,11 @@ async function getRecommendationItems(database, recommendationId, activeOnly = f
     `SELECT ri.rank_position, ri.match_score, ri.skill_match, ri.interest_match,
             ri.personality_match, ri.personal_factor_match, ri.ai_narrative,
             c.course_id, c.course_code, c.course_name, c.course_abbreviation,
-            c.cluster_category, a.interests AS attempt_interests
+            c.cluster_category, c.description, c.obtainable_skills, pa.mbti_type, a.interests AS attempt_interests
      FROM RECOMMENDATION_ITEM ri
      JOIN COURSE c ON c.course_id = ri.course_id
      JOIN RECOMMENDATION r ON r.recommendation_id = ri.recommendation_id
+     LEFT JOIN PERSONALITY_ASSESSMENT pa ON pa.assessment_id = r.assessment_id
      LEFT JOIN ASSESSMENT_ATTEMPT a ON a.attempt_id = (
        SELECT MAX(attempt_id) FROM ASSESSMENT_ATTEMPT
        WHERE user_id = r.user_id AND personality_assessment_id = r.assessment_id AND status = 'COMPLETED'
@@ -210,7 +214,8 @@ export async function getOrCreateSavedRecommendations(
   pool,
   userId,
   generateRecommendations = getTopCourseRecommendations,
-  explainRecommendations = generateRecommendationExplanations
+  explainRecommendations = generateRecommendationExplanations,
+  { onProgress = () => {} } = {}
 ) {
   const assessmentId = await getPersonalityAssessmentId(pool, userId)
   if (!assessmentId) {
@@ -218,12 +223,41 @@ export async function getOrCreateSavedRecommendations(
       'A completed personality assessment is required to generate recommendations.'
     )
   }
+  onProgress({ completed: 1, label: 'Finding your course matches' })
 
   const saved = await getSavedRecommendationForAssessment(pool, userId, assessmentId)
-  if (saved) return saved.recommendations
+  if (saved) {
+    onProgress({ completed: 2, label: 'Preparing your course explanations' })
+    const outdated = saved.recommendations.filter(rec => needsExplanationRefresh(rec.ai_narrative))
+    if (!outdated.length) {
+      onProgress({ completed: 3, label: 'Checking your saved recommendations' })
+      onProgress({ completed: 4, label: 'Loading your results overview' })
+      return saved.recommendations
+    }
+    // Update wording only for the latest viewed result; retain its exact ranking
+    // and scores and leave older assessment history alone.
+    const explained = await explainRecommendations(saved.recommendations)
+    onProgress({ completed: 3, label: 'Saving your course explanations' })
+    const narratives = new Map(explained.map(rec => [rec.rank_position, rec.ai_narrative]))
+    for (const rec of outdated) {
+      const next = narratives.get(rec.rank_position)
+      const narrative = typeof next === 'string' && next.trim() && !needsExplanationRefresh(next)
+        ? next.trim() : buildDeterministicExplanation(rec)
+      await pool.query(
+        `UPDATE RECOMMENDATION_ITEM SET ai_narrative = ?
+         WHERE recommendation_id = ? AND course_id = ? AND rank_position = ? AND ai_narrative = ?`,
+        [narrative, saved.recommendation_id, rec.course_id, rec.rank_position, rec.ai_narrative]
+      )
+      rec.ai_narrative = narrative
+    }
+    onProgress({ completed: 4, label: 'Loading your results overview' })
+    return saved.recommendations
+  }
 
   const generated = await generateRecommendations(pool, userId)
+  onProgress({ completed: 2, label: 'Preparing your course explanations' })
   const explained = await explainRecommendations(generated)
+  onProgress({ completed: 3, label: 'Saving your recommendations' })
   const narrativesByRank = new Map(
     explained.map(({ rank_position, ai_narrative }) => [rank_position, ai_narrative])
   )
@@ -240,7 +274,10 @@ export async function getOrCreateSavedRecommendations(
       assessmentId,
       recommendationsWithExplanations
     )
-    if (persistence.created) return recommendationsWithExplanations
+    if (persistence.created) {
+      onProgress({ completed: 4, label: 'Loading your results overview' })
+      return recommendationsWithExplanations
+    }
   } catch (error) {
     if (error.code !== 'ER_DUP_ENTRY') throw error
   }
@@ -249,6 +286,7 @@ export async function getOrCreateSavedRecommendations(
   if (!concurrentlySaved) {
     throw new RecommendationDataError('The recommendation snapshot could not be retrieved after persistence.')
   }
+  onProgress({ completed: 4, label: 'Loading your results overview' })
   return concurrentlySaved.recommendations
 }
 

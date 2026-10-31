@@ -9,7 +9,10 @@ Internal publication review; this document is not public-page content.
   recipient email, sender, subject and HTML message. Password storage uses bcrypt.
 - `services/recommendationExplanationService.js`: the conditional OpenAI integration
   sends rank, course name/category, match score, strongest component summaries and
-  development area. It does not serialize the whole recommendation/student object.
+  development area. The 31 October 2026 explanation update also supplies bounded public
+  catalog descriptions/skills and broad personality themes derived using the existing
+  MBTI-to-RIASEC mapping. It does not send account details, raw answers or detailed
+  personal-factor disclosures, or serialize the whole recommendation/student object.
 - `services/collegeMismatchExplanationService.js`: the conditional OpenAI integration
   sends deterministic status, alignment percentage, phase, dimension scores and GWA
   (null if omitted). On Track uses deterministic feedback. These are result-derived

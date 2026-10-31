@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+import { TERMS_VERSION, PRIVACY_NOTICE_VERSION } from '../../../shared/legalDocuments.js'
 
 test.beforeEach(async ({ page }) => {
   page.on('pageerror', error => { throw error })
@@ -46,8 +47,8 @@ test('required agreement blocks requests; new document tabs preserve the registr
     requests++
     const body = route.request().postDataJSON()
     expect(body.agreementAccepted).toBe(true)
-    expect(body.termsVersion).toBe('1.0')
-    expect(body.privacyNoticeVersion).toBe('1.3')
+    expect(body.termsVersion).toBe(TERMS_VERSION)
+    expect(body.privacyNoticeVersion).toBe(PRIVACY_NOTICE_VERSION)
     await route.fulfill({ status: 201, json: { userId: 12 } })
   })
   await page.route('**/api/auth/verify-otp', route => route.fulfill({ status: 400, json: { message: 'Synthetic invalid code' } }))

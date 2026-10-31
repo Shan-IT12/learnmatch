@@ -3,6 +3,8 @@ import assert from 'node:assert/strict'
 
 import {
   buildDeterministicExplanation,
+  buildExplanationContext,
+  needsExplanationRefresh,
   generateRecommendationExplanations,
 } from '../services/recommendationExplanationService.js'
 
@@ -88,18 +90,33 @@ test('explanation payload matches the notice and excludes account details and ra
   } })
   assert.equal(payload.length, 3)
   for (const item of payload) {
-    assert.deepEqual(Object.keys(item).sort(), ['area_to_develop', 'cluster_category', 'course_name', 'match_score', 'rank_position', 'strongest_alignment_factors'])
+    assert.deepEqual(Object.keys(item).sort(), ['area_to_develop', 'cluster_category', 'course_context', 'course_name', 'match_score', 'personality_themes', 'rank_position', 'strongest_alignment_factors'])
     for (const factor of [...item.strongest_alignment_factors, item.area_to_develop]) assert.deepEqual(Object.keys(factor).sort(), ['label', 'score'])
   }
   assert.doesNotMatch(JSON.stringify(payload), /PRIVATE_SENTINEL/)
 })
 
-test('deterministic explanation describes existing WSM evidence', () => {
-  const narrative = buildDeterministicExplanation(recommendations[0])
-  assert.match(narrative, /weighted scoring model/i)
-  assert.match(narrative, /rank #1/)
-  assert.match(narrative, /91\.25%/)
-  assert.match(narrative, /does not change the ranking/i)
+test('fallback is conversational, grounded in supplied context, and avoids technical boilerplate', () => {
+  const context = buildExplanationContext({ description: 'Studies design.', obtainable_skills: ['design', 'drawing'], mbti_type: 'INTP' })
+  const narrative = buildDeterministicExplanation({ ...recommendations[0], explanation_context: context })
+  assert.match(narrative, /Your personality result suggests you may enjoy investigating ideas and solving problems/)
+  assert.match(narrative, /design and drawing/)
+  assert.equal(needsExplanationRefresh(narrative), false)
+  assert.doesNotMatch(narrative, /weighted|rank|91\.25%|100%|guarantee|perfect fit/i)
+})
+
+test('context excludes private fields, bounds course content and handles unavailable themes', () => {
+  const context = buildExplanationContext({ description: 'x'.repeat(3000), obtainable_skills: Array(10).fill('drawing'), mbti_type: 'UNKNOWN', email: 'PRIVATE_SENTINEL' })
+  assert.equal(context.course_description.length, 1800)
+  assert.equal(context.course_skills.length, 6)
+  assert.deepEqual(context.personality_themes, [])
+  assert.doesNotMatch(JSON.stringify(context), /PRIVATE_SENTINEL/)
+})
+
+test('missing interests and personal circumstances are not invented as strengths', () => {
+  const narrative = buildDeterministicExplanation({ ...recommendations[0], interests_available: false,
+    score_breakdown: { interest_match: 100, personal_factor_match: 50, skill_match: 0, personality_match: 0 } })
+  assert.doesNotMatch(narrative, /Your interests|strongest connections|personality result|personal profile|personal circumstances/)
 })
 
 test('missing API key returns fallback explanations without changing recommendations', async () => {
@@ -108,7 +125,7 @@ test('missing API key returns fallback explanations without changing recommendat
     result.map(({ rank_position, course_code, match_score }) => ({ rank_position, course_code, match_score })),
     recommendations.map(({ rank_position, course_code, match_score }) => ({ rank_position, course_code, match_score }))
   )
-  assert.ok(result.every(({ ai_narrative }) => ai_narrative.includes('weighted scoring model')))
+  assert.ok(result.every(({ ai_narrative }) => !needsExplanationRefresh(ai_narrative)))
 })
 
 test('OpenAI failure returns deterministic fallbacks and keeps Top 3 visible', async () => {
@@ -138,6 +155,8 @@ test('successful OpenAI narratives attach by rank without altering order or scor
       'match_score',
       'strongest_alignment_factors',
       'area_to_develop',
+      'course_context',
+      'personality_themes',
     ])
     return openAIResponse()
   }
@@ -190,4 +209,12 @@ test('development logs official Responses API usage fields and production logs n
     if (originalNodeEnv === undefined) delete process.env.NODE_ENV
     else process.env.NODE_ENV = originalNodeEnv
   }
+})
+
+test('technical AI wording is replaced with the conversational fallback', async () => {
+  const result = await generateRecommendationExplanations(recommendations, {
+    apiKey: 'test-key', fetchImpl: async () => ({ ok: true, json: async () => ({ output_text: JSON.stringify({ explanations: recommendations.map(rec => ({ rank_position: rec.rank_position, narrative: 'The weighted scoring model selected this.' })) }) }) }),
+  })
+  assert.ok(result.every(rec => !needsExplanationRefresh(rec.ai_narrative)))
+  assert.deepEqual(result.map(rec => rec.match_score), recommendations.map(rec => rec.match_score))
 })

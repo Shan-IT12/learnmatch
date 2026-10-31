@@ -438,3 +438,58 @@ test('saved no-interest snapshots retain their scoring basis after refresh', asy
     assert.doesNotMatch(result.ai_narrative, /developing your interests/)
   }
 })
+
+test('latest legacy technical narratives refresh without recomputing scores or rewriting other narratives', async () => {
+  const updates = []
+  const rows = savedRows.map((row, index) => ({ ...row,
+    ai_narrative: index === 0 ? 'LearnMatch weighted scoring placed this at rank #1.' : 'Your interests connect with this course.',
+    description: 'A course about designing and building.', obtainable_skills: 'design, drawing', mbti_type: 'INTP',
+  }))
+  const pool = { async query(sql, params) {
+    if (sql.startsWith('UPDATE')) { updates.push({ sql, params }); return [{ affectedRows: 1 }] }
+    if (sql.includes('FROM PERSONALITY_ASSESSMENT')) return [[{ assessment_id: 11 }]]
+    if (sql.includes('FROM RECOMMENDATION_ITEM')) return [rows]
+    return [[{ recommendation_id: 99, assessment_id: 11 }]]
+  } }
+  let explanations = 0
+  const result = await getOrCreateSavedRecommendations(pool, 7,
+    () => { throw new Error('Ranking must not run') },
+    async recs => { explanations++; assert.deepEqual(recs[0].explanation_context.course_skills, ['design', 'drawing']); return recs.map(rec => ({ ...rec, ai_narrative: 'You may enjoy exploring design through this course.' })) })
+  assert.equal(explanations, 1)
+  assert.equal(updates.length, 1)
+  assert.match(updates[0].sql, /SET ai_narrative = \?/)
+  assert.match(updates[0].sql, /recommendation_id = \? AND course_id = \? AND rank_position = \? AND ai_narrative = \?/)
+  assert.doesNotMatch(updates[0].sql, /SET.*match_score|SET.*rank_position/)
+  assert.equal(result[0].ai_narrative, 'You may enjoy exploring design through this course.')
+  assert.equal(result[1].ai_narrative, rows[1].ai_narrative)
+  assert.deepEqual(result.map(rec => [rec.rank_position, rec.match_score]), generatedRecommendations.map(rec => [rec.rank_position, rec.match_score]))
+})
+
+test('saved results report completed preparation steps without rerunning ranking', async () => {
+  const steps = []
+  const database = { async query(sql) {
+    if (sql.includes('FROM PERSONALITY_ASSESSMENT')) return [[{ assessment_id: 11 }]]
+    if (sql.includes('FROM RECOMMENDATION_ITEM')) return [savedRows]
+    return [[{ recommendation_id: 99, assessment_id: 11 }]]
+  } }
+  const result = await getOrCreateSavedRecommendations(database, 7,
+    () => { throw new Error('Should use saved ranking') }, undefined,
+    { onProgress: progress => steps.push(progress.completed) })
+  assert.equal(result.length, 3)
+  assert.deepEqual(steps, [1, 2, 3, 4])
+})
+
+test('explanation preparation stays pending until generation actually finishes', async () => {
+  const steps = []
+  const database = { async query(sql) {
+    if (sql.startsWith('UPDATE')) return [{ affectedRows: 1 }]
+    if (sql.includes('FROM PERSONALITY_ASSESSMENT')) return [[{ assessment_id: 11 }]]
+    if (sql.includes('FROM RECOMMENDATION_ITEM')) return [savedRows.map(row => ({ ...row, ai_narrative: 'LearnMatch weighted scoring selected this course.' }))]
+    return [[{ recommendation_id: 99, assessment_id: 11 }]]
+  } }
+  await getOrCreateSavedRecommendations(database, 7, undefined, async recs => {
+    assert.deepEqual(steps, [1, 2])
+    return recs.map(rec => ({ ...rec, ai_narrative: 'Your interests connect with this course.' }))
+  }, { onProgress: progress => steps.push(progress.completed) })
+  assert.deepEqual(steps, [1, 2, 3, 4])
+})

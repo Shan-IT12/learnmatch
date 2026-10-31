@@ -5,6 +5,7 @@ import React from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { MemoryRouter } from 'react-router-dom'
 import { createServer } from 'vite'
+import { PRIVACY_NOTICE_VERSION, LEGAL_REVISION_DATE } from '../../../shared/legalDocuments.js'
 
 test('public notice, links and results copy render without changing access or forms', async t => {
   const vite = await createServer({ server: { middlewareMode: true, hmr: false }, appType: 'custom', optimizeDeps: { noDiscovery: true } })
@@ -18,10 +19,12 @@ test('public notice, links and results copy render without changing access or fo
       const markup = render(React.createElement(PrivacyNotice))
       assert.match(markup, /<main/)
       assert.match(markup, /<h1[^>]*>LearnMatch Privacy Notice/)
-      assert.match(markup, /Notice version 1\.3/)
-      assert.match(markup, /dateTime="2026-10-25"/)
+      assert.ok(markup.includes(`Notice version ${PRIVACY_NOTICE_VERSION}`))
+      assert.ok(markup.includes(`dateTime="${LEGAL_REVISION_DATE}"`))
       assert.match(markup, /href="mailto:learnmatch1@gmail.com"/)
       assert.match(markup, /Back to LearnMatch/)
+      assert.match(markup, /Each of the five Personal Factors requires a Yes or No answer/)
+      assert.doesNotMatch(markup, /Prefer not to|Personal Factor is optional/)
       assert.match(markup, /current form does not collect an Others free-text response/)
       assert.match(markup, /Older records may still contain retired Others text/)
       assert.match(markup, /Sending an email does not automatically delete or change saved information/)

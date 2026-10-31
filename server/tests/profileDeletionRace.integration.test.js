@@ -13,7 +13,7 @@ const gate = () => {
   return { promise, release }
 }
 const profile = username => ({
-  username, personal_factor_answers: { physical: 'unknown', health: 'unknown', financial: 'unknown', family: 'unknown', work: 'unknown' },
+  username, personal_factor_answers: { physical: 'no', health: 'no', financial: 'no', family: 'no', work: 'no' },
   physical_accessibility_areas: [], physical_accessibility_difficulties: {}, factor_physical_impact: null, factor_health_impact: null,
   factor_financial_impact: null, factor_family_impact: null, factor_work_impact: null,
 })

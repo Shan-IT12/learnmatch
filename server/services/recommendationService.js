@@ -1,3 +1,4 @@
+import { buildExplanationContext } from './recommendationExplanationService.js'
 import { personalFactorResponses } from '../shared/personalFactors.js'
 import { normalizeInterestResponse } from './interestSubmissionService.js'
 import { parseAttemptJson } from './assessmentAttemptService.js'
@@ -19,7 +20,6 @@ import {
   calculateCourseScore,
   calculateCourseSkillMatch,
   calculatePersonalFactorScore,
-  personalFactorCoverage,
   calculatePersonalityScore,
   calculateRiasecCosineSimilarity,
   rankCourses,
@@ -27,7 +27,11 @@ import {
 import { isCurrentIndependentCourse } from './courseIdentityService.js'
 import { selectDiversifiedTopThree } from './recommendationDiversityService.js'
 export function buildPersonalFactorResponses(profile = {}) {
-  return personalFactorResponses(profile)
+  const responses = personalFactorResponses(profile)
+  if (Object.values(responses).some(value => value === null)) {
+    throw new RecommendationInputError('Answer Yes or No for all five Personal Factors and complete the impact details before generating recommendations.')
+  }
+  return responses
 }
 
 export class RecommendationInputError extends Error {
@@ -196,7 +200,7 @@ export function scoreAndRankClusters({
     const personalityScore = calculatePersonalityScore(mbtiType, parentCluster)
     const personalFactorScore = calculatePersonalFactorScore(personalFactorResponses, parentCluster)
     const clusterScore = calculateClusterScore(
-      { skillScore, interestScore, personalityScore, personalFactorScore, personalFactorCoverage: personalFactorCoverage(personalFactorResponses) },
+      { skillScore, interestScore, personalityScore, personalFactorScore },
       parentCluster
     )
 
@@ -207,7 +211,6 @@ export function scoreAndRankClusters({
       interestScore,
       personalityScore,
       personalFactorScore,
-      personalFactorCoverage: personalFactorCoverage(personalFactorResponses),
     }
   })
 
@@ -344,6 +347,7 @@ function shapeRecommendation(course) {
       personality_match: toDisplayPercent(course.scoreBreakdown.personalityMatch),
       personal_factor_match: course.scoreBreakdown.personalFactorMatch === null ? null : toDisplayPercent(course.scoreBreakdown.personalFactorMatch),
     },
+    explanation_context: course.explanationContext,
     ai_narrative: null,
   }
 }
@@ -398,7 +402,7 @@ export async function getTopCourseRecommendations(pool, userId) {
       [userId]
     ),
     pool.query(
-      `SELECT course_id, course_code, course_name, course_abbreviation, cluster_category
+      `SELECT course_id, course_code, course_name, course_abbreviation, cluster_category, description, obtainable_skills
        FROM COURSE
        WHERE is_active = 1 AND is_draft = 0`,
     ),
@@ -505,13 +509,13 @@ export async function getTopCourseRecommendations(pool, userId) {
       courseInterestMatch,
       parentClusterPersonalityScore,
       parentClusterPersonalFactorScore,
-      personalFactorCoverage: clusterScores.personalFactorCoverage,
       parentCluster: course.cluster_category,
     })
 
     return {
       ...course,
       finalScore,
+      explanationContext: buildExplanationContext({ ...course, mbti_type: mbtiType }),
       scoreBreakdown: {
         skillMatch: courseSkillMatch,
         interestMatch: courseInterestMatch,

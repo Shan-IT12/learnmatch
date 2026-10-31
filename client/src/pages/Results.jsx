@@ -1,8 +1,9 @@
 import HeaderBrand from '../components/HeaderBrand'
+import RecommendationsLoadingState from '../components/RecommendationsLoadingState'
 import CompatibilityDisclaimer from '../components/CompatibilityDisclaimer'
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { IconLoader2, IconSchool, IconSparkles, IconArrowUpRight } from '@tabler/icons-react'
+import { IconSchool, IconSparkles, IconArrowUpRight, IconBrain, IconChartBar, IconActivity, IconBulb } from '@tabler/icons-react'
 import FeedbackPopup from '../components/FeedbackPopup'
 import CourseName from '../components/CourseName'
 import CourseSchoolAction from '../components/CourseSchoolAction'
@@ -11,72 +12,9 @@ import { getPersonalFactorExplanation } from '../../../shared/personalFactorExpl
 import { MBTI_TYPE_CONTENT, getExpandedType } from '../data/mbtiResultContent'
 import { getAssessmentReturnDestination, SUMMARY_DASHBOARD_DESTINATION } from '../utils/assessmentReturnDestination'
 import { feedbackPromptKey, setActiveFeedbackPromptKey } from '../utils/feedbackPrompt'
+import { readRecommendationResponse } from '../utils/recommendationProgress'
 
 const RECOMMENDATIONS_TIMEOUT_MS = 30000
-
-function RecommendationCardSkeleton({ index }) {
-  return (
-    <div
-      className="overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm"
-      aria-hidden="true"
-    >
-      <div className="p-5 sm:p-6">
-        <div className="mb-5 flex items-start justify-between gap-4">
-          <div className="min-w-0 flex-1">
-            <div className="h-3 w-20 animate-pulse rounded-full bg-orange-100" />
-            <div className={`mt-3 h-6 animate-pulse rounded-lg bg-gray-200 ${index === 0 ? 'max-w-md' : 'max-w-sm'}`} />
-          </div>
-          <div className="h-8 w-16 shrink-0 animate-pulse rounded-lg bg-orange-100" />
-        </div>
-        <div className="mb-5 h-2 w-full animate-pulse rounded-full bg-gray-100">
-          <div className={`h-2 rounded-full bg-orange-200 ${index === 0 ? 'w-4/5' : index === 1 ? 'w-3/4' : 'w-2/3'}`} />
-        </div>
-        <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_17rem]">
-          <div className="relative overflow-hidden rounded-2xl border border-orange-200 bg-gradient-to-br from-orange-50 via-orange-50/60 to-amber-50/70 p-5 sm:p-6">
-            <div className="absolute inset-y-0 left-0 w-1 bg-orange-300" />
-            <div className="mb-4 flex items-center gap-3"><div className="h-10 w-10 shrink-0 animate-pulse rounded-xl bg-orange-200" /><div className="h-5 w-48 max-w-full animate-pulse rounded-lg bg-orange-200/80" /></div>
-            <div className="space-y-4">
-              <div className="h-3 w-full animate-pulse rounded-full bg-orange-100" />
-              <div className="h-3 w-11/12 animate-pulse rounded-full bg-orange-100" />
-              <div className="h-3 w-3/4 animate-pulse rounded-full bg-orange-100" />
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-2">
-            {[0, 1, 2, 3].map((item) => (
-              <div key={item} className="rounded-xl border border-gray-100 bg-gray-50 px-3 py-3">
-                <div className="h-2.5 w-12 animate-pulse rounded-full bg-gray-200" />
-                <div className="mt-2 h-4 w-9 animate-pulse rounded-full bg-gray-200" />
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-      <div className="flex gap-5 border-t border-gray-100 bg-gray-50/60 px-5 py-4 sm:px-6">
-        <div className="h-3 w-28 animate-pulse rounded-full bg-gray-200" />
-        <div className="h-3 w-32 animate-pulse rounded-full bg-gray-200" />
-      </div>
-    </div>
-  )
-}
-
-function RecommendationsLoadingState() {
-  return (
-    <section aria-live="polite" aria-busy="true" aria-label="Generating course recommendations">
-      <div className="mb-6 flex flex-col gap-3 rounded-2xl border border-orange-100 bg-gradient-to-r from-orange-50 to-amber-50 px-5 py-4 sm:flex-row sm:items-center sm:px-6">
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-orange-500 shadow-sm">
-          <IconLoader2 className="animate-spin" size={21} stroke={2.2} />
-        </span>
-        <div>
-          <p className="font-semibold text-gray-900">Generating your course recommendations...</p>
-          <p className="mt-0.5 text-sm leading-relaxed text-gray-500">We’re comparing your assessment results with courses that fit you best.</p>
-        </div>
-      </div>
-      <div className="space-y-5">
-        {[0, 1, 2].map((index) => <RecommendationCardSkeleton key={index} index={index} />)}
-      </div>
-    </section>
-  )
-}
 
 const physicalRelevanceClusters = new Set([
   'HEALTHCARE SCIENCE CLUSTER',
@@ -108,6 +46,7 @@ function Results() {
   const pageRef = useRef(null)
   const [recommendations, setRecommendations] = useState([])
   const [loading, setLoading] = useState(true)
+  const [loadingProgress, setLoadingProgress] = useState({ percent: 0, label: 'Checking your assessment' })
   const [error, setError] = useState('')
   const [rankingPending, setRankingPending] = useState(false)
   const [retryCount, setRetryCount] = useState(0)
@@ -127,6 +66,7 @@ function Results() {
 
     const loadRecommendations = async () => {
       setLoading(true)
+      setLoadingProgress({ percent: 0, label: 'Checking your assessment' })
       // Reset the scrolling ancestors immediately for each load, including retries.
       pageRef.current?.scrollIntoView({ block: 'start', inline: 'nearest', behavior: 'instant' })
       setError('')
@@ -141,18 +81,20 @@ function Results() {
         const response = await fetch(`${import.meta.env.VITE_API_URL}/api/results`, {
           headers: {
             Authorization: `Bearer ${token}`,
+            Accept: 'text/event-stream',
           },
           signal: controller.signal,
         })
-        const data = await response.json().catch(() => ({}))
-        window.clearTimeout(timeoutId)
+        const { status, data } = await readRecommendationResponse(response, progress => {
+          if (!controller.signal.aborted) setLoadingProgress(previous => ({ percent: Math.max(previous.percent, progress.completed * 20), label: progress.label }))
+        })
 
-        if (response.status === 401 || response.status === 403) {
+        if (status === 401 || status === 403) {
           navigate('/login', { replace: true })
           return
         }
 
-        if (response.status === 400) {
+        if (status === 400) {
           setRankingPending(data.code === 'MISSING_INTEREST_SCORING_POLICY')
           setError(
             data.message || 'Please complete all required assessments before viewing recommendations.'
@@ -161,7 +103,7 @@ function Results() {
           return
         }
 
-        if (!response.ok) {
+        if (status >= 400) {
           setError('Could not load your recommendations. Please try again.')
           setRecommendations([])
           return
@@ -169,6 +111,12 @@ function Results() {
 
         setRecommendations(Array.isArray(data.recommendations) ? data.recommendations : [])
 
+        setLoadingProgress({ percent: 80, label: 'Loading your results overview' })
+        let completedDetails = 0
+        const trackDetail = request => request.finally(() => {
+          completedDetails += 1
+          if (!controller.signal.aborted) setLoadingProgress({ percent: Math.min(99, 80 + Math.floor(completedDetails / 6 * 20)), label: 'Loading your results overview' })
+        })
         const headers = { Authorization: `Bearer ${token}` }
         const userId = localStorage.getItem('userId')
         const assessmentResponses = await Promise.allSettled([
@@ -180,10 +128,11 @@ function Results() {
             .then(async (res) => res.ok ? res.json() : null),
           fetch(`${import.meta.env.VITE_API_URL}/api/recommendations/latest`, { headers, signal: controller.signal })
             .then(async (res) => res.ok ? res.json() : null),
-        ])
+        ].map(trackDetail))
+        if (controller.signal.aborted) throw new DOMException('Results request cancelled', 'AbortError')
 
         const valueAt = (index) => assessmentResponses[index].status === 'fulfilled'
-          ? assessmentResponses[index].value
+          ? assessmentResponses[index].value ?? {}
           : {}
         if (!controller.signal.aborted) {
           setAssessment({
@@ -196,6 +145,9 @@ function Results() {
           const promptKey = feedbackPromptKey(userId, valueAt(5)?.recommendation?.recommendation_id)
           setFeedbackMilestoneKey(promptKey)
           setActiveFeedbackPromptKey(localStorage, promptKey)
+          setLoadingProgress({ percent: 100, label: 'Your recommendations are ready' })
+          // Let the completed bar settle before revealing the results.
+          await new Promise(resolve => window.setTimeout(resolve, 400))
         }
       } catch (requestError) {
         if (requestTimedOut) {
@@ -239,8 +191,6 @@ function Results() {
     .sort(([, left], [, right]) => right.correct / right.total - left.correct / left.total)
     .slice(0, 2)
   const personalFactorDetails = getPersonalFactorExplanation(assessment.profile || {}, recommendations)
-  const selectedFactors = personalFactorDetails.map(factor => `${factor.label}: ${factor.impact}/4`)
-  const personalFactorsConsidered = selectedFactors.length > 0
 
   return (
     <div ref={pageRef} className="min-h-screen bg-gray-50">
@@ -257,12 +207,14 @@ function Results() {
       </nav>
 
       <div className="max-w-6xl mx-auto px-5 sm:px-8 py-8 sm:py-12">
+        {!loading && <>
         <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900 mb-2">Your Recommended Courses</h1>
         <p className="text-gray-500 text-sm mb-6">
           {recommendations[0]?.interests_available === false
             ? 'These recommendations are based on your skills, personality, and personal factors because you selected no activity interests.'
             : 'Based on your skills, interests, and profile, here are your top matches.'}
         </p>
+        </>}
         {returnDestination.path === '/college' && (
           <p className="mb-6 rounded-xl border border-orange-100 bg-orange-50 px-4 py-3 text-sm text-orange-900">
             These recommendations are informational and do not change your enrolled course or College Phase tracking.
@@ -270,7 +222,7 @@ function Results() {
         )}
 
         {loading ? (
-          <RecommendationsLoadingState />
+          <RecommendationsLoadingState progress={loadingProgress.percent} status={loadingProgress.label} />
         ) : error ? (
           <div role="status" className={`${rankingPending ? 'bg-blue-50 text-blue-900' : 'bg-red-50 text-red-600'} px-4 py-3 rounded-xl text-sm mb-6`}>
             <p>{error}</p>
@@ -290,90 +242,27 @@ function Results() {
           </div>
         ) : (
           <>
-          <section className="mb-6 overflow-hidden rounded-3xl border border-orange-100 bg-white shadow-sm" aria-labelledby="assessment-snapshot-title">
-            <div className="flex flex-col gap-2 border-b border-orange-100 bg-gradient-to-r from-orange-50 to-amber-50 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-              <div>
-                <p className="text-[11px] font-bold uppercase tracking-wider text-orange-600">Assessment snapshot</p>
-                <h2 id="assessment-snapshot-title" className="mt-0.5 font-bold text-gray-900">The inputs considered in your matches</h2>
-              </div>
-              {returnDestination.path !== '/college' && (
-                <button type="button" onClick={() => navigate('/dashboard/summary')} className="lm-action">
-                  Open Full Summary →
-                </button>
-              )}
-            </div>
-            <div className="grid sm:grid-cols-3">
-              <div className="border-b border-gray-100 p-5 sm:border-b-0 sm:border-r">
-                <p className="text-xs font-semibold text-gray-400">Personality type</p>
-                <p className="mt-2 text-3xl font-black tracking-[0.16em] text-orange-500">{assessment.mbti || '—'}</p>
-                <p className="mt-1 text-xs text-gray-500">Your four-letter MBTI result</p>
-                {personalityInfo && <div className="mt-3 rounded-xl bg-orange-50/60 p-3">
-                  <p className="text-xs font-semibold leading-5 text-orange-800">{getExpandedType(assessment.mbti)}</p>
-                  <p className="mt-1.5 text-xs leading-5 text-gray-600">{personalityInfo.summary}</p>
-                </div>}
-              </div>
-              <div className="border-b border-gray-100 p-5 sm:border-b-0 sm:border-r">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-xs font-semibold text-gray-400">Academic skills</p>
-                    <p className="mt-2 text-2xl font-bold text-gray-900">{skillTotals.total ? `${skillTotals.correct}/${skillTotals.total}` : '—'}</p>
-                  </div>
-                  {skillPercent !== null && <span className="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-bold text-blue-700">{skillPercent}%</span>}
-                </div>
-                <p className="mt-1 text-xs text-gray-500">Correct answers in your latest quiz</p>
-                {skillHighlights.length > 0 && <div className="mt-3">
-                  <p className="mb-2 text-[11px] font-semibold text-gray-500">Highest-scoring areas in this quiz</p>
-                  <ul className="space-y-1.5">
-                    {skillHighlights.map(([domain, score]) => <li key={domain} className="flex items-center justify-between gap-3 rounded-lg bg-blue-50/60 px-2.5 py-2 text-xs">
-                      <span className="font-medium text-gray-700">{domain}</span>
-                      <span className="shrink-0 font-semibold text-blue-700">{score.correct}/{score.total}</span>
-                    </li>)}
-                  </ul>
-                </div>}
-              </div>
-              <div className="p-5">
-                <p className="text-xs font-semibold text-gray-400">Personal factors</p>
-                <div className="mt-2 flex items-center gap-2">
-                  <span className={`h-2.5 w-2.5 rounded-full ${personalFactorsConsidered ? 'bg-emerald-500' : 'bg-gray-300'}`} />
-                  <p className="font-bold text-gray-900">{personalFactorsConsidered ? 'Factors considered' : 'No reported impacts'}</p>
-                </div>
-                {personalFactorsConsidered ? (
-                  <div className="mt-2">
-                    <p className="text-xs text-gray-500">Your reported impacts:</p>
-                    <ul className="mt-2 space-y-1.5">
-                      {selectedFactors.map(factor => <li key={factor} className="rounded-lg bg-emerald-50 px-2.5 py-1.5 text-xs leading-5 text-emerald-800">{factor}</li>)}
-                    </ul>
-                  </div>
-                ) : <p className="mt-1 text-xs leading-relaxed text-gray-500">No reported personal impacts to show.</p>}
-              </div>
-            </div>
-            <div className="border-t border-gray-100 px-5 py-4 sm:px-6">
-              <p className="mb-2 text-xs font-semibold text-gray-400">Selected interests & hobbies</p>
-              <div className="flex flex-wrap gap-2">
-                {assessment.interests.length > 0 ? assessment.interests.map((interest) => (
-                  <span key={interest} className="rounded-full bg-orange-50 px-3 py-1.5 text-xs font-medium text-orange-800">{interest}</span>
-                )) : <span className="text-xs text-gray-400">No interests available.</span>}
-              </div>
-            </div>
-            <PersonalFactorExplanation factors={personalFactorDetails} />
-          </section>
-
-          <div className="motion-stagger space-y-5">
-            {recommendations.map((rec) => (
+          <div className="motion-stagger grid items-stretch gap-5 lg:grid-cols-2">
+            {recommendations.map((rec) => {
+              const isTopMatch = rec.rank_position === 1
+              const isSecondMatch = rec.rank_position === 2
+              return (
               <div
                 key={rec.course_id}
-                className="overflow-hidden bg-white border border-gray-200 rounded-3xl shadow-sm"
+                data-recommendation-rank={rec.rank_position}
+                className={`flex flex-col overflow-hidden rounded-3xl border bg-white ${isTopMatch ? 'border-orange-200 shadow-[0_10px_35px_-24px_rgba(234,88,12,.45)] ring-1 ring-orange-100/60 lg:col-span-2' : isSecondMatch ? 'border-orange-200 shadow-sm' : 'border-orange-100 shadow-sm'}`}
               >
-                <div className="p-5 sm:p-6">
+                <div className={isTopMatch ? 'bg-gradient-to-br from-orange-50/60 via-white to-white p-6 sm:p-8' : 'p-5 sm:p-6'}>
                 <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-start mb-4">
                   <div className="min-w-0">
-                    <span className="text-xs font-semibold text-orange-500 uppercase tracking-wide">
+                    <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[11px] font-bold uppercase tracking-wide ${isTopMatch ? 'border-orange-200 bg-orange-100/70 text-orange-700' : isSecondMatch ? 'border-orange-200 bg-orange-50 text-orange-700' : 'border-orange-100 bg-amber-50/70 text-stone-600'}`}>
+                      {isTopMatch && <IconSparkles size={13} aria-hidden="true" />}
                       {rankLabel[rec.rank_position - 1] || `#${rec.rank_position}`}
                     </span>
-                    <CourseName as="h2" name={rec.course_name} abbreviation={rec.course_abbreviation} className="text-lg sm:text-xl font-bold text-gray-900 mt-1 leading-snug" secondaryClassName="mt-1 text-base font-medium text-gray-500" />
+                    <CourseName as="h2" name={rec.course_name} abbreviation={rec.course_abbreviation} className={`mt-2 font-bold leading-snug tracking-tight text-gray-900 ${isTopMatch ? 'text-2xl sm:text-3xl' : 'text-lg sm:text-xl'}`} secondaryClassName="mt-1 text-base font-medium text-gray-500" />
                   </div>
-                  <div className="flex items-baseline gap-1 sm:block sm:text-right shrink-0">
-                    <span className="text-2xl font-bold text-orange-500">{rec.match_score}%</span>
+                  <div className="flex shrink-0 items-baseline gap-2 sm:justify-end">
+                    <span className={`font-bold tracking-tight ${isTopMatch ? 'text-3xl text-orange-600 sm:text-4xl' : isSecondMatch ? 'text-2xl text-orange-700' : 'text-2xl text-stone-700'}`}>{rec.match_score}%</span>
                     <span className="text-xs text-gray-400">match</span>
                   </div>
                 </div>
@@ -381,27 +270,27 @@ function Results() {
                 {/* Match score bar */}
                 <div className="w-full bg-gray-100 rounded-full h-2 mb-4">
                   <div
-                    className="bg-orange-500 h-2 rounded-full transition-all"
+                    className={`h-2 rounded-full transition-all ${isTopMatch ? 'bg-orange-500' : isSecondMatch ? 'bg-orange-400' : 'bg-orange-200'}`}
                     style={{ width: `${rec.match_score}%` }}
                   />
                 </div>
 
-                <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_17rem]">
+                <div className={`grid items-start gap-4 ${isTopMatch ? 'lg:grid-cols-[minmax(0,1fr)_17rem]' : ''}`}>
                   {rec.ai_narrative && (
-                    <section aria-labelledby={`course-fit-${rec.rank_position}`} className="relative overflow-hidden rounded-2xl border border-orange-200 bg-gradient-to-br from-orange-50 via-orange-50/60 to-amber-50/70 p-5 shadow-[0_8px_24px_-18px_rgba(234,88,12,.45)] sm:p-6">
-                      <div aria-hidden="true" className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-orange-400 to-orange-500" />
+                    <section aria-labelledby={`course-fit-${rec.rank_position}`} className={`relative overflow-hidden rounded-2xl border p-5 ${isTopMatch ? 'border-orange-200 bg-gradient-to-br from-orange-50 via-orange-50/60 to-amber-50/70 sm:p-6' : isSecondMatch ? 'border-orange-200 bg-orange-50/70' : 'border-orange-100 bg-amber-50/60'}`}>
+                      {isTopMatch && <div aria-hidden="true" className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-orange-400 to-orange-500" />}
                       <div className="mb-4 flex items-center gap-3">
-                        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-500 text-white shadow-sm shadow-orange-200"><IconSparkles size={21} stroke={1.8} aria-hidden="true" /></span>
-                        <h3 id={`course-fit-${rec.rank_position}`} className="text-base font-bold leading-snug tracking-tight text-gray-950 sm:text-lg">Why this course fits you</h3>
+                        <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${isTopMatch ? 'bg-orange-500 text-white shadow-sm shadow-orange-200' : isSecondMatch ? 'bg-orange-100 text-orange-600' : 'bg-orange-50 text-orange-700 ring-1 ring-orange-100'}`}><IconSparkles size={21} stroke={1.8} aria-hidden="true" /></span>
+                        <h3 id={`course-fit-${rec.rank_position}`} className={`font-bold leading-snug tracking-tight text-gray-950 ${isTopMatch ? 'text-base sm:text-lg' : 'text-sm sm:text-base'}`}>Why this course fits you</h3>
                       </div>
-                      <p className="text-sm leading-7 text-gray-800 sm:text-[15px]">{rec.ai_narrative}</p>
+                      <p className={`text-sm font-medium text-gray-800 ${isTopMatch ? 'leading-7 sm:text-[15px]' : 'leading-6'}`}>{rec.ai_narrative}</p>
                     </section>
                   )}
                   {rec.score_breakdown && (
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className={`grid grid-cols-2 ${isTopMatch ? 'gap-2' : 'gap-x-5 gap-y-1 border-t border-gray-100 pt-3'}`}>
                       {Object.entries(breakdownLabels).map(([key, label]) => (
-                        <div key={key} className="rounded-xl border border-gray-100 bg-gray-50 px-3 py-2.5">
-                          <p className="text-[11px] text-gray-400">{label}</p>
+                        <div key={key} className={isTopMatch ? 'rounded-xl border border-gray-100 bg-gray-50 px-3 py-2.5' : 'flex items-center justify-between gap-2 py-1.5'}>
+                          <p className="text-[11px] text-gray-500">{!isTopMatch && key === 'personal_factor_match' ? 'Personal Factors' : label}</p>
                           <p className="text-sm font-bold text-gray-800">{rec.score_breakdown[key] === null || (key === 'interest_match' && rec.interests_available === false) ? 'Not used' : `${rec.score_breakdown[key]}%`}</p>
                         </div>
                       ))}
@@ -414,14 +303,15 @@ function Results() {
                   </p>
                 )}
                 </div>
-                <div className="flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-gray-100 bg-gray-50/60 px-5 py-3.5 sm:px-6">
+                <div className={`mt-auto border-t px-5 py-4 ${isTopMatch ? 'flex flex-wrap items-center gap-x-5 gap-y-2 border-orange-100 bg-orange-50/40 sm:px-8' : 'grid grid-cols-1 items-start gap-3 border-gray-100 bg-gray-50/50 sm:grid-cols-[max-content_minmax(0,1fr)] sm:px-6'}`}>
                 <button
                 onClick={() => navigate(`/results/career-path/${encodeURIComponent(rec.course_code)}`, { state: { recommendations, source: 'results' } })}
-                className="lm-action"
+                className="lm-action justify-self-start"
               >
                 View Career Path →
               </button>
                   <CourseSchoolAction
+                    layout={isTopMatch ? 'inline' : 'card'}
                     courseCode={rec.course_code}
                     onClick={() => navigate(`/schools/${encodeURIComponent(rec.course_code)}?source=results`, { state: { source: 'results' } })}
                     className="inline-flex items-center gap-1.5 rounded-lg bg-orange-500 px-3.5 py-2 text-sm font-semibold text-white shadow-sm shadow-orange-200 transition hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
@@ -430,8 +320,70 @@ function Results() {
                   </CourseSchoolAction>
                 </div>
               </div>
-            ))}
+              )
+            })}
           </div>
+          <section className="mt-10 overflow-hidden rounded-3xl border border-stone-200/80 bg-white shadow-[0_4px_24px_-16px_rgba(120,53,15,.15)]" aria-labelledby="assessment-snapshot-title">
+            <div className="flex flex-col gap-4 px-5 pb-5 pt-6 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-orange-600">Assessment snapshot</p>
+                <h2 id="assessment-snapshot-title" className="mt-1.5 text-lg font-bold tracking-tight text-stone-900 sm:text-xl">Your assessment at a glance</h2>
+                <p className="mt-1 text-xs leading-5 text-stone-500">The profile behind your course matches.</p>
+              </div>
+              {returnDestination.path !== '/college' && (
+                <button type="button" onClick={() => navigate('/dashboard/summary')} className="lm-action w-fit shrink-0 gap-2">
+                  Open Full Summary <IconArrowUpRight size={15} aria-hidden="true" />
+                </button>
+              )}
+            </div>
+            <div className="grid gap-3 px-5 pb-5 md:grid-cols-3 sm:px-6">
+              <article className="relative overflow-hidden rounded-2xl border border-orange-100 bg-gradient-to-br from-orange-50/90 to-[#fffcf8] p-5">
+                <div className="flex items-center gap-2 text-orange-800"><IconBrain size={17} stroke={1.6} aria-hidden="true" /><h3 className="text-xs font-semibold">Personality type</h3></div>
+                <p className="mt-5 text-4xl font-bold tracking-[0.12em] text-orange-600">{assessment.mbti || '\u2014'}</p>
+                <p className="mt-2 text-[11px] leading-5 text-orange-900/70">{assessment.mbti ? getExpandedType(assessment.mbti) : 'Your four-letter MBTI result'}</p>
+                {personalityInfo && <p className="mt-4 border-t border-orange-200/60 pt-4 text-xs leading-6 text-stone-600">{personalityInfo.summary}</p>}
+              </article>
+              <article className="rounded-2xl border border-stone-200/70 bg-[#fdfcfb] p-5">
+                <div className="flex items-center gap-2 text-stone-600"><IconChartBar size={17} stroke={1.6} className="text-orange-600" aria-hidden="true" /><h3 className="text-xs font-semibold">Academic skills</h3></div>
+                <div className="mt-5 flex items-baseline justify-between gap-2">
+                  <p className="font-bold tracking-tight text-stone-900"><span className="text-3xl">{skillTotals.total ? skillTotals.correct : '\u2014'}</span>{skillTotals.total > 0 && <span className="ml-1 text-sm font-medium text-stone-400">/ {skillTotals.total}</span>}</p>
+                  {skillPercent !== null && <span className="text-xs font-semibold text-orange-700">{skillPercent}% correct</span>}
+                </div>
+                <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-stone-100" aria-hidden="true"><div className="h-full rounded-full bg-orange-400" style={{ width: `${skillPercent ?? 0}%` }} /></div>
+                <p className="mt-2 text-[11px] text-stone-500">Correct answers in your latest quiz</p>
+                {skillHighlights.length > 0 && <div className="mt-5 border-t border-stone-200/70 pt-4">
+                  <p className="text-[10px] font-semibold text-stone-500">Highest-scoring areas in this quiz</p>
+                  <ul className="mt-2 space-y-2.5">
+                    {skillHighlights.map(([domain, score]) => <li key={domain} className="flex items-center justify-between gap-3 text-xs">
+                      <span className="text-stone-600">{domain}</span>
+                      <span className="shrink-0 font-semibold tabular-nums text-stone-800">{score.correct}/{score.total}</span>
+                    </li>)}
+                  </ul>
+                </div>}
+              </article>
+              <article className="rounded-2xl border border-stone-200/70 bg-[#fdfcfb] p-5">
+                <div className="flex items-center gap-2 text-stone-600"><IconActivity size={17} stroke={1.6} className="text-orange-600" aria-hidden="true" /><h3 className="text-xs font-semibold">Personal factors</h3></div>
+                <p className="mt-5 text-base font-bold tracking-tight text-stone-900">{personalFactorDetails.length ? `${personalFactorDetails.length} reported impact${personalFactorDetails.length === 1 ? '' : 's'}` : 'No reported impacts'}</p>
+                <p className="mt-1 text-[11px] text-stone-500">Impact on your studies, as you reported</p>
+                {personalFactorDetails.length > 0 ? <ul className="mt-4 space-y-3">
+                  {personalFactorDetails.map(factor => <li key={factor.factor} className="flex items-center justify-between gap-3 text-xs">
+                    <span className="min-w-0 leading-5 text-stone-600">{factor.label}</span>
+                    <span className="shrink-0 rounded-md border border-orange-100 bg-orange-50 px-2 py-0.5 font-semibold tabular-nums text-orange-800">{factor.impact}/4</span>
+                  </li>)}
+                </ul> : <p className="mt-4 text-xs leading-6 text-stone-500">No reported personal impacts to show.</p>}
+              </article>
+            </div>
+            <div className="mx-5 border-t border-stone-100 py-5 sm:mx-6">
+              <div className="mb-3 flex items-center gap-2"><IconBulb size={17} stroke={1.6} className="text-orange-600" aria-hidden="true" /><h3 className="text-xs font-semibold text-stone-700">Selected interests &amp; hobbies</h3>{assessment.interests.length > 0 && <span className="ml-1 text-[11px] text-stone-400">{assessment.interests.length} selected</span>}</div>
+              <div className="flex flex-wrap gap-2">
+                {assessment.interests.length > 0 ? assessment.interests.map((interest) => (
+                  <span key={interest} className="rounded-lg border border-stone-200/80 bg-[#fdfbf8] px-3 py-1.5 text-xs font-medium text-stone-600">{interest}</span>
+                )) : <span className="text-xs text-stone-500">No interests available.</span>}
+              </div>
+            </div>
+            <PersonalFactorExplanation factors={personalFactorDetails} />
+          </section>
+
           </>
         )}
         <CompatibilityDisclaimer />

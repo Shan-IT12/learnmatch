@@ -139,7 +139,7 @@ function SummaryDashboard() {
   const domainScores = loading ? Object.fromEntries(['Practical/Applied', 'Scientific Reasoning', 'Spatial', 'Abstract/Logical', 'Numerical', 'Verbal'].map(domain => [domain, { correct: 3, total: 5 }])) : savedDomainScores
  
   const factorAnswers = deriveFactorApplicability(profile || {})
-  const hasDisclosedFactors = Object.values(factorAnswers).some(value => value === 'yes' || value === 'no')
+  const hasFactorAnswers = Object.values(factorAnswers).some(value => value === 'yes' || value === 'no')
   const checkedFactors = profile
     ? Object.entries(personalFactorLabels)
         .filter(([key]) => factorAnswers[key.replace('factor_', '').replace('_impact', '')] === 'yes')
@@ -244,7 +244,7 @@ function SummaryDashboard() {
           <section className="rounded-2xl border border-white/90 bg-white/78 p-5 shadow-[0_18px_48px_-40px_rgba(120,53,15,.5)] sm:p-6">
             <div className="flex items-center justify-between gap-3 mb-4">
               <div className="flex items-center gap-3"><span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600"><IconShieldCheck size={20} stroke={1.8} /></span><div><p className="text-[11px] font-semibold uppercase tracking-wide text-gray-400">Personal Factors</p><p className="text-sm font-bold text-gray-900">Recommendation considerations</p></div></div>
-              <span className={`rounded-full px-2.5 py-1 text-[11px] font-bold ${checkedFactors.length ? 'bg-emerald-50 text-emerald-700' : 'bg-gray-100 text-gray-500'}`}>{hasDisclosedFactors ? 'Disclosed factors' : 'Not used'}</span>
+              <span className={`rounded-full px-2.5 py-1 text-[11px] font-bold ${checkedFactors.length ? 'bg-emerald-50 text-emerald-700' : 'bg-gray-100 text-gray-500'}`}>{hasFactorAnswers ? 'Personal Factors' : 'Not used'}</span>
             </div>
             <div className="flex flex-wrap gap-2">
               {checkedFactors.length > 0 ? (
@@ -257,7 +257,7 @@ function SummaryDashboard() {
                   </span>
                 ))
               ) : (
-                <p className="text-sm text-gray-400">No disclosed impacts to show. Undisclosed and unclear historical answers are excluded from matching.</p>
+                <p className="text-sm text-gray-400">No reported impacts to show. For new recommendations, complete all five Yes or No answers in Personal Factors.</p>
               )}
             </div>
           </section>

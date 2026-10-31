@@ -303,13 +303,13 @@ test('WSM candidates admit published new courses through existing scoring and cl
   // Select a fixture interest from the existing engine mapping, not a new scoring rule.
   const selectedInterest = Object.keys(INTEREST_RIASEC_MAP)[0]
   const studentDomainScores = Object.fromEntries(SKILL_DOMAINS.map((domain) => [domain, 1]))
-  const clusters = scoreAndRankClusters({ studentDomainScores, studentRiasecVector: buildStudentRiasecVector([selectedInterest]), mbtiType: 'ENTJ', personalFactorResponses: null })
+  const clusters = scoreAndRankClusters({ studentDomainScores, studentRiasecVector: buildStudentRiasecVector([selectedInterest]), mbtiType: 'ENTJ', personalFactorResponses: { physical: 1, health: 1, financial: 1, family: 1, work: 1 } })
   f.state.course.cluster_category = clusters[0].cluster_category
   const wsm = { async query(sql) {
     if (sql.includes('FROM SKILL_RESPONSE')) return [SKILL_DOMAINS.flatMap((dimension) => Array.from({ length: 5 }, () => ({ dimension, is_correct: 1 })))]
     if (sql.includes('FROM INTEREST_RESPONSE')) return [[{ interest_name: selectedInterest }]]
     if (sql.includes('FROM PERSONALITY_ASSESSMENT')) return [[{ assessment_id: 1, mbti_type: 'ENTJ' }]]
-    if (sql.includes('FROM PROFILE')) return [[{}]]
+    if (sql.includes('FROM PROFILE')) return [[{ personal_factor_answers: { physical: 'no', health: 'no', financial: 'no', family: 'no', work: 'no' }, physical_accessibility_areas: [], physical_accessibility_difficulties: {}, factor_physical_impact: null, factor_health_impact: null, factor_financial_impact: null, factor_family_impact: null, factor_work_impact: null }]]
     assert.match(sql, /is_active = 1/); assert.match(sql, /is_draft = 0/)
     if (!f.state.course.is_active || f.state.course.is_draft) return [[]]
     if (sql.includes('FROM COURSE_SKILL_PROFILE')) return [f.state.skills.map((row) => ({ ...row, course_id: 9001 }))]

@@ -3,7 +3,7 @@ import { defineConfig } from '@playwright/test'
 export default defineConfig({
   outputDir: '../.local-backups/public-test-results',
   testDir: './src/pages',
-  testMatch: ['PublicInformation.browser.spec.js', 'SummaryExplorer.browser.spec.js', 'PersonalityResult.browser.spec.js', 'ResultsSchoolAvailability.browser.spec.js', 'AssessmentLayout.browser.spec.js'],
+  testMatch: ['PublicInformation.browser.spec.js', 'SummaryExplorer.browser.spec.js', 'PersonalityResult.browser.spec.js', 'ResultsSchoolAvailability.browser.spec.js', 'ResultsProgress.browser.spec.js', 'AssessmentLayout.browser.spec.js'],
   workers: 1,
   use: { channel: 'msedge', headless: true, baseURL: 'http://127.0.0.1:5181' },
   webServer: {

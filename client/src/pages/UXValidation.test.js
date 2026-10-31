@@ -13,6 +13,18 @@ test('representative Profile and Registration controls render required and inlin
     optimizeDeps: { noDiscovery: true },
   })
   try {
+    const { validatePersonalFactors } = await vite.ssrLoadModule('/src/components/PersonalFactorsForm.jsx')
+    const factors = ['physical', 'health', 'financial', 'family', 'work']
+    const noAnswers = Object.fromEntries(factors.map(factor => [factor, 'no']))
+    const profile = { physical_accessibility_areas: [], physical_accessibility_difficulties: {} }
+    assert.deepEqual(validatePersonalFactors(profile, noAnswers), {})
+    assert.equal(Object.keys(validatePersonalFactors(profile, {})).length, 5)
+    for (const factor of factors) {
+      for (const oldAnswer of ['unknown', 'legacy_unknown', '']) {
+        assert.equal(validatePersonalFactors(profile, { ...noAnswers, [factor]: oldAnswer })[`applies_${factor}`], 'Please select Yes or No.')
+      }
+      assert.equal(validatePersonalFactors(profile, { ...noAnswers, [factor]: 'yes' })[`factor_${factor}_impact`], 'Please select an impact level.')
+    }
     const { ApplicabilityQuestion, ImpactOptions, UsernameField } = await vite.ssrLoadModule('/src/pages/Profile.jsx')
     const usernameMarkup = renderToStaticMarkup(React.createElement(UsernameField, {
       value: 'current_student',
@@ -34,9 +46,9 @@ test('representative Profile and Registration controls render required and inlin
       onChange: () => {},
       error: 'Please choose Yes or No.',
     }))
-    assert.deepEqual([...applicabilityMarkup.matchAll(/value="(no|yes|unknown)"/g)].map((match) => match[1]), ['no', 'yes', 'unknown'])
-    assert.doesNotMatch(applicabilityMarkup, /required=""/)
-    assert.match(applicabilityMarkup, /Prefer not to answer/)
+    assert.deepEqual([...applicabilityMarkup.matchAll(/value="(no|yes|unknown)"/g)].map((match) => match[1]), ['no', 'yes'])
+    assert.match(applicabilityMarkup, /required=""/)
+    assert.doesNotMatch(applicabilityMarkup, /Prefer not to answer/)
     assert.match(applicabilityMarkup, /aria-invalid="true"/)
     assert.match(applicabilityMarkup, /Please choose Yes or No\./)
 

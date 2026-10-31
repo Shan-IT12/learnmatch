@@ -15,8 +15,8 @@ const parseJson = (value, fallback) => { if (value && typeof value === 'object')
 const impactLabels = Object.fromEntries(impactOptions)
 const factorLabels = { physical: 'Physical / Accessibility', health: 'Health', financial: 'Financial', family: 'Family Responsibilities', work: 'Work Responsibilities' }
 const summarizeFactor = (formData, applicability, factor) => {
-  if (!applicability[factor] || applicability[factor] === 'unknown') return 'Not disclosed (not used)'
-  if (applicability[factor] === 'legacy_unknown') return 'Previous answer unclear (not used)'
+  if (!applicability[factor] || applicability[factor] === 'unknown') return 'Please answer Yes or No'
+  if (applicability[factor] === 'legacy_unknown') return 'Please answer Yes or No'
   if (applicability[factor] === 'no') return 'No'
   return impactLabels[Number(formData[`factor_${factor}_impact`])] || 'Incomplete'
 }
@@ -46,7 +46,7 @@ function OnboardingProfile() {
         const rawDifficulties = parseJson(data.profile.physical_accessibility_difficulties, {})
         const difficulties = Object.fromEntries(Object.entries(rawDifficulties).filter(([area, level]) => areas.includes(area) && difficultyLevels.some(([value]) => value === level)))
         const loaded = { personal_factor_answers: data.profile.personal_factor_answers, username: data.username || '', physical_accessibility_areas: areas, physical_accessibility_difficulties: difficulties, factor_physical_impact: data.profile.factor_physical_impact || '', factor_health_impact: data.profile.factor_health_impact || '', factor_financial_impact: data.profile.factor_financial_impact || '', factor_family_impact: data.profile.factor_family_impact || '', factor_work_impact: data.profile.factor_work_impact || '' }
-        setFormData(loaded); setApplicability(deriveFactorApplicability(loaded)); setHasSavedProfile(true)
+        setFormData(loaded); setApplicability(deriveFactorApplicability(loaded)); setHasSavedProfile(true); setIsEditing(Object.keys(validatePersonalFactors(loaded, deriveFactorApplicability(loaded))).length > 0)
       })
       .catch(() => setError('Could not load your Personal Factors.'))
       .finally(() => setLoading(false))

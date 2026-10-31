@@ -16,7 +16,7 @@ const impactField = (factor) => `factor_${factor}_impact`
 
 export function isPersonalFactorsComplete(profile = {}) {
   const applicability = deriveFactorApplicability(profile)
-  if (PERSONAL_FACTOR_KEYS.some((factor) => !applicability[factor])) return false
+  if (PERSONAL_FACTOR_KEYS.some((factor) => !['yes', 'no'].includes(applicability[factor]))) return false
   if (PERSONAL_FACTOR_KEYS.some((factor) => applicability[factor] === 'yes' && ![1, 2, 3, 4].includes(Number(profile[impactField(factor)])))) return false
   if (applicability.physical === 'yes') {
     const areas = Array.isArray(profile.physical_accessibility_areas) ? profile.physical_accessibility_areas : []
@@ -40,13 +40,13 @@ export function shouldShowFactorDetails(applicability, factor) {
 }
 
 export function buildProfilePayload(profile, applicability = deriveFactorApplicability(profile)) {
-  const answers = Object.fromEntries(PERSONAL_FACTOR_KEYS.map(factor => [factor, applicability[factor] || 'unknown']))
+  const answers = Object.fromEntries(PERSONAL_FACTOR_KEYS.map(factor => [factor, applicability[factor] || '']))
   return {
     username: profile.username.trim(),
     personal_factor_answers: answers,
-    physical_accessibility_areas: answers.physical === 'yes' || answers.physical === 'legacy_unknown' ? profile.physical_accessibility_areas : [],
-    physical_accessibility_difficulties: answers.physical === 'yes' || answers.physical === 'legacy_unknown' ? profile.physical_accessibility_difficulties : {},
+    physical_accessibility_areas: answers.physical === 'yes' ? profile.physical_accessibility_areas : [],
+    physical_accessibility_difficulties: answers.physical === 'yes' ? profile.physical_accessibility_difficulties : {},
     ...Object.fromEntries(PERSONAL_FACTOR_KEYS.map(factor => [impactField(factor),
-      ['yes', 'legacy_unknown'].includes(answers[factor]) ? Number(profile[impactField(factor)]) : null])),
+      answers[factor] === 'yes' ? Number(profile[impactField(factor)]) : null])),
   }
 }

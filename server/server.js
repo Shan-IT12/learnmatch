@@ -371,12 +371,35 @@ app.post('/api/quiz', authenticateToken, async (req, res) => {
 
 app.get('/api/results', authenticateToken, async (req, res) => {
   const userId = req.user.userId
+  const streaming = req.get('accept')?.includes('text/event-stream') === true
+  const send = (event, data) => {
+    if (!res.destroyed && !res.writableEnded) res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`)
+  }
+  if (streaming) {
+    res.set({ 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache, no-transform', 'X-Accel-Buffering': 'no' })
+    res.flushHeaders()
+    send('progress', { completed: 0, label: 'Checking your assessment' })
+  }
 
   try {
-    const recommendations = await getOrCreateSavedRecommendations(pool, userId)
-    res.json({ recommendations })
+    const recommendations = await getOrCreateSavedRecommendations(pool, userId, undefined, undefined, {
+      onProgress: progress => { if (streaming) send('progress', progress) },
+    })
+    if (streaming) {
+      send('result', { recommendations })
+      return res.end()
+    }
+    return res.json({ recommendations })
   } catch (error) {
     console.error('Results fetch error:', error)
+    if (streaming) {
+      send('error', {
+        status: error instanceof RecommendationInputError ? 400 : 500,
+        message: error instanceof RecommendationInputError || error instanceof RecommendationDataError ? error.message : 'Server error fetching results',
+        code: error.code,
+      })
+      return res.end()
+    }
 
     if (error instanceof RecommendationInputError) {
       return res.status(400).json({ message: error.message, code: error.code })

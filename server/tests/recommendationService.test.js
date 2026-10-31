@@ -35,17 +35,13 @@ test('explicit structured Personal Factor answers map to engine response names',
   }), { physical: 1, health: 2, financial: 3, family: 4, work: 1 })
 })
 
-test('legacy booleans and AI classification remain unknown', () => {
-  assert.deepEqual(buildPersonalFactorResponses({
-    factor_health: true,
-    factor_working_student: true,
-    factor_others_classification_status: 'MATCHED',
-    factor_others_classification: ['factor_financial'],
-  }), { physical: null, health: null, financial: null, family: null, work: null })
+test('legacy booleans and AI classification cannot substitute for Yes/No answers', () => {
+  assert.throws(() => buildPersonalFactorResponses({ factor_health: true, factor_working_student: true }), RecommendationInputError)
 })
 
 test('Other Context never changes structured Personal Factor responses', () => {
   const profile = {
+    personal_factor_answers: { physical: 'yes', health: 'yes', financial: 'yes', family: 'yes', work: 'yes' },
     factor_physical_impact: 1,
     factor_health_impact: 2,
     factor_financial_impact: 3,
@@ -58,13 +54,9 @@ test('Other Context never changes structured Personal Factor responses', () => {
   )
 })
 
-test('ambiguous historical impact 1 and invalid values remain unknown; known factors survive', () => {
-  assert.deepEqual(buildPersonalFactorResponses({ factor_physical_impact: 1 }), {
-    physical: null, health: null, financial: null, family: null, work: null,
-  })
-  assert.deepEqual(buildPersonalFactorResponses({ factor_health_impact: 2, factor_work_impact: 5 }), {
-    physical: null, health: 2, financial: null, family: null, work: null,
-  })
+test('ambiguous or incomplete historical answers require profile completion', () => {
+  assert.throws(() => buildPersonalFactorResponses({ factor_physical_impact: 1 }), RecommendationInputError)
+  assert.throws(() => buildPersonalFactorResponses({ factor_health_impact: 2, factor_work_impact: 5 }), RecommendationInputError)
 })
 
 test('canonical interest names produce the expected RIASEC totals', () => {
@@ -318,10 +310,10 @@ test('explicit no interests produces proportional cluster and course scores; bla
   assert.throws(() => buildStudentRiasecVector([]), { code: 'INCOMPLETE_INTERESTS' })
   const clusters = scoreAndRankClusters({
     studentDomainScores: Object.fromEntries(SKILL_DOMAINS.map(domain => [domain, 1])),
-    studentRiasecVector: null, mbtiType: 'INTJ', personalFactorResponses: null,
+    studentRiasecVector: null, mbtiType: 'INTJ', personalFactorResponses: { physical: 1, health: 1, financial: 1, family: 1, work: 1 },
   })
   const business = clusters.find(row => row.cluster_category === 'BUSINESS CLUSTER')
-  assert.ok(Math.abs(business.clusterScore - (0.35 + 0.30) / 0.65) < 1e-12)
+  assert.ok(Math.abs(business.clusterScore - (0.35 + 0.30 + 0.5 * 0.10) / 0.75) < 1e-12)
   assert.equal(business.interestScore, null)
   const courses = clusters.slice(0, 3).map((row, index) => ({
     course_id: index + 1, course_code: `CRS00${index + 1}`,
@@ -336,7 +328,7 @@ test('explicit no interests produces proportional cluster and course scores; bla
       assert.match(sql, /personality_assessment_id = \?/)
       return [[{ interests: JSON.stringify({ selected: [], noInterests: explicit }) }]]
     }
-    if (sql.includes('FROM PROFILE')) return [[{}]]
+    if (sql.includes('FROM PROFILE')) return [[{ personal_factor_answers: { physical: 'no', health: 'no', financial: 'no', family: 'no', work: 'no' } }]]
     if (sql.includes('FROM COURSE_SKILL_PROFILE')) return [courses.map(course => ({ course_id: course.course_id, skill_domain: 'Verbal', weight: 1 }))]
     if (sql.includes('FROM COURSE_RIASEC_PROFILE')) return [courses.flatMap(course => ['R','I','A','S','E','C'].map(riasec_type => ({ course_id: course.course_id, riasec_type, weight: 1 })))]
     if (sql.includes('FROM COURSE')) return [courses]

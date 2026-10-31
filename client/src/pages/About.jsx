@@ -5,8 +5,8 @@ const steps = [
   ['Interests Assessment', 'Choose activities you enjoy from the interest groups, or select No interests or hobbies. These choices help compare your interests with course profiles.'],
   ['Academic Skills Assessment', 'Answer questions across verbal, numerical, abstract/logical, spatial, scientific reasoning, and practical/applied skills. Your answers provide a snapshot of the skills measured by these questions.'],
   ['Personality Assessment', 'Rate statements about your preferences. LearnMatch summarizes them into personality dimensions and an MBTI-style result to support reflection. This is not a clinical diagnosis.'],
-  ['Optional Personal Factors', 'You may share structured information about accessibility, health, finances, and family or work responsibilities. You can leave factors unanswered or choose Prefer not to answer. Undisclosed factors are excluded from matching.'],
-  ['Weighted Scoring Model', 'Predefined weights combine academic skills, interests, personality, and disclosed Personal Factors into compatibility scores. Weights vary by course cluster. AI does not calculate these rankings.'],
+  ['Personal Factors', 'Answer Yes or No for accessibility, health, finances, and family or work responsibilities. All five answers are required. Yes requires an impact level and, for accessibility, areas and difficulty levels. Choose No when the circumstance does not apply to you.'],
+  ['Weighted Scoring Model', 'Predefined weights combine academic skills, interests, personality, and all five Personal Factor answers into compatibility scores. Weights vary by course cluster. AI does not calculate these rankings.'],
   ['Course Recommendations', 'Explore your top three course matches, score breakdowns, course details, and saved assessment results. When enabled and available, AI-generated explanations describe the computed results in everyday language; they can contain mistakes.'],
 ]
 
@@ -14,7 +14,7 @@ export default function About() {
   return <PublicInformationLayout title="About LearnMatch" eyebrow="Understand your options" introduction="Course guidance that starts with getting to know yourself.">
     <section className="rounded-3xl border border-orange-100 bg-white/80 p-6 leading-7 text-gray-700 sm:p-8">
       <h2 className="mb-3 text-xl font-bold text-gray-950">Built for a decision that matters</h2>
-      <p>LearnMatch is a school capstone project developed to help senior high school students explore college courses and help college students reflect on their current program. It brings interests, academic skills, personality, and optional personal circumstances into one guided experience.</p>
+      <p>LearnMatch is a school capstone project developed to help senior high school students explore college courses and help college students reflect on their current program. It brings interests, academic skills, personality, and personal circumstances into one guided experience.</p>
       <p className="mt-3">The project aims to make course exploration easier to understand and discuss with teachers, guidance counselors, and family. It provides educational guidance and does not guarantee admission, academic success, employment, or career outcomes.</p>
     </section>
     <section className="mt-9" aria-labelledby="about-matching">

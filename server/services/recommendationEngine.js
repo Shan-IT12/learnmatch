@@ -135,35 +135,26 @@ export function getClusterPersonalFactorRelevance(parentCluster) {
 export function calculatePersonalFactorScore(responses, parentCluster) {
   requireCluster(parentCluster)
 
-  if (responses === null || responses === undefined) return null
-  if (typeof responses !== 'object' || Array.isArray(responses)) {
-    throw new TypeError('Personal Factor responses must be an object')
+  if (!responses || typeof responses !== 'object' || Array.isArray(responses)) {
+    throw new TypeError('Complete Personal Factor responses are required')
   }
-
   const relevance = PERSONAL_FACTOR_RELEVANCE[parentCluster]
-  const coverage = personalFactorCoverage(responses)
-  if (coverage === 0) return null
   const applicableBarrierSum = SCORED_PERSONAL_FACTORS.reduce(
-    (sum, factor) => responses[factor] == null ? sum : sum + relevance[factor] * normalizePersonalFactorImpact(responses[factor]),
+    (sum, factor) => sum + relevance[factor] * normalizePersonalFactorImpact(responses[factor]),
     0
   )
-  return Math.min(0.5, Math.max(0, 0.5 - 0.1 * applicableBarrierSum / coverage))
-}
-
-export function personalFactorCoverage(responses) {
-  return SCORED_PERSONAL_FACTORS.filter(factor => responses?.[factor] != null).length / SCORED_PERSONAL_FACTORS.length
+  return Math.min(0.5, Math.max(0, 0.5 - 0.1 * applicableBarrierSum))
 }
 
 export function calculateClusterScore(
-  { skillScore, interestScore, personalityScore, personalFactorScore, personalFactorCoverage: coverage = personalFactorScore === null ? 0 : 1 },
+  { skillScore, interestScore, personalityScore, personalFactorScore },
   parentCluster
 ) {
   requireCluster(parentCluster)
   requireNormalizedScore(skillScore, 'skillScore')
   if (interestScore !== null) requireNormalizedScore(interestScore, 'interestScore')
   requireNormalizedScore(personalityScore, 'personalityScore')
-  if (personalFactorScore !== null) requireNormalizedScore(personalFactorScore, 'personalFactorScore')
-  requireNormalizedScore(coverage, 'personalFactorCoverage')
+  requireNormalizedScore(personalFactorScore, 'personalFactorScore')
 
   const weights = CLUSTER_WSM_WEIGHTS[parentCluster]
 
@@ -171,8 +162,8 @@ export function calculateClusterScore(
     (skillScore * weights.skillsWeight
     + (interestScore ?? 0) * weights.interestsWeight
     + personalityScore * weights.personalityWeight
-    + (personalFactorScore ?? 0) * weights.personalFactorsWeight * coverage)
-    / (1 - (interestScore === null ? weights.interestsWeight : 0) - weights.personalFactorsWeight * (1 - coverage))
+    + personalFactorScore * weights.personalFactorsWeight)
+    / (1 - (interestScore === null ? weights.interestsWeight : 0))
   )
 }
 
@@ -181,7 +172,6 @@ export function calculateCourseScore({
   courseInterestMatch,
   parentClusterPersonalityScore,
   parentClusterPersonalFactorScore,
-  personalFactorCoverage: coverage,
   parentCluster,
 }) {
   return calculateClusterScore(
@@ -190,7 +180,6 @@ export function calculateCourseScore({
       interestScore: courseInterestMatch,
       personalityScore: parentClusterPersonalityScore,
       personalFactorScore: parentClusterPersonalFactorScore,
-      personalFactorCoverage: coverage,
     },
     parentCluster
   )

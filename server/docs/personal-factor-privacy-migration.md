@@ -12,23 +12,28 @@ To apply missing changes to that same target, use
 with the fingerprint printed by inspection. The runner verifies both columns,
 resumes partial application, and never reads or backfills student records.
 
-The new nullable JSON column distinguishes `yes`, `no`, `unknown` (unanswered or
-prefer not to answer), and `legacy_unknown`. Yes requires an impact of 1–4; No
-and unknown store NULL impact and no accessibility details. Historical ambiguous
-impact=1 stays unchanged and is labelled legacy_unknown when read, never guessed.
-Historical unambiguous impacts 2–4 remain Yes. Students can explicitly replace any
-historical answer or decline to answer. Saving without changing an ambiguous answer
-preserves its value and explicit legacy_unknown state.
+Current Yes/No behavior (31 October 2026)
+---------------------------------------
+New profile writes require explicit `yes` or `no` for all five factors. Yes requires
+impact 1-4 and physical/accessibility details where applicable. No stores a NULL
+impact and empty physical details; scoring maps No to response 1 (zero normalized
+barrier). Yes/slight remains a distinct answer even though its normalized barrier
+is also zero.
 
-No backfill or historical-results recalculation is included. Old snapshots and their
-explanations remain as originally saved. New calculations omit unknown factors and
-renormalize the remaining component weights. Each disclosed factor uses one fifth of
-the configured personal-factor weight; unknown factors contribute neither score nor
-weight. With all factors unknown the entire personal-factor component is excluded.
-Saved NULL personal_factor_match is displayed as Not used.
+The column still permits reading older `unknown` and `legacy_unknown` records.
+They are historical compatibility states, not selectable or accepted on new saves.
+Students must replace them with Yes or No before saving or generating new results.
+Do not backfill missing or ambiguous answers as No. Incomplete attempt snapshots
+are rejected and can be refreshed from a complete profile through recovery.
 
-Profile changes refresh the latest recommendation using the existing refresh flow;
-older assessment history is retained. Browser cleanup removes local drafts only.
+WSM uses all five factors and the full configured personal-factor component weight:
+normalized impact = (response - 1) / 3;
+personal-factor score = clamp(0.5 - 0.1 * sum(relevance * normalized impact), 0, 0.5).
+There is no personal-factor coverage multiplier or partial-disclosure reweighting.
+The separate explicit No interests behavior is unchanged.
 
-Before rollback, account for explicit answer states and NULL scores: the old code
-cannot safely interpret them. Do not backfill unknowns as No for compatibility.
+No new schema migration is required for this Yes/No change. Deploy client and server
+together. No historical records are backfilled. Saving changed Personal Factors uses the existing
+refresh flow for the latest saved recommendation; older assessment history is retained.
+Existing NULL historical scores remain readable as Not used. The privacy notice and
+Terms versions are updated for new registrations; old agreement records are retained.

@@ -56,7 +56,7 @@ export function buildPersonalFactorsSnapshot(profile) {
     physical_accessibility_areas: parseAttemptJson(profile.physical_accessibility_areas, []),
     physical_accessibility_difficulties: parseAttemptJson(profile.physical_accessibility_difficulties, {}),
     ...Object.fromEntries(Object.entries(states).map(([factor, state]) => [
-      `factor_${factor}_impact`, ['yes', 'legacy_unknown'].includes(state) ? Number(profile[`factor_${factor}_impact`]) : null,
+      `factor_${factor}_impact`, state === 'yes' ? Number(profile[`factor_${factor}_impact`]) : null,
     ])),
   }
   const validation = validateProfile(candidate)
@@ -174,7 +174,7 @@ function savedAnswerCount(value) {
 }
 
 export function hasCompletePersonalityPrerequisites(attempt) {
-  const personalFactors = parseAttemptJson(attempt?.personal_factors, null)
+  const personalFactors = buildPersonalFactorsSnapshot(parseAttemptJson(attempt?.personal_factors, null))
   const interests = parseAttemptJson(attempt?.interests, [])
   const skillQuestions = parseAttemptJson(attempt?.skill_questions, [])
   const skillAnswers = parseAttemptJson(attempt?.skill_answers, [])
