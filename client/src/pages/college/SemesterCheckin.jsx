@@ -314,13 +314,12 @@ function SemesterCheckin() {
               <div><p className="text-sm font-semibold text-gray-900">{submitting ? 'Preparing your check-in result...' : `${answeredCount} of 5 answered`}</p>
               <p className="mt-1 text-sm text-gray-500">{submitting ? 'Saving your answers and preparing your personalized feedback. Please wait.' : answeredCount === 5 ? 'All questions answered. Your check-in is ready to submit.' : 'Complete all questions before submitting.'}</p></div>
             </div>
-            <button
+            {!submitting && <button
               type="submit"
-              disabled={submitting}
               className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-xl bg-orange-500 px-7 text-sm font-semibold text-white transition hover:bg-orange-600 focus:outline-none focus:ring-4 focus:ring-orange-200 disabled:cursor-wait disabled:bg-orange-100 disabled:text-orange-800"
             >
-              {submitting && <IconLoader2 aria-hidden="true" size={18} className="animate-spin motion-reduce:animate-none" />}{submitting ? 'Processing...' : 'Submit Check-in'}
-            </button>
+              Submit Check-in
+            </button>}
           </div>
         </form>
       </main>

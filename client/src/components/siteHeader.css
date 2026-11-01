@@ -1,4 +1,7 @@
 .lm-site-header {
+  /* Keep account dropdowns above positioned dashboard content. */
+  position: relative;
+  z-index: 20;
   min-height: 84px;
   display: flex;
   flex-direction: row;

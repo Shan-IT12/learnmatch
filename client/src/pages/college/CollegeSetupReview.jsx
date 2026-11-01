@@ -47,9 +47,9 @@ export function CollegeSetupReviewContent({ draft, onEdit, onConfirm, submitting
         </dl>
       </section>
 
-      <section className="motion-enter motion-delay-2 mt-6 rounded-[26px] border border-slate-800 bg-slate-950 p-5 text-white sm:p-7">
-        <div className="flex items-start gap-3"><IconCalendarEvent className="mt-0.5 shrink-0 text-orange-400" size={22} /><div><h2 className="font-bold">How tracking works</h2><p className="mt-1 text-sm leading-6 text-slate-300">LearnMatch uses three short check-ins during your term to track how your course continues to align with your academic experience and career direction.</p></div></div>
-        <div className="mt-5 flex flex-wrap items-center gap-2 text-sm font-semibold"><span className="rounded-full bg-white/10 px-3 py-2">Early Check-in</span><IconArrowRight size={16} className="text-orange-400" /><span className="rounded-full bg-white/10 px-3 py-2">Mid Check-in</span><IconArrowRight size={16} className="text-orange-400" /><span className="rounded-full bg-white/10 px-3 py-2">End Check-in</span></div>
+      <section className="motion-enter motion-delay-2 mt-6 rounded-[26px] border border-orange-200 bg-gradient-to-br from-orange-50 to-amber-50/60 p-5 text-gray-900 sm:p-7">
+        <div className="flex items-start gap-3"><IconCalendarEvent className="mt-0.5 shrink-0 text-orange-600" size={22} /><div><h2 className="font-bold">How tracking works</h2><p className="mt-1 text-sm leading-6 text-gray-600">LearnMatch uses three short check-ins during your term to track how your course continues to align with your academic experience and career direction.</p></div></div>
+        <div className="mt-5 flex flex-wrap items-center gap-2 text-sm font-semibold"><span className="rounded-full border border-orange-200 bg-white/80 px-3 py-2 text-orange-800">Early Check-in</span><IconArrowRight size={16} className="text-orange-600" /><span className="rounded-full border border-orange-200 bg-white/80 px-3 py-2 text-orange-800">Mid Check-in</span><IconArrowRight size={16} className="text-orange-600" /><span className="rounded-full border border-orange-200 bg-white/80 px-3 py-2 text-orange-800">End Check-in</span></div>
       </section>
 
       <div className="motion-enter motion-delay-3 mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">

@@ -14,4 +14,5 @@
 @media (max-width: 479px) { .college-view-button { padding: .6rem .7rem; font-size: 12px; gap: .35rem; } }
 
 .college-next-action { border-color: #fed7aa; background: linear-gradient(135deg, #fff7ed, #fffaf4 70%, #ffedd5); }
+.college-hero { border-color: #fed7aa; background: linear-gradient(115deg, #fffdfb, #fff7ed); }
 [role="tabpanel"][id^="college-panel-"]:focus-visible { outline: 2px solid #fb923c; outline-offset: 4px; border-radius: 20px; }

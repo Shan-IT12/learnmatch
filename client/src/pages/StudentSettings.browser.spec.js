@@ -172,6 +172,28 @@ test('students without a profile keep the dashboard setup prompt', async ({ page
   await expect(page.getByRole('button', { name: 'Profile', exact: true })).toBeVisible()
 })
 
+for (const width of [375, 1280]) {
+  test(`college account menu stays above dashboard cards at ${width}px`, async ({ page }, testInfo) => {
+    await fixture(page)
+    await page.setViewportSize({ width, height: 900 })
+    await page.route('**/api/college/status', route => route.fulfill({ json: {
+      active: true, lifecycleStatus: 'active', courseName: 'Computer Science',
+      yearLevel: '1st Year', semester: '1st Semester', academicYear: '2026-2027',
+    } }))
+    await page.goto('/college')
+    await expect(page.getByText('Tracking status: Active')).toBeVisible()
+    await page.getByRole('button', { name: 'Account menu for Student', exact: true }).click()
+    const settings = page.getByRole('link', { name: 'Settings', exact: true })
+    await expect(settings).toBeVisible()
+    await expect(settings).toBeInViewport()
+    await settings.click({ trial: true })
+    await page.screenshot({ path: testInfo.outputPath(`college-account-menu-${width}.png`), animations: 'disabled' })
+    await settings.click()
+    await expect(page).toHaveURL(/\/settings\?returnTo=college$/)
+    await expect(page.getByRole('heading', { name: 'Settings', exact: true })).toBeVisible()
+  })
+}
+
 for (const identity of ['anonymous', 'admin', 'expired']) {
   test(`${identity} cannot access student settings`, async ({ page }) => {
     await fixture(page, { authenticated: identity === 'expired', status: 403 })

@@ -493,13 +493,12 @@ function CollegeDashboard() {
         {error && <div role="alert" className="rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700">{error}</div>}
         {successMessage && <div className="rounded-2xl border border-emerald-100 bg-emerald-50/70 px-5 py-4"><SuccessConfirmation compact message={successMessage} /></div>}
 
-        <header className="college-panel relative overflow-hidden">
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(251,146,60,.08),transparent_65%)]" aria-hidden="true" />
+        <header className="college-panel college-hero relative overflow-hidden">
           <div className="relative flex flex-col justify-between gap-5 sm:flex-row sm:items-start">
             <div className="min-w-0"><p className="college-eyebrow">College dashboard</p><CourseName as="h1" name={collegeInfo?.courseName} className="max-w-3xl text-2xl font-bold leading-tight tracking-tight text-gray-950 sm:text-3xl" secondaryClassName="mt-2 text-base font-medium text-gray-500" /><div className="mt-4 flex flex-wrap items-center gap-2 text-sm text-gray-600">{[collegeInfo?.yearLevel, collegeInfo?.semester, collegeInfo?.academicYear ? `AY ${collegeInfo.academicYear}` : null].filter(Boolean).map(label => <span key={label} className="rounded-lg border border-gray-200/80 bg-white/80 px-3 py-1.5">{label}</span>)}</div></div>
             <span className={`inline-flex w-fit shrink-0 items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold ${lifecycleStatus === 'active' ? 'border-emerald-100 bg-emerald-50 text-emerald-700' : 'border-gray-200 bg-gray-50 text-gray-600'}`}><span className={`h-1.5 w-1.5 rounded-full ${lifecycleStatus === 'active' ? 'bg-emerald-500' : 'bg-gray-400'}`} />Tracking status: {lifecycleStatus === 'active' ? 'Active' : lifecycleStatus === 'paused' ? 'Paused' : 'Ended / Archived'}</span>
           </div>
-          <div className="relative mt-6 border-t border-gray-100 pt-4"><p className="text-sm leading-6 text-gray-500">Career Alignment Tracking</p><p className="text-sm leading-6 text-gray-600">Follow your course experience, complete your next check-in, and see your progress over time.</p></div>
+          <div className="relative mt-6 border-t border-orange-100 pt-4"><p className="text-sm font-medium leading-6 text-gray-600">Career Alignment Tracking</p><p className="text-sm leading-6 text-gray-600">Follow your course experience, complete your next check-in, and see your progress over time.</p></div>
         </header>
 
         <div className="inline-flex max-w-full flex-wrap gap-1 rounded-2xl border border-gray-200/70 bg-gray-100/80 p-1.5" role="tablist" aria-label="College dashboard sections">
@@ -634,7 +633,13 @@ function CollegeDashboard() {
 
             <section id="latest-alignment-insight" className="college-panel scroll-mt-6">
               <p className="college-eyebrow">Understand your result</p><h2 className="college-heading">Latest alignment insight</h2>
-              {latestResult ? <><div className="mt-4 flex flex-wrap items-center gap-3"><span className={`inline-flex rounded-full border px-3 py-1.5 text-xs font-bold ${statusStyle(latestResult.status)}`}>{statusLabel(latestResult.status)}</span><span className="text-sm font-semibold text-gray-700">{latestAlignment}% aligned</span></div><div className="mt-5 grid gap-5 md:grid-cols-2"><div className="rounded-2xl bg-gray-50 p-5"><p className="mb-2 text-xs font-bold uppercase tracking-wide text-gray-500">What this means</p><p className="text-base leading-7 text-gray-600">{latestResult.feedback}</p></div><div className="rounded-2xl border border-orange-100 bg-orange-50/50 p-5"><p className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-orange-700"><IconSparkles size={16} />Suggested next step</p><p className="text-base leading-7 text-gray-700">{latestResult.recommendation}</p></div></div></> : <p className="mt-4 text-base leading-7 text-gray-500">Your first check-in will show how your current course experience aligns with you.</p>}
+              {latestResult ? <><div className="mt-4 flex flex-wrap items-center gap-3"><span className={`inline-flex rounded-full border px-3 py-1.5 text-xs font-bold ${statusStyle(latestResult.status)}`}>{statusLabel(latestResult.status)}</span><span className="text-sm font-semibold text-gray-700">{latestAlignment}% aligned</span></div><div className="mt-5 grid gap-5 md:grid-cols-2">
+                <div className="rounded-2xl border border-orange-200 border-l-4 border-l-orange-500 bg-gradient-to-br from-orange-50 to-amber-50/60 p-5 shadow-sm">
+                  <p className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-orange-800"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-orange-200 bg-white text-orange-600"><IconSparkles size={16} aria-hidden="true" /></span>What this means</p>
+                  <p className="text-base leading-7 text-gray-800">{latestResult.feedback}</p>
+                </div>
+                <div className="rounded-2xl border border-orange-100 bg-orange-50/50 p-5"><p className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-orange-700"><IconSparkles size={16} />Suggested next step</p><p className="text-base leading-7 text-gray-700">{latestResult.recommendation}</p></div>
+              </div></> : <p className="mt-4 text-base leading-7 text-gray-500">Your first check-in will show how your current course experience aligns with you.</p>}
             </section>
 
             <section className="college-panel">
@@ -752,8 +757,17 @@ function CollegeDashboard() {
 
         </div>
 
-        <details className="college-management group overflow-hidden rounded-2xl border border-gray-200 bg-white">
-          <summary className="flex cursor-pointer items-center justify-between gap-4 p-5 outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-orange-500 sm:px-7"><span className="flex items-center gap-3"><span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gray-100 text-gray-500"><IconSettings size={20} stroke={1.6} /></span><span><span className="block text-sm font-semibold text-gray-900">Manage tracking</span><span className="mt-1 block text-xs text-gray-500">Assessment and program settings</span></span></span><IconChevronDown size={18} className="shrink-0 text-gray-400 transition-transform group-open:rotate-180" /></summary>
+        <details className="college-management group overflow-hidden rounded-2xl border border-orange-200 bg-white shadow-sm">
+          <summary className="flex cursor-pointer flex-wrap items-center justify-between gap-4 bg-orange-50/80 p-5 outline-none transition-colors hover:bg-orange-100/70 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-orange-500 sm:px-7">
+            <span className="flex items-center gap-3 sm:gap-4">
+              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-orange-500 text-white shadow-sm"><IconSettings size={24} stroke={1.8} aria-hidden="true" /></span>
+              <span><span className="block text-base font-bold text-gray-950 sm:text-lg">Manage tracking</span><span className="mt-1 block text-sm text-gray-600">Assessment and program settings</span></span>
+            </span>
+            <span className="ml-auto inline-flex shrink-0 items-center gap-2 rounded-xl border border-orange-200 bg-white px-3 py-2 text-sm font-semibold text-orange-800">
+              <span className="group-open:hidden">View settings</span><span className="hidden group-open:inline">Hide settings</span>
+              <IconChevronDown size={18} className="transition-transform group-open:rotate-180 motion-reduce:transition-none" aria-hidden="true" />
+            </span>
+          </summary>
           {lifecycleStatus === 'active' ? (
 <section className="flex flex-wrap gap-3 border-t border-gray-100 px-5 py-5 sm:px-7">
             <button type="button" disabled={startingAssessment} onClick={handleTakeAssessment} className="inline-flex items-center gap-2 rounded-xl border border-orange-200 bg-orange-50 px-4 py-2.5 text-sm font-semibold text-orange-700 disabled:cursor-not-allowed disabled:opacity-50">

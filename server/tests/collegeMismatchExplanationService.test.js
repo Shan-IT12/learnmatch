@@ -38,11 +38,40 @@ test('college explanation payload discloses optional GWA and dimension scores wi
   }
 })
 
-test('deterministic mismatch fallback is supportive and uses the lowest dimension', () => {
+test('fallback sounds conversational and connects supported strengths and difficulties to one next step', () => {
   const fallback = buildMismatchFallback(monitorResult)
-  assert.match(fallback.feedback, /worth monitoring/i)
-  assert.match(fallback.feedback, /skill fit and workload/i)
+  assert.match(fallback.feedback, /you seem to enjoy what you’re studying/i)
+  assert.match(fallback.feedback, /harder time with keeping up with the coursework/i)
+  assert.match(fallback.recommendation, /one task.*instructor or a classmate/i)
+  assert.doesNotMatch(JSON.stringify(fallback), /56|Monitor|GWA|perceived skill fit|lowest-rated|alignment result/)
   assert.doesNotMatch(`${fallback.feedback} ${fallback.recommendation}`, /must leave|diagnos/i)
+})
+
+test('fallback never turns low or neutral answers into strengths and gives dimension-specific advice', () => {
+  for (const score of [1, 3]) {
+    for (let question = 1; question <= 5; question++) {
+      const result = buildMismatchFallback({ ...monitorResult, status: 'At Risk', answers: monitorResult.answers.map(answer => ({ ...answer, score: answer.question_number === question ? score : 3 })) })
+      assert.doesNotMatch(result.feedback, /encouraging sign/)
+      assert.ok(result.recommendation.length > 0)
+      assert.ok(result.feedback.length <= 500)
+      if (score === 1) assert.match(result.feedback, /harder time/)
+      else assert.match(result.feedback, /unsure/)
+    }
+  }
+})
+
+test('check-in prompt requests the course-fit style grounded in answers, without score recaps or missing-GWA disclaimers', async () => {
+  await generateMismatchExplanation(monitorResult, {
+    apiKey: 'test-key', fetchImpl: async (_url, options) => {
+      const { instructions } = JSON.parse(options.body)
+      assert.match(instructions, /warm, casual but respectful/)
+      assert.match(instructions, /you and your.*contractions/)
+      assert.match(instructions, /Do not call a low or neutral score a strength/)
+      assert.match(instructions, /Do not mention absent GWA/)
+      assert.match(instructions, /one specific, manageable next step/)
+      return { ok: false }
+    },
+  })
 })
 
 test('missing key and failed AI both return deterministic fallback', async () => {
@@ -63,11 +92,26 @@ test('missing key and failed AI both return deterministic fallback', async () =>
 test('On Track uses deterministic feedback without calling AI', async () => {
   let calls = 0
   const result = await generateMismatchExplanation(
-    { ...monitorResult, status: 'On Track', alignmentPercent: 88 },
+    { ...monitorResult, status: 'On Track', alignmentPercent: 88, answers: monitorResult.answers.map(answer => ({ ...answer, score: 5 })) },
     { apiKey: 'test-key', fetchImpl: async () => { calls += 1 } }
   )
   assert.equal(calls, 0)
-  assert.match(result.feedback, /generally matching/i)
+  assert.match(result.feedback, /working well for you overall/i)
+  assert.doesNotMatch(result.feedback, /harder time|unsure/)
+  assert.match(result.recommendation, /study habit or source of support/)
+})
+
+test('formal boilerplate and malformed AI fields fall back to grounded conversational text', async () => {
+  for (const feedback of [
+    'Your current college alignment result is Monitor, with a 56% alignment level.',
+    'No GWA was provided, so this reflects the available alignment measures only.',
+    123, null, ' ', 'x'.repeat(501),
+  ]) {
+    const result = await generateMismatchExplanation(monitorResult, {
+      apiKey: 'test-key', fetchImpl: async () => ({ ok: true, json: async () => ({ output_text: JSON.stringify({ feedback, recommendation: 'Ask your instructor about one difficult task.' }) }) }),
+    })
+    assert.deepEqual(result, buildMismatchFallback(monitorResult))
+  }
 })
 
 test('valid AI response cannot change deterministic status or scores', async () => {
