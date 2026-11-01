@@ -15,4 +15,20 @@
 
 .college-next-action { border-color: #fed7aa; background: linear-gradient(135deg, #fff7ed, #fffaf4 70%, #ffedd5); }
 .college-hero { border-color: #fed7aa; background: linear-gradient(115deg, #fffdfb, #fff7ed); }
+.college-completion { background: radial-gradient(ellipse at top, #ffedd5, transparent 70%), linear-gradient(135deg, #fffaf5, #fffbeb 60%, #fff7ed); }
+.college-completion-dialog::backdrop { background: rgb(15 23 42 / .55); backdrop-filter: blur(5px); }
+.college-completion-confetti > span { position: absolute; left: var(--confetti-x); top: var(--confetti-y); width: 6px; height: 13px; border-radius: 2px; background: var(--confetti-color); opacity: .5; transform: rotate(var(--confetti-rotation)); }
+.college-completion-confetti > span:nth-child(3n) { width: 7px; height: 7px; border-radius: 50%; }
+@media (prefers-reduced-motion: no-preference) {
+  .college-completion-dialog[open] { animation: college-popup-in 320ms cubic-bezier(.16, 1, .3, 1) both; }
+  .college-completion-dialog[open]::backdrop { animation: college-backdrop-in 320ms ease-out both; }
+  .college-completion-dialog[data-closing="true"] { animation: college-popup-out 220ms ease-in both; }
+  .college-completion-dialog[data-closing="true"]::backdrop { animation: college-backdrop-out 220ms ease-in both; }
+  .college-completion-confetti > span { animation: college-confetti-fall var(--confetti-duration) linear var(--confetti-delay) infinite; }
+}
+@keyframes college-popup-in { from { opacity: 0; transform: translateY(16px) scale(.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes college-popup-out { from { opacity: 1; transform: translateY(0) scale(1); } to { opacity: 0; transform: translateY(8px) scale(.98); } }
+@keyframes college-backdrop-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes college-backdrop-out { from { opacity: 1; } to { opacity: 0; } }
+@keyframes college-confetti-fall { 0% { top: -5%; opacity: 0; transform: translateX(0) rotate(var(--confetti-rotation)); } 10%, 85% { opacity: .6; } 100% { top: 105%; opacity: 0; transform: translateX(var(--confetti-drift)) rotate(calc(var(--confetti-rotation) + 300deg)); } }
 [role="tabpanel"][id^="college-panel-"]:focus-visible { outline: 2px solid #fb923c; outline-offset: 4px; border-radius: 20px; }

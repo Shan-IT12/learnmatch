@@ -27,6 +27,8 @@ import {
   IconRoute,
   IconRefresh,
   IconSparkles,
+  IconSchool,
+  IconX,
   IconTrendingDown,
   IconTrendingUp,
 } from '@tabler/icons-react'
@@ -127,6 +129,82 @@ function AlignmentTrendChart({ records }) {
   )
 }
 
+export function CollegeCompletionDialog({ yearLevel, termLabel, onDismiss }) {
+  const dialogRef = useRef(null)
+  const [closing, setClosing] = useState(false)
+  useEffect(() => {
+    const dialog = dialogRef.current
+    const previousFocus = document.activeElement
+    const previousOverflow = document.body.style.overflow
+    dialog.showModal()
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = previousOverflow
+      previousFocus?.focus?.()
+    }
+  }, [])
+  useEffect(() => {
+    if (!closing) return undefined
+    // Keep the modal and backdrop mounted until the fade-out finishes.
+    const timeout = window.setTimeout(() => dialogRef.current?.close(), 260)
+    return () => window.clearTimeout(timeout)
+  }, [closing])
+  const requestClose = () => {
+    if (closing) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) dialogRef.current?.close()
+    else setClosing(true)
+  }
+  const handleKeyDown = event => {
+    if (event.key !== 'Tab') return
+    const buttons = dialogRef.current.querySelectorAll('button')
+    const first = buttons[0]
+    const last = buttons[buttons.length - 1]
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault()
+      last.focus()
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault()
+      first.focus()
+    }
+  }
+  return <dialog ref={dialogRef} onClose={onDismiss} onCancel={event => { event.preventDefault(); requestClose() }} onKeyDown={handleKeyDown} data-closing={closing} onAnimationEnd={event => {
+    if (event.target === event.currentTarget && event.animationName === 'college-popup-out') dialogRef.current?.close()
+  }} className="college-completion-dialog m-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-2xl overflow-y-auto rounded-3xl border-0 bg-transparent p-0 shadow-2xl" aria-labelledby="college-completion-title" aria-describedby="college-completion-description">
+    <CollegeCompletionBanner yearLevel={yearLevel} termLabel={termLabel} onDismiss={requestClose} />
+  </dialog>
+}
+
+export function CollegeCompletionBanner({ yearLevel, termLabel, onDismiss }) {
+  return <section className="college-completion relative isolate overflow-hidden rounded-3xl border border-orange-200 px-6 py-9 text-center sm:px-12 sm:py-12" aria-labelledby="college-completion-title">
+    <button type="button" onClick={onDismiss} aria-label="Close congratulations" className="absolute right-3 top-3 flex h-10 w-10 items-center justify-center rounded-full text-orange-900 hover:bg-orange-100 focus-visible:outline-2 focus-visible:outline-orange-600"><IconX size={20} aria-hidden="true" /></button>
+    <div className="college-completion-confetti pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
+      {Array.from({ length: 32 }, (_, index) => {
+        const duration = 4.5 + ((index * 0.618034) % 1) * 3
+        const progress = (index * 0.754878 + 0.17) % 1
+        return <span key={index} style={{
+          '--confetti-x': `${(index + 0.5) * 100 / 32}%`,
+          '--confetti-y': `${progress * 100}%`,
+          '--confetti-rotation': `${index * 137.5}deg`,
+          '--confetti-delay': `${-duration * progress}s`,
+          '--confetti-duration': `${duration}s`,
+          '--confetti-drift': `${-25 + (index * 29) % 61}px`,
+          '--confetti-color': ['#f97316', '#fbbf24', '#34d399', '#fb7185'][(index * 7 + Math.floor(index / 4)) % 4],
+        }} />
+      })}
+    </div>
+    <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-3xl border border-orange-200 bg-white/90 text-orange-600 shadow-sm"><IconSchool size={44} stroke={1.5} aria-hidden="true" /></div>
+    <p className="text-xs font-bold uppercase tracking-[0.16em] text-orange-800">Program Tracking Complete</p>
+    <h2 id="college-completion-title" className="mt-3 text-3xl font-extrabold tracking-tight text-gray-950 sm:text-4xl">Congratulations, you did it!</h2>
+    <p id="college-completion-description" className="mx-auto mt-4 max-w-xl text-base leading-7 text-gray-700">You’ve completed your College Phase check-ins through the final term of your program. Take a moment to celebrate how far you’ve come.</p>
+    <div className="mt-5 flex flex-wrap items-center justify-center gap-2 text-sm font-semibold text-orange-900">
+      {[yearLevel, termLabel].filter(Boolean).map(label => <span key={label} className="rounded-full border border-orange-200 bg-white/90 px-3 py-1.5">{label}</span>)}
+      <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-emerald-800"><IconCircleCheck size={16} aria-hidden="true" />College Phase completed</span>
+    </div>
+    <p className="mx-auto mt-5 max-w-lg text-sm leading-6 text-gray-600">Your check-in history is here whenever you want to look back on your journey.</p>
+    <button type="button" onClick={onDismiss} className="mt-6 rounded-xl bg-orange-500 px-6 py-3 text-sm font-semibold text-white hover:bg-orange-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600">Back to dashboard</button>
+  </section>
+}
+
 export function CheckinProgress({ completedPhases = [], phaseStates = [], nextPhase = 'Early' }) {
   const completed = CHECKIN_PHASES.filter((phase) => completedPhases.includes(phase))
   const completedCount = completed.length
@@ -201,6 +279,7 @@ function CollegeDashboard() {
   const [nextTermErrors, setNextTermErrors] = useState({})
   const [startingAssessment, setStartingAssessment] = useState(false)
   const [activeView, setActiveView] = useState('overview')
+  const [dismissedCompletion, setDismissedCompletion] = useState(null)
   const viewButtonsRef = useRef([])
   const [showFullHistory, setShowFullHistory] = useState(false)
   const [successMessage, setSuccessMessage] = useState('')
@@ -320,6 +399,7 @@ function CollegeDashboard() {
     ? `Start ${nextAcademicStage.semester}`
     : 'Start Next Term'
   const programTrackingComplete = Boolean(checkinStatus?.progressionEligible && nextAcademicStage?.programCompleted)
+  const completionKey = [collegeInfo?.courseId, collegeInfo?.academicYear, collegeInfo?.yearLevel, collegeInfo?.semester].join('|')
 
   const openNextTermForm = () => {
     setShowNextSemesterForm(true)
@@ -501,6 +581,8 @@ function CollegeDashboard() {
           <div className="relative mt-6 border-t border-orange-100 pt-4"><p className="text-sm font-medium leading-6 text-gray-600">Career Alignment Tracking</p><p className="text-sm leading-6 text-gray-600">Follow your course experience, complete your next check-in, and see your progress over time.</p></div>
         </header>
 
+        {!loading && programTrackingComplete && dismissedCompletion !== completionKey && <CollegeCompletionDialog yearLevel={collegeInfo?.yearLevel} termLabel={collegeInfo?.semester} onDismiss={() => setDismissedCompletion(completionKey)} />}
+
         <div className="inline-flex max-w-full flex-wrap gap-1 rounded-2xl border border-gray-200/70 bg-gray-100/80 p-1.5" role="tablist" aria-label="College dashboard sections">
           {dashboardViews.map((view, index) => { const ViewIcon = view.icon; return <button key={view.id} ref={element => { viewButtonsRef.current[index] = element }} id={`college-view-${view.id}`} type="button" role="tab" aria-selected={visibleView === view.id} aria-controls={`college-panel-${view.id}`} tabIndex={visibleView === view.id ? 0 : -1} onClick={() => setActiveView(view.id)} onKeyDown={event => handleViewKey(event, index)} className="college-view-button"><ViewIcon size={17} stroke={1.7} aria-hidden="true" />{view.label}</button> })}
         </div>
@@ -551,9 +633,12 @@ function CollegeDashboard() {
                     {institutionDependentTerm ? 'Start Next Term' : nextTermActionLabel} <IconArrowRight size={16} />
                   </button>
                 )}
-                <button type="button" onClick={() => document.getElementById('latest-alignment-insight')?.scrollIntoView({ behavior: 'smooth', block: 'start' })} className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-5 py-3 text-sm font-semibold text-gray-800">
+                <button type="button" onClick={() => navigate(`/college/checkin/results/${latestResult.checkinId}`)} className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-5 py-3 text-sm font-semibold text-gray-800">
                   View Completed Check-in
                 </button>
+                {programTrackingComplete && (
+                  <button type="button" onClick={() => setDismissedCompletion(null)} className="inline-flex items-center justify-center gap-2 rounded-xl border border-orange-200 bg-orange-50 px-5 py-3 text-sm font-semibold text-orange-800"><IconSparkles size={18} aria-hidden="true" />View celebration</button>
+                )}
                 {programTrackingComplete && (
                   <button type="button" disabled={lifecyclePending} onClick={() => updateLifecycle('end')} className="inline-flex items-center justify-center gap-2 rounded-xl bg-gray-950 px-5 py-3 text-sm font-semibold text-white disabled:opacity-50">
                     {lifecyclePending ? 'Finishing...' : 'Finish Tracking'}
@@ -706,7 +791,6 @@ function CollegeDashboard() {
 
         {lifecycleStatus === 'active' && <div id="college-panel-roadmap" role="tabpanel" tabIndex={0} aria-labelledby="college-view-roadmap" hidden={visibleView !== 'roadmap'}>
           <CollegeProgramRoadmap key={collegeInfo?.courseCode} years={roadmapYears} currentYear={currentYearNumber} currentTerm={collegeInfo?.semester} duration={courseRoadmap?.program_duration_years} />
-          {programTrackingComplete && <div className="mt-5 rounded-2xl border border-emerald-100 bg-emerald-50 p-5"><p className="font-bold text-emerald-800">Program Tracking Complete</p><p className="mt-2 text-sm text-emerald-700">You completed the final regular term in this program.</p></div>}
         </div>}
 
         <div id="college-panel-history" role="tabpanel" tabIndex={0} aria-labelledby="college-view-history" hidden={visibleView !== 'history'}>

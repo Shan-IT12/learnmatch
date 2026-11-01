@@ -4,6 +4,41 @@ import React from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { createServer } from 'vite'
 import { readFile } from 'node:fs/promises'
+import { getNextAcademicStage } from '../../utils/collegeTrackingView.js'
+
+test('College Phase celebration requires the completed final term for four- and five-year calendars', () => {
+  for (const duration of [4, 5]) {
+    const year = `${duration}th Year`
+    for (const [calendar, finalTerm, finalCode, earlierTerm, earlierCode] of [
+      ['semester', '2nd Semester', 'SEM_2', '1st Semester', 'SEM_1'],
+      ['trimester', '3rd Trimester', 'TRI_3', '2nd Trimester', 'TRI_2'],
+    ]) {
+      assert.equal(getNextAcademicStage(year, finalTerm, duration, true, calendar, finalCode).programCompleted, true)
+      assert.equal(getNextAcademicStage(year, earlierTerm, duration, true, calendar, earlierCode).programCompleted, false)
+      assert.equal(getNextAcademicStage(year, finalTerm, duration, false, calendar, finalCode), null)
+      assert.equal(getNextAcademicStage('3rd Year', finalTerm, duration, true, calendar, finalCode).programCompleted, false)
+    }
+  }
+})
+
+test('completion banner celebrates tracked milestones without claiming graduation', async () => {
+  const vite = await createServer({ server: { middlewareMode: true }, appType: 'custom', optimizeDeps: { noDiscovery: true } })
+  try {
+    const { CollegeCompletionBanner } = await vite.ssrLoadModule('/src/pages/college/CollegeDashboard.jsx')
+    const markup = renderToStaticMarkup(React.createElement(CollegeCompletionBanner, { yearLevel: '5th Year', termLabel: '3rd Trimester' }))
+    assert.match(markup, /Congratulations, you did it!/)
+    assert.match(markup, /completed your College Phase check-ins/)
+    assert.match(markup, /5th Year/)
+    assert.match(markup, /3rd Trimester/)
+    assert.match(markup, /aria-labelledby="college-completion-title"/)
+    assert.match(markup, /college-completion-confetti[^>]*aria-hidden="true"/)
+    assert.doesNotMatch(markup, /you(?:’|')ve graduated|earned your degree/i)
+    const source = await readFile(new URL('./CollegeDashboard.jsx', import.meta.url), 'utf8')
+    assert.match(source, /programTrackingComplete && dismissedCompletion !== completionKey && <CollegeCompletionDialog/)
+  } finally {
+    await vite.close()
+  }
+})
 
 test('completed term card presents calendar-aware transition as primary and completed result as secondary', async () => {
   const source = await readFile(new URL('./CollegeDashboard.jsx', import.meta.url), 'utf8')

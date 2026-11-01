@@ -14,6 +14,7 @@ import {
   pauseCollegeTracking,
   getCollegeStatus,
   getCheckinHistory,
+  getCompletedCheckin,
   getNextSequentialCheckinPhase,
   normalizeApproximateDate,
   resolveTimingInput,
@@ -1036,6 +1037,23 @@ test('history is user-scoped, ordered, and returned without update or delete que
   assert.doesNotMatch(calls[0].sql, /UPDATE|DELETE/)
 })
 
+test('completed result lookup scopes the saved result to its owner and ID', async () => {
+  const database = { query: async (sql, values) => {
+    assert.match(sql, /WHERE sc\.user_id = \?\s+AND sc\.checkin_id = \?/)
+    assert.match(sql, /JOIN AI_MISMATCH_ANALYSIS/)
+    assert.doesNotMatch(sql, /UPDATE|INSERT|DELETE/)
+    assert.deepEqual(values, [7, 12, 1])
+    return [[{ checkin_id: 12, phase: 'End', alignment_score: 0.8, gwa: null, status: 'On Track', ai_feedback: 'Saved feedback', recommendation: 'Saved next step', course_name: 'Course One', semester: '2nd Semester' }]]
+  } }
+  const result = await getCompletedCheckin(database, 7, '12')
+  assert.equal(result.checkinId, 12)
+  assert.equal(result.alignmentPercent, 80)
+  assert.equal(result.feedback, 'Saved feedback')
+  assert.equal(result.recommendation, 'Saved next step')
+  await assert.rejects(getCompletedCheckin({ query: async () => [[]] }, 8, 12), error => error.status === 404)
+  for (const id of ['abc', 0, -1, '1.5']) await assert.rejects(getCompletedCheckin({ query: () => { throw new Error('must not query') } }, 7, id), error => error.code === 'INVALID_CHECKIN')
+})
+
 test('all College Phase routes require authentication', () => {
   const serverSource = fs.readFileSync(new URL('../server.js', import.meta.url), 'utf8')
   for (const path of [
@@ -1047,6 +1065,7 @@ test('all College Phase routes require authentication', () => {
     '/api/college/checkin/start',
     '/api/college/semester/advance',
     '/api/college/checkin/history',
+    '/api/college/checkin/results/:checkinId',
   ]) {
     assert.match(serverSource, new RegExp(`app\\.(?:get|post)\\('${path.replaceAll('/', '\\/')}', authenticateToken`))
   }

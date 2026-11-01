@@ -62,6 +62,7 @@ import {
   createCollegeSetup,
   endCollegeTracking,
   getCheckinHistory,
+  getCompletedCheckin,
   getCheckinStatus,
   getCollegeStatus,
   getPendingCheckin,
@@ -1018,6 +1019,17 @@ app.get('/api/college/checkin/history', authenticateToken, async (req, res) => {
   } catch (error) {
     console.error('Check-in history error:', error)
     res.status(500).json({ message: 'Server error fetching check-in history' })
+  }
+})
+
+app.get('/api/college/checkin/results/:checkinId', authenticateToken, async (req, res) => {
+  try {
+    const result = await getCompletedCheckin(pool, req.user.userId, req.params.checkinId)
+    res.json({ result })
+  } catch (error) {
+    if (error instanceof CollegeTrackingError) return res.status(error.status).json({ message: error.message, code: error.code })
+    console.error('Completed check-in error:', error)
+    res.status(500).json({ message: 'Could not load your completed check-in.' })
   }
 })
 

@@ -968,6 +968,18 @@ export async function submitCollegeCheckin(
 }
 
 export async function getCheckinHistory(database, userId, limit = 10) {
+  return fetchCheckinResults(database, userId, limit)
+}
+
+export async function getCompletedCheckin(database, userId, checkinId) {
+  const id = Number(checkinId)
+  if (!Number.isSafeInteger(id) || id <= 0) throw new CollegeTrackingError('Invalid check-in.', 'INVALID_CHECKIN')
+  const [result] = await fetchCheckinResults(database, userId, 1, id)
+  if (!result) throw new CollegeTrackingError('Completed check-in not found.', 'CHECKIN_NOT_FOUND', 404)
+  return result
+}
+
+async function fetchCheckinResults(database, userId, limit = 10, checkinId = null) {
   const safeLimit = Math.max(1, Math.min(Number(limit) || 10, 50))
   const [rows] = await database.query(
     `SELECT sc.checkin_id, sc.term_id, term.tracking_cycle_id, sc.phase, sc.year_level, sc.semester, sc.gwa,
@@ -982,9 +994,10 @@ export async function getCheckinHistory(database, userId, limit = 10) {
        WHERE latest.checkin_id = sc.checkin_id
      )
      WHERE sc.user_id = ?
+     ${checkinId === null ? '' : 'AND sc.checkin_id = ?'}
      ORDER BY sc.checkin_id DESC
      LIMIT ?`,
-    [userId, safeLimit]
+    checkinId === null ? [userId, safeLimit] : [userId, checkinId, safeLimit]
   )
   return rows.map((row) => ({
     checkinId: row.checkin_id,

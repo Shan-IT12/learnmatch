@@ -18,6 +18,7 @@ import CollegeSetup from './pages/college/CollegeSetup'
 import CollegeSetupReview from './pages/college/CollegeSetupReview'
 import CollegeDashboard from './pages/college/CollegeDashboard'
 import SemesterCheckin from './pages/college/SemesterCheckin'
+import CompletedCheckin from './pages/college/CompletedCheckin'
 import SummaryDashboard from './pages/SummaryDashboard'
 import CareerPath from './pages/CareerPath'
 import Feedback from './pages/Feedback'
@@ -78,6 +79,7 @@ function App() {
       <Route path="/college/setup/review" element={<CollegeSetupReview />} />
       <Route path="/college" element={<CollegeDashboard />} />
       <Route path="/college/checkin" element={<SemesterCheckin />} />
+      <Route path="/college/checkin/results/:checkinId" element={<CompletedCheckin />} />
       <Route path="/results" element={<Results />} />
       <Route path="/assessment-history" element={<AssessmentHistory />} />
       <Route path="/assessment-history/:recommendationId" element={<AssessmentHistoryResult />} />
