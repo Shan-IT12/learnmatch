@@ -491,10 +491,10 @@ function CollegeSetup() {
               </div>
             )}
             {searchStatus === 'success' && courses.length === 0 && !selectedCourse && (
-              <p className="mt-2 text-xs text-gray-400">No active courses found.</p>
+              <p className="mt-2 text-xs text-gray-400">No courses match your search. Try a broader course name or abbreviation.</p>
             )}
             {searchStatus === 'error' && !selectedCourse && (
-              <p className="mt-2 text-xs text-red-500">Course search is unavailable. Please try again.</p>
+              <p role="alert" className="mt-2 text-xs text-red-500">We couldn’t load courses. Check your connection, then change your search to try again.</p>
             )}
             </>}
 

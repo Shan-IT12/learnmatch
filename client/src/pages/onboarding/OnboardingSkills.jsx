@@ -310,7 +310,7 @@ function OnboardingSkills() {
     const data = await response.json()
 
     if (!response.ok) {
-      setError(data.message || 'Something went wrong submitting the quiz.')
+      setError(data.message || 'Could not submit your Academic Skills answers. Please try again.')
       setSubmitting(false)
       return
     }
@@ -426,8 +426,8 @@ function OnboardingSkills() {
   if (loading) {
     return (
       <OnboardingLayout currentStep={3} isComplete={false} showFooterNavigation={false}>
-        <SkeletonContent label="Loading quiz questions..."><div className="max-w-2xl mx-auto px-5 sm:px-8 py-8 sm:py-12">
-          <div className="mb-5 flex items-start justify-between gap-4"><div><SkeletonBlock className="mb-3 h-7 w-32" /><h2 className="text-2xl sm:text-3xl font-bold tracking-tight">Academic Skills Quiz</h2></div><SkeletonBlock className="h-14 w-20" /></div>
+        <SkeletonContent label="Loading Academic Skills questions..."><div className="max-w-2xl mx-auto px-5 sm:px-8 py-8 sm:py-12">
+          <div className="mb-5 flex items-start justify-between gap-4"><div><SkeletonBlock className="mb-3 h-7 w-32" /><h2 className="text-2xl sm:text-3xl font-bold tracking-tight">Academic Skills Assessment</h2></div><SkeletonBlock className="h-14 w-20" /></div>
           <div className="mb-7 flex items-center gap-3"><SkeletonBlock className="h-1.5 flex-1" /><SkeletonBlock className="h-3 w-24" /></div>
           <div className="mb-7 rounded-3xl border border-gray-200 bg-white p-5 sm:p-7 shadow-sm">
             <div className="mb-5 border-l-4 border-gray-200 pl-4"><SkeletonBlock className="mb-2 h-3 w-32" /><SkeletonBlock className="h-5 w-full" /><SkeletonBlock className="mt-2 h-5 w-2/3" /></div>
@@ -451,7 +451,7 @@ function OnboardingSkills() {
     return (
       <OnboardingLayout currentStep={3} isComplete={false}>
         <div className="max-w-xl mx-auto px-6 py-12 text-center text-gray-500 text-sm">
-          No quiz questions available right now.
+          Academic Skills questions are unavailable right now. Refresh the page to try again, or return to your dashboard and try later.
         </div>
       </OnboardingLayout>
     )
@@ -478,7 +478,7 @@ function OnboardingSkills() {
               </svg>
               Skills check
             </div>
-            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900">Academic Skills Quiz</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900">Academic Skills Assessment</h2>
           </div>
           <div className="shrink-0 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-center">
             <p className="text-[10px] font-semibold uppercase tracking-wide text-gray-400">Question</p>

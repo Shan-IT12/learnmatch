@@ -237,7 +237,7 @@ function SummaryDashboard() {
                 <p className="text-sm text-gray-900 font-medium">{profile.username}</p>
               </div>
             ) : (
-              <p className="text-sm text-gray-400">No profile info yet.</p>
+              <p className="text-sm text-gray-400">No profile information is saved. Open Profile from your account menu to add your details.</p>
             )}
           </section>
  
@@ -257,7 +257,7 @@ function SummaryDashboard() {
                   </span>
                 ))
               ) : (
-                <p className="text-sm text-gray-400">No reported impacts to show. For new recommendations, complete all five Yes or No answers in Personal Factors.</p>
+                <p className="text-sm text-gray-400">No reported impacts to show. Open Profile from your account menu to review or update your Personal Factors.</p>
               )}
             </div>
           </section>
@@ -275,14 +275,14 @@ function SummaryDashboard() {
                   </span>
                 ))
               ) : (
-                <p className="text-sm text-gray-400">{noInterests ? 'No interests or hobbies.' : 'No interests recorded yet.'}</p>
+                <p className="text-sm text-gray-400">{noInterests ? 'No interests or hobbies.' : 'No interests are saved. Return to your dashboard to complete the Interests assessment.'}</p>
               )}
             </div>
           </section>
           </div>
 
           <section className="flex h-full flex-col rounded-2xl border border-white/90 bg-white/78 p-5 shadow-[0_18px_48px_-40px_rgba(120,53,15,.5)] sm:p-6">
-            <div className="flex items-center justify-between gap-3 mb-4"><div className="flex items-center gap-3"><span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-violet-50 text-violet-600"><IconBrain size={20} stroke={1.8} /></span><div><p className="text-[11px] font-semibold uppercase tracking-wide text-gray-400">Skills Quiz</p><p className="text-sm font-bold text-gray-900">{skillTotals.total ? `${skillTotals.correct} of ${skillTotals.total} correct` : 'No result yet'}</p></div></div>{skillPercent !== null && <span className="rounded-full bg-violet-50 px-2.5 py-1 text-xs font-bold text-violet-700">{skillPercent}%</span>}</div>
+            <div className="flex items-center justify-between gap-3 mb-4"><div className="flex items-center gap-3"><span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-violet-50 text-violet-600"><IconBrain size={20} stroke={1.8} /></span><div><p className="text-[11px] font-semibold uppercase tracking-wide text-gray-400">Academic Skills</p><p className="text-sm font-bold text-gray-900">{skillTotals.total ? `${skillTotals.correct} of ${skillTotals.total} correct` : 'No result yet'}</p></div></div>{skillPercent !== null && <span className="rounded-full bg-violet-50 px-2.5 py-1 text-xs font-bold text-violet-700">{skillPercent}%</span>}</div>
             <div className="flex flex-1 flex-col justify-between gap-4">
               {Object.keys(domainScores).length > 0 ? (
                 Object.entries(domainScores).map(([domain, score]) => (
@@ -302,7 +302,7 @@ function SummaryDashboard() {
                   </div>
                 ))
               ) : (
-                <p className="text-sm text-gray-400">No quiz results yet.</p>
+                <p className="text-sm text-gray-400">No Academic Skills result is saved. Return to your dashboard to complete the assessment.</p>
               )}
             </div>
           </section>
@@ -343,7 +343,7 @@ function SummaryDashboard() {
             </div>
           ) : (
             <p className="text-sm text-gray-400">
-              Coming soon — take the Personality assessment to see your MBTI type here.
+              No Personality result is saved. Return to your dashboard to complete the Personality assessment and see your MBTI type here.
             </p>
           )}
         </section>

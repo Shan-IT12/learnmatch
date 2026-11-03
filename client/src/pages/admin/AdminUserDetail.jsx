@@ -159,7 +159,7 @@ function AdminUserDetail() {
                 <div className="grid gap-3 sm:grid-cols-2">
                   <ComponentState label="Profile" complete={user.assessment.components.profile} detail={user.assessment.components.profile ? 'Profile information recorded' : 'Not started'} />
                   <ComponentState label="Interests" complete={user.assessment.components.interests} detail={user.assessment.components.interests ? `${user.assessment.interestCount} interests recorded` : 'Not started'} />
-                  <ComponentState label="Skills Quiz" complete={user.assessment.components.skills} detail={user.assessment.skillScore ? `${user.assessment.skillScore.correct} of ${user.assessment.skillScore.total} correct (${user.assessment.skillScore.percent}%)` : 'Not completed'} />
+                  <ComponentState label="Academic Skills" complete={user.assessment.components.skills} detail={user.assessment.skillScore ? `${user.assessment.skillScore.correct} of ${user.assessment.skillScore.total} correct (${user.assessment.skillScore.percent}%)` : 'Not completed'} />
                   <ComponentState label="Personality" complete={user.assessment.components.personality} detail={user.assessment.mbtiType ? `${user.assessment.mbtiType} · ${formatDate(user.assessment.personalityTakenAt)}` : 'Not completed'} />
                 </div>
               </SectionCard>

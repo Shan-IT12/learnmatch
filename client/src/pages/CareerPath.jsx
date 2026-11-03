@@ -136,8 +136,8 @@ function CareerPath() {
       </nav>
 
       <SkeletonContent loading={status === 'loading'} label="Loading career path..."><main className="max-w-[1320px] mx-auto px-5 sm:px-10 lg:px-14 py-10 sm:py-14">
-        {status === 'error' && <p className="bg-red-50 border border-red-100 text-red-700 rounded-xl p-5">We couldn’t load this information. Please try again.</p>}
-        {status === 'not-found' && <p className="bg-white border border-gray-100 rounded-xl p-5 text-gray-600">This course is unavailable or inactive.</p>}
+        {status === 'error' && <p role="alert" className="bg-red-50 border border-red-100 text-red-700 rounded-xl p-5">We couldn’t load the career path information. Check your connection and refresh the page to try again.</p>}
+        {status === 'not-found' && <p className="bg-white border border-gray-100 rounded-xl p-5 text-gray-600">This course is unavailable or inactive. Use the back button above to explore another course.</p>}
 
         {!courseCode && (status === 'success' || status === 'loading') && (
           <section className="mx-auto max-w-6xl">
@@ -150,7 +150,10 @@ function CareerPath() {
             </header>
 
             {topRecommendations.length === 0 ? (
-              <div className="bg-white border border-gray-100 rounded-2xl p-7 text-gray-500">No course recommendations are available yet.</div>
+              <div className="bg-white border border-gray-100 rounded-2xl p-7 text-gray-500">
+                <p>No course recommendations are available yet. Return to your dashboard to complete your assessment, or browse available courses.</p>
+                <button type="button" onClick={() => navigate('/courses/search')} className="lm-action mt-4">Explore Courses</button>
+              </div>
             ) : (
               <>
                 <div className="grid items-stretch gap-5 md:grid-cols-3 lg:gap-6">

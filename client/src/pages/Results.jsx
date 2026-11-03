@@ -238,7 +238,7 @@ function Results() {
           </div>
         ) : recommendations.length === 0 ? (
           <div className="text-center text-gray-500 text-sm py-12">
-            No recommendations are available yet.
+            No recommendations are available yet. Return to your dashboard to complete all four assessment steps, then view your results again.
           </div>
         ) : (
           <>

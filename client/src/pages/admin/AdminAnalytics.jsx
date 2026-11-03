@@ -320,7 +320,7 @@ function AdminAnalytics() {
               <div className="h-80 min-w-0 sm:h-96">
                 {analytics.averageSkillScores.length > 0
                   ? <Bar data={chartData.skills} options={horizontalPercentOptions} />
-                  : <EmptyState>No completed skill assessments are available yet.</EmptyState>}
+                  : <EmptyState>No completed Academic Skills assessments yet.</EmptyState>}
               </div>
             </ChartCard>
 
@@ -379,7 +379,7 @@ function AdminAnalytics() {
                     </button>
                   )}
                 </>
-              ) : <EmptyState>No persisted course recommendations are available yet.</EmptyState>}
+              ) : <EmptyState>No saved course recommendations yet.</EmptyState>}
 
             </ChartCard>
           </div>

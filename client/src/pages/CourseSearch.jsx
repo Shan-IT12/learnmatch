@@ -30,6 +30,7 @@ function CourseSearch() {
   }
   const [courses, setCourses] = useState([])
   const [status, setStatus] = useState('idle')
+  const [retryCount, setRetryCount] = useState(0)
   const [resolvedQuery, setResolvedQuery] = useState(null)
   const [sort, setSort] = useState('asc')
   const [page, setPage] = useState(1)
@@ -94,7 +95,7 @@ function CourseSearch() {
     return () => {
       controller.abort()
     }
-  }, [query])
+  }, [query, retryCount])
 
   const updateSearch = (value) => {
     setPage(1)
@@ -150,7 +151,10 @@ function CourseSearch() {
 
         <SkeletonContent loading={displayStatus === 'loading'} label="Loading courses..."><section ref={resultsRef} className="motion-swap mt-9" aria-live="polite">
           {displayStatus === 'error' && (
-            <div className="bg-red-50 border border-red-100 text-red-700 rounded-xl p-5">We couldn’t load courses. Please try again.</div>
+            <div role="alert" className="bg-red-50 border border-red-100 text-red-700 rounded-xl p-5">
+              <p>We couldn’t load courses. Check your connection and try again.</p>
+              <button type="button" onClick={() => { setStatus('loading'); setRetryCount(count => count + 1) }} className="lm-action mt-3">Try again</button>
+            </div>
           )}
           {displayStatus === 'success' && courses.length === 0 && (
             <div className="bg-white border border-gray-100 rounded-xl p-7 text-center">

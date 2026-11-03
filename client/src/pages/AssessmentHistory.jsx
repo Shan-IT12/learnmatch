@@ -23,7 +23,7 @@ export function HistoryListContent({ history, onView }) {
         </span>
         <h2 className="mt-4 text-lg font-bold text-gray-900">No completed assessments yet</h2>
         <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-gray-500">
-          Completed recommendation results will appear here after you finish an assessment.
+          Return to your dashboard to start or resume an assessment. Your completed recommendation results will appear here.
         </p>
       </div>
     )

@@ -159,7 +159,7 @@ function Landing() {
               {query.trim() && results && (
                 <div className="absolute left-0 right-0 top-full z-50 mt-2 overflow-hidden rounded-2xl border border-orange-100 bg-white shadow-2xl">
                   {results.courses.length === 0 ? (
-                    <div className="px-5 py-4 text-sm text-gray-500">No courses found for “{query}”.</div>
+                    <div className="px-5 py-4 text-sm text-gray-500">No courses found for “{query}”. Try a broader course name, skill, or career keyword.</div>
                   ) : (
                     <div className="course-suggestion-scroll">
                       <div className="bg-orange-50/70 px-5 py-2 text-[10px] font-bold uppercase tracking-[0.16em] text-orange-600">Courses</div>

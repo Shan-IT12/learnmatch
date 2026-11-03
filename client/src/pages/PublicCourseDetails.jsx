@@ -73,7 +73,7 @@ function PublicCourseDetails() {
     <div className="min-h-screen bg-gray-50">
       <PublicHeader activeCollegePhase={hasActiveCollegePhase} showDashboard={fromDashboard || fromSummary} dashboardPath={fromSummary ? '/dashboard/summary' : '/dashboard'} />
       <main className="max-w-5xl mx-auto px-5 sm:px-10 py-10 sm:py-14">
-        {displayStatus === 'error' && <div className="bg-red-50 border border-red-100 text-red-700 rounded-xl p-5">We couldn’t load this course. Please try again.</div>}
+        {displayStatus === 'error' && <div role="alert" className="bg-red-50 border border-red-100 text-red-700 rounded-xl p-5">We couldn’t load this course. Check your connection and refresh the page to try again.</div>}
         {displayStatus === 'not-found' && (
           <div className="bg-white border border-gray-100 rounded-2xl p-8 text-center">
             <h1 className="text-2xl font-bold text-gray-900">Course not found</h1>

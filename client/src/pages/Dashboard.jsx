@@ -64,9 +64,9 @@ function Dashboard() {
 
 
   const steps = [
-    { label: 'Profile', description: 'Tell us about yourself.', done: hasProfile, icon: IconUser, IconCheck, IconArrowUpRight, IconCalendar, IconTarget },
+    { label: 'Personal Factors', description: 'Tell us about your circumstances.', done: hasProfile, icon: IconUser, IconCheck, IconArrowUpRight, IconCalendar, IconTarget },
     { label: 'Interests', description: 'What do you enjoy?', done: hasInterests, icon: IconHeart },
-    { label: 'Skills Quiz', description: 'What are you good at?', done: hasSkills, icon: IconChecklist },
+    { label: 'Academic Skills', description: 'Explore your academic skills.', done: hasSkills, icon: IconChecklist },
     { label: 'Personality', description: 'Discover your personality type.', done: hasPersonality, icon: IconBrain },
   ]
   const completedSteps = steps.filter((step) => step.done).length
