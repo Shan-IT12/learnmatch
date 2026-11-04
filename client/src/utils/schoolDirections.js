@@ -33,7 +33,3 @@ export function directionsErrorMessage(code) {
 }
 
 export const routeDistanceLabel = (distanceMeters) => `${(distanceMeters / 1000).toFixed(1)} km`
-export const routeDurationLabel = (seconds) => {
-  const minutes = Math.max(1, Math.round(seconds / 60))
-  return minutes < 60 ? `${minutes} min` : `${Math.floor(minutes / 60)} hr ${minutes % 60} min`
-}

@@ -1,5 +1,3 @@
-export const RIASEC_NAMES = Object.freeze({ R: 'Realistic', I: 'Investigative', A: 'Artistic', S: 'Social', E: 'Enterprising', C: 'Conventional' })
-
 // Mirrors server/config/recommendationConfig.js; the result tests enforce parity.
 export const MBTI_TO_RIASEC = Object.freeze({
   ISTJ: ['R', 'C'], ISFJ: ['S', 'C'], INFJ: ['S', 'A'], INTJ: ['I', 'C'],

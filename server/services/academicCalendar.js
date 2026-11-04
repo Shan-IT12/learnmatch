@@ -55,7 +55,3 @@ export function resolveActiveCalendarTerm(input = {}) {
   }
   return null
 }
-
-export function calendarTermOptions(calendarType) {
-  return ACADEMIC_CALENDARS[calendarType]?.terms || []
-}

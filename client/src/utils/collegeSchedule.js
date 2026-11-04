@@ -31,15 +31,6 @@ export function getAcademicYearOptions(value) {
   )
 }
 
-export function getFutureAcademicYearRanges(date = new Date(), count = 6) {
-  const current = getCurrentAcademicYear(date)
-  const startYear = Number(current.slice(0, 4))
-  return Array.from({ length: count }, (_, index) => {
-    const start = startYear + index
-    return `${start}-${start + 1}`
-  })
-}
-
 const MONTH_PART_ORDER = Object.freeze({ early: 5, middle: 15, late: 25 })
 
 export function approximateScheduleValue(value) {

@@ -111,10 +111,6 @@ export function finishAssessmentAttempt(storage) {
   Object.values(ASSESSMENT_SESSION_KEYS).forEach((key) => storage.removeItem(key))
 }
 
-export function isEmptyAttemptProfileResponse(response, attemptId) {
-  return Boolean(attemptId) && (response.status === 404 || response.status === 204)
-}
-
 export function readAssessmentSession(storage, key, fallback) {
   if (!storage) return fallback
   try {

@@ -3,8 +3,6 @@ import verified from '../data/schoolLocatorVerifiedOfferings.json' with { type: 
 import { resolveCanonicalCourseIds } from './courseIdentityService.js'
 
 export const SCHOOL_LOCATOR_SCOPE = 'San Jose del Monte, Bulacan'
-// Historic CSV year; current locator evidence has its own verification date.
-export const SCHOOL_LOCATOR_ACADEMIC_YEAR = '2024-25'
 
 const normalizeCourseCode = (value) => String(value || '').trim().toUpperCase()
 export async function getSchoolsForCourse(courseCode, database = pool) {

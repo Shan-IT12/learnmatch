@@ -1,17 +1,6 @@
 import { PERSONAL_FACTOR_KEYS, deriveFactorApplicability } from '../../../shared/personalFactors.js'
 export { PERSONAL_FACTOR_KEYS, deriveFactorApplicability }
 
-export const SUPPORTED_PERSONAL_FACTOR_FIELDS = Object.freeze([
-  'personal_factor_answers',
-  'physical_accessibility_areas',
-  'physical_accessibility_difficulties',
-  'factor_physical_impact',
-  'factor_health_impact',
-  'factor_financial_impact',
-  'factor_family_impact',
-  'factor_work_impact',
-])
-
 const impactField = (factor) => `factor_${factor}_impact`
 
 export function isPersonalFactorsComplete(profile = {}) {

@@ -12,7 +12,3 @@ export default function SkeletonContent({ loading = true, label = 'Loading conte
 export function SkeletonBlock({ className = '' }) {
   return <div className={`skeleton-block rounded-lg bg-gray-200/70 ${className}`} />
 }
-
-export function SkeletonLines({ count = 3 }) {
-  return <div className="space-y-3">{Array.from({ length: count }, (_, index) => <SkeletonBlock key={index} className={`h-3 ${index === count - 1 ? 'w-2/3' : 'w-full'}`} />)}</div>
-}

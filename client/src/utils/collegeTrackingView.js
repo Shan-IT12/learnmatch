@@ -29,16 +29,6 @@ export function getCurrentSemesterRecords(history = [], collegeInfo = {}) {
     .filter(Boolean)
 }
 
-export function getPreviousSemesterRecords(history = [], collegeInfo = {}) {
-  return history.filter((record) => collegeInfo.termId
-    ? record.termId !== collegeInfo.termId
-    : !(
-      record.courseCode === collegeInfo.courseCode &&
-      record.yearLevel === collegeInfo.yearLevel &&
-      record.semester === collegeInfo.semester
-    ))
-}
-
 export function getCheckinHistoryRecords(history = []) {
   return [...history].sort((left, right) => {
     const idDifference = Number(right.checkinId || 0) - Number(left.checkinId || 0)
@@ -70,10 +60,6 @@ export function getNextCheckinPhase(checkinStatus) {
   if (checkinStatus?.state === 'due') return checkinStatus.nextExpectedPhase || checkinStatus.nextPhase || null
   if (checkinStatus?.state === 'not_due') return checkinStatus.nextExpectedPhase || checkinStatus.nextPhase || null
   return null
-}
-
-export function isSemesterComplete(records = []) {
-  return CHECKIN_PHASES.every((phase) => records.some((record) => record.phase === phase))
 }
 
 export function getNextAcademicStage(yearLevel, semester, programDurationYears, semesterComplete, calendarType = 'semester', termCode = null) {
@@ -125,12 +111,4 @@ export function getNextAcademicStage(yearLevel, semester, programDurationYears, 
     return { programCompleted: false, yearLevel: `${nextYear}${ordinal} Year`, semester: '1st Trimester', calendarType: 'trimester', termCode: 'TRI_1' }
   }
   return null
-}
-
-export function summarizeRoadmapOverview(overview, maximumLength = 220) {
-  const text = String(overview || '').trim()
-  if (text.length <= maximumLength) return text
-  const shortened = text.slice(0, maximumLength + 1)
-  const lastSpace = shortened.lastIndexOf(' ')
-  return `${shortened.slice(0, lastSpace > 0 ? lastSpace : maximumLength).trim()}…`
 }

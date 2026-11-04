@@ -60,9 +60,3 @@ export function getDisplayCourseAbbreviation(courseName, abbreviation = '') {
     .join('')
   return suffix.length <= 8 ? `${baseAbbreviation}-${suffix}` : baseAbbreviation
 }
-
-export function formatCourseNameSingleLine(courseName, abbreviation = '') {
-  const displayAbbreviation = getDisplayCourseAbbreviation(courseName, abbreviation)
-  const suffix = displayAbbreviation ? ` (${displayAbbreviation})` : ''
-  return `${courseName ?? ''}${suffix}`
-}

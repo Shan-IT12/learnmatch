@@ -127,11 +127,6 @@ export function normalizePersonalFactorImpact(response) {
   return (value - 1) / 3
 }
 
-export function getClusterPersonalFactorRelevance(parentCluster) {
-  requireCluster(parentCluster)
-  return { ...PERSONAL_FACTOR_RELEVANCE[parentCluster] }
-}
-
 export function calculatePersonalFactorScore(responses, parentCluster) {
   requireCluster(parentCluster)
 

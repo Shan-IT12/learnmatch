@@ -25,7 +25,3 @@ export function createProxyTrust(env = process.env) {
     return ranges.some(([network, prefix]) => peer.kind() === network.kind() && peer.match(network, prefix))
   }
 }
-
-export function normalizeClientIp(address) {
-  return typeof address === 'string' && isIP(address) ? ipaddr.process(address).toString() : null
-}

@@ -148,10 +148,6 @@ export function getPublicCourse(courseCode) {
   return match ? publicCourse(match.course, true) : null
 }
 
-export function getPublicCourseCount() {
-  return currentIndexedCourses.length
-}
-
 export async function getActivePublicCourseCodes(database = pool) {
   const [rows] = await database.query(
     'SELECT course_code FROM COURSE WHERE is_active = 1 AND is_draft = 0'

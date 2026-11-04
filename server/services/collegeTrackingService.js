@@ -1,12 +1,11 @@
 import { generateMismatchExplanation } from './collegeMismatchExplanationService.js'
 import { getPublicCourse, getAvailablePublicCourse } from './publicCourseService.js'
 import { isCurrentIndependentCourse } from './courseIdentityService.js'
-import { ACADEMIC_CALENDARS, getTermDefinition, resolveActiveCalendarTerm, resolveCalendarTerm } from './academicCalendar.js'
+import { getTermDefinition, resolveActiveCalendarTerm, resolveCalendarTerm } from './academicCalendar.js'
 
 export const CHECKIN_PHASES = ['Early', 'Mid', 'End']
 export const CHECKIN_PHASE_BOUNDARIES = Object.freeze({ Mid: 0.33, End: 0.66 })
 export const YEAR_LEVELS = ['1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year']
-export const SEMESTERS = ['1st Semester', '2nd Semester', '3rd Semester', 'Summer', 'Summer/Midyear', '1st Trimester', '2nd Trimester', '3rd Trimester']
 export const TIMING_MODES = ['exact', 'approximate', 'phase_only', 'manual']
 export const MONTH_PARTS = ['early', 'middle', 'late']
 export const ALIGNMENT_RULES = Object.freeze({
@@ -171,7 +170,7 @@ export function resolveTimingInput(input, academicYear, currentDate = new Date()
     validateChoice(input.initialTrackingPhase, CHECKIN_PHASES, 'initial tracking phase')
     const semesterStartDate = normalizeApproximateDate(input.approximateStart, academicYear, 'semester start')
     const semesterEndDate = normalizeApproximateDate(input.approximateEnd, academicYear, 'semester end')
-    const timing = calculateSemesterTiming(semesterStartDate, semesterEndDate, currentDate)
+    calculateSemesterTiming(semesterStartDate, semesterEndDate, currentDate)
     return {
       timingMode: inferredMode,
       semesterStartDate,
