@@ -4,6 +4,7 @@ import { isCurrentIndependentCourse } from './courseIdentityService.js'
 import { ACADEMIC_CALENDARS, getTermDefinition, resolveActiveCalendarTerm, resolveCalendarTerm } from './academicCalendar.js'
 
 export const CHECKIN_PHASES = ['Early', 'Mid', 'End']
+export const CHECKIN_PHASE_BOUNDARIES = Object.freeze({ Mid: 0.33, End: 0.66 })
 export const YEAR_LEVELS = ['1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year']
 export const SEMESTERS = ['1st Semester', '2nd Semester', '3rd Semester', 'Summer', 'Summer/Midyear', '1st Trimester', '2nd Trimester', '3rd Trimester']
 export const TIMING_MODES = ['exact', 'approximate', 'phase_only', 'manual']
@@ -235,7 +236,7 @@ export function calculateSemesterTiming(startDate, endDate, currentDate = new Da
     ? 'NOT_STARTED'
     : currentDay > end
       ? 'ENDED'
-      : progress <= 0.33 ? 'Early' : progress <= 0.66 ? 'Mid' : 'End'
+      : progress <= CHECKIN_PHASE_BOUNDARIES.Mid ? 'Early' : progress <= CHECKIN_PHASE_BOUNDARIES.End ? 'Mid' : 'End'
 
   return {
     timingAvailable: true,
@@ -1127,7 +1128,7 @@ export async function getCheckinStatus(database, userId, currentDate = new Date(
   }
 }
 
-export async function startNextCheckin(pool, userId, { phase: requestedPhase } = {}) {
+export async function startNextCheckin(pool, userId, { phase: requestedPhase, termId: requestedTermId } = {}) {
   const connection = await pool.getConnection()
   try {
     await connection.beginTransaction()
@@ -1143,6 +1144,9 @@ export async function startNextCheckin(pool, userId, { phase: requestedPhase } =
     )
     if (termRows.length > 0) {
       const term = termRows[0]
+      if (requestedTermId && Number(requestedTermId) !== Number(term.term_id)) {
+        throw new CollegeTrackingError('This reminder is no longer pending.', 'STALE_REMINDER', 409)
+      }
       const [completedRows] = await connection.query(
         `SELECT DISTINCT sc.phase
          FROM SEMESTER_CHECKIN sc
@@ -1181,6 +1185,7 @@ export async function startNextCheckin(pool, userId, { phase: requestedPhase } =
       return { created: true, checkinId: result.insertId, phase }
     }
 
+    if (requestedTermId) throw new CollegeTrackingError('This reminder is no longer pending.', 'STALE_REMINDER', 409)
     const [rows] = await connection.query(
       `SELECT checkin_id, course_id, year_level, semester, phase
        FROM SEMESTER_CHECKIN WHERE user_id = ? AND term_id IS NULL

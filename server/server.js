@@ -1,4 +1,5 @@
 import express from 'express'
+import { createCheckinReminderRouter } from './routes/checkinReminderRoutes.js'
 import cors from 'cors'
 import helmet from 'helmet'
 import dotenv from 'dotenv'
@@ -110,6 +111,7 @@ app.use('/api/admin/courses/:courseId/sources', createDraftSourceRouter(pool, au
 app.use('/api/admin/course-sources', createSourceCheckRouter(authenticateAdmin, undefined, pool))
 app.use('/api/admin/courses/:courseId/publication', createCoursePublicationRouter(pool, authenticateAdmin))
 app.use('/api/public/directions', directionsRoutes)
+app.use('/api/college/notifications', createCheckinReminderRouter(pool, authenticateToken))
 
 app.post('/api/assessment-attempts', authenticateToken, async (req, res) => {
   try {

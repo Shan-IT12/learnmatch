@@ -5,3 +5,6 @@ dist/
 .postman/
 postman/
 .local-backups/
+
+.vercel
+.env*

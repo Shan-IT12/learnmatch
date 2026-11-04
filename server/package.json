@@ -4,6 +4,10 @@
   "description": "",
   "main": "index.js",
   "type": "module",
+  "scripts": {
+    "reminders": "node scripts/runCheckinReminders.mjs",
+    "test:reminders": "node --test tests/checkinReminders.test.js"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",

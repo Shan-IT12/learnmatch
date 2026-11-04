@@ -1,7 +1,7 @@
 import HeaderBrand from '../../components/HeaderBrand'
 import './collegeDashboard.css'
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { IconArrowRight, IconCircleCheck, IconSparkles, IconBulb, IconLoader2 } from '@tabler/icons-react'
 import { checkinQuestions, checkinScale } from '../../data/checkinQuestions'
 import { FieldError, RequiredMark } from '../../components/FormValidation'
@@ -153,6 +153,7 @@ export function EndPhaseGwaField({ value = '', onChange = () => {} }) {
 
 function SemesterCheckin() {
   const navigate = useNavigate()
+  const location = useLocation()
   const token = localStorage.getItem('token')
 
   const [loading, setLoading] = useState(true)
@@ -170,13 +171,27 @@ function SemesterCheckin() {
 
   useEffect(() => {
     if (!token) {
-      navigate('/login')
+      navigate('/login', { state: { returnTo: `/college/checkin${location.search}` } })
       return
     }
 
     const fetchPending = async () => {
       try {
         const headers = { Authorization: `Bearer ${token}` }
+        const reminderId = new URLSearchParams(location.search).get('reminder')
+        if (reminderId) {
+          const opened = await fetch(`${import.meta.env.VITE_API_URL}/api/college/notifications/${encodeURIComponent(reminderId)}/open`, { method: 'POST', headers })
+          if (opened.status === 401 || opened.status === 403) {
+            navigate('/login', { state: { returnTo: `/college/checkin${location.search}` } })
+            return
+          }
+          if (!opened.ok) {
+            const failure = await opened.json()
+            setError(failure.message || 'This reminder is no longer pending.')
+            setLoading(false)
+            return
+          }
+        }
         const [res, statusRes] = await Promise.all([
           fetch(`${import.meta.env.VITE_API_URL}/api/college/checkin/pending`, { headers }),
           fetch(`${import.meta.env.VITE_API_URL}/api/college/status`, { headers }).catch(() => null),
@@ -203,7 +218,7 @@ function SemesterCheckin() {
     }
 
     fetchPending()
-  }, [navigate, token])
+  }, [navigate, token, location.search])
 
   const handleSelect = (questionNumber, score) => {
     setAnswers((prev) => ({ ...prev, [questionNumber]: score }))
@@ -276,6 +291,8 @@ function SemesterCheckin() {
   if (saveConfirmed) {
     return <div className="flex min-h-screen items-center justify-center bg-slate-50 px-5"><SuccessConfirmation message="Check-in Saved" /></div>
   }
+
+  if (!phase) return <main className="mx-auto max-w-xl p-6"><p role="alert">{error || 'This check-in is unavailable.'}</p><button type="button" className="mt-4 rounded-xl bg-orange-600 px-4 py-3 text-white" onClick={() => navigate('/college')}>Back to College Dashboard</button></main>
 
   const questions = checkinQuestions[phase]
   const answeredCount = questions.filter(({ number }) => answers[number] !== undefined).length

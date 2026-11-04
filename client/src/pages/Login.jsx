@@ -1,6 +1,6 @@
 import HeaderBrand from '../components/HeaderBrand'
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { IconEye, IconEyeOff } from '@tabler/icons-react'
 import AuthJourneyPanel from '../components/AuthJourneyPanel'
 import { FieldError, RequiredMark } from '../components/FormValidation'
@@ -15,6 +15,7 @@ function Login() {
   const [showPassword, setShowPassword] = useState(false)
   const [fieldErrors, setFieldErrors] = useState({})
   const navigate = useNavigate()
+  const location = useLocation()
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -48,7 +49,8 @@ function Login() {
 
       storeUserAuth(localStorage, data)
 
-      navigate('/dashboard')
+      const returnTo = location.state?.returnTo
+      navigate(typeof returnTo === 'string' && /^\/college(?:\?notifications=1|\/checkin\?reminder=\d+)?$/.test(returnTo) ? returnTo : '/dashboard')
     } catch {
       setError('Cannot connect to server. Please try again.')
       setSubmitting(false)

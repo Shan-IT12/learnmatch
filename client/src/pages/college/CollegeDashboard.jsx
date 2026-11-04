@@ -3,6 +3,7 @@ import CollegeProgramRoadmap from '../../components/CollegeProgramRoadmap'
 import './collegeDashboard.css'
 import LogoutButton from '../../components/LogoutButton'
 import StudentAccountMenu from '../../components/StudentAccountMenu'
+import CheckinNotifications from '../../components/CheckinNotifications'
 import { IconLogout, IconMessageCircle } from '@tabler/icons-react'
 import HeaderBrand from '../../components/HeaderBrand'
 import { collegePlaceholder, coursePlaceholder } from '../../data/loadingPlaceholders'
@@ -289,7 +290,7 @@ function CollegeDashboard() {
 
   useEffect(() => {
     if (!token) {
-      navigate('/login')
+      navigate('/login', { state: { returnTo: '/college?notifications=1' } })
       return undefined
     }
 
@@ -304,7 +305,7 @@ function CollegeDashboard() {
         ])
 
         if (collegeRes.status === 401 || collegeRes.status === 403) {
-          navigate('/login', { replace: true })
+          navigate('/login', { replace: true, state: { returnTo: '/college?notifications=1' } })
           return
         }
         const collegeData = await collegeRes.json()
@@ -556,6 +557,7 @@ function CollegeDashboard() {
           <HeaderBrand />
         </button>
         <div className="lm-header-actions flex items-center gap-3 sm:gap-4">
+          <CheckinNotifications />
           <StudentAccountMenu username={username} returnTo="college" onProfile={() => navigate('/profile')} />
           <button onClick={() => navigate('/feedback', { state: { entryContext: 'college' } })} className="lm-action"><IconMessageCircle size={16} stroke={1.7} aria-hidden="true" /> Feedback
           </button>
