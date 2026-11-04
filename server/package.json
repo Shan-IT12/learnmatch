@@ -5,6 +5,8 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
+    "test": "node --test",
+    "update:disposable-emails": "node scripts/updateDisposableEmailDomains.mjs",
     "reminders": "node scripts/runCheckinReminders.mjs"
   },
   "keywords": [],

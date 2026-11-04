@@ -75,7 +75,7 @@ function Register() {
 
     const nextErrors = {}
     if (!formData.email.trim()) nextErrors.email = 'Please enter your email address.'
-    else if (!isValidEmail(formData.email)) nextErrors.email = 'Please enter a valid email address.'
+    else if (!isValidEmail(formData.email.trim())) nextErrors.email = 'Please enter a valid email address.'
     const usernameError = validateUsername(formData.username)
     if (usernameError) nextErrors.username = usernameError
     const passwordError = isValidPassword(formData.password)
@@ -99,6 +99,10 @@ function Register() {
       const data = await response.json()
 
       if (!response.ok) {
+        if (data.code === 'DISPOSABLE_EMAIL') {
+          setFieldErrors({ email: data.message })
+          scrollToFirstInvalidField(['email'])
+        }
         setError(data.message || 'Something went wrong. Please try again.')
         setSubmitting(false)
         return

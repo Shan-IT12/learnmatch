@@ -9,6 +9,7 @@ import {
   jwtVerifyOptions,
 } from '../config/security.js'
 import { validateUsername } from '../services/usernameValidationService.js'
+import { normalizeRegistrationEmail, isDisposableEmail, DISPOSABLE_EMAIL_MESSAGE } from '../services/registrationEmailService.js'
 import { TERMS_VERSION, PRIVACY_NOTICE_VERSION } from '../shared/legalDocuments.js'
 
 const sendResendMail = async ({ to, subject, html }) => {
@@ -88,18 +89,23 @@ const createUserAuthPayload = (user, message) => ({
 })
 
 export const registerUser = async (req, res) => {
-  const { email, username, password } = req.body
+  const { email: rawEmail, username, password } = req.body || {}
+  const email = normalizeRegistrationEmail(rawEmail)
 
-  if (!email || !username || !password) {
+  if (!rawEmail || !username || !password) {
     return res.status(400).json({
       message: 'Email, username, and password are required',
     })
   }
 
-  if (!isValidEmail(email)) {
+  if (!email) {
     return res.status(400).json({
       message: 'Please enter a valid email address',
     })
+  }
+
+  if (isDisposableEmail(email)) {
+    return res.status(400).json({ code: 'DISPOSABLE_EMAIL', message: DISPOSABLE_EMAIL_MESSAGE })
   }
 
   const usernameValidation = validateUsername(username)

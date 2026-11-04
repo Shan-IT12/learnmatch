@@ -99,31 +99,32 @@ function Landing() {
   return (
     <div className="min-h-screen overflow-x-hidden bg-[var(--lm-landing-background)] text-gray-900">
       <LandingIntro />
+      <a href="#landing-content" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-xl focus:bg-white focus:p-4 focus:text-orange-800 focus:outline-2 focus:outline-orange-800">Skip to content</a>
       <div className="pointer-events-none absolute inset-x-0 top-0 h-[760px] bg-[radial-gradient(circle_at_13%_18%,rgba(251,146,60,.13),transparent_28%),radial-gradient(circle_at_78%_28%,rgba(253,186,116,.16),transparent_31%),linear-gradient(115deg,rgba(255,255,255,.8),rgba(255,247,237,.25))]" />
 
       <header className="relative z-30 mx-auto flex max-w-[1440px] items-center justify-between gap-4 px-5 py-5 sm:px-8 lg:px-10">
         <Link to="/" className="text-xl font-bold tracking-tight text-gray-900">Learn<span className="text-orange-500">Match</span></Link>
         <div className="flex items-center gap-1.5 sm:gap-2">
           <Link to="/login" className="rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 transition hover:text-orange-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500 sm:px-4">Log In</Link>
-          <Link to="/register" className="rounded-xl bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white shadow-[0_8px_20px_-10px_rgba(234,88,12,.85)] transition duration-150 hover:-translate-y-0.5 hover:bg-orange-600 active:translate-y-0">Get Started</Link>
+          <Link to="/register" className="rounded-xl bg-orange-700 px-4 py-2.5 text-sm font-semibold text-white shadow-[0_8px_20px_-10px_rgba(234,88,12,.85)] transition duration-150 hover:-translate-y-0.5 hover:bg-orange-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-800 active:translate-y-0">Get Started</Link>
         </div>
       </header>
 
-      <main className="relative">
+      <main id="landing-content" tabIndex={-1} className="relative">
         <section className="mx-auto grid max-w-[1380px] gap-10 px-5 pb-14 pt-8 sm:px-8 sm:pb-16 sm:pt-12 lg:grid-cols-[minmax(390px,.86fr)_minmax(500px,1.14fr)] lg:items-center lg:gap-12 lg:px-10 lg:pb-20 lg:pt-14 xl:gap-16">
           <div className="mx-auto w-full max-w-xl lg:mx-0">
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-orange-100 bg-white/70 px-3.5 py-2 text-xs font-semibold text-orange-700 shadow-sm backdrop-blur-md">
               <IconTargetArrow size={15} stroke={1.9} /> Personalized course guidance
             </div>
             <h1 className="max-w-lg text-[2.65rem] font-bold leading-[1.02] tracking-[-0.045em] text-gray-950 sm:text-6xl lg:text-[4rem]">
-              Find the right course <span className="text-orange-500">for your future.</span>
+              Find the right course <span className="text-orange-700">for your future.</span>
             </h1>
             <p className="mt-5 max-w-lg text-base leading-relaxed text-gray-600 sm:text-lg">
               Discover courses that match your strengths, interests, personality, and situation.
             </p>
 
             <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
-              <Link to="/register" className="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-orange-500 to-orange-600 px-6 py-3.5 text-sm font-semibold text-white shadow-[0_14px_30px_-14px_rgba(234,88,12,.8)] transition duration-150 hover:-translate-y-0.5 hover:shadow-[0_18px_34px_-14px_rgba(234,88,12,.7)] active:translate-y-0">
+              <Link to="/register" className="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-orange-700 to-orange-800 px-6 py-3.5 text-sm font-semibold text-white shadow-[0_14px_30px_-14px_rgba(234,88,12,.8)] transition duration-150 hover:-translate-y-0.5 hover:shadow-[0_18px_34px_-14px_rgba(234,88,12,.7)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-800 active:translate-y-0">
                 Start Assessment <IconArrowRight size={17} stroke={2} />
               </Link>
               <Link to="/login" className="lm-action">
@@ -151,7 +152,7 @@ function Landing() {
                   aria-label="Search courses"
                   className="min-w-0 flex-1 bg-transparent px-1 py-2.5 text-sm font-medium text-slate-900 outline-none placeholder:font-normal placeholder:text-slate-500"
                 />
-                <button type="submit" className="rounded-xl bg-orange-500 px-4 py-2.5 text-xs font-semibold text-white shadow-[0_8px_18px_-10px_rgba(234,88,12,.8)] transition duration-150 hover:bg-orange-600 hover:shadow-[0_10px_22px_-10px_rgba(234,88,12,.75)] active:translate-y-px sm:px-5">
+                <button type="submit" className="rounded-xl bg-orange-700 px-4 py-2.5 text-xs font-semibold text-white shadow-[0_8px_18px_-10px_rgba(234,88,12,.8)] transition duration-150 hover:bg-orange-800 hover:shadow-[0_10px_22px_-10px_rgba(234,88,12,.75)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-800 active:translate-y-px sm:px-5">
                   {searching ? 'Searching…' : 'Search'}
                 </button>
               </form>
@@ -204,7 +205,7 @@ function Landing() {
         <section id="how-it-works" className="relative border-y border-orange-100/70 bg-white/48 px-5 py-16 sm:px-8 sm:py-20 lg:px-10">
           <div className="mx-auto max-w-6xl">
             <div className="mx-auto max-w-2xl text-center">
-              <p className="text-xs font-bold uppercase tracking-[0.18em] text-orange-500">How it works</p>
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-orange-700">How it works</p>
               <h2 className="mt-3 text-3xl font-bold tracking-[-0.03em] text-gray-950 sm:text-4xl">A clearer path, one step at a time.</h2>
               <p className="mt-4 text-sm leading-relaxed text-gray-500 sm:text-base">Build your profile, understand your fit, then explore courses with context.</p>
             </div>
@@ -234,7 +235,7 @@ function Landing() {
               <p className="text-xs font-semibold uppercase tracking-[0.17em] text-orange-300">Your direction starts here</p>
               <h2 className="mt-2 max-w-xl text-2xl font-bold tracking-tight sm:text-3xl">Explore your options with more clarity.</h2>
             </div>
-            <Link to="/register" className="inline-flex shrink-0 items-center gap-2 rounded-2xl bg-orange-500 px-5 py-3 text-sm font-semibold shadow-lg shadow-orange-950/20 transition duration-150 hover:-translate-y-0.5 hover:bg-orange-400 active:translate-y-0">
+            <Link to="/register" className="inline-flex shrink-0 items-center gap-2 rounded-2xl bg-orange-700 px-5 py-3 text-sm font-semibold shadow-lg shadow-orange-950/20 transition duration-150 hover:-translate-y-0.5 hover:bg-orange-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white active:translate-y-0">
               Get Started <IconArrowRight size={17} />
             </Link>
           </div>
