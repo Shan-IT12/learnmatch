@@ -24,6 +24,10 @@ function toNormalizedScore(displayPercent, label) {
 
 function shapeSavedRecommendation(row) {
   const interestResponse = normalizeInterestResponse(parseAttemptJson(row.attempt_interests))
+  const skillResult = parseAttemptJson(row.attempt_skill_result)
+  const academicDomains = Object.fromEntries(Object.entries(skillResult?.domainScores || {})
+    .filter(([, result]) => result && Number(result.total) > 0)
+    .map(([domain, result]) => [domain, Number(result.correct) / Number(result.total)]))
   const recommendation = {
     interests_available: !(interestResponse?.noInterests === true && interestResponse?.selected?.length === 0),
     rank_position: row.rank_position,
@@ -39,7 +43,11 @@ function shapeSavedRecommendation(row) {
       personality_match: toDisplayPercent(Number(row.personality_match)),
       personal_factor_match: row.personal_factor_match == null ? null : toDisplayPercent(Number(row.personal_factor_match)),
     },
-    explanation_context: buildExplanationContext(row),
+    explanation_context: buildExplanationContext({
+      ...row,
+      selected_interests: interestResponse?.selected || [],
+      academic_domains: academicDomains,
+    }),
     ai_narrative: row.ai_narrative ?? null,
   }
   recommendation.ai_narrative ||= buildDeterministicExplanation(recommendation)
@@ -104,7 +112,8 @@ async function getRecommendationItems(database, recommendationId, activeOnly = f
     `SELECT ri.rank_position, ri.match_score, ri.skill_match, ri.interest_match,
             ri.personality_match, ri.personal_factor_match, ri.ai_narrative,
             c.course_id, c.course_code, c.course_name, c.course_abbreviation,
-            c.cluster_category, c.description, c.obtainable_skills, pa.mbti_type, a.interests AS attempt_interests
+            c.cluster_category, c.description, c.obtainable_skills, pa.mbti_type,
+            a.interests AS attempt_interests, a.skill_result AS attempt_skill_result
      FROM RECOMMENDATION_ITEM ri
      JOIN COURSE c ON c.course_id = ri.course_id
      JOIN RECOMMENDATION r ON r.recommendation_id = ri.recommendation_id
@@ -228,7 +237,8 @@ export async function getOrCreateSavedRecommendations(
   const saved = await getSavedRecommendationForAssessment(pool, userId, assessmentId)
   if (saved) {
     onProgress({ completed: 2, label: 'Preparing your course explanations' })
-    const outdated = saved.recommendations.filter(rec => needsExplanationRefresh(rec.ai_narrative))
+    const outdated = saved.recommendations.filter(rec => needsExplanationRefresh(rec.ai_narrative)
+      || rec.ai_narrative === buildDeterministicExplanation(rec))
     if (!outdated.length) {
       onProgress({ completed: 3, label: 'Checking your saved recommendations' })
       onProgress({ completed: 4, label: 'Loading your results overview' })
@@ -245,7 +255,7 @@ export async function getOrCreateSavedRecommendations(
         ? next.trim() : buildDeterministicExplanation(rec)
       await pool.query(
         `UPDATE RECOMMENDATION_ITEM SET ai_narrative = ?
-         WHERE recommendation_id = ? AND course_id = ? AND rank_position = ? AND ai_narrative = ?`,
+         WHERE recommendation_id = ? AND course_id = ? AND rank_position = ? AND (ai_narrative = ? OR ai_narrative IS NULL)`,
         [narrative, saved.recommendation_id, rec.course_id, rec.rank_position, rec.ai_narrative]
       )
       rec.ai_narrative = narrative

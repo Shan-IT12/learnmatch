@@ -3,9 +3,20 @@ import {
   getAvailablePublicCourse,
   searchAvailablePublicCourses,
 } from '../services/publicCourseService.js'
-import { getSchoolsForCourse } from '../services/schoolLocatorService.js'
+import { countAvailableLocatorSchools, getSchoolsForCourse } from '../services/schoolLocatorService.js'
 
 const router = express.Router()
+
+router.get('/stats', async (req, res) => {
+  try {
+    const courses = await searchAvailablePublicCourses('')
+    const schoolCount = await countAvailableLocatorSchools(new Set(courses.map(course => course.course_code)))
+    res.json({ courseCount: courses.length, schoolCount })
+  } catch (error) {
+    console.error('Public catalog stats error:', error)
+    res.status(500).json({ message: 'Server error loading catalog statistics' })
+  }
+})
 
 router.get('/', async (req, res) => {
   try {

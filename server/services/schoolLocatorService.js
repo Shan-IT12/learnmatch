@@ -5,6 +5,21 @@ import { resolveCanonicalCourseIds } from './courseIdentityService.js'
 export const SCHOOL_LOCATOR_SCOPE = 'San Jose del Monte, Bulacan'
 
 const normalizeCourseCode = (value) => String(value || '').trim().toUpperCase()
+
+export async function countAvailableLocatorSchools(courseCodes, database = pool) {
+  const eligibleUiis = [...new Set(verified.schools
+    .filter(school => school.programs.some(program => program.status === 'ACTIVE'
+      && program.course_codes.some(code => courseCodes.has(code))))
+    .map(school => school.uii))]
+  if (!eligibleUiis.length) return 0
+
+  const [rows] = await database.query(
+    'SELECT COUNT(DISTINCT uii) AS school_count FROM SCHOOL WHERE is_active = 1 AND uii IN (?)',
+    [eligibleUiis]
+  )
+  return Number(rows[0].school_count)
+}
+
 export async function getSchoolsForCourse(courseCode, database = pool) {
   const normalizedCode = normalizeCourseCode(courseCode)
   if (!/^CRS\d{3,7}$/.test(normalizedCode)) return null

@@ -515,7 +515,12 @@ export async function getTopCourseRecommendations(pool, userId) {
     return {
       ...course,
       finalScore,
-      explanationContext: buildExplanationContext({ ...course, mbti_type: mbtiType }),
+      explanationContext: buildExplanationContext({
+        ...course,
+        mbti_type: mbtiType,
+        selected_interests: interestRows.map(row => row.interest_name),
+        academic_domains: studentDomainScores,
+      }),
       scoreBreakdown: {
         skillMatch: courseSkillMatch,
         interestMatch: courseInterestMatch,

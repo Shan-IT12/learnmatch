@@ -9,7 +9,6 @@ import {
   IconTargetArrow,
   IconUserCircle,
 } from '@tabler/icons-react'
-import { STUDENT_ACTIVE_INDEPENDENT_COURSE_COUNT } from '../constants/courseCatalog'
 import landingCoursePathway from '../assets/landing-course-pathway.png'
 import CourseName from '../components/CourseName'
 import LandingIntro from '../components/LandingIntro'
@@ -60,7 +59,24 @@ function Landing() {
   const [query, setQuery] = useState('')
   const [results, setResults] = useState(null)
   const [searching, setSearching] = useState(false)
+  const [catalogStats, setCatalogStats] = useState(null)
   const navigate = useNavigate()
+
+  useEffect(() => {
+    const controller = new AbortController()
+    fetch(`${import.meta.env.VITE_API_URL || ''}/api/public/courses/stats`, { signal: controller.signal })
+      .then(async (response) => {
+        if (!response.ok) throw new Error('Catalog statistics request failed')
+        return response.json()
+      })
+      .then((data) => {
+        if (!controller.signal.aborted) setCatalogStats(data)
+      })
+      .catch(() => {
+        // Keep unavailable counts empty instead of displaying stale totals.
+      })
+    return () => controller.abort()
+  }, [])
 
   useEffect(() => {
     const trimmedQuery = query.trim()
@@ -106,7 +122,7 @@ function Landing() {
         <Link to="/" className="text-xl font-bold tracking-tight text-gray-900">Learn<span className="text-orange-500">Match</span></Link>
         <div className="flex items-center gap-1.5 sm:gap-2">
           <Link to="/login" className="rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 transition hover:text-orange-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500 sm:px-4">Log In</Link>
-          <Link to="/register" className="rounded-xl bg-orange-700 px-4 py-2.5 text-sm font-semibold text-white shadow-[0_8px_20px_-10px_rgba(234,88,12,.85)] transition duration-150 hover:-translate-y-0.5 hover:bg-orange-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-800 active:translate-y-0">Get Started</Link>
+          <Link to="/register" className="rounded-xl bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white shadow-[0_8px_20px_-10px_rgba(234,88,12,.85)] transition duration-150 hover:-translate-y-0.5 hover:bg-orange-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-800 active:translate-y-0">Get Started</Link>
         </div>
       </header>
 
@@ -117,14 +133,14 @@ function Landing() {
               <IconTargetArrow size={15} stroke={1.9} /> Personalized course guidance
             </div>
             <h1 className="max-w-lg text-[2.65rem] font-bold leading-[1.02] tracking-[-0.045em] text-gray-950 sm:text-6xl lg:text-[4rem]">
-              Find the right course <span className="text-orange-700">for your future.</span>
+              Find the right course <span className="text-orange-500">for your future.</span>
             </h1>
             <p className="mt-5 max-w-lg text-base leading-relaxed text-gray-600 sm:text-lg">
               Discover courses that match your strengths, interests, personality, and situation.
             </p>
 
             <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
-              <Link to="/register" className="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-orange-700 to-orange-800 px-6 py-3.5 text-sm font-semibold text-white shadow-[0_14px_30px_-14px_rgba(234,88,12,.8)] transition duration-150 hover:-translate-y-0.5 hover:shadow-[0_18px_34px_-14px_rgba(234,88,12,.7)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-800 active:translate-y-0">
+              <Link to="/register" className="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-orange-500 to-orange-600 px-6 py-3.5 text-sm font-semibold text-white shadow-[0_14px_30px_-14px_rgba(234,88,12,.8)] transition duration-150 hover:-translate-y-0.5 hover:shadow-[0_18px_34px_-14px_rgba(234,88,12,.7)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-800 active:translate-y-0">
                 Start Assessment <IconArrowRight size={17} stroke={2} />
               </Link>
               <Link to="/login" className="lm-action">
@@ -152,7 +168,7 @@ function Landing() {
                   aria-label="Search courses"
                   className="min-w-0 flex-1 bg-transparent px-1 py-2.5 text-sm font-medium text-slate-900 outline-none placeholder:font-normal placeholder:text-slate-500"
                 />
-                <button type="submit" className="rounded-xl bg-orange-700 px-4 py-2.5 text-xs font-semibold text-white shadow-[0_8px_18px_-10px_rgba(234,88,12,.8)] transition duration-150 hover:bg-orange-800 hover:shadow-[0_10px_22px_-10px_rgba(234,88,12,.75)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-800 active:translate-y-px sm:px-5">
+                <button type="submit" className="rounded-xl bg-orange-500 px-4 py-2.5 text-xs font-semibold text-white shadow-[0_8px_18px_-10px_rgba(234,88,12,.8)] transition duration-150 hover:bg-orange-600 hover:shadow-[0_10px_22px_-10px_rgba(234,88,12,.75)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-800 active:translate-y-px sm:px-5">
                   {searching ? 'Searching…' : 'Search'}
                 </button>
               </form>
@@ -187,13 +203,13 @@ function Landing() {
 
             <dl className="mt-6 grid grid-cols-3 overflow-hidden rounded-2xl border border-white/90 bg-white/55 shadow-sm backdrop-blur-lg">
               {[
-                ['13', 'Schools'],
-                [String(STUDENT_ACTIVE_INDEPENDENT_COURSE_COUNT), 'Active courses'],
-                ['4', 'Assessments'],
+                [catalogStats?.schoolCount ?? '\u2014', 'Schools in SJDM'],
+                [catalogStats?.courseCount ?? '\u2014', 'Courses in catalog'],
+                ['4', 'Assessment areas'],
               ].map(([value, label], index) => (
-                <div key={label} className={`px-3 py-3.5 sm:px-4 ${index ? 'border-l border-orange-100/80' : ''}`}>
-                  <dt className="text-lg font-bold text-gray-950 sm:text-xl">{value}</dt>
-                  <dd className="mt-0.5 text-[10px] leading-tight text-gray-500 sm:text-xs">{label}</dd>
+                <div key={label} className={`flex flex-col px-3 py-3.5 sm:px-4 ${index ? 'border-l border-orange-100/80' : ''}`}>
+                  <dt className="mt-0.5 text-[10px] leading-tight text-gray-500 sm:text-xs">{label}</dt>
+                  <dd className="-order-1 text-lg font-bold text-gray-950 sm:text-xl">{value}</dd>
                 </div>
               ))}
             </dl>
@@ -235,7 +251,7 @@ function Landing() {
               <p className="text-xs font-semibold uppercase tracking-[0.17em] text-orange-300">Your direction starts here</p>
               <h2 className="mt-2 max-w-xl text-2xl font-bold tracking-tight sm:text-3xl">Explore your options with more clarity.</h2>
             </div>
-            <Link to="/register" className="inline-flex shrink-0 items-center gap-2 rounded-2xl bg-orange-700 px-5 py-3 text-sm font-semibold shadow-lg shadow-orange-950/20 transition duration-150 hover:-translate-y-0.5 hover:bg-orange-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white active:translate-y-0">
+            <Link to="/register" className="inline-flex shrink-0 items-center gap-2 rounded-2xl bg-orange-500 px-5 py-3 text-sm font-semibold shadow-lg shadow-orange-950/20 transition duration-150 hover:-translate-y-0.5 hover:bg-orange-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white active:translate-y-0">
               Get Started <IconArrowRight size={17} />
             </Link>
           </div>
