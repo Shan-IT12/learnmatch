@@ -11,6 +11,7 @@ import {
 import { validateUsername } from '../services/usernameValidationService.js'
 import { normalizeRegistrationEmail, isDisposableEmail, DISPOSABLE_EMAIL_MESSAGE } from '../services/registrationEmailService.js'
 import { TERMS_VERSION, PRIVACY_NOTICE_VERSION } from '../shared/legalDocuments.js'
+import { recordSuccessfulLogin } from '../services/accountInactivityService.js'
 
 const sendResendMail = async ({ to, subject, html }) => {
   if (!process.env.RESEND_API_KEY) {
@@ -158,8 +159,8 @@ export const registerUser = async (req, res) => {
     const [result] = await pool.query(
       `
       INSERT INTO USER_ACCOUNT
-      (email, username, password, is_active, terms_version, terms_accepted_at, privacy_notice_version)
-      VALUES (?, ?, ?, 0, ?, UTC_TIMESTAMP(3), ?)
+      (email, username, password, is_active, terms_version, terms_accepted_at, privacy_notice_version, inactivity_tracking_started_at)
+      VALUES (?, ?, ?, 0, ?, UTC_TIMESTAMP(3), ?, UTC_TIMESTAMP(3))
       `,
       [email, normalizedUsername, hashedPassword, TERMS_VERSION, PRIVACY_NOTICE_VERSION]
     )
@@ -327,6 +328,7 @@ export const verifyOtp = async (req, res) => {
       users[0],
       'Account verified successfully!',
     )
+    await recordSuccessfulLogin(connection, normalizedUserId)
     await connection.commit()
 
     return res.json(authPayload)
@@ -482,7 +484,9 @@ export const loginUser = async (req, res) => {
       })
     }
 
-    return res.json(createUserAuthPayload(user, 'Login successful'))
+    const authPayload = createUserAuthPayload(user, 'Login successful')
+    await recordSuccessfulLogin(pool, user.user_id)
+    return res.json(authPayload)
   } catch (error) {
     console.error('Login error:', error)
 

@@ -1,0 +1,11 @@
+# Keep private local data out of every deployment archive.
+.local-backups
+.local-backups/**
+.git/
+.agents/
+.codex/
+.aws/
+**/.env
+**/.env.*
+**/node_modules/
+**/dist/

@@ -7,7 +7,8 @@
   "scripts": {
     "test": "node --test",
     "update:disposable-emails": "node scripts/updateDisposableEmailDomains.mjs",
-    "reminders": "node scripts/runCheckinReminders.mjs"
+    "reminders": "node scripts/runCheckinReminders.mjs",
+    "inactivity": "node scripts/runAccountInactivity.mjs"
   },
   "keywords": [],
   "author": "",
