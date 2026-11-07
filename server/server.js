@@ -6,6 +6,7 @@ import dotenv from 'dotenv'
 import authRoutes from './routes/authRoutes.js'
 import { createAccountRouter } from './routes/accountRoutes.js'
 import { createProxyTrust } from './config/proxyTrust.js'
+import { createInactivityWebhookRouter } from './routes/inactivityWebhookRoutes.js'
 import profileRoutes from './routes/profileRoutes.js'
 import pool from './config/db.js'
 import authenticateToken from './middleware/authenticateToken.js'
@@ -98,6 +99,8 @@ app.use(helmet({
   },
 }))
 app.use(cors(corsOptions()))
+// Signature verification must see the original bytes, before express.json().
+app.use('/api/webhooks/resend/inactivity', createInactivityWebhookRouter(pool))
 // Account deletion owns its bounded JSON parser and sanitized parser errors.
 app.use('/api/account', createAccountRouter(pool, authenticateToken))
 // Source receipts carry bounded excerpts and exact-content confirmation snapshots.
