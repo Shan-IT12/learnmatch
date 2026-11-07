@@ -36,7 +36,6 @@ function OnboardingInterests() {
   const { selected, noInterests } = interestState
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
-  const [selectionMessage, setSelectionMessage] = useState('')
   const [attemptLoaded, setAttemptLoaded] = useState(false)
   const [restoreFailed, setRestoreFailed] = useState(false)
   const [saveConfirmed, setSaveConfirmed] = useState(false)
@@ -64,6 +63,7 @@ function OnboardingInterests() {
   }, [interestState])
 
   const isComplete = isInterestStateComplete(interestState)
+  const selectionLimitReached = selected.length >= MAX_INTEREST_SELECTIONS
 
   const saveSelection = (result) => {
     const nextState = timestampInterestSelection(result, interestState)
@@ -77,16 +77,13 @@ function OnboardingInterests() {
 
   const toggleInterest = (name) => {
     const result = updateInterestActivity(interestState, name)
-    setSelectionMessage(
-      result.maxReached ? `You can select up to ${MAX_INTEREST_SELECTIONS} interests.` : ''
-    )
+    if (result.maxReached) return
     saveSelection(result)
   }
 
   const toggleNone = () => {
     const result = toggleNoInterests(interestState)
     saveSelection(result)
-    setSelectionMessage('')
   }
 
  const handleNext = async () => {
@@ -142,7 +139,7 @@ function OnboardingInterests() {
       stickyChrome
       showFooterNavigation={false}
     >
-      <SkeletonContent loading={!attemptLoaded && !restoreFailed} label="Loading your interests..."><div className="max-w-3xl mx-auto px-5 sm:px-8 pt-8 sm:pt-12 pb-8">
+      <SkeletonContent loading={!attemptLoaded && !restoreFailed} label="Loading your interests..."><div className={`max-w-3xl mx-auto px-5 sm:px-8 pt-8 sm:pt-12 ${selectionLimitReached ? 'pb-36' : 'pb-8'}`}>
         <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between mb-8">
           <div>
             <div className="inline-flex items-center gap-2 rounded-full bg-orange-50 px-3 py-1.5 text-xs font-semibold text-orange-700 mb-3">
@@ -244,7 +241,6 @@ function OnboardingInterests() {
           </button>
           <div role="status" className="min-w-0 text-center text-xs leading-5">
             <p className="text-gray-500">{selected.length} / {MAX_INTEREST_SELECTIONS} activities selected</p>
-            {selectionMessage && <p className="mt-1 text-amber-700">{selectionMessage}</p>}
           </div>
           <button
             type="button"
@@ -257,6 +253,19 @@ function OnboardingInterests() {
         </div>
 
       </div></SkeletonContent>
+      {attemptLoaded && selectionLimitReached && (
+        <div role="status" aria-live="polite" aria-atomic="true" className="pointer-events-none fixed bottom-4 left-1/2 z-50 flex w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 items-start gap-3 rounded-2xl border border-orange-200 bg-white p-4 shadow-lg shadow-gray-900/10">
+          <span aria-hidden="true" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-orange-100 text-orange-700">
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+          </span>
+          <div className="min-w-0 text-sm">
+            <p className="font-semibold text-gray-900">You’ve selected the maximum of {MAX_INTEREST_SELECTIONS} interests.</p>
+            <p className="mt-1 leading-relaxed text-gray-600">Unselect one to choose another, or select Next to continue.</p>
+          </div>
+        </div>
+      )}
     </OnboardingLayout>
   )
 }
