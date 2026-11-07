@@ -36,6 +36,7 @@ function OnboardingInterests() {
   const { selected, noInterests } = interestState
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
+  const [limitNoticeAttempt, setLimitNoticeAttempt] = useState(0)
   const [attemptLoaded, setAttemptLoaded] = useState(false)
   const [restoreFailed, setRestoreFailed] = useState(false)
   const [saveConfirmed, setSaveConfirmed] = useState(false)
@@ -64,6 +65,13 @@ function OnboardingInterests() {
 
   const isComplete = isInterestStateComplete(interestState)
   const selectionLimitReached = selected.length >= MAX_INTEREST_SELECTIONS
+  const showLimitNotice = selectionLimitReached && limitNoticeAttempt > 0
+
+  useEffect(() => {
+    if (!limitNoticeAttempt) return
+    const timeout = window.setTimeout(() => setLimitNoticeAttempt(0), 4000)
+    return () => window.clearTimeout(timeout)
+  }, [limitNoticeAttempt])
 
   const saveSelection = (result) => {
     const nextState = timestampInterestSelection(result, interestState)
@@ -77,11 +85,16 @@ function OnboardingInterests() {
 
   const toggleInterest = (name) => {
     const result = updateInterestActivity(interestState, name)
-    if (result.maxReached) return
+    if (result.maxReached) {
+      setLimitNoticeAttempt((attempt) => attempt + 1)
+      return
+    }
+    setLimitNoticeAttempt(0)
     saveSelection(result)
   }
 
   const toggleNone = () => {
+    setLimitNoticeAttempt(0)
     const result = toggleNoInterests(interestState)
     saveSelection(result)
   }
@@ -205,7 +218,7 @@ function OnboardingInterests() {
                       disabled={!attemptLoaded || submitting || noInterests}
                       onClick={() => toggleInterest(item.name)}
                       aria-pressed={isChecked}
-                      className={`group flex min-h-12 items-center gap-3 text-left px-3.5 py-3 rounded-2xl border text-sm font-medium transition-all disabled:cursor-not-allowed disabled:opacity-50 ${
+                      className={`assessment-choice group flex min-h-12 items-center gap-3 text-left px-3.5 py-3 rounded-2xl border text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50 ${
                         isChecked
                           ? 'bg-orange-500 text-white border-orange-500 shadow-md shadow-orange-100 -translate-y-px'
                           : 'bg-gray-50/70 text-gray-700 border-gray-200 hover:border-orange-300 hover:bg-orange-50/50 hover:text-orange-800'
@@ -253,8 +266,8 @@ function OnboardingInterests() {
         </div>
 
       </div></SkeletonContent>
-      {attemptLoaded && selectionLimitReached && (
-        <div role="status" aria-live="polite" aria-atomic="true" className="pointer-events-none fixed bottom-4 left-1/2 z-50 flex w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 items-start gap-3 rounded-2xl border border-orange-200 bg-white p-4 shadow-lg shadow-gray-900/10">
+      {attemptLoaded && (
+        <div role="status" aria-live="polite" aria-atomic="true" aria-hidden={!showLimitNotice} className={`pointer-events-none fixed bottom-4 left-1/2 z-50 flex w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 items-start gap-3 rounded-2xl border border-orange-200 bg-white p-4 shadow-lg shadow-gray-900/10 transition-[opacity,translate] duration-300 ease-out motion-reduce:transition-none motion-reduce:translate-y-0 ${showLimitNotice ? 'translate-y-0 opacity-100' : 'translate-y-3 opacity-0'}`}>
           <span aria-hidden="true" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-orange-100 text-orange-700">
             <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />

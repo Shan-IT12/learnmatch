@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import OnboardingLayout from '../../components/OnboardingLayout'
 import AssessmentQuestionNavigation from '../../components/AssessmentQuestionNavigation'
 import SkillAnswerChoices from '../../components/SkillAnswerChoices'
+import useAssessmentQuestionFocus from '../../hooks/useAssessmentQuestionFocus'
 import { getSkillFigurePresentation } from '../../../../shared/skillFigureChoices'
 import { FieldError, RequiredMark } from '../../components/FormValidation'
 import { scrollToFirstInvalidField } from '../../utils/formValidation'
@@ -166,6 +167,7 @@ function OnboardingSkills() {
   const initialSession = readAssessmentSession(storage, ASSESSMENT_SESSION_KEYS.skills, {})
   const [questions, setQuestions] = useState(() => initialSession.questions || [])
   const [currentIndex, setCurrentIndex] = useState(() => boundedQuestionIndex(initialSession.currentIndex, initialSession.questions?.length || 0))
+  const questionRef = useAssessmentQuestionFocus(currentIndex)
   const [answers, setAnswers] = useState(() => initialSession.answers || {})
   const [loading, setLoading] = useState(() => !initialSession.questions?.length)
   const [submitting, setSubmitting] = useState(false)
@@ -472,8 +474,8 @@ function OnboardingSkills() {
       <div className="max-w-2xl mx-auto px-5 sm:px-8 py-8 sm:py-12">
         <div className="flex items-start justify-between gap-4 mb-5">
           <div>
-            <div className="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-white mb-3">
-              <svg className="h-3.5 w-3.5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <div className="inline-flex items-center gap-2 rounded-lg bg-orange-50 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-orange-700 mb-3">
+              <svg className="h-3.5 w-3.5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5s3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18s-3.332.477-4.5 1.253" />
               </svg>
               Skills check
@@ -502,7 +504,8 @@ function OnboardingSkills() {
           </div>
         )}
 
-        <div key={currentQuestion.question_id} data-validation-field="skillQuestion" className="motion-enter rounded-3xl border border-gray-200 bg-white p-5 sm:p-7 shadow-[0_18px_45px_-34px_rgba(15,23,42,0.45)] mb-7" aria-invalid={questionError ? 'true' : undefined} aria-describedby={questionError ? 'skill-question-error' : undefined}>
+        <div ref={questionRef} tabIndex={-1} role="group" aria-labelledby="skill-question-text" data-validation-field="skillQuestion" className="assessment-question rounded-3xl border border-gray-200 bg-white p-5 sm:p-7 shadow-[0_18px_45px_-34px_rgba(15,23,42,0.45)] mb-7" aria-invalid={questionError ? 'true' : undefined} aria-describedby={questionError ? 'skill-question-error' : undefined}>
+          <div key={currentQuestion.question_id} className="assessment-question-content">
           {/* Question figure, if this item has one */}
           {promptImage && (
             <div className="mb-5 overflow-x-auto rounded-2xl border border-gray-100 bg-gray-50 p-3">
@@ -517,7 +520,7 @@ function OnboardingSkills() {
 
           <div className="mb-5 border-l-4 border-orange-500 pl-4">
             <p className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-gray-400">Select the best answer</p>
-            <p className="text-base sm:text-lg font-semibold leading-relaxed text-gray-900">
+            <p id="skill-question-text" className="text-base sm:text-lg font-semibold leading-relaxed text-gray-900">
               {currentQuestion.question_text} <RequiredMark />
             </p>
           </div>
@@ -528,6 +531,7 @@ function OnboardingSkills() {
                 type="button"
                 onClick={() => setShowExplanation((current) => !current)}
                 aria-expanded={showExplanation}
+                aria-controls="skill-question-guide"
                 className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left text-sm font-semibold text-slate-700 transition hover:bg-blue-50"
               >
                 <span className="flex items-center gap-2">
@@ -538,16 +542,19 @@ function OnboardingSkills() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
-              {showExplanation && (
-                <div className="border-t border-blue-100 px-4 py-3 text-sm leading-relaxed text-slate-600">
-                  <p>{questionGuide}</p>
+              <div id="skill-question-guide" aria-hidden={!showExplanation} className={`grid transition-[grid-template-rows,opacity] duration-250 ease-out motion-reduce:transition-none ${showExplanation ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
+                <div className="min-h-0 overflow-hidden">
+                  <div className="border-t border-blue-100 px-4 py-3 text-sm leading-relaxed text-slate-600">
+                    <p>{questionGuide}</p>
+                  </div>
                 </div>
-              )}
+              </div>
             </div>
           )}
 
           <SkillAnswerChoices question={currentQuestion} selectedChoice={selectedChoice} onSelect={handleSelect} />
           <FieldError id="skill-question-error">{questionError}</FieldError>
+          </div>
         </div>
 
         <AssessmentQuestionNavigation

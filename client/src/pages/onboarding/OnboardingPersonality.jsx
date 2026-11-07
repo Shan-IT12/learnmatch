@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import OnboardingLayout from '../../components/OnboardingLayout'
 import AssessmentQuestionNavigation from '../../components/AssessmentQuestionNavigation'
+import useAssessmentQuestionFocus from '../../hooks/useAssessmentQuestionFocus'
 import PersonalityResult from '../../components/PersonalityResult'
 import { getResponseChoices, mbtiQuestions } from '../../data/mbtiQuestions'
 import { FieldError, RequiredMark } from '../../components/FormValidation'
@@ -28,6 +29,7 @@ function OnboardingPersonality() {
   const storage = typeof sessionStorage === 'undefined' ? null : sessionStorage
   const initialSession = readAssessmentSession(storage, ASSESSMENT_SESSION_KEYS.personality, {})
   const [currentIndex, setCurrentIndex] = useState(() => boundedQuestionIndex(initialSession.currentIndex, mbtiQuestions.length))
+  const questionRef = useAssessmentQuestionFocus(currentIndex)
   const [answers, setAnswers] = useState(() => initialSession.answers || {})
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
@@ -213,14 +215,15 @@ function OnboardingPersonality() {
           </div>
         )}
 
-        <div key={currentQuestion.id} data-validation-field="personalityQuestion" className="motion-enter rounded-3xl border border-orange-100 bg-gradient-to-br from-orange-50 via-white to-amber-50 p-5 sm:p-8 shadow-[0_18px_45px_-32px_rgba(234,88,12,0.55)] mb-7" aria-invalid={questionError ? 'true' : undefined} aria-describedby={questionError ? 'personality-question-error' : undefined}>
+        <div ref={questionRef} tabIndex={-1} role="group" aria-labelledby="personality-question-text" data-validation-field="personalityQuestion" className="assessment-question rounded-3xl border border-orange-100 bg-gradient-to-br from-orange-50 via-white to-amber-50 p-5 sm:p-8 shadow-[0_18px_45px_-32px_rgba(234,88,12,0.55)] mb-7" aria-invalid={questionError ? 'true' : undefined} aria-describedby={questionError ? 'personality-question-error' : undefined}>
+          <div key={currentQuestion.id} className="assessment-question-content">
           <div className="flex items-start gap-4 mb-7 sm:mb-9">
             <div className="hidden sm:flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white text-orange-500 shadow-sm ring-1 ring-orange-100">
               <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 4v-4z" />
               </svg>
             </div>
-            <p className="text-lg sm:text-xl font-semibold leading-relaxed text-gray-900">{currentQuestion.text} <RequiredMark /></p>
+            <p id="personality-question-text" className="text-lg sm:text-xl font-semibold leading-relaxed text-gray-900">{currentQuestion.text} <RequiredMark /></p>
           </div>
           <FieldError id="personality-question-error">{questionError}</FieldError>
 
@@ -237,7 +240,7 @@ function OnboardingPersonality() {
                   type="button"
                   onClick={() => handleSelect(choice.value)}
                   aria-pressed={selectedRating === choice.value}
-                  className={`group flex min-h-12 items-center gap-3 rounded-2xl border px-4 py-3 text-left text-sm font-medium leading-snug transition-all sm:min-h-28 sm:flex-col sm:justify-center sm:px-2 sm:text-center sm:text-xs ${
+                  className={`assessment-choice group flex min-h-12 items-center gap-3 rounded-2xl border px-4 py-3 text-left text-sm font-medium leading-snug sm:min-h-28 sm:flex-col sm:justify-center sm:px-2 sm:text-center sm:text-xs ${
                     selectedRating === choice.value
                       ? 'border-orange-500 bg-orange-500 text-white shadow-lg shadow-orange-200 -translate-y-0.5'
                       : 'border-white bg-white/90 text-gray-600 shadow-sm hover:-translate-y-0.5 hover:border-orange-200 hover:text-orange-700 hover:shadow-md'
@@ -250,12 +253,13 @@ function OnboardingPersonality() {
                         ? 'border-gray-300 bg-gray-50 text-gray-400 group-hover:border-orange-300'
                         : 'border-orange-200 bg-orange-50 text-orange-500 group-hover:border-orange-400'
                   }`}>
-                    <span className={selectedRating === choice.value ? 'h-2.5 w-2.5 rounded-full bg-current' : 'h-1.5 w-1.5 rounded-full bg-current'} />
+                    <span className={`assessment-choice-dot rounded-full bg-current ${selectedRating === choice.value ? 'h-2.5 w-2.5' : 'h-1.5 w-1.5'}`} />
                   </span>
                   <span>{choice.label}</span>
                 </button>
               ))}
             </div>
+          </div>
           </div>
         </div>
 
