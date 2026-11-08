@@ -1,8 +1,13 @@
-import { Link, NavLink } from 'react-router-dom'
+import { useEffect } from 'react'
+import { Link, NavLink, useLocation } from 'react-router-dom'
 import HeaderBrand from './HeaderBrand'
 import PublicFooter from './PublicFooter'
 
 export default function PublicInformationLayout({ title, eyebrow = 'LearnMatch', introduction, children }) {
+  const { hash } = useLocation()
+  useEffect(() => {
+    if (hash) document.getElementById(hash.slice(1))?.scrollIntoView()
+  }, [hash])
   return <div className="min-h-screen bg-[var(--lm-landing-background)] text-gray-900">
     <a href="#public-content" className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:rounded-xl focus:bg-white focus:p-4">Skip to content</a>
     <header className="border-b border-orange-100/80 bg-white/75 px-5 py-5 sm:px-8">
@@ -14,7 +19,7 @@ export default function PublicInformationLayout({ title, eyebrow = 'LearnMatch',
         {[['/about', 'About'], ['/help', 'Help Center'], ['/terms', 'Terms & Conditions'], ['/privacy', 'Privacy Notice']].map(([to, label]) => <NavLink key={to} to={to} target="_blank" rel="noopener noreferrer" className={({ isActive }) => `rounded py-1 font-semibold transition hover:text-orange-800 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-orange-600 ${isActive ? 'text-orange-800 underline underline-offset-8' : 'text-gray-600'}`}>{label}</NavLink>)}
       </nav>
     </header>
-    <main id="public-content" className="mx-auto max-w-4xl px-5 py-9 sm:px-8 sm:py-12">
+    <main id="public-content" tabIndex={-1} className="mx-auto max-w-4xl px-5 py-9 sm:px-8 sm:py-12">
       <header className="mb-8">
         <p className="mb-3 text-xs font-bold uppercase tracking-[0.16em] text-orange-800">{eyebrow}</p>
         <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">{title}</h1>

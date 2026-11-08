@@ -9,7 +9,7 @@ import {
   IconTargetArrow,
   IconUserCircle,
 } from '@tabler/icons-react'
-import landingCoursePathway from '../assets/landing-course-pathway.png'
+import landingCoursePathway from '../assets/landing-course-pathway.webp'
 import CourseName from '../components/CourseName'
 import LandingIntro from '../components/LandingIntro'
 import PublicFooter from '../components/PublicFooter'
@@ -41,12 +41,16 @@ function PathwayVisual() {
       <div className="pointer-events-none absolute inset-x-[3%] bottom-[4%] top-[7%] rounded-[46%_54%_42%_58%/48%_39%_61%_52%] bg-gradient-to-br from-orange-100 via-orange-200/70 to-amber-100" />
       <div className="pointer-events-none absolute right-[3%] top-[10%] h-[72%] w-[72%] rounded-full border border-orange-200/70" />
       <div className="hero-orbit hero-orbit-delayed pointer-events-none absolute right-[8%] top-[17%] h-3 w-3 rounded-full bg-teal-500 shadow-[0_0_0_8px_rgba(20,184,166,.10)]" />
-      <div className="hero-orbit pointer-events-none absolute bottom-[20%] left-[7%] h-3.5 w-3.5 rounded-full bg-orange-500 shadow-[0_0_0_9px_rgba(249,115,22,.11)]" />
+      <div className="hero-orbit pointer-events-none absolute bottom-[20%] left-[7%] h-3.5 w-3.5 rounded-full bg-orange-700 shadow-[0_0_0_9px_rgba(249,115,22,.11)]" />
       <div className="pointer-events-none absolute bottom-[9%] left-[4%] h-24 w-24 rounded-full bg-white/70 blur-2xl sm:h-36 sm:w-36" />
       <div className="pointer-events-none absolute inset-0 opacity-20 [background-image:radial-gradient(rgba(194,65,12,.5)_1px,transparent_1px)] [background-size:18px_18px] [mask-image:linear-gradient(to_bottom_left,black,transparent_52%)]" />
       <div className="hero-people-float relative z-10 flex items-center justify-center">
         <img
           src={landingCoursePathway}
+          width={1024}
+          height={683}
+          fetchPriority="high"
+          decoding="async"
           alt="Education and career pathways represented by a laptop, books, and course icons"
           className="h-auto max-h-[335px] w-auto max-w-[99%] object-contain drop-shadow-[0_26px_30px_rgba(124,45,18,.18)] sm:max-h-[445px] lg:max-h-[565px]"
         />
@@ -119,11 +123,11 @@ function Landing() {
       <div className="pointer-events-none absolute inset-x-0 top-0 h-[760px] bg-[radial-gradient(circle_at_13%_18%,rgba(251,146,60,.13),transparent_28%),radial-gradient(circle_at_78%_28%,rgba(253,186,116,.16),transparent_31%),linear-gradient(115deg,rgba(255,255,255,.8),rgba(255,247,237,.25))]" />
 
       <header className="relative z-30 mx-auto flex max-w-[1440px] items-center justify-between gap-4 px-5 py-5 sm:px-8 lg:px-10">
-        <Link to="/" className="text-xl font-bold tracking-tight text-gray-900">Learn<span className="text-orange-500">Match</span></Link>
-        <div className="flex items-center gap-1.5 sm:gap-2">
-          <Link to="/login" className="rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 transition hover:text-orange-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500 sm:px-4">Log In</Link>
-          <Link to="/register" className="rounded-xl bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white shadow-[0_8px_20px_-10px_rgba(234,88,12,.85)] transition duration-150 hover:-translate-y-0.5 hover:bg-orange-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-800 active:translate-y-0">Get Started</Link>
-        </div>
+        <Link to="/" className="text-xl font-bold tracking-tight text-gray-900">Learn<span className="text-orange-700">Match</span></Link>
+        <nav aria-label="Account" className="flex items-center gap-1.5 sm:gap-2">
+          <Link to="/login" className="rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 transition hover:text-orange-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500 sm:px-4">Log In</Link>
+          <Link to="/register" className="rounded-xl bg-orange-700 px-4 py-2.5 text-sm font-semibold text-white shadow-[0_8px_20px_-10px_rgba(234,88,12,.85)] transition duration-150 hover:-translate-y-0.5 hover:bg-orange-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-800 active:translate-y-0">Get Started</Link>
+        </nav>
       </header>
 
       <main id="landing-content" tabIndex={-1} className="relative">
@@ -133,14 +137,14 @@ function Landing() {
               <IconTargetArrow size={15} stroke={1.9} /> Personalized course guidance
             </div>
             <h1 className="max-w-lg text-[2.65rem] font-bold leading-[1.02] tracking-[-0.045em] text-gray-950 sm:text-6xl lg:text-[4rem]">
-              Find the right course <span className="text-orange-500">for your future.</span>
+              Find the right course <span className="text-orange-700">for your future.</span>
             </h1>
             <p className="mt-5 max-w-lg text-base leading-relaxed text-gray-600 sm:text-lg">
               Discover courses that match your strengths, interests, personality, and situation.
             </p>
 
             <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
-              <Link to="/register" className="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-orange-500 to-orange-600 px-6 py-3.5 text-sm font-semibold text-white shadow-[0_14px_30px_-14px_rgba(234,88,12,.8)] transition duration-150 hover:-translate-y-0.5 hover:shadow-[0_18px_34px_-14px_rgba(234,88,12,.7)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-800 active:translate-y-0">
+              <Link to="/register" className="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-orange-700 to-orange-800 px-6 py-3.5 text-sm font-semibold text-white shadow-[0_14px_30px_-14px_rgba(234,88,12,.8)] transition duration-150 hover:-translate-y-0.5 hover:shadow-[0_18px_34px_-14px_rgba(234,88,12,.7)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-800 active:translate-y-0">
                 Start Assessment <IconArrowRight size={17} stroke={2} />
               </Link>
               <Link to="/login" className="lm-action">
@@ -153,7 +157,7 @@ function Landing() {
                 <span className="h-px w-5 bg-orange-400" /> Explore the course catalog
               </p>
               <form onSubmit={handleSearch} className="flex items-center gap-2 rounded-2xl border border-orange-200/90 bg-[#fffdf9] p-2 shadow-[0_14px_32px_-24px_rgba(154,52,18,.58)] transition duration-150 hover:border-orange-300 hover:shadow-[0_16px_34px_-24px_rgba(154,52,18,.68)] focus-within:border-orange-400 focus-within:ring-4 focus-within:ring-orange-100/90">
-                <span className="ml-1.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-orange-50 text-orange-600">
+                <span className="ml-1.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-orange-50 text-orange-700">
                   <IconSearch size={19} stroke={2} />
                 </span>
                 <input
@@ -168,7 +172,7 @@ function Landing() {
                   aria-label="Search courses"
                   className="min-w-0 flex-1 bg-transparent px-1 py-2.5 text-sm font-medium text-slate-900 outline-none placeholder:font-normal placeholder:text-slate-500"
                 />
-                <button type="submit" className="rounded-xl bg-orange-500 px-4 py-2.5 text-xs font-semibold text-white shadow-[0_8px_18px_-10px_rgba(234,88,12,.8)] transition duration-150 hover:bg-orange-600 hover:shadow-[0_10px_22px_-10px_rgba(234,88,12,.75)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-800 active:translate-y-px sm:px-5">
+                <button type="submit" className="rounded-xl bg-orange-700 px-4 py-2.5 text-xs font-semibold text-white shadow-[0_8px_18px_-10px_rgba(234,88,12,.8)] transition duration-150 hover:bg-orange-800 hover:shadow-[0_10px_22px_-10px_rgba(234,88,12,.75)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-800 active:translate-y-px sm:px-5">
                   {searching ? 'Searching…' : 'Search'}
                 </button>
               </form>
@@ -176,10 +180,10 @@ function Landing() {
               {query.trim() && results && (
                 <div className="absolute left-0 right-0 top-full z-50 mt-2 overflow-hidden rounded-2xl border border-orange-100 bg-white shadow-2xl">
                   {results.courses.length === 0 ? (
-                    <div className="px-5 py-4 text-sm text-gray-500">No courses found for “{query}”. Try a broader course name, skill, or career keyword.</div>
+                    <div className="px-5 py-4 text-sm text-gray-600">No courses found for “{query}”. Try a broader course name, skill, or career keyword.</div>
                   ) : (
                     <div className="course-suggestion-scroll">
-                      <div className="bg-orange-50/70 px-5 py-2 text-[10px] font-bold uppercase tracking-[0.16em] text-orange-600">Courses</div>
+                      <div className="bg-orange-50/70 px-5 py-2 text-[10px] font-bold uppercase tracking-[0.16em] text-orange-700">Courses</div>
                       {results.courses.map((course, index) => (
                         <button
                           type="button"
@@ -192,7 +196,7 @@ function Landing() {
                           })}
                           className="block w-full border-t border-orange-50 px-5 py-3 text-left transition duration-150 hover:bg-orange-50"
                         >
-                          <CourseName name={course.course_name} abbreviation={course.course_abbreviation} className="text-sm font-medium text-gray-800" secondaryClassName="mt-1 text-sm font-normal text-gray-500" />
+                          <CourseName name={course.course_name} abbreviation={course.course_abbreviation} className="text-sm font-medium text-gray-800" secondaryClassName="mt-1 text-sm font-normal text-gray-600" />
                         </button>
                       ))}
                     </div>
@@ -208,7 +212,7 @@ function Landing() {
                 ['4', 'Assessment areas'],
               ].map(([value, label], index) => (
                 <div key={label} className={`flex flex-col px-3 py-3.5 sm:px-4 ${index ? 'border-l border-orange-100/80' : ''}`}>
-                  <dt className="mt-0.5 text-[10px] leading-tight text-gray-500 sm:text-xs">{label}</dt>
+                  <dt className="mt-0.5 text-[10px] leading-tight text-gray-600 sm:text-xs">{label}</dt>
                   <dd className="-order-1 text-lg font-bold text-gray-950 sm:text-xl">{value}</dd>
                 </div>
               ))}
@@ -223,7 +227,7 @@ function Landing() {
             <div className="mx-auto max-w-2xl text-center">
               <p className="text-xs font-bold uppercase tracking-[0.18em] text-orange-700">How it works</p>
               <h2 className="mt-3 text-3xl font-bold tracking-[-0.03em] text-gray-950 sm:text-4xl">A clearer path, one step at a time.</h2>
-              <p className="mt-4 text-sm leading-relaxed text-gray-500 sm:text-base">Build your profile, understand your fit, then explore courses with context.</p>
+              <p className="mt-4 text-sm leading-relaxed text-gray-600 sm:text-base">Build your profile, understand your fit, then explore courses with context.</p>
             </div>
 
             <div className="relative mt-12 grid gap-5 md:grid-cols-3 md:gap-6">
@@ -233,11 +237,11 @@ function Landing() {
                 return (
                   <article key={item.step} className={`group relative rounded-[24px] border border-white bg-white/75 p-6 shadow-[0_18px_50px_-38px_rgba(120,53,15,.55)] backdrop-blur-lg transition duration-200 motion-safe:hover:-translate-y-1 ${index === 1 ? 'md:mt-8' : index === 2 ? 'md:mt-16' : ''}`}>
                     <div className="relative z-10 flex items-center justify-between">
-                      <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-100 text-orange-600 transition duration-200 group-hover:bg-orange-500 group-hover:text-white"><StepIcon size={23} stroke={1.7} /></span>
-                      <span className="text-3xl font-bold tracking-[-0.05em] text-orange-200">{item.step}</span>
+                      <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-100 text-orange-700 transition duration-200 group-hover:bg-orange-700 group-hover:text-white"><StepIcon size={23} stroke={1.7} /></span>
+                      <span className="text-3xl font-bold tracking-[-0.05em] text-orange-700">{item.step}</span>
                     </div>
                     <h3 className="mt-6 text-lg font-bold tracking-tight text-gray-900">{item.title}</h3>
-                    <p className="mt-2 text-sm leading-relaxed text-gray-500">{item.description}</p>
+                    <p className="mt-2 text-sm leading-relaxed text-gray-600">{item.description}</p>
                   </article>
                 )
               })}
@@ -251,7 +255,7 @@ function Landing() {
               <p className="text-xs font-semibold uppercase tracking-[0.17em] text-orange-300">Your direction starts here</p>
               <h2 className="mt-2 max-w-xl text-2xl font-bold tracking-tight sm:text-3xl">Explore your options with more clarity.</h2>
             </div>
-            <Link to="/register" className="inline-flex shrink-0 items-center gap-2 rounded-2xl bg-orange-500 px-5 py-3 text-sm font-semibold shadow-lg shadow-orange-950/20 transition duration-150 hover:-translate-y-0.5 hover:bg-orange-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white active:translate-y-0">
+            <Link to="/register" className="inline-flex shrink-0 items-center gap-2 rounded-2xl bg-orange-700 px-5 py-3 text-sm font-semibold shadow-lg shadow-orange-950/20 transition duration-150 hover:-translate-y-0.5 hover:bg-orange-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white active:translate-y-0">
               Get Started <IconArrowRight size={17} />
             </Link>
           </div>

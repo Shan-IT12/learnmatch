@@ -7,6 +7,7 @@ import CourseName from '../components/CourseName'
 import { getDisplayCourseAbbreviation } from '../utils/courseName'
 import { getCourseOverviewBackNavigation } from '../utils/courseOverviewNavigation'
 import useActiveCollegePhase from '../hooks/useActiveCollegePhase'
+import { SITE_URL } from '../seo'
 
 const apiUrl = import.meta.env.VITE_API_URL || ''
 
@@ -59,6 +60,15 @@ function PublicCourseDetails() {
         setResolvedCourseCode(courseCode)
         document.title = `${getDisplayCourseAbbreviation(data.course.course_name, data.course.course_abbreviation) || data.course.course_name} | LearnMatch`
         setMetaDescription((data.course.description || `Explore ${data.course.course_name} on LearnMatch`).slice(0, 160))
+        document.querySelector('meta[name="robots"]').content = 'index, follow'
+        const canonical = document.createElement('link')
+        canonical.rel = 'canonical'
+        canonical.href = `${SITE_URL}/courses/${encodeURIComponent(courseCode)}`
+        document.querySelector('link[rel="canonical"]')?.remove()
+        document.head.append(canonical)
+        document.querySelector('meta[property="og:title"]').content = document.title
+        document.querySelector('meta[property="og:description"]').content = document.querySelector('meta[name="description"]').content
+        document.querySelector('meta[property="og:url"]').content = canonical.href
       })
       .catch((error) => {
         if (error.name !== 'AbortError') {
@@ -94,7 +104,7 @@ function PublicCourseDetails() {
             )}
             <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-6 sm:p-9 mt-5">
               <div className="flex flex-wrap items-center gap-2 mb-4">
-                {course.course_abbreviation && <span className="text-xs font-bold text-orange-600 bg-orange-50 px-3 py-1.5 rounded-full">{getDisplayCourseAbbreviation(course.course_name, course.course_abbreviation)}</span>}
+                {course.course_abbreviation && <span className="text-xs font-bold text-orange-700 bg-orange-50 px-3 py-1.5 rounded-full">{getDisplayCourseAbbreviation(course.course_name, course.course_abbreviation)}</span>}
               </div>
               <CourseName as="h1" name={course.course_name} className="text-3xl sm:text-4xl font-bold text-gray-900 leading-tight" secondaryClassName="mt-2 text-lg font-medium text-gray-500" />
               {course.description && <p className="text-gray-600 leading-7 whitespace-pre-line mt-6">{course.description}</p>}
@@ -111,7 +121,7 @@ function PublicCourseDetails() {
                     returnTo: `${location.pathname}${location.search}`,
                     returnState: resultsContext ? { entryContext: 'results' } : location.state || null,
                   }}
-                  className="inline-flex mt-6 bg-orange-500 text-white px-5 py-3 rounded-xl text-sm font-semibold hover:bg-orange-600 transition"
+                  className="inline-flex mt-6 bg-orange-700 text-white px-5 py-3 rounded-xl text-sm font-semibold hover:bg-orange-800 transition"
                 >
                   Find Schools in SJDM
                 </Link>
@@ -120,18 +130,18 @@ function PublicCourseDetails() {
               <div className="grid md:grid-cols-2 gap-8 mt-10 pt-8 border-t border-gray-100">
                 <section>
                   <h2 className="text-lg font-semibold text-gray-900 mb-4">Skills you can develop</h2>
-                  {course.obtainable_skills.length ? <ul className="space-y-2">{course.obtainable_skills.map((skill) => <li key={skill} className="text-sm text-gray-600 flex gap-2"><span className="text-orange-500">•</span>{skill}</li>)}</ul> : <p className="text-sm text-gray-400">No skills listed.</p>}
+                  {course.obtainable_skills.length ? <ul className="space-y-2">{course.obtainable_skills.map((skill) => <li key={skill} className="text-sm text-gray-600 flex gap-2"><span className="text-orange-700">•</span>{skill}</li>)}</ul> : <p className="text-sm text-gray-400">No skills listed.</p>}
                 </section>
                 <section>
                   <h2 className="text-lg font-semibold text-gray-900 mb-4">Possible career paths</h2>
-                  {course.career_paths.length ? <ul className="space-y-2">{course.career_paths.map((career) => <li key={career} className="text-sm text-gray-600 flex gap-2"><span className="text-orange-500">•</span>{career}</li>)}</ul> : <p className="text-sm text-gray-400">No career paths listed.</p>}
+                  {course.career_paths.length ? <ul className="space-y-2">{course.career_paths.map((career) => <li key={career} className="text-sm text-gray-600 flex gap-2"><span className="text-orange-700">•</span>{career}</li>)}</ul> : <p className="text-sm text-gray-400">No career paths listed.</p>}
                 </section>
               </div>
 
             </div>
             <div className="bg-gray-900 rounded-2xl p-7 sm:p-9 mt-6 flex flex-col sm:flex-row sm:items-center justify-between gap-5">
               <div><h2 className="text-xl font-semibold text-white">Is this course right for you?</h2><p className="text-sm text-gray-400 mt-1">Get recommendations based on your skills, interests, and personality.</p></div>
-              <Link to={fromSummary ? '/dashboard/summary' : isAuthenticated ? '/dashboard' : '/register'} className="shrink-0 text-center bg-orange-500 text-white px-5 py-3 rounded-xl font-medium hover:bg-orange-600">{fromSummary ? 'Back to Summary Dashboard' : 'Take the LearnMatch Assessment'}</Link>
+              <Link to={fromSummary ? '/dashboard/summary' : isAuthenticated ? '/dashboard' : '/register'} className="shrink-0 text-center bg-orange-700 text-white px-5 py-3 rounded-xl font-medium hover:bg-orange-800">{fromSummary ? 'Back to Summary Dashboard' : 'Take the LearnMatch Assessment'}</Link>
             </div>
           </article></SkeletonContent>
         )}

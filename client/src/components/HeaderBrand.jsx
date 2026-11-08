@@ -1,7 +1,7 @@
 import './siteHeader.css'
 
 export default function HeaderBrand() {
-  return <span className="text-xl font-bold tracking-tight text-gray-900">Learn<span className="text-orange-500">Match</span></span>
+  return <span className="text-xl font-bold tracking-tight text-gray-900">Learn<span className="text-orange-700">Match</span></span>
 }
 
 export function HeaderAccount({ username }) {

@@ -56,6 +56,7 @@ function OnboardingPersonality() {
   const responseChoices = getResponseChoices(currentQuestion)
 
   useEffect(() => {
+    if (submitting || result) return
     writeAssessmentSession(storage, ASSESSMENT_SESSION_KEYS.personality, {
       answers,
       currentIndex,
@@ -66,7 +67,7 @@ function OnboardingPersonality() {
         .catch(() => console.warn('Personality draft autosave will retry on the next change.'))
     }, 250)
     return () => clearTimeout(timer)
-  }, [answers, attemptLoaded, currentIndex, storage])
+  }, [answers, attemptLoaded, currentIndex, storage, submitting, result])
 
   useEffect(() => {
     const token = localStorage.getItem('token')
@@ -129,6 +130,9 @@ function OnboardingPersonality() {
     }))
 
     try {
+      // Final submission can happen before the debounced autosave. Drain older
+      // writes and persist this complete snapshot before server validation.
+      await saveActiveAttemptDraft(import.meta.env.VITE_API_URL, token, storage, { personality_answers: answers })
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/mbti`, {
         method: 'POST',
         headers: assessmentHeaders(storage, {

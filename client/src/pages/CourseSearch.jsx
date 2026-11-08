@@ -126,7 +126,7 @@ function CourseSearch() {
             ← Back to Landing Page
           </Link>
         )}
-        <p className="text-xs font-semibold text-orange-500 uppercase tracking-widest mb-3">Course explorer</p>
+        <p className="text-xs font-semibold text-orange-700 uppercase tracking-widest mb-3">Course explorer</p>
         <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-3">Find a course</h1>
         <p className="text-gray-500 mb-7">Search by course name, abbreviation, skill, or career.</p>
 
@@ -143,7 +143,7 @@ function CourseSearch() {
               placeholder="Try BSIT, programming, teacher..."
               className="flex-1 min-w-0 px-5 py-4 outline-none text-gray-800"
             />
-            <button className="bg-orange-500 text-white px-5 sm:px-7 font-medium hover:bg-orange-600">Search</button>
+            <button className="bg-orange-700 text-white px-5 sm:px-7 font-medium hover:bg-orange-800">Search</button>
           </form>
 
           </div>
@@ -183,7 +183,7 @@ function CourseSearch() {
                 {(displayStatus === 'loading' ? recommendationPlaceholders : visibleCourses).map((course) => (
                   <article key={course.course_code} className="flex flex-col bg-white border border-gray-100 rounded-2xl p-5 sm:p-6 shadow-sm hover:shadow-md hover:border-orange-200 transition">
                     <div className="flex flex-wrap items-center gap-2 mb-3">
-                      {course.course_abbreviation && <span className="text-xs font-bold text-orange-600 bg-orange-50 px-2.5 py-1 rounded-full">{getDisplayCourseAbbreviation(course.course_name, course.course_abbreviation)}</span>}
+                      {course.course_abbreviation && <span className="text-xs font-bold text-orange-700 bg-orange-50 px-2.5 py-1 rounded-full">{getDisplayCourseAbbreviation(course.course_name, course.course_abbreviation)}</span>}
                     </div>
                     <CourseName as="h2" name={course.course_name} className="text-lg font-semibold text-gray-900" secondaryClassName="mt-1 text-base font-medium text-gray-500" />
                     {course.description && <p className="text-sm text-gray-500 leading-relaxed mt-2 line-clamp-2">{course.description}</p>}

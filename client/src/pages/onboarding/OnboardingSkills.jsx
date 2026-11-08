@@ -239,7 +239,7 @@ function OnboardingSkills() {
   }, [attemptLoaded, questions.length, storage])
 
   useEffect(() => {
-    if (!questions.length) return
+    if (!questions.length || submitting || results) return
     writeAssessmentSession(storage, ASSESSMENT_SESSION_KEYS.skills, {
       questions,
       answers,
@@ -256,7 +256,7 @@ function OnboardingSkills() {
       }).catch(() => console.warn('Academic Skills draft autosave will retry on the next change.'))
     }, 250)
     return () => clearTimeout(timer)
-  }, [answers, attemptLoaded, currentIndex, questions, storage])
+  }, [answers, attemptLoaded, currentIndex, questions, storage, submitting, results])
 
   const handleSelect = (questionId, choice) => {
     setAnswers((prev) => ({ ...prev, [questionId]: choice }))
@@ -301,6 +301,12 @@ function OnboardingSkills() {
   }))
 
   try {
+    // Flush debounced drafts before finalization so a late partial autosave
+    // cannot replace the complete answer set used for the saved result.
+    await saveActiveAttemptDraft(import.meta.env.VITE_API_URL, token, storage, {
+      skill_questions: questions,
+      skill_answers: formattedAnswers,
+    })
     const response = await fetch(`${import.meta.env.VITE_API_URL}/api/quiz`, {
       method: 'POST',
       headers: assessmentHeaders(storage, {

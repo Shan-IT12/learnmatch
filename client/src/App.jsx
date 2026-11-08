@@ -1,47 +1,49 @@
-import { Routes, Route, useLocation } from 'react-router-dom'
-import { useEffect } from 'react'
+import { Routes, Route, Navigate, Link, useLocation } from 'react-router-dom'
+import { lazy, Suspense, useEffect } from 'react'
+import RouteMetadata from './components/RouteMetadata'
+import SkipNavigation from './components/SkipNavigation'
 import Landing from './pages/Landing'
-import Login from './pages/Login'
-import Register from './pages/Register'
-import ForgotPassword from './pages/ForgotPassword'
-import Dashboard from './pages/Dashboard'
-import Profile from './pages/Profile'
-import ProfileEdit from './pages/ProfileEdit'
-import OnboardingProfile from './pages/onboarding/OnboardingProfile'
-import OnboardingInterests from './pages/onboarding/OnboardingInterests'
-import OnboardingSkills from './pages/onboarding/OnboardingSkills'
-import OnboardingPersonality from './pages/onboarding/OnboardingPersonality'
-import Results from './pages/Results'
-import AssessmentHistory from './pages/AssessmentHistory'
-import AssessmentHistoryResult from './pages/AssessmentHistoryResult'
-import CollegeSetup from './pages/college/CollegeSetup' 
-import CollegeSetupReview from './pages/college/CollegeSetupReview'
-import CollegeDashboard from './pages/college/CollegeDashboard'
-import SemesterCheckin from './pages/college/SemesterCheckin'
-import CompletedCheckin from './pages/college/CompletedCheckin'
-import SummaryDashboard from './pages/SummaryDashboard'
-import CareerPath from './pages/CareerPath'
-import Feedback from './pages/Feedback'
-import AdminLogin from "./pages/AdminLogin";
-import ManageCourses from './pages/admin/ManageCourses'
-import AdminDashboard from './pages/admin/AdminDashboard'
-import AdminUsers from './pages/admin/AdminUsers'
-import AdminUserDetail from './pages/admin/AdminUserDetail'
-import AdminAnalytics from './pages/admin/AdminAnalytics'
-import AdminFeedback from './pages/admin/AdminFeedback'
-import AdminFeedbackDetail from './pages/admin/AdminFeedbackDetail'
 import AdminRoute from './components/AdminRoute'
-import CourseSearch from './pages/CourseSearch'
-import PublicCourseDetails from './pages/PublicCourseDetails'
-import SchoolLocator from './pages/SchoolLocator'
 import PageTransition from './components/PageTransition'
-import PrivacyNotice from './pages/PrivacyNotice'
-import Terms from './pages/Terms'
-import About from './pages/About'
-import Help from './pages/Help'
-import StudentSettings from './pages/StudentSettings'
 import StudentEntryRoute from './components/StudentEntryRoute'
 
+const Login = lazy(() => import('./pages/Login'))
+const Register = lazy(() => import('./pages/Register'))
+const ForgotPassword = lazy(() => import('./pages/ForgotPassword'))
+const Dashboard = lazy(() => import('./pages/Dashboard'))
+const Profile = lazy(() => import('./pages/Profile'))
+const ProfileEdit = lazy(() => import('./pages/ProfileEdit'))
+const OnboardingProfile = lazy(() => import('./pages/onboarding/OnboardingProfile'))
+const OnboardingInterests = lazy(() => import('./pages/onboarding/OnboardingInterests'))
+const OnboardingSkills = lazy(() => import('./pages/onboarding/OnboardingSkills'))
+const OnboardingPersonality = lazy(() => import('./pages/onboarding/OnboardingPersonality'))
+const Results = lazy(() => import('./pages/Results'))
+const AssessmentHistory = lazy(() => import('./pages/AssessmentHistory'))
+const AssessmentHistoryResult = lazy(() => import('./pages/AssessmentHistoryResult'))
+const CollegeSetup = lazy(() => import('./pages/college/CollegeSetup'))
+const CollegeSetupReview = lazy(() => import('./pages/college/CollegeSetupReview'))
+const CollegeDashboard = lazy(() => import('./pages/college/CollegeDashboard'))
+const SemesterCheckin = lazy(() => import('./pages/college/SemesterCheckin'))
+const CompletedCheckin = lazy(() => import('./pages/college/CompletedCheckin'))
+const SummaryDashboard = lazy(() => import('./pages/SummaryDashboard'))
+const CareerPath = lazy(() => import('./pages/CareerPath'))
+const Feedback = lazy(() => import('./pages/Feedback'))
+const AdminLogin = lazy(() => import('./pages/AdminLogin'))
+const ManageCourses = lazy(() => import('./pages/admin/ManageCourses'))
+const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'))
+const AdminUsers = lazy(() => import('./pages/admin/AdminUsers'))
+const AdminUserDetail = lazy(() => import('./pages/admin/AdminUserDetail'))
+const AdminAnalytics = lazy(() => import('./pages/admin/AdminAnalytics'))
+const AdminFeedback = lazy(() => import('./pages/admin/AdminFeedback'))
+const AdminFeedbackDetail = lazy(() => import('./pages/admin/AdminFeedbackDetail'))
+const CourseSearch = lazy(() => import('./pages/CourseSearch'))
+const PublicCourseDetails = lazy(() => import('./pages/PublicCourseDetails'))
+const SchoolLocator = lazy(() => import('./pages/SchoolLocator'))
+const PrivacyNotice = lazy(() => import('./pages/PrivacyNotice'))
+const Terms = lazy(() => import('./pages/Terms'))
+const About = lazy(() => import('./pages/About'))
+const Help = lazy(() => import('./pages/Help'))
+const StudentSettings = lazy(() => import('./pages/StudentSettings'))
 
 function App() {
   const location = useLocation()
@@ -55,13 +57,14 @@ function App() {
     return () => cancelAnimationFrame(frame)
   }, [location.pathname, location.hash])
   return (
-    <PageTransition><Routes>
+    <><RouteMetadata /><SkipNavigation /><PageTransition><Suspense fallback={<main id="main-content" tabIndex={-1} className="p-8" aria-busy="true"><p role="status">Loading page...</p></main>}><Routes>
       <Route path="/" element={<StudentEntryRoute><Landing /></StudentEntryRoute>} />
       <Route path="/courses/search" element={<CourseSearch />} />
       <Route path="/courses/:courseCode" element={<PublicCourseDetails />} />
       <Route path="/schools/:courseCode" element={<SchoolLocator />} />
       <Route path="/login" element={<StudentEntryRoute><Login /></StudentEntryRoute>} />
       <Route path="/register" element={<Register />} />
+      <Route path="/privacy-policy" element={<Navigate to="/privacy" replace />} />
       <Route path="/privacy" element={<PrivacyNotice />} />
       <Route path="/terms" element={<Terms />} />
       <Route path="/about" element={<About />} />
@@ -95,7 +98,8 @@ function App() {
       <Route path="/admin/analytics" element={<AdminRoute><AdminAnalytics /></AdminRoute>} />
       <Route path="/admin/feedback" element={<AdminRoute><AdminFeedback /></AdminRoute>} />
       <Route path="/admin/feedback/:feedbackId" element={<AdminRoute><AdminFeedbackDetail /></AdminRoute>} />
-    </Routes></PageTransition>
+      <Route path="*" element={<main id="main-content" tabIndex={-1} className="p-8"><h1 className="text-3xl font-bold">Page not found</h1><Link to="/" className="public-text-link">Return to LearnMatch</Link></main>} />
+    </Routes></Suspense></PageTransition></>
   )
 }
 

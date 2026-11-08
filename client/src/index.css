@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+.skip-navigation { position: absolute; left: 1rem; top: -10rem; z-index: 100; padding: 1rem; background: white; color: #9a3412; border: 2px solid #9a3412; border-radius: .5rem; }
+.skip-navigation:focus { top: 1rem; }
+
 .public-document h2 { margin-bottom: .65rem; font-size: 1.125rem; font-weight: 700; color: #111827; }
 .public-document p + p { margin-top: .75rem; }
 .public-document a, .public-text-link { color: #9a3412; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; border-radius: 3px; }

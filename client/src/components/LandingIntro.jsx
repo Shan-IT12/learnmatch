@@ -16,6 +16,7 @@ const PARTICLE_PATHS = [
 ]
 
 function shouldPlayIntro() {
+  if (typeof window === 'undefined') return false
   try {
     return !window.matchMedia('(prefers-reduced-motion: reduce)').matches
       && window.sessionStorage.getItem(SESSION_KEY) !== '1'

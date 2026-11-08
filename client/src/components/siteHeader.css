@@ -38,8 +38,8 @@
 .lm-site-header .lm-action-danger { background: #fff1f2; border-color: #ffe4e6; color: #e11d48; }
 .lm-site-header .lm-action-danger:hover { background: #ffe4e6; border-color: #fecdd3; color: #be123c; }
 .lm-site-header .lm-action-selected { background: #fff7ed; border-color: #fed7aa; color: #c2410c; box-shadow: inset 0 -2px 0 #f97316; }
-.lm-header-primary { display: inline-flex; align-items: center; justify-content: center; min-height: 40px; gap: .5rem; border: 1px solid #f97316; border-radius: 12px; padding: .65rem 1rem; background: #f97316; color: white; font-size: 14px; font-weight: 600; box-shadow: 0 4px 10px -6px rgb(234 88 12 / .5); }
-.lm-header-primary:hover { background: #ea580c; border-color: #ea580c; }
+.lm-header-primary { display: inline-flex; align-items: center; justify-content: center; min-height: 40px; gap: .5rem; border: 1px solid #c2410c; border-radius: 12px; padding: .65rem 1rem; background: #c2410c; color: white; font-size: 14px; font-weight: 600; box-shadow: 0 4px 10px -6px rgb(234 88 12 / .5); }
+.lm-header-primary:hover { background: #9a3412; border-color: #9a3412; }
 .lm-header-primary:focus-visible, .lm-site-header .lm-brand:focus-visible { outline: 2px solid #fb923c; outline-offset: 4px; }
 @media (max-width: 767px) { .lm-header-account { display: none; } }
 @media (max-width: 767px) { .lm-account-trigger .lm-account-text { display: none; } }
