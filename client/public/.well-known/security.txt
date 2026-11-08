@@ -1,0 +1,4 @@
+Contact: mailto:learnmatch1@gmail.com
+Expires: 2027-05-09T00:00:00Z
+Canonical: https://www.learnmatch.online/.well-known/security.txt
+Preferred-Languages: en
