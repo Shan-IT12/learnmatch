@@ -6,7 +6,7 @@ function PageTransition({ children, transitionLocation }) {
   // Course filters and saved-draft navigation stay inside the same screen.
   // Remounting it for query changes clears state and flashes the loading view.
   const transitionKey = location.pathname === '/admin/courses' ? location.pathname : location.key
-  return <div key={transitionKey} className="motion-page">{children}</div>
+  return <div key={transitionKey}>{children}</div>
 }
 
 export default PageTransition

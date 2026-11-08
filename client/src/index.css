@@ -1,12 +1,35 @@
 @import "tailwindcss";
+@import "./palette.css";
 
 .skip-navigation { position: absolute; left: 1rem; top: -10rem; z-index: 100; padding: 1rem; background: white; color: #9a3412; border: 2px solid #9a3412; border-radius: .5rem; }
 .skip-navigation:focus { top: 1rem; }
 
+.route-network-feedback {
+  position: fixed;
+  bottom: 1rem;
+  left: 1rem;
+  right: 1rem;
+  z-index: 60;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+  max-width: 50rem;
+  margin-inline: auto;
+  padding: .75rem 1rem;
+  border: 1px solid var(--lm-orange-border);
+  border-radius: .75rem;
+  background: #fffaf5;
+  color: #374151;
+  box-shadow: 0 4px 20px rgb(15 23 42 / .12);
+  font-size: .875rem;
+}
+
 .public-document h2 { margin-bottom: .65rem; font-size: 1.125rem; font-weight: 700; color: #111827; }
 .public-document p + p { margin-top: .75rem; }
-.public-document a, .public-text-link { color: #9a3412; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; border-radius: 3px; }
-.public-document a:hover, .public-text-link:hover { color: #7c2d12; }
+.public-document a, .public-text-link { color: var(--lm-orange-text); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; border-radius: 3px; }
+.public-document a:hover, .public-text-link:hover { color: var(--lm-orange-text-hover); }
 .public-document a:focus-visible, .public-text-link:focus-visible { outline: 2px solid #c2410c; outline-offset: 3px; }
 
 html { min-width: 320px; overflow-x: hidden; }
@@ -175,10 +198,10 @@ button, input, select, textarea { max-width: 100%; }
   min-height: 2.5rem;
   max-width: 100%;
   padding: .6rem .9rem;
-  border: 1px solid #fed7aa;
+  border: 1px solid var(--lm-orange-border);
   border-radius: .75rem;
-  background: #fff7ed;
-  color: #9a3412;
+  background: var(--lm-orange-soft);
+  color: var(--lm-orange-text);
   font-size: .8125rem;
   font-weight: 600;
   line-height: 1.4;
@@ -188,12 +211,12 @@ button, input, select, textarea { max-width: 100%; }
   cursor: pointer;
   transition: background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
 }
-.lm-action:not(:disabled):hover { background: #ffedd5; border-color: #fb923c; color: #7c2d12; box-shadow: 0 3px 8px -4px rgb(234 88 12 / .25); }
+.lm-action:not(:disabled):hover { background: #ffedd5; border-color: #fb923c; color: var(--lm-orange-text-hover); box-shadow: 0 3px 8px -4px rgb(234 88 12 / .25); }
 .lm-action:focus-visible { outline: 2px solid #f97316; outline-offset: 3px; }
 .lm-action:disabled { cursor: not-allowed; opacity: .5; box-shadow: none; }
 .lm-action svg { flex-shrink: 0; }
 .lm-action-danger { border-color: #fecaca; background: #fff1f2; color: #be123c; }
 .lm-action-danger:not(:disabled):hover { border-color: #fda4af; background: #ffe4e6; color: #9f1239; }
-.lm-action-selected { border-color: #f97316; background: #f97316; color: white; }
-.lm-action-selected:not(:disabled):hover { border-color: #ea580c; background: #ea580c; color: white; }
+.lm-action-selected { border-color: var(--lm-orange-action); background: var(--lm-orange-action); color: var(--lm-orange-on-action); }
+.lm-action-selected:not(:disabled):hover { border-color: var(--lm-orange-action-hover); background: var(--lm-orange-action-hover); color: var(--lm-orange-on-action); }
 @media (prefers-reduced-motion: reduce) { .lm-action { transition: none; } }

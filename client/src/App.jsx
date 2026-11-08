@@ -1,5 +1,7 @@
 import { Routes, Route, Navigate, Link, useLocation } from 'react-router-dom'
-import { lazy, Suspense, useEffect } from 'react'
+import { useEffect } from 'react'
+import { createLazyPage as lazy, publicPages } from './utils/routeLoading'
+import RouteNavigation, { SlowNavigationFeedback } from './components/RouteNavigation'
 import RouteMetadata from './components/RouteMetadata'
 import SkipNavigation from './components/SkipNavigation'
 import Landing from './pages/Landing'
@@ -39,13 +41,13 @@ const AdminFeedbackDetail = lazy(() => import('./pages/admin/AdminFeedbackDetail
 const CourseSearch = lazy(() => import('./pages/CourseSearch'))
 const PublicCourseDetails = lazy(() => import('./pages/PublicCourseDetails'))
 const SchoolLocator = lazy(() => import('./pages/SchoolLocator'))
-const PrivacyNotice = lazy(() => import('./pages/PrivacyNotice'))
-const Terms = lazy(() => import('./pages/Terms'))
-const About = lazy(() => import('./pages/About'))
-const Help = lazy(() => import('./pages/Help'))
+const PrivacyNotice = publicPages['/privacy']
+const Terms = publicPages['/terms']
+const About = publicPages['/about']
+const Help = publicPages['/help']
 const StudentSettings = lazy(() => import('./pages/StudentSettings'))
 
-function App() {
+function ReadyRouteEffects() {
   const location = useLocation()
   useEffect(() => {
     if (!['/about', '/help', '/terms', '/privacy'].includes(location.pathname) && !(location.pathname === '/' && location.hash)) return
@@ -56,8 +58,12 @@ function App() {
     })
     return () => cancelAnimationFrame(frame)
   }, [location.pathname, location.hash])
+  return <><RouteMetadata /><SkipNavigation /></>
+}
+
+function App() {
   return (
-    <><RouteMetadata /><SkipNavigation /><PageTransition><Suspense fallback={<main id="main-content" tabIndex={-1} className="p-8" aria-busy="true"><p role="status">Loading page...</p></main>}><Routes>
+    <><SlowNavigationFeedback /><RouteNavigation><ReadyRouteEffects /><PageTransition><Routes>
       <Route path="/" element={<StudentEntryRoute><Landing /></StudentEntryRoute>} />
       <Route path="/courses/search" element={<CourseSearch />} />
       <Route path="/courses/:courseCode" element={<PublicCourseDetails />} />
@@ -99,7 +105,7 @@ function App() {
       <Route path="/admin/feedback" element={<AdminRoute><AdminFeedback /></AdminRoute>} />
       <Route path="/admin/feedback/:feedbackId" element={<AdminRoute><AdminFeedbackDetail /></AdminRoute>} />
       <Route path="*" element={<main id="main-content" tabIndex={-1} className="p-8"><h1 className="text-3xl font-bold">Page not found</h1><Link to="/" className="public-text-link">Return to LearnMatch</Link></main>} />
-    </Routes></Suspense></PageTransition></>
+    </Routes></PageTransition></RouteNavigation></>
   )
 }
 

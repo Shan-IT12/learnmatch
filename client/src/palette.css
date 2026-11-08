@@ -1,0 +1,43 @@
+/* The pre-November 8 brand used bright orange-500 and #f97316.
+   Keep that orange for decoration and logos; text roles need more contrast. */
+:root {
+  --lm-orange-brand: #f97316;
+  --lm-orange-heading: #e56300;
+  --lm-orange-action: #c85000;
+  --lm-orange-action-hover: #b64400;
+  --lm-orange-text: #b94700;
+  --lm-orange-text-hover: #9c3c00;
+  --lm-orange-on-action: #ffffff;
+  --lm-orange-soft: #fff7ed;
+  --lm-orange-border: #fed7aa;
+}
+
+@theme inline {
+  --color-orange-500: var(--lm-orange-brand);
+  --color-brand: var(--lm-orange-brand);
+  --color-brand-heading: var(--lm-orange-heading);
+  --color-brand-ink: var(--lm-orange-text);
+  --color-action: var(--lm-orange-action);
+  --color-action-hover: var(--lm-orange-action-hover);
+}
+
+/* Bridge existing orange actions to the same tokens without changing page
+   components, event handlers, disabled states or assessment/authentication logic. */
+:is(a, button, [role="button"]):is(.bg-orange-500, .bg-orange-600, .bg-orange-700):not(:disabled):not([aria-disabled="true"]) {
+  background-color: var(--lm-orange-action);
+  color: var(--lm-orange-on-action);
+}
+:is(a, button, [role="button"]):is(.from-orange-500, .from-orange-600, .from-orange-700):not(:disabled):not([aria-disabled="true"]) {
+  background-image: linear-gradient(to right, var(--lm-orange-action), var(--lm-orange-action-hover));
+  color: var(--lm-orange-on-action);
+}
+:is(a, button, [role="button"]):is(.bg-orange-500, .bg-orange-600, .bg-orange-700, .from-orange-500, .from-orange-600, .from-orange-700):not(:disabled):not([aria-disabled="true"]):hover {
+  background-color: var(--lm-orange-action-hover);
+}
+:is(a, button, p, label, small, strong, h2, h3, h4, h5, h6):is(.text-orange-500, .text-orange-600),
+.text-orange-600, .text-orange-700, .text-orange-800 {
+  color: var(--lm-orange-text);
+}
+:is(a, button):is(.text-orange-500, .text-orange-600):hover {
+  color: var(--lm-orange-text-hover);
+}

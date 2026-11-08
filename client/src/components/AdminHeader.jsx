@@ -20,13 +20,13 @@ function AdminHeader({ currentPage }) {
           <span><HeaderBrand /></span>
           <span className="hidden rounded-md border border-gray-200 bg-gray-50 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-slate-500 sm:inline">Admin Portal</span>
         </Link>
-        <nav className="grid w-full min-w-0 grid-cols-3 items-center gap-1 sm:flex sm:w-auto sm:justify-end sm:gap-2" aria-label="Admin navigation">
+        <nav className="lm-admin-navigation" aria-label="Admin navigation">
           <Link to="/admin" className={navClass('dashboard')} aria-current={currentPage === 'dashboard' ? 'page' : undefined}>Dashboard</Link>
           <Link to="/admin/users" className={navClass('users')} aria-current={currentPage === 'users' ? 'page' : undefined}>Users</Link>
           <Link to="/admin/courses" className={navClass('courses')} aria-current={currentPage === 'courses' ? 'page' : undefined}>Manage Courses</Link>
           <Link to="/admin/analytics" className={navClass('analytics')} aria-current={currentPage === 'analytics' ? 'page' : undefined}>Analytics</Link>
           <Link to="/admin/feedback" className={navClass('feedback')} aria-current={currentPage === 'feedback' ? 'page' : undefined}>Feedback</Link>
-          <LogoutButton type="button" onConfirm={handleLogout} className="lm-action lm-action-danger sm:shrink-0">
+          <LogoutButton onConfirm={handleLogout} className="lm-action lm-action-danger">
             Logout
           </LogoutButton>
         </nav>
