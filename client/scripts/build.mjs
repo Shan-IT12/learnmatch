@@ -11,7 +11,8 @@ await writeFile('dist/app.html', template.replace('<title>LearnMatch</title>', '
 // private shell's noindex directive on these public routes before their API loads.
 await writeFile('dist/course.html', template.replace('<title>LearnMatch</title>', '<title>College Course Details | LearnMatch</title><meta name="description" content="Explore college course information, skills, careers, and schools on LearnMatch." /><meta name="robots" content="index, follow" />'))
 const escape = (value) => value.replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
-const server = await createServer({ server: { middlewareMode: true }, appType: 'custom', optimizeDeps: { noDiscovery: true, include: [] } })
+// Prerendering must not replace the optimized dependencies of a running dev server.
+const server = await createServer({ cacheDir: 'node_modules/.vite-prerender', server: { middlewareMode: true }, appType: 'custom', optimizeDeps: { noDiscovery: true, include: [] } })
 try {
   const { renderPublicPage } = await server.ssrLoadModule('/src/PublicStatic.jsx')
   for (const path of Object.keys(PUBLIC_PAGES)) {

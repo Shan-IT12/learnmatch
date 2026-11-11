@@ -6,7 +6,7 @@ export const PUBLIC_PAGES = {
   '/help': { title: 'Help Center | LearnMatch', description: 'Get help with LearnMatch accounts, assessments, course recommendations, college tracking, and privacy. Find support and account settings guidance.' },
   '/privacy': { title: 'Privacy Notice | LearnMatch', description: 'Read how LearnMatch collects, uses, and protects account, assessment, and college tracking information, including your privacy and deletion options.' },
   '/terms': { title: 'Terms & Conditions | LearnMatch', description: 'Read the terms for using LearnMatch educational course guidance, assessments, course information, and AI-generated explanations.' },
-  '/courses/search': { title: 'Explore College Courses | LearnMatch', description: 'Search the LearnMatch course catalog by course, skill, or career to explore your college options.' },
+  '/courses/search': { title: 'Course Catalog | LearnMatch', description: 'Search the LearnMatch course catalog by course, skill, or career to explore your college options.' },
 }
 
 export const PRERENDER_PATHS = ['/', '/about', '/help', '/privacy', '/terms']

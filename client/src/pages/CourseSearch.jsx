@@ -2,6 +2,7 @@ import SkeletonContent from '../components/SkeletonContent'
 import { recommendationPlaceholders } from '../data/loadingPlaceholders'
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { Link, useLocation, useSearchParams } from 'react-router-dom'
+import { IconChevronLeftPipe, IconChevronRightPipe } from '@tabler/icons-react'
 import { getCourseCatalogUrl } from '../utils/courseCatalog'
 import useActiveCollegePhase from '../hooks/useActiveCollegePhase'
 import PublicHeader from '../components/PublicHeader'
@@ -68,7 +69,7 @@ function CourseSearch() {
   }
 
   useEffect(() => {
-    document.title = query ? `${query} Courses | LearnMatch` : 'Explore Courses | LearnMatch'
+    document.title = query ? `${query} Courses | LearnMatch` : 'Course Catalog | LearnMatch'
     const controller = new AbortController()
 
     fetch(getCourseCatalogUrl(apiUrl, query), {
@@ -122,7 +123,7 @@ function CourseSearch() {
             ← Back to Landing Page
           </Link>
         )}
-        <p className="text-xs font-semibold text-orange-700 uppercase tracking-widest mb-3">Course explorer</p>
+        <p className="text-xs font-semibold text-orange-700 uppercase tracking-widest mb-3">Course Catalog</p>
         <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-3">Find a course</h1>
         <p className="text-gray-500 mb-7">Search by course name, abbreviation, skill, or career.</p>
 
@@ -192,9 +193,11 @@ function CourseSearch() {
               {pageCount > 1 && (
                 <nav className="mt-7 flex flex-wrap items-center justify-between gap-3" aria-label="Course catalog pages">
                   <p className="text-sm text-gray-500">Page {page} of {pageCount}</p>
-                  <div className="flex gap-2">
+                  <div className="flex items-center gap-2">
+                    <button type="button" onClick={() => changePage(1)} disabled={page === 1} aria-label="First page" title="First page" className="inline-flex min-h-10 min-w-10 items-center justify-center rounded-lg border border-gray-200 bg-white px-2 py-2 text-gray-700 hover:border-orange-300 hover:text-orange-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500 disabled:cursor-not-allowed disabled:opacity-40"><IconChevronLeftPipe size={18} aria-hidden="true" /></button>
                     <button type="button" onClick={() => changePage(page - 1)} disabled={page === 1} className="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:border-orange-300 hover:text-orange-700 disabled:cursor-not-allowed disabled:opacity-40">Previous</button>
                     <button type="button" onClick={() => changePage(page + 1)} disabled={page === pageCount} className="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:border-orange-300 hover:text-orange-700 disabled:cursor-not-allowed disabled:opacity-40">Next</button>
+                    <button type="button" onClick={() => changePage(pageCount)} disabled={page === pageCount} aria-label="Last page" title="Last page" className="inline-flex min-h-10 min-w-10 items-center justify-center rounded-lg border border-gray-200 bg-white px-2 py-2 text-gray-700 hover:border-orange-300 hover:text-orange-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500 disabled:cursor-not-allowed disabled:opacity-40"><IconChevronRightPipe size={18} aria-hidden="true" /></button>
                   </div>
                 </nav>
               )}

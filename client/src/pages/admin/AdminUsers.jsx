@@ -3,7 +3,9 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   IconChevronLeft,
+  IconChevronLeftPipe,
   IconChevronRight,
+  IconChevronRightPipe,
   IconSearch,
   IconUserSearch,
   IconX,
@@ -297,14 +299,20 @@ function AdminUsers() {
               ))}
             </div>
 
-            <nav className="mt-5 flex flex-col items-center justify-between gap-3 rounded-xl border border-orange-100 bg-white px-5 py-4 shadow-sm sm:flex-row" aria-label="User pagination">
+            <nav className="mt-5 flex flex-col items-center justify-between gap-3 rounded-xl border border-orange-100 bg-white px-3 py-4 shadow-sm sm:flex-row sm:px-5" aria-label="User pagination">
               <p className="text-sm text-slate-500">Page {pagination.page} of {pagination.totalPages}</p>
-              <div className="flex items-center gap-2">
-                <button type="button" disabled={pagination.page <= 1} onClick={() => changePage(pagination.page - 1)} className="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 hover:border-orange-200 hover:bg-orange-50 disabled:cursor-not-allowed disabled:opacity-40">
+              <div className="flex items-center gap-1 sm:gap-2">
+                <button type="button" disabled={pagination.page <= 1} onClick={() => changePage(1)} aria-label="First page" title="First page" className="inline-flex min-h-10 min-w-10 items-center justify-center rounded-lg border border-slate-200 px-2 py-2 text-slate-700 hover:border-orange-200 hover:bg-orange-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500 disabled:cursor-not-allowed disabled:opacity-40">
+                  <IconChevronLeftPipe size={18} aria-hidden="true" />
+                </button>
+                <button type="button" disabled={pagination.page <= 1} onClick={() => changePage(pagination.page - 1)} className="inline-flex min-h-10 items-center gap-1 rounded-lg border border-slate-200 px-2 py-2 text-xs font-medium text-slate-700 hover:border-orange-200 hover:bg-orange-50 disabled:cursor-not-allowed disabled:opacity-40 sm:px-3 sm:text-sm">
                   <IconChevronLeft size={16} /> Previous
                 </button>
-                <button type="button" disabled={pagination.page >= pagination.totalPages} onClick={() => changePage(pagination.page + 1)} className="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 hover:border-orange-200 hover:bg-orange-50 disabled:cursor-not-allowed disabled:opacity-40">
+                <button type="button" disabled={pagination.page >= pagination.totalPages} onClick={() => changePage(pagination.page + 1)} className="inline-flex min-h-10 items-center gap-1 rounded-lg border border-slate-200 px-2 py-2 text-xs font-medium text-slate-700 hover:border-orange-200 hover:bg-orange-50 disabled:cursor-not-allowed disabled:opacity-40 sm:px-3 sm:text-sm">
                   Next <IconChevronRight size={16} />
+                </button>
+                <button type="button" disabled={pagination.page >= pagination.totalPages} onClick={() => changePage(pagination.totalPages)} aria-label="Last page" title="Last page" className="inline-flex min-h-10 min-w-10 items-center justify-center rounded-lg border border-slate-200 px-2 py-2 text-slate-700 hover:border-orange-200 hover:bg-orange-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500 disabled:cursor-not-allowed disabled:opacity-40">
+                  <IconChevronRightPipe size={18} aria-hidden="true" />
                 </button>
               </div>
             </nav>

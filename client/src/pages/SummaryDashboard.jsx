@@ -421,7 +421,7 @@ function SummaryDashboard() {
             <div className="flex items-start gap-3">
               <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-orange-50 text-orange-600"><IconCompass size={20} stroke={1.8} aria-hidden="true" /></span>
               <div>
-                <p className="text-[11px] font-semibold uppercase tracking-wide text-gray-600">Course Explorer</p>
+                <p className="text-[11px] font-semibold uppercase tracking-wide text-gray-600">Course Catalog</p>
                 <h2 id="summary-explorer-title" className="mt-1 text-xl font-bold tracking-tight text-gray-950">Explore more possibilities</h2>
                 <p className="mt-2 max-w-xl text-sm leading-6 text-gray-500">Discover other programs, the skills you can develop, and possible career paths alongside your recommendations.</p>
               </div>
