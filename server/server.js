@@ -57,7 +57,7 @@ import {
   getAssessmentHistory,
   getAssessmentHistoryDetail,
 } from './services/assessmentHistoryService.js'
-import { createAssessmentAttempt, ensureAttemptPersonalFactors, ensureFinalizedSkillResponses, getCurrentAttempt, getOwnedAttempt, hasCompletePersonalityPrerequisites, insertFinalizedSkillResponses, parseAttemptJson, requestedAttemptId, scoreSkillAnswers, updateAttempt, updateCurrentAttemptDraft } from './services/assessmentAttemptService.js'
+import { createAssessmentAttempt, ensureAttemptPersonalFactors, ensureFinalizedSkillResponses, getCurrentAttempt, getOwnedAttempt, hasCompletePersonalityPrerequisites, hasSubmittedAttemptInterests, insertFinalizedSkillResponses, parseAttemptJson, requestedAttemptId, scoreSkillAnswers, submittedInterestResponse, updateAttempt, updateCurrentAttemptDraft } from './services/assessmentAttemptService.js'
 import {
   CollegeTrackingError,
   changeCollegeProgram,
@@ -128,23 +128,10 @@ app.post('/api/assessment-attempts', authenticateToken, async (req, res) => {
 
 app.post('/api/assessment-attempts/recover', authenticateToken, async (req, res) => {
   try {
-    const requestedId = requestedAttemptId(req)
-    if (requestedId) {
-      const attempt = await getOwnedAttempt(pool, req.user.userId, requestedId)
-      if (attempt?.status === 'IN_PROGRESS') {
-        const personalFactors = await ensureAttemptPersonalFactors(pool, req.user.userId, requestedId)
-        return res.json({ attemptId: requestedId, recovered: true, personalFactorsSnapshotted: Boolean(personalFactors) })
-      }
-    }
-    const [activeAttempts] = await pool.query(
-      `SELECT attempt_id FROM ASSESSMENT_ATTEMPT
-       WHERE user_id = ? AND status = 'IN_PROGRESS'
-       ORDER BY attempt_id DESC LIMIT 1`,
-      [req.user.userId]
-    )
-    if (activeAttempts.length) {
-      const personalFactors = await ensureAttemptPersonalFactors(pool, req.user.userId, activeAttempts[0].attempt_id)
-      return res.json({ attemptId: activeAttempts[0].attempt_id, recovered: true, personalFactorsSnapshotted: Boolean(personalFactors) })
+    const current = await getCurrentAttempt(pool, req.user.userId)
+    if (current) {
+      const personalFactors = await ensureAttemptPersonalFactors(pool, req.user.userId, current.attempt_id)
+      return res.json({ attemptId: current.attempt_id, recovered: true, personalFactorsSnapshotted: Boolean(personalFactors) })
     }
     const attempt = await createAssessmentAttempt(pool, req.user.userId)
     res.status(201).json({ attemptId: attempt.attemptId, recovered: false, personalFactorsSnapshotted: Boolean(attempt.personalFactors) })
@@ -157,13 +144,12 @@ app.post('/api/assessment-attempts/recover', authenticateToken, async (req, res)
 app.get('/api/assessment-attempts/current', authenticateToken, async (req, res) => {
   try {
     const requestedId = requestedAttemptId(req)
-    const attempt = requestedId
-      ? await getOwnedAttempt(pool, req.user.userId, requestedId)
-      : await getCurrentAttempt(pool, req.user.userId)
-    if (!attempt || attempt.status !== 'IN_PROGRESS') return res.status(404).json({ message: 'Assessment progress is no longer active.' })
+    const attempt = await getCurrentAttempt(pool, req.user.userId)
+    if (!attempt || (requestedId && attempt.attempt_id !== requestedId)) return res.status(404).json({ message: 'Assessment progress is no longer active.' })
     res.json({
       attemptId: attempt.attempt_id,
       interests: parseAttemptJson(attempt.interests, []),
+      interestsSubmitted: hasSubmittedAttemptInterests(attempt),
       skillQuestions: parseAttemptJson(attempt.skill_questions, []),
       skillAnswers: parseAttemptJson(attempt.skill_answers, []),
       skillResult: parseAttemptJson(attempt.skill_result, null),
@@ -257,7 +243,7 @@ app.post('/api/interests', authenticateToken, async (req, res) => {
   try {
     const attemptId = requestedAttemptId(req)
     if (attemptId) {
-      const saved = await updateAttempt(pool, userId, attemptId, 'interests', interests)
+      const saved = await updateAttempt(pool, userId, attemptId, 'interests', submittedInterestResponse(interests))
       if (!saved) return res.status(409).json({ message: 'Your assessment session needs to be refreshed. Please return to Personal Factors and continue again.' })
       return res.json({ message: 'Interests saved for this assessment attempt', count: getSelectedInterestNames(interests).length })
     }
@@ -507,32 +493,34 @@ app.get('/api/dashboard/status', authenticateToken, async (req, res) => {
       [userId]
     )
 
-    const isCollegePhase = checkins.length > 0
+    // A tracking cycle can already exist before the first check-in. Keep the
+    // legacy check-in evidence, then resolve current tracking when it is absent.
+    const collegeStatus = checkins.length ? null : await getCollegeStatus(pool, userId)
+    const isCollegePhase = checkins.length > 0 || Boolean(collegeStatus)
     const [savedAttempts] = await pool.query(
-      `SELECT status, interests FROM ASSESSMENT_ATTEMPT
+      `SELECT status, interests, skill_questions, skill_result, personality_answers FROM ASSESSMENT_ATTEMPT
        WHERE user_id = ? AND status IN ('IN_PROGRESS', 'COMPLETED')
        ORDER BY (status = 'COMPLETED') DESC, attempt_id DESC LIMIT 1`, [userId]
     )
     // A new retake draft must not erase the dashboard's completed-assessment evidence.
     const hasCompletedAssessment = savedAttempts[0]?.status === 'COMPLETED'
-    const savedInterestState = parseAttemptJson(savedAttempts[0]?.interests, null)
-    const hasCategoryAnswers = savedInterestState
-      && !validateInterestSubmission(savedInterestState)
+    const hasSubmittedInterests = savedAttempts.length
+      ? hasSubmittedAttemptInterests(savedAttempts[0]) : interestCount.count > 0
 
     res.json({
       hasCompletedAssessment,
       hasProfile: hasCompletedAssessment || profileCount.count > 0,
-      hasInterests: hasCompletedAssessment || interestCount.count > 0 || Boolean(hasCategoryAnswers),
+      hasInterests: hasCompletedAssessment || hasSubmittedInterests,
       hasSkills: hasCompletedAssessment || skillCount.count > 0,
       hasPersonality: hasCompletedAssessment || personalityCount.count > 0,
       isCollegePhase,
-      collegeInfo: isCollegePhase
+      collegeInfo: checkins.length
         ? {
             courseName: checkins[0].course_name,
             semester: checkins[0].semester,
             comments: checkins[0].comments,
           }
-        : null,
+        : collegeStatus ? { courseName: collegeStatus.courseName, semester: collegeStatus.semester, comments: null } : null,
     })
   } catch (error) {
     console.error('Dashboard status error:', error)

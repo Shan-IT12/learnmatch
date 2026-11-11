@@ -36,7 +36,7 @@ const ACTION_DETAILS = {
     title: 'Leave this assessment?',
     description: 'Take a break and come back when you are ready.',
     noteTitle: 'Your progress stays saved',
-    note: 'Your answers are saved for this assessment session, so you can return without starting over.',
+    note: 'LearnMatch saves your assessment answers automatically. We will confirm pending saves before you leave. Unsaved Personal Factors edits must be saved using the form first.',
     cancelLabel: 'Stay here',
     confirmLabel: 'Leave Assessment',
     icon: IconLogout,

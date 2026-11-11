@@ -1,7 +1,9 @@
+import { readStudentQuestionPosition, saveStudentQuestionPosition } from '../../utils/studentPosition'
 import SkeletonContent, { SkeletonBlock } from '../../components/SkeletonContent'
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import OnboardingLayout from '../../components/OnboardingLayout'
+import useAssessmentDraftSave from '../../hooks/useAssessmentDraftSave'
 import AssessmentQuestionNavigation from '../../components/AssessmentQuestionNavigation'
 import SkillAnswerChoices from '../../components/SkillAnswerChoices'
 import useAssessmentQuestionFocus from '../../hooks/useAssessmentQuestionFocus'
@@ -12,6 +14,7 @@ import SuccessConfirmation from '../../components/SuccessConfirmation'
 import { waitForSuccessConfirmation } from '../../utils/successConfirmation'
 import {
   ASSESSMENT_SESSION_KEYS,
+  getAssessmentAttemptId,
   assessmentHeaders,
   boundedQuestionIndex,
   firstUnansweredQuestionIndex,
@@ -19,7 +22,6 @@ import {
   readAssessmentSession,
   writeAssessmentSession,
   readActiveAttempt,
-  saveActiveAttemptDraft,
 } from '../../utils/assessmentSession'
 
 function getQuestionGuide(question) {
@@ -164,6 +166,8 @@ function OnboardingSkills() {
   const navigate = useNavigate()
 
   const storage = typeof sessionStorage === 'undefined' ? null : sessionStorage
+  const saveProgress = useAssessmentDraftSave(storage, ASSESSMENT_SESSION_KEYS.skills)
+  const saveDraft = saveProgress.save
   const initialSession = readAssessmentSession(storage, ASSESSMENT_SESSION_KEYS.skills, {})
   const [questions, setQuestions] = useState(() => initialSession.questions || [])
   const [currentIndex, setCurrentIndex] = useState(() => boundedQuestionIndex(initialSession.currentIndex, initialSession.questions?.length || 0))
@@ -180,17 +184,29 @@ function OnboardingSkills() {
   const [submitConfirmed, setSubmitConfirmed] = useState(false)
 
   useEffect(() => {
+    let active = true
     readActiveAttempt(import.meta.env.VITE_API_URL, localStorage.getItem('token'), storage)
       .then((attempt) => {
-        if (!attempt) return
-        if (attempt.skillQuestions?.length) setQuestions(attempt.skillQuestions)
-        if (attempt.skillAnswers?.length) setAnswers(Object.fromEntries(
-          attempt.skillAnswers.map((answer) => [answer.question_id, answer.selected_option])
-        ))
+        if (!active) return
+        if (!attempt) { setQuestions([]); setAnswers({}); return }
+        const local = readAssessmentSession(storage, ASSESSMENT_SESSION_KEYS.skills, {})
+        const savedIndex = readStudentQuestionPosition(localStorage, localStorage.getItem('userId'), 'skills', attempt.attemptId)
+        const resumeIndex = Number.isInteger(local.currentIndex) ? local.currentIndex : savedIndex
+        const restoredQuestions = local.pending ? local.questions : attempt.skillQuestions
+        const restoredAnswers = local.pending ? local.answers : Object.fromEntries(
+          (attempt.skillAnswers || []).map(answer => [answer.question_id, answer.selected_option]))
+        setQuestions(restoredQuestions || [])
+        setAnswers(restoredAnswers || {})
+        const firstMissing = firstUnansweredQuestionIndex(restoredQuestions || [], restoredAnswers || {}, question => question.question_id)
+        setCurrentIndex(Number.isInteger(resumeIndex) ? boundedQuestionIndex(resumeIndex, restoredQuestions?.length || 0)
+          : Math.max(0, firstMissing < 0 ? (restoredQuestions?.length || 1) - 1 : firstMissing))
+        if (local.pending) saveDraft({ skill_questions: restoredQuestions, skill_answers: Object.entries(restoredAnswers || {}).map(
+          ([id, selected_option]) => ({ question_id: Number(id), selected_option })) }).catch(() => {})
       })
-      .catch(() => setAssessmentAccessError('Could not restore your saved Academic Skills progress. Please refresh.'))
-      .finally(() => setAttemptLoaded(true))
-  }, [storage])
+      .catch(() => { if (active) setAssessmentAccessError('Could not restore your saved Skills progress. Please refresh.') })
+      .finally(() => { if (active) setAttemptLoaded(true) })
+    return () => { active = false }
+  }, [storage, saveDraft])
 
   // A persisted submission is authoritative. Only load editable questions when
   // the account has no saved Academic Skills result.
@@ -239,27 +255,21 @@ function OnboardingSkills() {
   }, [attemptLoaded, questions.length, storage])
 
   useEffect(() => {
-    if (!questions.length || submitting || results) return
+    if (!attemptLoaded || !questions.length || submitting || results) return
+    saveStudentQuestionPosition(localStorage, localStorage.getItem('userId'), 'skills', getAssessmentAttemptId(storage), currentIndex)
     writeAssessmentSession(storage, ASSESSMENT_SESSION_KEYS.skills, {
       questions,
       answers,
       currentIndex,
     })
-    if (!attemptLoaded) return
-    const skillAnswers = Object.entries(answers).map(([questionId, selectedOption]) => ({
-      question_id: Number(questionId), selected_option: selectedOption,
-    }))
-    const timer = setTimeout(() => {
-      saveActiveAttemptDraft(import.meta.env.VITE_API_URL, localStorage.getItem('token'), storage, {
-        skill_questions: questions,
-        skill_answers: skillAnswers,
-      }).catch(() => console.warn('Academic Skills draft autosave will retry on the next change.'))
-    }, 250)
-    return () => clearTimeout(timer)
   }, [answers, attemptLoaded, currentIndex, questions, storage, submitting, results])
 
   const handleSelect = (questionId, choice) => {
-    setAnswers((prev) => ({ ...prev, [questionId]: choice }))
+    const nextAnswers = { ...answers, [questionId]: choice }
+    setAnswers(nextAnswers)
+    writeAssessmentSession(storage, ASSESSMENT_SESSION_KEYS.skills, { questions, answers: nextAnswers, currentIndex })
+    saveDraft({ skill_questions: questions, skill_answers: Object.entries(nextAnswers).map(
+      ([id, selected_option]) => ({ question_id: Number(id), selected_option })) }).catch(() => {})
     setQuestionError('')
   }
 
@@ -301,9 +311,10 @@ function OnboardingSkills() {
   }))
 
   try {
-    // Flush debounced drafts before finalization so a late partial autosave
+    // Flush drafts before finalization so a late partial autosave
     // cannot replace the complete answer set used for the saved result.
-    await saveActiveAttemptDraft(import.meta.env.VITE_API_URL, token, storage, {
+    await saveProgress.flush()
+    await saveDraft({
       skill_questions: questions,
       skill_answers: formattedAnswers,
     })
@@ -357,14 +368,14 @@ function OnboardingSkills() {
     const areasToImprove = domainResults.filter((domain) => domain.percentage === lowestPercentage)
 
     return (
-      <OnboardingLayout currentStep={3} isComplete={true} showFooterNavigation={false}>
+      <OnboardingLayout currentStep={3} stickyChrome isComplete={true} onNext={handleContinue} navigationStatus={<p className="text-xs text-gray-500">Next: Personality</p>}>
         <div className="mx-auto max-w-4xl px-5 py-8 sm:px-8 sm:py-12">
           <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_20px_55px_-38px_rgba(15,23,42,0.45)]">
             <div className="border-b border-slate-100 p-6 sm:p-8">
               <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
                 <div className="max-w-2xl">
                   <p className="mb-2 text-xs font-bold uppercase tracking-[0.18em] text-orange-600">Skills assessment complete</p>
-                  <h2 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Academic Skills Results</h2>
+                  <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Academic Skills Results</h1>
                   <p className="mt-3 text-sm leading-6 text-slate-600 sm:text-base">This is a snapshot of your current performance and can help highlight the skills you already use well and the areas you can continue developing.</p>
                 </div>
                 <div className="rounded-2xl border border-orange-100 bg-orange-50/70 px-6 py-5 md:min-w-72">
@@ -419,23 +430,17 @@ function OnboardingSkills() {
             These results represent your current performance across the six Academic Skills domains. LearnMatch combines this with your Interests, Personality, and Personal Factors when generating recommendations.
           </aside>
 
-          <button
-            type="button"
-            onClick={handleContinue}
-            className="mt-8 flex w-full items-center justify-center rounded-xl bg-orange-500 px-6 py-3.5 text-sm font-semibold text-white shadow-sm transition hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 sm:ml-auto sm:w-auto"
-          >
-            Continue to Personality Assessment
-          </button>
+
         </div>
       </OnboardingLayout>
     )
   }
 
-  if (loading) {
+  if (loading || !attemptLoaded) {
     return (
       <OnboardingLayout currentStep={3} isComplete={false} showFooterNavigation={false}>
         <SkeletonContent label="Loading Academic Skills questions..."><div className="max-w-2xl mx-auto px-5 sm:px-8 py-8 sm:py-12">
-          <div className="mb-5 flex items-start justify-between gap-4"><div><SkeletonBlock className="mb-3 h-7 w-32" /><h2 className="text-2xl sm:text-3xl font-bold tracking-tight">Academic Skills Assessment</h2></div><SkeletonBlock className="h-14 w-20" /></div>
+          <div className="mb-5 flex items-start justify-between gap-4"><div><SkeletonBlock className="mb-3 h-7 w-32" /><h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Academic Skills Assessment</h1></div><SkeletonBlock className="h-14 w-20" /></div>
           <div className="mb-7 flex items-center gap-3"><SkeletonBlock className="h-1.5 flex-1" /><SkeletonBlock className="h-3 w-24" /></div>
           <div className="mb-7 rounded-3xl border border-gray-200 bg-white p-5 sm:p-7 shadow-sm">
             <div className="mb-5 border-l-4 border-gray-200 pl-4"><SkeletonBlock className="mb-2 h-3 w-32" /><SkeletonBlock className="h-5 w-full" /><SkeletonBlock className="mt-2 h-5 w-2/3" /></div>
@@ -476,7 +481,8 @@ function OnboardingSkills() {
     ? figurePresentation.promptImage : currentQuestion.image_url
 
   return (
-    <OnboardingLayout currentStep={3} isComplete={answeredCount === questions.length} showFooterNavigation={false}>
+    <OnboardingLayout currentStep={3} stickyChrome isComplete={false} onNext={handleContinue} navigationBusy={submitting}
+      saveProgress={saveProgress} navigationStatus={<p className="text-xs leading-5 text-gray-500">Complete and submit Academic Skills to continue.</p>}>
       <div className="max-w-2xl mx-auto px-5 sm:px-8 py-8 sm:py-12">
         <div className="flex items-start justify-between gap-4 mb-5">
           <div>
@@ -486,10 +492,10 @@ function OnboardingSkills() {
               </svg>
               Skills check
             </div>
-            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900">Academic Skills Assessment</h2>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900">Academic Skills Assessment</h1>
           </div>
           <div className="shrink-0 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-center">
-            <p className="text-[10px] font-semibold uppercase tracking-wide text-gray-400">Question</p>
+            <p className="text-[10px] font-semibold uppercase tracking-wide text-gray-600">Question</p>
             <p className="text-sm font-bold text-gray-900"><span className="text-orange-600">{currentIndex + 1}</span> of {questions.length}</p>
           </div>
         </div>
@@ -501,7 +507,7 @@ function OnboardingSkills() {
               style={{ width: `${((currentIndex + 1) / questions.length) * 100}%` }}
             />
           </div>
-          <span className="shrink-0 text-xs font-semibold text-gray-400">{currentQuestion.dimension}</span>
+          <span className="shrink-0 text-xs font-semibold text-gray-600">{currentQuestion.dimension}</span>
         </div>
 
         {error && (
@@ -525,7 +531,7 @@ function OnboardingSkills() {
           )}
 
           <div className="mb-5 border-l-4 border-orange-500 pl-4">
-            <p className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-gray-400">Select the best answer</p>
+            <p className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-gray-600">Select the best answer</p>
             <p id="skill-question-text" className="text-base sm:text-lg font-semibold leading-relaxed text-gray-900">
               {currentQuestion.question_text} <RequiredMark />
             </p>

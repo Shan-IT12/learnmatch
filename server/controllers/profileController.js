@@ -1,16 +1,22 @@
 import pool from '../config/db.js'
 import { isDeepStrictEqual } from 'node:util'
 import { validateProfile } from '../services/requestValidationService.js'
+import { validateUsername } from '../services/usernameValidationService.js'
+import { getCollegeStatus } from '../services/collegeTrackingService.js'
 import { refreshSavedRecommendationsForLatestAssessment } from '../services/recommendationPersistenceService.js'
-import { buildPersonalFactorsSnapshot, requestedAttemptId, setAttemptPersonalFactors } from '../services/assessmentAttemptService.js'
+import { buildPersonalFactorsSnapshot, getCurrentAttempt, requestedAttemptId, setAttemptPersonalFactors } from '../services/assessmentAttemptService.js'
 
 export const saveProfileWithDependencies = async (
   req,
   res,
-  { database = pool, refreshRecommendations = refreshSavedRecommendationsForLatestAssessment } = {}
+  { database = pool, refreshRecommendations = refreshSavedRecommendationsForLatestAssessment, readCollegeStatus = getCollegeStatus } = {}
 ) => {
   const userId = req.user.userId
-  const validation = validateProfile(req.body)
+  const usernameOnly = req.body && !Array.isArray(req.body) && Object.keys(req.body).length === 1 && Object.hasOwn(req.body, 'username')
+  const usernameValidation = usernameOnly ? validateUsername(req.body.username) : null
+  const validation = usernameOnly
+    ? { ...usernameValidation, field: 'username', value: { username: usernameValidation.value } }
+    : validateProfile(req.body)
   if (!validation.valid) {
     return res.status(400).json({
       ...(validation.field ? { field: validation.field } : {}),
@@ -53,6 +59,24 @@ export const saveProfileWithDependencies = async (
       return res.status(404).json({ message: 'Account not found.' })
     }
 
+    const collegeStatus = await readCollegeStatus(connection, userId)
+    if (collegeStatus && !usernameOnly) {
+      // Only an explicit, current assessment may update factors during a retake.
+      // A profile edit (or a stale/foreign attempt header) cannot change them.
+      const attemptId = requestedAttemptId(req)
+      const attempt = attemptId ? await getCurrentAttempt(connection, userId) : null
+      if (!attempt || Number(attempt.attempt_id) !== attemptId) {
+        await connection.rollback()
+        transactionStarted = false
+        return res.status(409).json({ code: 'PERSONAL_FACTORS_READ_ONLY', message: 'Personal Factors are read-only in your College Phase profile.' })
+      }
+    }
+    if (!collegeStatus && usernameOnly) {
+      await connection.rollback()
+      transactionStarted = false
+      return res.status(400).json({ message: 'Complete your Personal Factors before saving your profile.' })
+    }
+
     if (accounts[0].username !== username) {
       const [duplicates] = await connection.query(
         'SELECT user_id FROM USER_ACCOUNT WHERE username = ? AND user_id <> ? LIMIT 1',
@@ -73,6 +97,14 @@ export const saveProfileWithDependencies = async (
         [username, userId]
       )
       if (accountWrite.affectedRows !== 1) throw conflict()
+    }
+
+    if (usernameOnly) {
+      // Do not rewrite factors or refresh recommendations for an account edit.
+      committing = true
+      await connection.commit()
+      transactionStarted = false
+      return res.json({ message: 'Profile updated successfully', username, recommendationsRefreshed: false })
     }
 
     // Same parent order as deletion: account -> recommendations -> attempts -> profile.
@@ -196,7 +228,7 @@ export const saveProfile = (req, res) => saveProfileWithDependencies(req, res)
 export const getProfileWithDependencies = async (
   req,
   res,
-  { database = pool } = {}
+  { database = pool, readCollegeStatus = getCollegeStatus } = {}
 ) => {
   const userId = req.user.userId
 
@@ -221,7 +253,8 @@ export const getProfileWithDependencies = async (
       [userId]
     )
 
-    res.json({ username: accounts[0].username, profile: rows[0] || null })
+    const collegeStatus = await readCollegeStatus(database, userId)
+    res.json({ username: accounts[0].username, profile: rows[0] || null, personalFactorsReadOnly: Boolean(collegeStatus) })
 
   } catch (error) {
     console.error('Profile fetch error:', error)

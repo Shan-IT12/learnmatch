@@ -1,6 +1,7 @@
 import HeaderBrand from '../components/HeaderBrand'
 import { getProfileReturnDestination } from '../utils/profileNavigation'
 import SkeletonContent from '../components/SkeletonContent'
+import PersonalFactorsSummary from '../components/PersonalFactorsSummary'
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { IconArrowLeft, IconArrowRight, IconUser } from '@tabler/icons-react'
@@ -28,6 +29,7 @@ export default function ProfileEdit() {
   const profilePath = `/profile${returnDestination.search}`
   const [loading, setLoading] = useState(true); const [saving, setSaving] = useState(false)
   const [isFirstTime, setIsFirstTime] = useState(true)
+  const [personalFactorsReadOnly, setPersonalFactorsReadOnly] = useState(null)
   const [saveConfirmed, setSaveConfirmed] = useState(false)
   const [saveOutcomeUnknown, setSaveOutcomeUnknown] = useState(false)
   const [formData, setFormData] = useState(emptyProfile); const [applicability, setApplicability] = useState(emptyApplicability); const [fieldErrors, setFieldErrors] = useState({}); const [error, setError] = useState('')
@@ -38,13 +40,16 @@ export default function ProfileEdit() {
       .then(async (response) => { if (response.status === 401 || response.status === 403) { navigate('/login', { replace: true }); return null }; if (response.status === 404 || response.status === 204) return { username: localStorage.getItem('username') || '', profile: null }; if (!response.ok) throw new Error('Could not load profile.'); return response.json() })
       .then((data) => {
         if (!data) return
+        const readOnly = data.personalFactorsReadOnly === true
+        setPersonalFactorsReadOnly(readOnly)
+        if (readOnly) setIsFirstTime(false)
         if (!data.profile) { setFormData((current) => ({ ...current, username: data.username || '' })); return }
         const rawAreas = parseJsonValue(data.profile.physical_accessibility_areas, [])
         const areas = Array.isArray(rawAreas) ? rawAreas.filter((area) => area !== 'none') : []
         const rawDifficulties = parseJsonValue(data.profile.physical_accessibility_difficulties, {})
         const difficulties = Object.fromEntries(Object.entries(rawDifficulties).filter(([area, level]) => areas.includes(area) && difficultyLevels.some(([value]) => value === level)))
         const loaded = { personal_factor_answers: data.profile.personal_factor_answers, username: data.username || localStorage.getItem('username') || '', physical_accessibility_areas: areas, physical_accessibility_difficulties: difficulties, factor_physical_impact: data.profile.factor_physical_impact || '', factor_health_impact: data.profile.factor_health_impact || '', factor_financial_impact: data.profile.factor_financial_impact || '', factor_family_impact: data.profile.factor_family_impact || '', factor_work_impact: data.profile.factor_work_impact || '' }
-        setFormData(loaded); setApplicability(deriveFactorApplicability(loaded)); setIsFirstTime(!isPersonalFactorsComplete(loaded))
+        setFormData(loaded); setApplicability(deriveFactorApplicability(loaded)); setIsFirstTime(!readOnly && !isPersonalFactorsComplete(loaded))
       })
       .catch(() => setError('Could not load your profile.'))
       .finally(() => setLoading(false))
@@ -53,14 +58,14 @@ export default function ProfileEdit() {
   const clearFieldError = (name) => { if (saveOutcomeUnknown) return; setError(''); setFieldErrors((current) => current[name] ? { ...current, [name]: undefined } : current) }
   const handleSubmit = async (event) => {
     event.preventDefault()
-    if (saving || saveOutcomeUnknown) return
+    if (loading || personalFactorsReadOnly === null || saving || saveOutcomeUnknown) return
     setError('')
-    const errors = validatePersonalFactors(formData, applicability); const usernameError = validateUsername(formData.username)
+    const errors = personalFactorsReadOnly ? {} : validatePersonalFactors(formData, applicability); const usernameError = validateUsername(formData.username)
     if (usernameError) errors.username = usernameError
     if (Object.keys(errors).length) { setFieldErrors(errors); scrollToFirstInvalidField(Object.keys(errors)); return }
     setSaving(true)
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/profile`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify(buildProfilePayload(formData, applicability)) })
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/profile`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify(personalFactorsReadOnly ? { username: formData.username.trim() } : buildProfilePayload(formData, applicability)) })
       const data = await response.json()
       if (response.status === 401 || response.status === 403) { navigate('/login', { replace: true }); return }
       if (data.code === 'PROFILE_SAVE_OUTCOME_UNKNOWN') { setSaveOutcomeUnknown(true); setError(data.message); return }
@@ -73,5 +78,5 @@ export default function ProfileEdit() {
   }
 
   if (saveConfirmed) return <div className="flex min-h-screen items-center justify-center bg-[#fcfbf9] px-5"><SuccessConfirmation message={isFirstTime ? 'Profile Saved' : 'Profile Updated'} /></div>
-  return <div className="min-h-screen bg-[#fcfbf9] text-gray-900"><nav className="lm-site-header flex items-center justify-between border-b border-gray-200/80 bg-white/90 px-4 py-4 backdrop-blur sm:px-8 lg:px-14"><button onClick={() => navigate(returnDestination.path)} className="text-lg font-bold tracking-tight"><HeaderBrand /></button><button onClick={() => navigate(isFirstTime ? returnDestination.path : profilePath)} className="lm-action"><IconArrowLeft size={16} /> {isFirstTime ? returnDestination.label : 'Back to Profile'}</button></nav><SkeletonContent loading={loading} label="Loading ProfileEdit..."><main className="mx-auto max-w-5xl px-4 py-8 sm:px-8 sm:py-10"><header className="mb-8"><p className="text-xs font-bold uppercase tracking-[0.16em] text-orange-500">Account profile</p><h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">{isFirstTime ? 'Set up your profile' : 'Edit profile'}</h1></header>{error && <div role="alert" className="mb-5 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-600">{error}{saveOutcomeUnknown && <button type="button" onClick={() => window.location.reload()} className="ml-3 font-semibold underline">Reload profile</button>}</div>}<form onSubmit={handleSubmit} noValidate className="space-y-6"><section className="rounded-2xl border border-gray-200/80 bg-white p-4 shadow-sm sm:p-5"><div className="flex flex-col gap-4 sm:flex-row sm:items-start"><div className="flex min-w-44 items-center gap-3 sm:pt-1"><span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-orange-50 text-orange-600"><IconUser size={20} /></span><div><h2 className="font-semibold">Account username</h2><p className="mt-0.5 text-sm text-gray-500">Used across LearnMatch</p></div></div><UsernameField value={formData.username} error={fieldErrors.username} onChange={(username) => { clearFieldError('username'); setFormData({ ...formData, username }) }} /></div></section><section className="rounded-3xl border border-gray-200/80 bg-white p-4 shadow-sm sm:p-7"><div className="mb-6 border-b border-gray-100 pb-5"><p className="text-xs font-bold uppercase tracking-[0.14em] text-orange-500">About your circumstances</p><h2 className="mt-1.5 text-xl font-bold">Personal Factors</h2><p className="mt-1.5 text-sm leading-6 text-gray-500">Tell us about personal circumstances that may affect your studies.</p></div><PersonalFactorsForm formData={formData} applicability={applicability} fieldErrors={fieldErrors} setFormData={setFormData} setApplicability={setApplicability} clearFieldError={clearFieldError} /></section><div className="flex justify-end"><button type="submit" disabled={saving || saveOutcomeUnknown} className="inline-flex items-center justify-center gap-2 rounded-xl bg-orange-500 px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-orange-600 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-500">{saving ? 'Saving...' : isFirstTime ? 'Save Profile' : 'Save Changes'} <IconArrowRight size={17} /></button></div></form></main></SkeletonContent></div>
+  return <div className="min-h-screen bg-[#fcfbf9] text-gray-900"><nav className="lm-site-header flex items-center justify-between border-b border-gray-200/80 bg-white/90 px-4 py-4 backdrop-blur sm:px-8 lg:px-14"><button onClick={() => navigate(returnDestination.path)} className="text-lg font-bold tracking-tight"><HeaderBrand /></button><button onClick={() => navigate(isFirstTime ? returnDestination.path : profilePath)} className="lm-action"><IconArrowLeft size={16} /> {isFirstTime ? returnDestination.label : 'Back to Profile'}</button></nav><SkeletonContent loading={loading} label="Loading ProfileEdit..."><main className="mx-auto max-w-5xl px-4 py-8 sm:px-8 sm:py-10"><header className="mb-8"><p className="text-xs font-bold uppercase tracking-[0.16em] text-orange-500">Account profile</p><h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">{isFirstTime ? 'Set up your profile' : 'Edit profile'}</h1></header>{error && <div role="alert" className="mb-5 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-600">{error}{saveOutcomeUnknown && <button type="button" onClick={() => window.location.reload()} className="ml-3 font-semibold underline">Reload profile</button>}</div>}<form onSubmit={handleSubmit} noValidate className="space-y-6"><section className="rounded-2xl border border-gray-200/80 bg-white p-4 shadow-sm sm:p-5"><div className="flex flex-col gap-4 sm:flex-row sm:items-start"><div className="flex min-w-44 items-center gap-3 sm:pt-1"><span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-orange-50 text-orange-600"><IconUser size={20} /></span><div><h2 className="font-semibold">Account username</h2><p className="mt-0.5 text-sm text-gray-500">Used across LearnMatch</p></div></div><UsernameField value={formData.username} error={fieldErrors.username} onChange={(username) => { clearFieldError('username'); setFormData({ ...formData, username }) }} /></div></section><section className="rounded-3xl border border-gray-200/80 bg-white p-4 shadow-sm sm:p-7"><div className="mb-6 border-b border-gray-100 pb-5"><p className="text-xs font-bold uppercase tracking-[0.14em] text-orange-500">About your circumstances</p><h2 className="mt-1.5 text-xl font-bold">Personal Factors</h2><p className="mt-1.5 text-sm leading-6 text-gray-500">{personalFactorsReadOnly ? 'These saved assessment answers are read-only in your College Phase profile.' : 'Tell us about personal circumstances that may affect your studies.'}</p></div>{personalFactorsReadOnly !== false ? <PersonalFactorsSummary profile={formData} /> : <PersonalFactorsForm formData={formData} applicability={applicability} fieldErrors={fieldErrors} setFormData={setFormData} setApplicability={setApplicability} clearFieldError={clearFieldError} />}</section><div className="flex justify-end"><button type="submit" disabled={loading || personalFactorsReadOnly === null || saving || saveOutcomeUnknown} className="inline-flex items-center justify-center gap-2 rounded-xl bg-orange-500 px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-orange-600 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-500">{saving ? 'Saving...' : isFirstTime ? 'Save Profile' : 'Save Changes'} <IconArrowRight size={17} /></button></div></form></main></SkeletonContent></div>
 }

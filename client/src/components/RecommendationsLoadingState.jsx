@@ -28,7 +28,7 @@ export default function RecommendationsLoadingState({ progress = 0, status = 'Ch
   return (
     <section className="lm-matching" aria-busy={progress < 100} aria-label="Generating course recommendations">
       <div className="lm-matching-wash" aria-hidden="true" />
-      <div className="relative">
+      <div className="lm-matching-content">
         <div className="lm-matching-eyebrow"><IconSparkles size={14} aria-hidden="true" /> A future that fits you</div>
         <div className="lm-matching-visual" aria-hidden="true">
           <div className="lm-matching-ring lm-matching-ring-outer" />

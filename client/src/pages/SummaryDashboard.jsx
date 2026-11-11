@@ -8,11 +8,14 @@ import HeaderBrand from '../components/HeaderBrand'
 import SkeletonContent from '../components/SkeletonContent'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { IconArrowRight, IconRefresh, IconSchool, IconHistory, IconUser, IconHeart, IconBrain, IconShieldCheck, IconStar, IconCompass } from '@tabler/icons-react'
+import { IconArrowLeft, IconArrowRight, IconRefresh, IconSchool, IconHistory, IconUser, IconHeart, IconBrain, IconShieldCheck, IconStar, IconCompass } from '@tabler/icons-react'
 import { beginAssessmentAttempt } from '../utils/assessmentSession'
 import { getDimensionResults, MBTI_TYPE_CONTENT } from '../data/mbtiResultContent'
 import CourseName from '../components/CourseName'
 import ActionConfirmationModal from '../components/ActionConfirmationModal'
+import { collegePhasePath, hasSavedAssessmentSummary } from '../utils/assessmentSummaryNavigation'
+import useActiveCollegePhase from '../hooks/useActiveCollegePhase'
+import useAssessmentResume from '../hooks/useAssessmentResume'
 
 const personalFactorLabels = {
   factor_physical_impact: 'Physical / accessibility',
@@ -38,6 +41,8 @@ function SummaryDashboard() {
   const token = localStorage.getItem('token')
   const userId = localStorage.getItem('userId')
   const username = localStorage.getItem('username')
+  const hasActiveCollegePhase = useActiveCollegePhase()
+  const assessmentResume = useAssessmentResume()
 
   const [loading, setLoading] = useState(true)
   const [showRetakeConfirmation, setShowRetakeConfirmation] = useState(false)
@@ -49,6 +54,7 @@ function SummaryDashboard() {
   const [interests, setInterests] = useState([])
   const [noInterests, setNoInterests] = useState(false)
   const [rankingPendingMessage, setRankingPendingMessage] = useState('')
+  const [summaryError, setSummaryError] = useState('')
   const [savedDomainScores, setDomainScores] = useState({})
   const [savedProfile, setProfile] = useState(null)
   const [savedMbti, setMbti] = useState(null)
@@ -63,7 +69,7 @@ function SummaryDashboard() {
       try {
         const headers = { Authorization: `Bearer ${token}` }
         const [resultsRes, interestsRes, quizRes, profileRes, mbtiRes] = await Promise.all([
-          fetch(`${import.meta.env.VITE_API_URL}/api/results`, { headers }),
+          fetch(`${import.meta.env.VITE_API_URL}/api/recommendations/latest`, { headers }),
           fetch(`${import.meta.env.VITE_API_URL}/api/interests`, { headers }),
           fetch(`${import.meta.env.VITE_API_URL}/api/quiz/results`, { headers }),
           fetch(`${import.meta.env.VITE_API_URL}/api/profile?userId=${userId}`, { headers }),
@@ -71,6 +77,9 @@ function SummaryDashboard() {
         ])
 
         const resultsData = await resultsRes.json()
+        if (!resultsRes.ok || !hasSavedAssessmentSummary(resultsData)) {
+          setSummaryError('Your saved assessment summary is unavailable. Return to your dashboard to continue.'); return
+        }
         if (resultsData.code === 'MISSING_INTEREST_SCORING_POLICY') setRankingPendingMessage(resultsData.message)
         const interestsData = await interestsRes.json()
         const quizData = await quizRes.json()
@@ -94,6 +103,7 @@ function SummaryDashboard() {
         setMbti(mbtiData.mbtiType ? mbtiData : null)
       } catch (error) {
         console.error('Summary fetch error:', error)
+        setSummaryError('We could not load your saved assessment summary. Please try again later.')
       } finally {
         setLoading(false)
       }
@@ -189,6 +199,12 @@ function SummaryDashboard() {
       </nav>
  
       <SkeletonContent loading={loading} label="Loading your summary..."><main className="relative z-0 mx-auto max-w-[1240px] px-5 py-8 sm:px-8 sm:py-11 lg:px-12">
+        {hasActiveCollegePhase === true && <nav aria-label="College Phase" className="mb-6">
+          <button type="button" onClick={() => navigate('/college')} className="lm-action w-full justify-center sm:w-auto">
+            <IconArrowLeft size={16} aria-hidden="true" /> Go back to College Dashboard
+          </button>
+        </nav>}
+        {summaryError ? <div role="alert" className="rounded-xl border border-red-100 bg-red-50 p-5 text-sm text-red-700">{summaryError}<button type="button" className="lm-action mt-4" onClick={() => navigate('/dashboard')}>Return to Dashboard</button></div> : <>
 
         <div className="mb-7">
           <p className="mb-2 text-xs font-bold uppercase tracking-[0.18em] text-orange-600">Assessment Summary</p>
@@ -211,7 +227,7 @@ function SummaryDashboard() {
               </div>
             </div>
             <button
-              onClick={() => navigate('/results')}
+              onClick={() => navigate('/results?saved=1&returnTo=summary')}
               className="relative mt-5 inline-flex shrink-0 items-center justify-center gap-1.5 rounded-xl border border-orange-200 bg-white px-5 py-3 text-sm font-bold text-orange-700 shadow-sm transition duration-150 hover:-translate-y-0.5 hover:border-orange-300 hover:bg-orange-50 sm:mt-0"
             >
               View Full Results <IconArrowRight size={16} stroke={2} />
@@ -230,21 +246,21 @@ function SummaryDashboard() {
           <section className="rounded-2xl border border-white/90 bg-white/78 p-5 shadow-[0_18px_48px_-40px_rgba(120,53,15,.5)] sm:p-6">
             <div className="flex items-center gap-3 mb-4">
               <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-blue-50 text-blue-600"><IconUser size={20} stroke={1.8} /></span>
-              <div><p className="text-[11px] font-semibold uppercase tracking-wide text-gray-400">Your Profile</p><p className="text-sm font-bold text-gray-900">Personal details</p></div>
+              <div><p className="text-[11px] font-semibold uppercase tracking-wide text-gray-600">Your Profile</p><p className="text-sm font-bold text-gray-900">Personal details</p></div>
             </div>
             {profile ? (
               <div className="space-y-1.5">
                 <p className="text-sm text-gray-900 font-medium">{profile.username}</p>
               </div>
             ) : (
-              <p className="text-sm text-gray-400">No profile information is saved. Open Profile from your account menu to add your details.</p>
+              <p className="text-sm text-gray-600">No profile information is saved. Open Profile from your account menu to add your details.</p>
             )}
           </section>
  
           <section className="rounded-2xl border border-white/90 bg-white/78 p-5 shadow-[0_18px_48px_-40px_rgba(120,53,15,.5)] sm:p-6">
             <div className="flex items-center justify-between gap-3 mb-4">
-              <div className="flex items-center gap-3"><span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600"><IconShieldCheck size={20} stroke={1.8} /></span><div><p className="text-[11px] font-semibold uppercase tracking-wide text-gray-400">Personal Factors</p><p className="text-sm font-bold text-gray-900">Recommendation considerations</p></div></div>
-              <span className={`rounded-full px-2.5 py-1 text-[11px] font-bold ${checkedFactors.length ? 'bg-emerald-50 text-emerald-700' : 'bg-gray-100 text-gray-500'}`}>{hasFactorAnswers ? 'Personal Factors' : 'Not used'}</span>
+              <div className="flex items-center gap-3"><span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600"><IconShieldCheck size={20} stroke={1.8} /></span><div><p className="text-[11px] font-semibold uppercase tracking-wide text-gray-600">Personal Factors</p><p className="text-sm font-bold text-gray-900">Recommendation considerations</p></div></div>
+              <span className={`rounded-full px-2.5 py-1 text-[11px] font-bold ${checkedFactors.length ? 'bg-emerald-50 text-emerald-700' : 'bg-gray-100 text-gray-600'}`}>{hasFactorAnswers ? 'Personal Factors' : 'Not used'}</span>
             </div>
             <div className="flex flex-wrap gap-2">
               {checkedFactors.length > 0 ? (
@@ -257,13 +273,13 @@ function SummaryDashboard() {
                   </span>
                 ))
               ) : (
-                <p className="text-sm text-gray-400">No reported impacts to show. Open Profile from your account menu to review or update your Personal Factors.</p>
+                <p className="text-sm text-gray-600">No reported impacts to show. Open Profile from your account menu to review or update your Personal Factors.</p>
               )}
             </div>
           </section>
 
           <section className="flex-1 rounded-2xl border border-white/90 bg-white/78 p-5 shadow-[0_18px_48px_-40px_rgba(120,53,15,.5)] sm:p-6">
-            <div className="flex items-center gap-3 mb-4"><span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-orange-50 text-orange-600"><IconHeart size={20} stroke={1.8} /></span><div><p className="text-[11px] font-semibold uppercase tracking-wide text-gray-400">Your Interests</p><p className="text-sm font-bold text-gray-900">{interests.length} selected hobbies</p></div></div>
+            <div className="flex items-center gap-3 mb-4"><span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-orange-50 text-orange-600"><IconHeart size={20} stroke={1.8} /></span><div><p className="text-[11px] font-semibold uppercase tracking-wide text-gray-600">Your Interests</p><p className="text-sm font-bold text-gray-900">{interests.length} selected hobbies</p></div></div>
             <div className="flex flex-wrap gap-2">
               {interests.length > 0 ? (
                 interests.map((interest) => (
@@ -275,14 +291,14 @@ function SummaryDashboard() {
                   </span>
                 ))
               ) : (
-                <p className="text-sm text-gray-400">{noInterests ? 'No interests or hobbies.' : 'No interests are saved. Return to your dashboard to complete the Interests assessment.'}</p>
+                <p className="text-sm text-gray-600">{noInterests ? 'No interests or hobbies.' : 'No interests are saved. Return to your dashboard to complete the Interests assessment.'}</p>
               )}
             </div>
           </section>
           </div>
 
           <section className="flex h-full flex-col rounded-2xl border border-white/90 bg-white/78 p-5 shadow-[0_18px_48px_-40px_rgba(120,53,15,.5)] sm:p-6">
-            <div className="flex items-center justify-between gap-3 mb-4"><div className="flex items-center gap-3"><span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-violet-50 text-violet-600"><IconBrain size={20} stroke={1.8} /></span><div><p className="text-[11px] font-semibold uppercase tracking-wide text-gray-400">Academic Skills</p><p className="text-sm font-bold text-gray-900">{skillTotals.total ? `${skillTotals.correct} of ${skillTotals.total} correct` : 'No result yet'}</p></div></div>{skillPercent !== null && <span className="rounded-full bg-violet-50 px-2.5 py-1 text-xs font-bold text-violet-700">{skillPercent}%</span>}</div>
+            <div className="flex items-center justify-between gap-3 mb-4"><div className="flex items-center gap-3"><span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-violet-50 text-violet-600"><IconBrain size={20} stroke={1.8} /></span><div><p className="text-[11px] font-semibold uppercase tracking-wide text-gray-600">Academic Skills</p><p className="text-sm font-bold text-gray-900">{skillTotals.total ? `${skillTotals.correct} of ${skillTotals.total} correct` : 'No result yet'}</p></div></div>{skillPercent !== null && <span className="rounded-full bg-violet-50 px-2.5 py-1 text-xs font-bold text-violet-700">{skillPercent}%</span>}</div>
             <div className="flex flex-1 flex-col justify-between gap-4">
               {Object.keys(domainScores).length > 0 ? (
                 Object.entries(domainScores).map(([domain, score]) => (
@@ -302,7 +318,7 @@ function SummaryDashboard() {
                   </div>
                 ))
               ) : (
-                <p className="text-sm text-gray-400">No Academic Skills result is saved. Return to your dashboard to complete the assessment.</p>
+                <p className="text-sm text-gray-600">No Academic Skills result is saved. Return to your dashboard to complete the assessment.</p>
               )}
             </div>
           </section>
@@ -342,7 +358,7 @@ function SummaryDashboard() {
               </div>
             </div>
           ) : (
-            <p className="text-sm text-gray-400">
+            <p className="text-sm text-gray-600">
               No Personality result is saved. Return to your dashboard to complete the Personality assessment and see your MBTI type here.
             </p>
           )}
@@ -379,7 +395,7 @@ function SummaryDashboard() {
                         {skill}
                       </span>
                     ))}
-                    {remainingSkillCount > 0 && <span className="text-xs font-medium text-gray-400">+{remainingSkillCount} more</span>}
+                    {remainingSkillCount > 0 && <span className="text-xs font-medium text-gray-600">+{remainingSkillCount} more</span>}
                   </div>
                 </div>
               </div>
@@ -392,7 +408,7 @@ function SummaryDashboard() {
                     </div>
                   ))}
                 </div>
-                {remainingCareerCount > 0 && <p className="mt-3 text-xs font-medium text-gray-400">+{remainingCareerCount} more</p>}
+                {remainingCareerCount > 0 && <p className="mt-3 text-xs font-medium text-gray-600">+{remainingCareerCount} more</p>}
               </div>
             </div>
           </div>
@@ -405,7 +421,7 @@ function SummaryDashboard() {
             <div className="flex items-start gap-3">
               <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-orange-50 text-orange-600"><IconCompass size={20} stroke={1.8} aria-hidden="true" /></span>
               <div>
-                <p className="text-[11px] font-semibold uppercase tracking-wide text-gray-400">Course Explorer</p>
+                <p className="text-[11px] font-semibold uppercase tracking-wide text-gray-600">Course Explorer</p>
                 <h2 id="summary-explorer-title" className="mt-1 text-xl font-bold tracking-tight text-gray-950">Explore more possibilities</h2>
                 <p className="mt-2 max-w-xl text-sm leading-6 text-gray-500">Discover other programs, the skills you can develop, and possible career paths alongside your recommendations.</p>
               </div>
@@ -425,18 +441,22 @@ function SummaryDashboard() {
           <h2 className="mt-1 text-xl font-bold tracking-tight text-gray-950">Continue your LearnMatch journey</h2>
         </div>
         <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+          {assessmentResume.error && <p role="alert" className="w-full text-sm text-red-700">{assessmentResume.error}</p>}
+          {assessmentResume.route ? <button type="button" className="lm-action" onClick={() => navigate(assessmentResume.route)}>Continue Assessment</button> :
           <button
+            disabled={assessmentResume.loading || Boolean(assessmentResume.error)}
             onClick={() => { setRetakeError(''); setShowRetakeConfirmation(true) }}
             className="flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-5 py-3 text-sm font-semibold text-gray-700 shadow-sm transition duration-150 hover:border-orange-200 hover:bg-orange-50 hover:text-orange-700"
           >
             <IconRefresh size={16} stroke={2} /> Retake Assessment
-          </button>
-          <button
-            onClick={() => navigate('/college/setup')}
+          </button>}
+          {hasActiveCollegePhase !== true && <button
+            disabled={hasActiveCollegePhase === null}
+            onClick={() => navigate(collegePhasePath({ active: hasActiveCollegePhase }))}
             className="flex items-center justify-center gap-2 rounded-xl bg-orange-500 px-6 py-3 text-sm font-semibold text-white shadow-[0_10px_24px_-12px_rgba(234,88,12,.8)] transition duration-150 hover:-translate-y-0.5 hover:bg-orange-600 active:translate-y-0"
           >
             <IconSchool size={16} stroke={2} /> Go to College Phase
-          </button>
+          </button>}
           <button
             onClick={() => navigate('/assessment-history')}
             className="flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-5 py-3 text-sm font-semibold text-gray-700 shadow-sm transition duration-150 hover:border-orange-200 hover:bg-orange-50 hover:text-orange-700"
@@ -446,6 +466,7 @@ function SummaryDashboard() {
         </div>
  
         <CompatibilityDisclaimer />
+        </>}
       </main></SkeletonContent>
       <ActionConfirmationModal
         action={showRetakeConfirmation ? 'retake' : null}

@@ -10,10 +10,24 @@ const SUMMARY_DESTINATION = Object.freeze({
   key: 'summary',
 })
 
-export function getCareerPathReturnDestination(search, hasActiveCollegePhase) {
-  if (hasActiveCollegePhase) return RESULTS_DESTINATION
-  const source = new URLSearchParams(search).get('returnTo')
-  return source === SUMMARY_DESTINATION.key ? SUMMARY_DESTINATION : RESULTS_DESTINATION
+export function getCareerPathReturnDestination(search) {
+  const params = new URLSearchParams(search)
+  if (params.get('returnTo') === SUMMARY_DESTINATION.key) return SUMMARY_DESTINATION
+  const resultsParams = new URLSearchParams()
+  if (params.get('saved') === '1') resultsParams.set('saved', '1')
+  const resultsReturnTo = params.get('resultsReturnTo')
+  if (['summary', 'college'].includes(resultsReturnTo)) resultsParams.set('returnTo', resultsReturnTo)
+  const query = resultsParams.toString()
+  return query ? { ...RESULTS_DESTINATION, path: `/results?${query}` } : RESULTS_DESTINATION
+}
+
+export function careerPathFromResultsSearch(search) {
+  const resultsParams = new URLSearchParams(search)
+  const params = new URLSearchParams({ returnTo: 'results' })
+  if (resultsParams.get('saved') === '1') params.set('saved', '1')
+  const returnTo = resultsParams.get('returnTo')
+  if (['summary', 'college'].includes(returnTo)) params.set('resultsReturnTo', returnTo)
+  return `?${params.toString()}`
 }
 
 export function careerPathChooserSearch(search) {

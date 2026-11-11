@@ -35,7 +35,7 @@ function CareerPath() {
   const hasActiveCollegePhase = useActiveCollegePhase()
   const passedRecommendations = location.state?.recommendations
   const cameFromCareerPaths = cameFromCareerPathChooser(location.search, location.state)
-  const returnDestination = getCareerPathReturnDestination(location.search, hasActiveCollegePhase)
+  const returnDestination = getCareerPathReturnDestination(location.search)
   const [recommendations, setRecommendations] = useState(() => (
     Array.isArray(passedRecommendations) ? passedRecommendations : []
   ))
@@ -82,7 +82,7 @@ function CareerPath() {
       return () => controller.abort()
     }
 
-    fetch(`${apiUrl}/api/results`, {
+    fetch(`${apiUrl}/api/recommendations/latest`, {
       headers: { Authorization: `Bearer ${token}` },
       signal: controller.signal,
     })
@@ -113,8 +113,8 @@ function CareerPath() {
   }
 
   const backToSelector = () => {
-    if (hasActiveCollegePhase || !cameFromCareerPaths) {
-      navigate('/results')
+    if (!cameFromCareerPaths) {
+      navigate(returnDestination.path)
       return
     }
     navigate(`/results/career-path${careerPathChooserSearch(location.search)}`, {
@@ -130,8 +130,8 @@ function CareerPath() {
         ) : (
           <span className="text-lg font-bold text-gray-900"><HeaderBrand /></span>
         )}
-        <button onClick={courseCode ? backToSelector : () => navigate(returnDestination.path)} disabled={hasActiveCollegePhase === null} className="lm-action disabled:cursor-wait disabled:opacity-50">
-          ← {courseCode && cameFromCareerPaths && !hasActiveCollegePhase ? 'Back to Career Paths' : returnDestination.label}
+        <button onClick={courseCode ? backToSelector : () => navigate(returnDestination.path)} className="lm-action">
+          ← {courseCode && cameFromCareerPaths ? 'Back to Career Paths' : returnDestination.label}
         </button>
       </nav>
 

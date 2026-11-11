@@ -1,8 +1,8 @@
-import { useState } from 'react'
+import useStudentView from '../hooks/useStudentView'
 import { IconArrowRight, IconBook2, IconSchool } from '@tabler/icons-react'
 
 export default function CollegeProgramRoadmap({ years = [], currentYear, currentTerm, duration }) {
-  const [selected, setSelected] = useState(null)
+  const [selected, setSelected] = useStudentView('college-roadmap-year', null, value => value === null || (Number.isInteger(value) && value >= 1 && value <= 10))
   const activeYear = years.find(item => Number(item.year) === selected) || years.find(item => Number(item.year) === currentYear) || years[0]
   return <section aria-labelledby="college-roadmap-title" className="college-panel">
     <div className="mb-7 flex flex-wrap items-start justify-between gap-3"><div><p className="college-eyebrow">The bigger picture</p><h2 id="college-roadmap-title" className="college-heading">Your course roadmap</h2><p className="mt-2 text-sm leading-6 text-gray-500">See where you are and explore what comes next. Select a year to view its focus.</p></div>{duration && <span className="rounded-full border border-orange-100 bg-orange-50 px-3 py-1.5 text-xs font-semibold text-orange-700">{duration}-year program</span>}</div>

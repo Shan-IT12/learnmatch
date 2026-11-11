@@ -6,7 +6,8 @@ import SkeletonContent from '../components/SkeletonContent'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { IconArrowRight, IconBook2, IconBrain, IconCertificate, IconChecklist, IconCompass, IconHeart, IconSchool, IconUser, IconCheck, IconArrowUpRight, IconCalendar, IconTarget } from '@tabler/icons-react'
-import { getNextAssessmentRoute } from '../utils/assessmentNavigation'
+import { getAttemptResumeRoute, getNextAssessmentRoute, hasSubmittedAssessmentInterests } from '../utils/assessmentNavigation'
+import { readActiveAttempt } from '../utils/assessmentSession'
 import { getPhilippineDateTime } from '../utils/philippineDateTime'
 import { clearUserAuth } from '../utils/userAuth'
 import './dashboard.css'
@@ -19,6 +20,7 @@ function Dashboard() {
   const [hasInterests, setHasInterests] = useState(false)
   const [hasSkills, setHasSkills] = useState(false)
   const [hasPersonality, setHasPersonality] = useState(false)
+  const [assessmentResumeRoute, setAssessmentResumeRoute] = useState(null)
   const token = localStorage.getItem('token')
   const username = localStorage.getItem('username')
   const { greeting, formattedDate } = getPhilippineDateTime()
@@ -30,27 +32,37 @@ function Dashboard() {
       return
     }
 
+    let active = true
     const checkStatus = async () => {
       try {
         const response = await fetch(`${import.meta.env.VITE_API_URL}/api/dashboard/status`, {
           headers: { Authorization: `Bearer ${token}` },
         })
         const data = await response.json()
+        const attempt = data.isCollegePhase ? null
+          : await readActiveAttempt(import.meta.env.VITE_API_URL, token, sessionStorage)
+        const resumeRoute = getAttemptResumeRoute(attempt)
+        if (!active) return
         if (data.isCollegePhase) navigate('/college')
         else if (data.hasCompletedAssessment || (data.hasInterests && data.hasSkills && data.hasPersonality)) navigate('/dashboard/summary')
         else {
+          // Leaving an assessment returns here. Resume only on an explicit
+          // Continue action; redirecting to the draft would trap the user.
+          setAssessmentResumeRoute(resumeRoute)
           setHasProfile(data.hasProfile)
-          setHasInterests(data.hasInterests)
+          setHasInterests(attempt ? hasSubmittedAssessmentInterests(attempt) : data.hasInterests)
           setHasSkills(data.hasSkills)
           setHasPersonality(data.hasPersonality)
           setLoading(false)
         }
       } catch (error) {
+        if (!active) return
         console.error('Dashboard status fetch error:', error)
         setLoading(false)
       }
     }
     checkStatus()
+    return () => { active = false }
   }, [navigate, token])
 
   const handleLogout = () => {
@@ -59,7 +71,7 @@ function Dashboard() {
   }
 
   const handleAssessment = () => {
-    navigate(getNextAssessmentRoute({ hasProfile, hasInterests, hasSkills, hasPersonality }))
+    navigate(assessmentResumeRoute || getNextAssessmentRoute({ hasProfile, hasInterests, hasSkills, hasPersonality }))
   }
 
 
@@ -122,7 +134,7 @@ function Dashboard() {
             </div>
             <div className="relative mt-7 flex flex-col gap-5 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between">
               <button onClick={handleAssessment} className="group inline-flex min-h-12 items-center justify-center gap-3 rounded-xl bg-orange-500 px-5 py-3.5 text-base font-semibold text-white shadow-[0_8px_20px_-10px_rgba(234,88,12,.6)] transition hover:bg-orange-600 hover:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600">
-                {completedSteps > 0 ? 'Continue Assessment' : 'Start Assessment'}<IconArrowRight size={17} stroke={2} className="transition-transform motion-safe:group-hover:translate-x-1" />
+                {assessmentResumeRoute || completedSteps > 0 ? 'Continue Assessment' : 'Start Assessment'}<IconArrowRight size={17} stroke={2} className="transition-transform motion-safe:group-hover:translate-x-1" />
               </button>
               {nextStep && <div className="flex items-center gap-2.5 text-sm"><span className="flex h-8 w-8 items-center justify-center rounded-full border border-white bg-white/55 text-orange-600"><IconTarget size={17} stroke={1.6} /></span><div><p className="text-xs font-bold uppercase tracking-wide text-amber-900/45">Up next</p><p className="mt-0.5 font-semibold text-amber-950/80">{nextStep.label}</p></div></div>}
             </div>
@@ -140,10 +152,11 @@ function Dashboard() {
               {steps.map((step, index) => {
                 const StepIcon = step.icon
                 const isNext = step === nextStep
+                const isUpcoming = Boolean(assessmentResumeRoute) && index > 0 && steps[index - 1] === nextStep && !step.done
                 const Row = isNext ? 'button' : 'div'
                 return <Row key={step.label} type={isNext ? 'button' : undefined} onClick={isNext ? handleAssessment : undefined} aria-label={isNext ? `Continue to ${step.label}` : undefined} aria-current={isNext ? 'step' : undefined} className={`group flex w-full items-center gap-3 rounded-2xl border px-3.5 py-3 text-left ${isNext ? 'dashboard-next-step border-orange-300 bg-orange-50/70 shadow-sm shadow-orange-100 outline-none hover:border-orange-400 hover:bg-orange-100/60 focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2' : 'border-gray-100 bg-gray-50/40'}`}>
                   <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${isNext ? 'bg-orange-500 text-white shadow-sm shadow-orange-200' : step.done ? 'border border-gray-200/80 bg-white text-gray-600' : 'border border-gray-100 bg-white text-gray-500'}`}><StepIcon size={18} stroke={1.7} /></div>
-                  <div className="min-w-0 flex-1"><div className="flex items-center gap-2"><p className="text-base font-semibold text-gray-900">{step.label}</p>{isNext && <span className="rounded-full bg-orange-100 px-1.5 py-0.5 text-[11px] font-bold uppercase tracking-wide text-orange-700">Next</span>}</div><p className="mt-1 text-sm leading-5 text-gray-600">{step.description}</p></div>
+                  <div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><p className="text-base font-semibold text-gray-900">{step.label}</p>{(isNext || isUpcoming) && <span className={`rounded-full px-1.5 py-0.5 text-[11px] font-bold uppercase tracking-wide ${isNext ? 'bg-orange-100 text-orange-700' : 'bg-gray-100 text-gray-500'}`}>{isNext && assessmentResumeRoute ? 'Continue' : 'Next'}</span>}</div><p className="mt-1 text-sm leading-5 text-gray-600">{step.description}</p></div>
                   {step.done ? <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-emerald-600" aria-label="Completed"><IconCheck size={13} stroke={2.5} /></span> : isNext ? <IconArrowRight size={16} className="shrink-0 text-orange-600 transition-transform motion-safe:group-hover:translate-x-0.5" /> : <span className="text-xs font-semibold text-gray-500">0{index + 1}</span>}
                 </Row>
               })}

@@ -23,17 +23,41 @@ export async function getCurrentAttempt(database, userId) {
   const [rows] = await database.query(
     `SELECT attempt_id, status, personal_factors, interests, skill_questions, skill_answers, skill_result, personality_answers, personality_assessment_id
      FROM ASSESSMENT_ATTEMPT
-     WHERE user_id = ? AND status = 'IN_PROGRESS'
+     WHERE user_id = ?
      ORDER BY attempt_id DESC LIMIT 1`,
     [userId]
   )
-  return rows[0] || null
+  // Only the latest attempt can be resumed. A completed newer attempt must
+  // never expose an older abandoned draft as the current assessment.
+  return rows[0]?.status === 'IN_PROGRESS' ? rows[0] : null
 }
 
 export function parseAttemptJson(value, fallback = null) {
   if (value == null) return fallback
   if (typeof value === 'object') return value
   try { return JSON.parse(value) } catch { return fallback }
+}
+
+export function submittedInterestResponse(interests, now = new Date()) {
+  return Array.isArray(interests) ? interests : { ...interests, submittedAt: now.toISOString() }
+}
+
+export function interestDraftResponse(interests) {
+  if (!interests || Array.isArray(interests) || typeof interests !== 'object') return interests
+  const { submittedAt: _submittedAt, ...draft } = interests
+  return draft
+}
+
+export function hasSubmittedAttemptInterests(attempt) {
+  if (attempt?.status === 'COMPLETED') return true
+  const interests = parseAttemptJson(attempt?.interests, null)
+  if (validateInterestSubmission(interests)) return false
+  // Historical arrays were submitted through the legacy form. For older
+  // structured attempts, downstream progress is evidence that Next was used.
+  return Boolean(Array.isArray(interests) || interests.submittedAt ||
+    parseAttemptJson(attempt?.skill_questions, [])?.length ||
+    parseAttemptJson(attempt?.skill_result, null) ||
+    Object.keys(parseAttemptJson(attempt?.personality_answers, {}) || {}).length)
 }
 
 const PERSONAL_FACTOR_FIELDS = Object.freeze([
@@ -208,6 +232,9 @@ export async function updateAttempt(database, userId, attemptId, field, value) {
 
 
 export async function updateCurrentAttemptDraft(database, userId, draft, attemptId = null) {
+  if (Object.prototype.hasOwnProperty.call(draft, 'interests')) {
+    draft = { ...draft, interests: interestDraftResponse(draft.interests) }
+  }
   const allowed = ['interests', 'skill_questions', 'skill_answers', 'personality_answers']
   const entries = allowed.filter((field) => Object.prototype.hasOwnProperty.call(draft, field))
   if (!entries.length) throw new Error('No supported assessment draft fields were provided')

@@ -1,6 +1,6 @@
 export const SUMMARY_DASHBOARD_DESTINATION = Object.freeze({
   path: '/dashboard/summary',
-  label: 'Go to Summary Dashboard',
+  label: 'Return to Summary Dashboard',
 })
 
 export const COLLEGE_DASHBOARD_DESTINATION = Object.freeze({
@@ -13,7 +13,8 @@ export const MAIN_DASHBOARD_DESTINATION = Object.freeze({
   label: 'Return to Dashboard',
 })
 
-export function getAssessmentReturnDestination(collegeStatus) {
+export function getAssessmentReturnDestination(collegeStatus, returnTo) {
+  if (returnTo === 'summary') return SUMMARY_DASHBOARD_DESTINATION
   return collegeStatus?.lifecycleStatus === 'active'
     ? COLLEGE_DASHBOARD_DESTINATION
     : SUMMARY_DASHBOARD_DESTINATION
@@ -23,4 +24,11 @@ export function getAssessmentCancelDestination(hasActiveCollegePhase) {
   return hasActiveCollegePhase
     ? COLLEGE_DASHBOARD_DESTINATION
     : MAIN_DASHBOARD_DESTINATION
+}
+
+export function getSavedResultsPath(search, returnPath) {
+  const params = new URLSearchParams(search)
+  params.set('saved', '1')
+  params.set('returnTo', returnPath === '/college' ? 'college' : 'summary')
+  return `/results?${params.toString()}`
 }

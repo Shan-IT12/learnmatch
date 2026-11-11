@@ -9,7 +9,7 @@ import HeaderBrand from '../../components/HeaderBrand'
 import { collegePlaceholder, coursePlaceholder } from '../../data/loadingPlaceholders'
 import SkeletonContent from '../../components/SkeletonContent'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import CourseName from '../../components/CourseName'
 import SuccessConfirmation from '../../components/SuccessConfirmation'
 import ActionConfirmationModal from '../../components/ActionConfirmationModal'
@@ -47,6 +47,11 @@ import { FieldError, RequiredMark } from '../../components/FormValidation'
 import { scrollToFirstInvalidField } from '../../utils/formValidation'
 import { getCalendarTerms, resolveCalendarTerm } from '../../constants/academicCalendars'
 import { beginAssessmentAttempt } from '../../utils/assessmentSession'
+import { hasSavedAssessmentSummary } from '../../utils/assessmentSummaryNavigation'
+import useAssessmentResume from '../../hooks/useAssessmentResume'
+import useCollegeCompletionNotice from '../../hooks/useCollegeCompletionNotice'
+import useStudentView from '../../hooks/useStudentView'
+import { collegeCompletionNoticeKey } from '../../utils/collegeCompletionNotice'
 import { ApproximateScheduleFields } from './CollegeSetup'
 import { getAcademicYearOptions, isApproximateEndAfterStart } from '../../utils/collegeSchedule'
 
@@ -94,7 +99,7 @@ function AlignmentTrendChart({ records }) {
     <div aria-label="Alignment percentage trend">
       <div className="grid grid-cols-3 gap-2 sm:hidden">{CHECKIN_PHASES.map(phase => {
         const record = records.find(item => item.phase === phase)
-        return <div key={phase} className="rounded-xl border border-gray-100 bg-gray-50 px-2 py-4 text-center"><p className="text-xs font-medium text-gray-500">{phase}</p><p className="mt-2 text-lg font-bold text-orange-600">{record ? `${record.alignmentPercent}%` : '-'}</p><p className="mt-1 text-[10px] text-gray-400">{record ? 'Alignment' : 'No result'}</p></div>
+        return <div key={phase} className="rounded-xl border border-gray-100 bg-gray-50 px-2 py-4 text-center"><p className="text-xs font-medium text-gray-500">{phase}</p><p className="mt-2 text-lg font-bold text-orange-600">{record ? `${record.alignmentPercent}%` : '-'}</p><p className="mt-1 text-[10px] text-gray-600">{record ? 'Alignment' : 'No result'}</p></div>
       })}</div>
       <svg viewBox="0 0 600 180" className="hidden h-auto max-h-56 w-full sm:block" role="img" aria-label="Alignment across Early, Mid and End check-ins">
         {[25, 50, 75, 100].map((value) => {
@@ -236,9 +241,9 @@ export function CheckinProgress({ completedPhases = [], phaseStates = [], nextPh
           return (
             <div key={phase} className="relative text-center">
               {index > 0 && <span aria-hidden="true" className="absolute right-[calc(50%+1.4rem)] top-1 text-lg font-bold text-gray-300">→</span>}
-              <span className={`relative z-10 mx-auto flex h-8 w-8 items-center justify-center rounded-full border text-sm font-bold ${isCompleted ? 'border-emerald-500 bg-emerald-500 text-white' : isCurrent ? 'border-orange-500 bg-orange-500 text-white ring-4 ring-orange-100' : 'border-gray-200 bg-white text-gray-400'}`}>{isCompleted ? '✓' : index + 1}</span>
-              <p className={`mt-2 text-sm font-semibold ${isCompleted ? 'text-emerald-700' : isCurrent ? 'text-orange-700' : 'text-gray-400'}`}>{phase}</p>
-              <p className={`mt-0.5 text-[11px] ${isNotRecorded ? 'text-gray-500' : 'text-gray-400'}`}>{stateText}</p>
+              <span className={`relative z-10 mx-auto flex h-8 w-8 items-center justify-center rounded-full border text-sm font-bold ${isCompleted ? 'border-emerald-500 bg-emerald-500 text-white' : isCurrent ? 'border-orange-500 bg-orange-500 text-white ring-4 ring-orange-100' : 'border-gray-200 bg-white text-gray-600'}`}>{isCompleted ? '✓' : index + 1}</span>
+              <p className={`mt-2 text-sm font-semibold ${isCompleted ? 'text-emerald-700' : isCurrent ? 'text-orange-700' : 'text-gray-600'}`}>{phase}</p>
+              <p className={`mt-0.5 text-[11px] ${isNotRecorded ? 'text-gray-500' : 'text-gray-600'}`}>{stateText}</p>
             </div>
           )
         })}
@@ -253,8 +258,11 @@ export function CheckinProgress({ completedPhases = [], phaseStates = [], nextPh
 
 function CollegeDashboard() {
   const navigate = useNavigate()
+  const location = useLocation()
+  const notificationEntry = new URLSearchParams(location.search).get('notifications') === '1'
   const token = localStorage.getItem('token')
   const username = localStorage.getItem('username')
+  const assessmentResume = useAssessmentResume()
 
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -262,6 +270,7 @@ function CollegeDashboard() {
   const collegeInfo = loading ? collegePlaceholder : savedCollegeInfo
   const [checkinStatus, setCheckinStatus] = useState(null)
   const [history, setHistory] = useState([])
+  const [hasAssessmentSummary, setHasAssessmentSummary] = useState(false)
   const [savedCourseRoadmap, setCourseRoadmap] = useState(null)
   const courseRoadmap = loading ? coursePlaceholder : savedCourseRoadmap
   const [startingCheckin, setStartingCheckin] = useState(false)
@@ -279,10 +288,9 @@ function CollegeDashboard() {
   const [lifecyclePending, setLifecyclePending] = useState(false)
   const [nextTermErrors, setNextTermErrors] = useState({})
   const [startingAssessment, setStartingAssessment] = useState(false)
-  const [activeView, setActiveView] = useState('overview')
-  const [dismissedCompletion, setDismissedCompletion] = useState(null)
+  const [activeView, setActiveView] = useStudentView('college-tab', 'overview', value => ['overview', 'roadmap', 'history'].includes(value))
   const viewButtonsRef = useRef([])
-  const [showFullHistory, setShowFullHistory] = useState(false)
+  const [showFullHistory, setShowFullHistory] = useStudentView('college-full-history', false, value => typeof value === 'boolean')
   const [successMessage, setSuccessMessage] = useState('')
   const [pendingLifecycleAction, setPendingLifecycleAction] = useState(null)
   const [pendingEarlyPhase, setPendingEarlyPhase] = useState(null)
@@ -290,11 +298,17 @@ function CollegeDashboard() {
 
   useEffect(() => {
     if (!token) {
-      navigate('/login', { state: { returnTo: '/college?notifications=1' } })
+      navigate('/login', { state: notificationEntry ? { returnTo: '/college?notifications=1' } : null })
       return undefined
     }
 
     const controller = new AbortController()
+    // Optional saved-result discovery must never block College tracking.
+    fetch(`${import.meta.env.VITE_API_URL}/api/recommendations/latest`, {
+      headers: { Authorization: `Bearer ${token}` }, signal: controller.signal,
+    }).then(async response => response.ok ? response.json() : null)
+      .then(data => { if (!controller.signal.aborted) setHasAssessmentSummary(hasSavedAssessmentSummary(data)) })
+      .catch(() => { /* Missing/unavailable results leave the link hidden. */ })
     const fetchData = async () => {
       try {
         const headers = { Authorization: `Bearer ${token}` }
@@ -305,7 +319,7 @@ function CollegeDashboard() {
         ])
 
         if (collegeRes.status === 401 || collegeRes.status === 403) {
-          navigate('/login', { replace: true, state: { returnTo: '/college?notifications=1' } })
+          navigate('/login', { replace: true, state: notificationEntry ? { returnTo: '/college?notifications=1' } : null })
           return
         }
         const collegeData = await collegeRes.json()
@@ -346,7 +360,7 @@ function CollegeDashboard() {
 
     fetchData()
     return () => controller.abort()
-  }, [navigate, token])
+  }, [navigate, token, notificationEntry])
 
   const currentSemesterRecords = useMemo(
     () => getCurrentSemesterRecords(history, collegeInfo || {}),
@@ -400,7 +414,10 @@ function CollegeDashboard() {
     ? `Start ${nextAcademicStage.semester}`
     : 'Start Next Term'
   const programTrackingComplete = Boolean(checkinStatus?.progressionEligible && nextAcademicStage?.programCompleted)
-  const completionKey = [collegeInfo?.courseId, collegeInfo?.academicYear, collegeInfo?.yearLevel, collegeInfo?.semester].join('|')
+  const completionKey = !loading && programTrackingComplete
+    ? collegeCompletionNoticeKey(localStorage.getItem('userId'), collegeInfo)
+    : null
+  const completionNotice = useCollegeCompletionNotice(completionKey)
 
   const openNextTermForm = () => {
     setShowNextSemesterForm(true)
@@ -583,7 +600,13 @@ function CollegeDashboard() {
           <div className="relative mt-6 border-t border-orange-100 pt-4"><p className="text-sm font-medium leading-6 text-gray-600">Career Alignment Tracking</p><p className="text-sm leading-6 text-gray-600">Follow your course experience, complete your next check-in, and see your progress over time.</p></div>
         </header>
 
-        {!loading && programTrackingComplete && dismissedCompletion !== completionKey && <CollegeCompletionDialog yearLevel={collegeInfo?.yearLevel} termLabel={collegeInfo?.semester} onDismiss={() => setDismissedCompletion(completionKey)} />}
+        {hasAssessmentSummary && <nav aria-label="Assessment" className="flex flex-wrap gap-3">
+          <button type="button" onClick={() => navigate('/dashboard/summary')} className="lm-action w-full justify-center sm:w-auto">
+            <IconLayoutDashboard size={17} aria-hidden="true" /> View Assessment Summary
+          </button>
+        </nav>}
+
+        {completionNotice.isOpen && <CollegeCompletionDialog yearLevel={collegeInfo?.yearLevel} termLabel={collegeInfo?.semester} onDismiss={completionNotice.dismiss} />}
 
         <div className="inline-flex max-w-full flex-wrap gap-1 rounded-2xl border border-gray-200/70 bg-gray-100/80 p-1.5" role="tablist" aria-label="College dashboard sections">
           {dashboardViews.map((view, index) => { const ViewIcon = view.icon; return <button key={view.id} ref={element => { viewButtonsRef.current[index] = element }} id={`college-view-${view.id}`} type="button" role="tab" aria-selected={visibleView === view.id} aria-controls={`college-panel-${view.id}`} tabIndex={visibleView === view.id ? 0 : -1} onClick={() => setActiveView(view.id)} onKeyDown={event => handleViewKey(event, index)} className="college-view-button"><ViewIcon size={17} stroke={1.7} aria-hidden="true" />{view.label}</button> })}
@@ -609,7 +632,7 @@ function CollegeDashboard() {
           ) : (<>
             <div className="grid gap-5 lg:grid-cols-[1.5fr_1fr]">
 <section className={`college-panel h-full ${checkinCardIsActionable ? 'college-next-action' : ''}`}>
-            <p className="college-eyebrow">Your next step</p><IconClipboardCheck size={28} stroke={1.7} className={checkinCardIsActionable ? 'text-orange-500' : 'text-gray-400'} />
+            <p className="college-eyebrow">Your next step</p><IconClipboardCheck size={28} stroke={1.7} className={checkinCardIsActionable ? 'text-orange-500' : 'text-gray-600'} />
             <h2 className="mt-4 text-2xl font-bold tracking-tight text-gray-950">
               {checkinStatus?.state === 'pending' && `Your ${nextCheckinPhase} check-in is ready`}
               {checkinStatus?.state === 'due' && (checkinStatus?.earlyCheckin ? `Your ${nextCheckinPhase} check-in is ahead of schedule` : `Your ${nextCheckinPhase} check-in is ready`)}
@@ -639,7 +662,7 @@ function CollegeDashboard() {
                   View Completed Check-in
                 </button>
                 {programTrackingComplete && (
-                  <button type="button" onClick={() => setDismissedCompletion(null)} className="inline-flex items-center justify-center gap-2 rounded-xl border border-orange-200 bg-orange-50 px-5 py-3 text-sm font-semibold text-orange-800"><IconSparkles size={18} aria-hidden="true" />View celebration</button>
+                  <button type="button" onClick={completionNotice.open} className="inline-flex items-center justify-center gap-2 rounded-xl border border-orange-200 bg-orange-50 px-5 py-3 text-sm font-semibold text-orange-800"><IconSparkles size={18} aria-hidden="true" />View celebration</button>
                 )}
                 {programTrackingComplete && (
                   <button type="button" disabled={lifecyclePending} onClick={() => updateLifecycle('end')} className="inline-flex items-center justify-center gap-2 rounded-xl bg-gray-950 px-5 py-3 text-sm font-semibold text-white disabled:opacity-50">
@@ -759,18 +782,18 @@ function CollegeDashboard() {
                         <p className="text-lg font-semibold text-gray-500 mt-2">{stateLabel}</p>
                       )}
                     </div>
-                    <div className={`w-9 h-9 rounded-full flex items-center justify-center ${record ? 'bg-orange-100 text-orange-600' : 'bg-white text-gray-400 border border-gray-200'}`}>
+                    <div className={`w-9 h-9 rounded-full flex items-center justify-center ${record ? 'bg-orange-100 text-orange-600' : 'bg-white text-gray-600 border border-gray-200'}`}>
                       {record ? <IconCircleCheck size={19} /> : <IconCalendar size={18} />}
                     </div>
                   </div>
                   {record ? (
                     <>
                       <span className={`inline-flex border rounded-full px-2.5 py-1 text-[10px] font-bold mt-4 ${statusStyle(record.status)}`}>{statusLabel(record.status)}</span>
-                      <p className="text-xs text-gray-400 mt-3">{formatCheckinDate(record.checkinDate) || 'Completion date unavailable'}</p>
+                      <p className="text-xs text-gray-600 mt-3">{formatCheckinDate(record.checkinDate) || 'Completion date unavailable'}</p>
                     </>
                   ) : (
                     <div className="mt-4">
-                      <p className="text-xs text-gray-400">No stored result for this phase.</p>
+                      <p className="text-xs text-gray-600">No stored result for this phase.</p>
                     </div>
                   )}
                 </article>
@@ -803,7 +826,7 @@ function CollegeDashboard() {
           </div>
           <p className="text-sm text-gray-500 mb-5">Every completed check-in appears here, newest first, including your current term.</p>
           {displayedHistory.length === 0 ? (
-            <p className="text-sm text-gray-400 rounded-2xl bg-gray-50 px-5 py-6">No completed check-ins yet.</p>
+            <p className="text-sm text-gray-600 rounded-2xl bg-gray-50 px-5 py-6">No completed check-ins yet.</p>
           ) : (
             <div className="space-y-3">
               {visibleHistory.map((record) => (
@@ -816,11 +839,11 @@ function CollegeDashboard() {
                       </div>
                       <span className={`inline-flex border rounded-full px-2 py-0.5 text-[9px] font-bold ${statusStyle(record.status)}`}>{statusLabel(record.status)}</span>
                     </div>
-                    <p className="text-xs text-gray-400 mt-1">{formatCheckinDate(record.checkinDate) || 'Date unavailable'}</p>
+                    <p className="text-xs text-gray-600 mt-1">{formatCheckinDate(record.checkinDate) || 'Date unavailable'}</p>
                   </div>
                   <div className="sm:text-right">
                     <p className="text-lg font-bold text-orange-500">{record.alignmentPercent}%</p>
-                    {hasDisplayableGwa(record) && <p className="text-xs text-gray-400">GWA: {record.gwa}</p>}
+                    {hasDisplayableGwa(record) && <p className="text-xs text-gray-600">GWA: {record.gwa}</p>}
                   </div>
                 </article>
               ))}
@@ -856,9 +879,11 @@ function CollegeDashboard() {
           </summary>
           {lifecycleStatus === 'active' ? (
 <section className="flex flex-wrap gap-3 border-t border-gray-100 px-5 py-5 sm:px-7">
-            <button type="button" disabled={startingAssessment} onClick={handleTakeAssessment} className="inline-flex items-center gap-2 rounded-xl border border-orange-200 bg-orange-50 px-4 py-2.5 text-sm font-semibold text-orange-700 disabled:cursor-not-allowed disabled:opacity-50">
+            {assessmentResume.error && <p role="alert" className="w-full text-sm text-red-700">{assessmentResume.error}</p>}
+            {assessmentResume.route ? <button type="button" className="lm-action" onClick={() => navigate(assessmentResume.route)}>Continue Assessment</button> :
+            <button type="button" disabled={startingAssessment || assessmentResume.loading || Boolean(assessmentResume.error)} onClick={handleTakeAssessment} className="inline-flex items-center gap-2 rounded-xl border border-orange-200 bg-orange-50 px-4 py-2.5 text-sm font-semibold text-orange-700 disabled:cursor-not-allowed disabled:opacity-50">
               <IconRefresh size={16} stroke={2} /> {startingAssessment ? 'Starting Assessment...' : 'Take Assessment Again'}
-            </button>
+            </button>}
             <button type="button" disabled={lifecyclePending} onClick={() => setPendingLifecycleAction('pause')} className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-700 disabled:opacity-50">Pause Tracking</button>
             <button type="button" disabled={lifecyclePending} onClick={() => setPendingLifecycleAction('change')} className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-700 disabled:opacity-50">Change Program</button>
             {!programTrackingComplete && <button type="button" disabled={lifecyclePending} onClick={() => setPendingLifecycleAction('end')} className="rounded-xl border border-red-200 px-4 py-2.5 text-sm font-semibold text-red-700 disabled:opacity-50">End Tracking</button>}

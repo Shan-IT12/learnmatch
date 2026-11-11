@@ -2,7 +2,7 @@ import HeaderBrand from '../components/HeaderBrand'
 import RecommendationsLoadingState from '../components/RecommendationsLoadingState'
 import CompatibilityDisclaimer from '../components/CompatibilityDisclaimer'
 import { useState, useEffect, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { IconSchool, IconSparkles, IconArrowUpRight, IconBrain, IconChartBar, IconActivity, IconBulb } from '@tabler/icons-react'
 import FeedbackPopup from '../components/FeedbackPopup'
 import CourseName from '../components/CourseName'
@@ -10,9 +10,11 @@ import CourseSchoolAction from '../components/CourseSchoolAction'
 import PersonalFactorExplanation from '../components/PersonalFactorExplanation'
 import { getPersonalFactorExplanation } from '../../../shared/personalFactorExplanation'
 import { MBTI_TYPE_CONTENT, getExpandedType } from '../data/mbtiResultContent'
-import { getAssessmentReturnDestination, SUMMARY_DASHBOARD_DESTINATION } from '../utils/assessmentReturnDestination'
+import { getAssessmentReturnDestination, getSavedResultsPath } from '../utils/assessmentReturnDestination'
 import { feedbackPromptKey, setActiveFeedbackPromptKey } from '../utils/feedbackPrompt'
 import { readRecommendationResponse } from '../utils/recommendationProgress'
+import { hasSavedAssessmentSummary } from '../utils/assessmentSummaryNavigation'
+import { careerPathFromResultsSearch } from '../utils/careerPathNavigation'
 
 const RECOMMENDATIONS_TIMEOUT_MS = 30000
 
@@ -43,6 +45,10 @@ function shouldShowRequirementsNote(profile, cluster) {
 
 function Results() {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const savedOnly = searchParams.get('saved') === '1'
+  // Older Summary links used saved=1 without an explicit return context.
+  const returnTo = searchParams.get('returnTo') || (savedOnly ? 'summary' : null)
   const pageRef = useRef(null)
   const [recommendations, setRecommendations] = useState([])
   const [loading, setLoading] = useState(true)
@@ -51,7 +57,9 @@ function Results() {
   const [rankingPending, setRankingPending] = useState(false)
   const [retryCount, setRetryCount] = useState(0)
   const [assessment, setAssessment] = useState({ interests: [], domainScores: {}, mbti: null, profile: null })
-  const [returnDestination, setReturnDestination] = useState(SUMMARY_DASHBOARD_DESTINATION)
+  const [collegeStatus, setCollegeStatus] = useState(null)
+  const returnDestination = getAssessmentReturnDestination(collegeStatus, returnTo)
+  const savedResultsPath = getSavedResultsPath(searchParams.toString(), returnDestination.path)
   const [feedbackMilestoneKey, setFeedbackMilestoneKey] = useState(null)
 
   useEffect(() => {
@@ -78,10 +86,10 @@ function Results() {
       }, RECOMMENDATIONS_TIMEOUT_MS)
 
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/results`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}${savedOnly ? '/api/recommendations/latest' : '/api/results'}`, {
           headers: {
             Authorization: `Bearer ${token}`,
-            Accept: 'text/event-stream',
+            Accept: savedOnly ? 'application/json' : 'text/event-stream',
           },
           signal: controller.signal,
         })
@@ -109,6 +117,10 @@ function Results() {
           return
         }
 
+        if (savedOnly && !hasSavedAssessmentSummary(data)) {
+          setError('Your saved recommendations are unavailable. Return to your assessment summary and try again later.')
+          return
+        }
         setRecommendations(Array.isArray(data.recommendations) ? data.recommendations : [])
 
         setLoadingProgress({ percent: 80, label: 'Loading your results overview' })
@@ -126,7 +138,7 @@ function Results() {
           fetch(`${import.meta.env.VITE_API_URL}/api/profile?userId=${userId}`, { headers, signal: controller.signal }).then((res) => res.json()),
           fetch(`${import.meta.env.VITE_API_URL}/api/college/status`, { headers, signal: controller.signal })
             .then(async (res) => res.ok ? res.json() : null),
-          fetch(`${import.meta.env.VITE_API_URL}/api/recommendations/latest`, { headers, signal: controller.signal })
+          savedOnly ? Promise.resolve(data) : fetch(`${import.meta.env.VITE_API_URL}/api/recommendations/latest`, { headers, signal: controller.signal })
             .then(async (res) => res.ok ? res.json() : null),
         ].map(trackDetail))
         if (controller.signal.aborted) throw new DOMException('Results request cancelled', 'AbortError')
@@ -141,7 +153,7 @@ function Results() {
             mbti: valueAt(2).mbtiType || null,
             profile: valueAt(3).profile || null,
           })
-          setReturnDestination(getAssessmentReturnDestination(valueAt(4)))
+          setCollegeStatus(valueAt(4))
           const promptKey = feedbackPromptKey(userId, valueAt(5)?.recommendation?.recommendation_id)
           setFeedbackMilestoneKey(promptKey)
           setActiveFeedbackPromptKey(localStorage, promptKey)
@@ -170,7 +182,7 @@ function Results() {
     loadRecommendations()
 
     return () => controller.abort()
-  }, [navigate, retryCount])
+  }, [navigate, retryCount, savedOnly])
 
   const rankLabel = ['Top Match', '2nd Match', '3rd Match']
   const breakdownLabels = {
@@ -193,7 +205,7 @@ function Results() {
   const personalFactorDetails = getPersonalFactorExplanation(assessment.profile || {}, recommendations)
 
   return (
-    <div ref={pageRef} className="min-h-screen bg-gray-50">
+    <div ref={pageRef} data-session-path={!loading && !error && recommendations.length ? savedResultsPath : undefined} className="min-h-screen bg-gray-50">
       {/* Nav */}
       <nav className="lm-site-header bg-white border-b border-gray-100 px-5 sm:px-8 py-4 sm:py-5 flex justify-between items-center gap-3">
         {loading || returnDestination.path === '/college' ? (
@@ -206,7 +218,7 @@ function Results() {
         )}
       </nav>
 
-      <div className="max-w-6xl mx-auto px-5 sm:px-8 py-8 sm:py-12">
+      <main id="main-content" tabIndex={-1} aria-busy={loading || undefined} className={loading ? 'lm-results-loading' : 'max-w-6xl mx-auto px-5 sm:px-8 py-8 sm:py-12'}>
         {!loading && <>
         <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900 mb-2">Your Recommended Courses</h1>
         <p className="text-gray-500 text-sm mb-6">
@@ -215,7 +227,7 @@ function Results() {
             : 'Based on your skills, interests, and profile, here are your top matches.'}
         </p>
         </>}
-        {returnDestination.path === '/college' && (
+        {!loading && collegeStatus?.lifecycleStatus === 'active' && (
           <p className="mb-6 rounded-xl border border-orange-100 bg-orange-50 px-4 py-3 text-sm text-orange-900">
             These recommendations are informational and do not change your enrolled course or College Phase tracking.
           </p>
@@ -263,7 +275,7 @@ function Results() {
                   </div>
                   <div className="flex shrink-0 items-baseline gap-2 sm:justify-end">
                     <span className={`font-bold tracking-tight ${isTopMatch ? 'text-3xl text-orange-600 sm:text-4xl' : isSecondMatch ? 'text-2xl text-orange-700' : 'text-2xl text-stone-700'}`}>{rec.match_score}%</span>
-                    <span className="text-xs text-gray-400">match</span>
+                    <span className="text-xs text-gray-600">match</span>
                   </div>
                 </div>
 
@@ -277,7 +289,7 @@ function Results() {
 
                 <div className={`grid items-start gap-4 ${isTopMatch ? 'lg:grid-cols-[minmax(0,1fr)_17rem]' : ''}`}>
                   {rec.ai_narrative && (
-                    <section aria-labelledby={`course-fit-${rec.rank_position}`} className={`relative overflow-hidden rounded-2xl border p-5 ${isTopMatch ? 'border-orange-200 bg-gradient-to-br from-orange-50 via-orange-50/60 to-amber-50/70 sm:p-6' : isSecondMatch ? 'border-orange-200 bg-orange-50/70' : 'border-orange-100 bg-amber-50/60'}`}>
+                    <section aria-label={`Recommendation ${rec.rank_position}: Why this course fits you: ${rec.course_name}`} className={`relative overflow-hidden rounded-2xl border p-5 ${isTopMatch ? 'border-orange-200 bg-gradient-to-br from-orange-50 via-orange-50/60 to-amber-50/70 sm:p-6' : isSecondMatch ? 'border-orange-200 bg-orange-50/70' : 'border-orange-100 bg-amber-50/60'}`}>
                       {isTopMatch && <div aria-hidden="true" className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-orange-400 to-orange-500" />}
                       <div className="mb-4 flex items-center gap-3">
                         <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${isTopMatch ? 'bg-orange-500 text-white shadow-sm shadow-orange-200' : isSecondMatch ? 'bg-orange-100 text-orange-600' : 'bg-orange-50 text-orange-700 ring-1 ring-orange-100'}`}><IconSparkles size={21} stroke={1.8} aria-hidden="true" /></span>
@@ -305,7 +317,7 @@ function Results() {
                 </div>
                 <div className={`mt-auto border-t px-5 py-4 ${isTopMatch ? 'flex flex-wrap items-center gap-x-5 gap-y-2 border-orange-100 bg-orange-50/40 sm:px-8' : 'grid grid-cols-1 items-start gap-3 border-gray-100 bg-gray-50/50 sm:grid-cols-[max-content_minmax(0,1fr)] sm:px-6'}`}>
                 <button
-                onClick={() => navigate(`/results/career-path/${encodeURIComponent(rec.course_code)}`, { state: { recommendations, source: 'results' } })}
+                onClick={() => navigate(`/results/career-path/${encodeURIComponent(rec.course_code)}${careerPathFromResultsSearch(savedResultsPath.slice('/results'.length))}`, { state: { recommendations, source: 'results' } })}
                 className="lm-action justify-self-start"
               >
                 View Career Path →
@@ -330,7 +342,7 @@ function Results() {
                 <h2 id="assessment-snapshot-title" className="mt-1.5 text-lg font-bold tracking-tight text-stone-900 sm:text-xl">Your assessment at a glance</h2>
                 <p className="mt-1 text-xs leading-5 text-stone-500">The profile behind your course matches.</p>
               </div>
-              {returnDestination.path !== '/college' && (
+              {(savedOnly || returnDestination.path !== '/college') && (
                 <button type="button" onClick={() => navigate('/dashboard/summary')} className="lm-action w-fit shrink-0 gap-2">
                   Open Full Summary <IconArrowUpRight size={15} aria-hidden="true" />
                 </button>
@@ -346,7 +358,7 @@ function Results() {
               <article className="rounded-2xl border border-stone-200/70 bg-[#fdfcfb] p-5">
                 <div className="flex items-center gap-2 text-stone-600"><IconChartBar size={17} stroke={1.6} className="text-orange-600" aria-hidden="true" /><h3 className="text-xs font-semibold">Academic skills</h3></div>
                 <div className="mt-5 flex items-baseline justify-between gap-2">
-                  <p className="font-bold tracking-tight text-stone-900"><span className="text-3xl">{skillTotals.total ? skillTotals.correct : '\u2014'}</span>{skillTotals.total > 0 && <span className="ml-1 text-sm font-medium text-stone-400">/ {skillTotals.total}</span>}</p>
+                  <p className="font-bold tracking-tight text-stone-900"><span className="text-3xl">{skillTotals.total ? skillTotals.correct : '\u2014'}</span>{skillTotals.total > 0 && <span className="ml-1 text-sm font-medium text-stone-600">/ {skillTotals.total}</span>}</p>
                   {skillPercent !== null && <span className="text-xs font-semibold text-orange-700">{skillPercent}% correct</span>}
                 </div>
                 <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-stone-100" aria-hidden="true"><div className="h-full rounded-full bg-orange-400" style={{ width: `${skillPercent ?? 0}%` }} /></div>
@@ -374,7 +386,7 @@ function Results() {
               </article>
             </div>
             <div className="mx-5 border-t border-stone-100 py-5 sm:mx-6">
-              <div className="mb-3 flex items-center gap-2"><IconBulb size={17} stroke={1.6} className="text-orange-600" aria-hidden="true" /><h3 className="text-xs font-semibold text-stone-700">Selected interests &amp; hobbies</h3>{assessment.interests.length > 0 && <span className="ml-1 text-[11px] text-stone-400">{assessment.interests.length} selected</span>}</div>
+              <div className="mb-3 flex items-center gap-2"><IconBulb size={17} stroke={1.6} className="text-orange-600" aria-hidden="true" /><h3 className="text-xs font-semibold text-stone-700">Selected interests &amp; hobbies</h3>{assessment.interests.length > 0 && <span className="ml-1 text-[11px] text-stone-600">{assessment.interests.length} selected</span>}</div>
               <div className="flex flex-wrap gap-2">
                 {assessment.interests.length > 0 ? assessment.interests.map((interest) => (
                   <span key={interest} className="rounded-lg border border-stone-200/80 bg-[#fdfbf8] px-3 py-1.5 text-xs font-medium text-stone-600">{interest}</span>
@@ -386,8 +398,8 @@ function Results() {
 
           </>
         )}
-        <CompatibilityDisclaimer />
-      </div>
+        {!loading && <CompatibilityDisclaimer />}
+      </main>
       <FeedbackPopup
         promptKey={feedbackMilestoneKey}
         milestoneReached={!loading && !error && recommendations.length > 0}

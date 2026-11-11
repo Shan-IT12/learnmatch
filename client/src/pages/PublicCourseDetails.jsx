@@ -130,11 +130,11 @@ function PublicCourseDetails() {
               <div className="grid md:grid-cols-2 gap-8 mt-10 pt-8 border-t border-gray-100">
                 <section>
                   <h2 className="text-lg font-semibold text-gray-900 mb-4">Skills you can develop</h2>
-                  {course.obtainable_skills.length ? <ul className="space-y-2">{course.obtainable_skills.map((skill) => <li key={skill} className="text-sm text-gray-600 flex gap-2"><span className="text-orange-700">•</span>{skill}</li>)}</ul> : <p className="text-sm text-gray-400">No skills listed.</p>}
+                  {course.obtainable_skills.length ? <ul className="space-y-2">{course.obtainable_skills.map((skill) => <li key={skill} className="text-sm text-gray-600 flex gap-2"><span className="text-orange-700">•</span>{skill}</li>)}</ul> : <p className="text-sm text-gray-600">No skills listed.</p>}
                 </section>
                 <section>
                   <h2 className="text-lg font-semibold text-gray-900 mb-4">Possible career paths</h2>
-                  {course.career_paths.length ? <ul className="space-y-2">{course.career_paths.map((career) => <li key={career} className="text-sm text-gray-600 flex gap-2"><span className="text-orange-700">•</span>{career}</li>)}</ul> : <p className="text-sm text-gray-400">No career paths listed.</p>}
+                  {course.career_paths.length ? <ul className="space-y-2">{course.career_paths.map((career) => <li key={career} className="text-sm text-gray-600 flex gap-2"><span className="text-orange-700">•</span>{career}</li>)}</ul> : <p className="text-sm text-gray-600">No career paths listed.</p>}
                 </section>
               </div>
 

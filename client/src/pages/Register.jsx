@@ -206,7 +206,7 @@ function Register() {
           <HeaderBrand />
         </Link>
         <div className="flex items-center gap-2">
-          <span className="hidden text-sm text-gray-400 sm:inline">Already have an account?</span>
+          <span className="hidden text-sm text-gray-600 sm:inline">Already have an account?</span>
           <Link
             to="/login"
             className="rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition duration-150 hover:border-orange-200 hover:bg-orange-50 hover:text-orange-700 active:translate-y-px"
@@ -243,10 +243,11 @@ function Register() {
 
               <form onSubmit={handleSubmit} noValidate className="space-y-4">
                 <div data-validation-field="email">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Email <RequiredMark /></label>
+                  <label htmlFor="register-email" className="block text-sm font-medium text-gray-700 mb-2">Email <RequiredMark /></label>
                   <input
                     type="email"
                     name="email"
+                      id="register-email"
                     value={formData.email}
                     onChange={handleChange}
                     className="w-full rounded-2xl border border-stone-200/90 bg-white/85 px-4 py-3.5 text-sm outline-none transition duration-150 hover:border-orange-200 focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100/80"
@@ -257,10 +258,11 @@ function Register() {
                 </div>
 
                 <div data-validation-field="username">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Username <RequiredMark /></label>
+                  <label htmlFor="register-username" className="block text-sm font-medium text-gray-700 mb-2">Username <RequiredMark /></label>
                   <input
                     type="text"
                     name="username"
+                      id="register-username"
                     value={formData.username}
                     onChange={handleChange}
                     minLength={USERNAME_MIN_LENGTH}
@@ -273,11 +275,12 @@ function Register() {
                 </div>
 
                 <div data-validation-field="password">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Password <RequiredMark /></label>
+                  <label htmlFor="register-password" className="block text-sm font-medium text-gray-700 mb-2">Password <RequiredMark /></label>
                   <div className="relative">
                     <input
                       type={showPassword ? 'text' : 'password'}
                       name="password"
+                      id="register-password"
                       value={formData.password}
                       onChange={handleChange}
                       className="w-full rounded-2xl border border-stone-200/90 bg-white/85 px-4 py-3.5 pr-11 text-sm outline-none transition duration-150 hover:border-orange-200 focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100/80"
@@ -288,24 +291,27 @@ function Register() {
                     <button
                       type="button"
                       onClick={() => setShowPassword((prev) => !prev)}
-                      className="absolute right-1 top-1/2 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-lg text-gray-400 transition duration-150 hover:bg-gray-50 hover:text-gray-600 active:scale-95"
-                      tabIndex={-1}
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
+                      aria-pressed={showPassword}
+                      aria-controls="register-password"
+                      className="absolute right-1 top-1/2 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-lg text-gray-600 transition duration-150 hover:bg-gray-50 hover:text-gray-600 active:scale-95"
                     >
                       {showPassword ? <IconEyeOff size={18} stroke={1.75} /> : <IconEye size={18} stroke={1.75} />}
                     </button>
                   </div>
                   <FieldError id="register-password-error">{fieldErrors.password}</FieldError>
-                  <p className="text-xs text-gray-400 mt-1.5">
+                  <p className="text-xs text-gray-600 mt-1.5">
                     At least 8 characters, with 1 uppercase letter and 1 number
                   </p>
                 </div>
 
                 <div data-validation-field="confirmPassword">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Confirm Password <RequiredMark /></label>
+                  <label htmlFor="register-confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">Confirm Password <RequiredMark /></label>
                   <div className="relative">
                     <input
                       type={showConfirmPassword ? 'text' : 'password'}
                       name="confirmPassword"
+                      id="register-confirmPassword"
                       value={formData.confirmPassword}
                       onChange={handleChange}
                       className="w-full rounded-2xl border border-stone-200/90 bg-white/85 px-4 py-3.5 pr-11 text-sm outline-none transition duration-150 hover:border-orange-200 focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100/80"
@@ -316,8 +322,10 @@ function Register() {
                     <button
                       type="button"
                       onClick={() => setShowConfirmPassword((prev) => !prev)}
-                      className="absolute right-1 top-1/2 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-lg text-gray-400 transition duration-150 hover:bg-gray-50 hover:text-gray-600 active:scale-95"
-                      tabIndex={-1}
+                      aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
+                      aria-pressed={showConfirmPassword}
+                      aria-controls="register-confirmPassword"
+                      className="absolute right-1 top-1/2 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-lg text-gray-600 transition duration-150 hover:bg-gray-50 hover:text-gray-600 active:scale-95"
                     >
                       {showConfirmPassword ? <IconEyeOff size={18} stroke={1.75} /> : <IconEye size={18} stroke={1.75} />}
                     </button>
@@ -387,10 +395,11 @@ function Register() {
 
               <form onSubmit={handleVerifyOtp} noValidate className="space-y-4">
                 <div data-validation-field="otpCode">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Verification Code <RequiredMark /></label>
+                  <label htmlFor="register-otp" className="block text-sm font-medium text-gray-700 mb-2">Verification Code <RequiredMark /></label>
                   <input
                     type="text"
                     inputMode="numeric"
+                    id="register-otp"
                     maxLength={6}
                     value={otpCode}
                     onChange={(e) => { setOtpCode(e.target.value.replace(/\D/g, '')); setOtpError('') }}

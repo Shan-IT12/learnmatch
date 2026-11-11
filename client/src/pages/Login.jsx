@@ -6,6 +6,7 @@ import AuthJourneyPanel from '../components/AuthJourneyPanel'
 import { FieldError, RequiredMark } from '../components/FormValidation'
 import { scrollToFirstInvalidField } from '../utils/formValidation'
 import { storeUserAuth } from '../utils/userAuth'
+import { lastStudentPath } from '../utils/studentPosition'
 
 
 function Login() {
@@ -50,7 +51,7 @@ function Login() {
       storeUserAuth(localStorage, data)
 
       const returnTo = location.state?.returnTo
-      navigate(typeof returnTo === 'string' && /^\/college(?:\?notifications=1|\/checkin\?reminder=\d+)?$/.test(returnTo) ? returnTo : '/dashboard')
+      navigate(typeof returnTo === 'string' && /^\/college(?:\?notifications=1|\/checkin\?reminder=\d+)?$/.test(returnTo) ? returnTo : lastStudentPath(localStorage, data.userId) || '/dashboard')
     } catch {
       setError('Cannot connect to server. Please try again.')
       setSubmitting(false)
@@ -67,7 +68,7 @@ function Login() {
           <HeaderBrand />
         </Link>
         <div className="flex items-center gap-2">
-          <span className="hidden sm:inline text-sm text-gray-400">No account?</span>
+          <span className="hidden sm:inline text-sm text-gray-600">No account?</span>
           <Link
             to="/register"
             className="rounded-xl bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white shadow-sm shadow-orange-100 transition duration-150 hover:bg-orange-600 active:translate-y-px"
@@ -103,11 +104,12 @@ function Login() {
 
           <form onSubmit={handleSubmit} noValidate className="space-y-4">
             <div className="group/field" data-validation-field="identifier">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="login-identifier" className="block text-sm font-medium text-gray-700 mb-2">
                 Email or Username <RequiredMark />
               </label>
               <input
                 type="text"
+                id="login-identifier"
                 name="identifier"
                 value={formData.identifier}
                 onChange={handleChange}
@@ -122,7 +124,7 @@ function Login() {
 
              <div data-validation-field="password">
               <div className="flex items-center justify-between mb-2">
-                <label className="block text-sm font-medium text-gray-700">
+                <label htmlFor="login-password" className="block text-sm font-medium text-gray-700">
                   Password <RequiredMark />
                 </label>
                 <Link to="/forgot-password" className="text-sm text-orange-500 font-medium hover:underline">
@@ -132,6 +134,7 @@ function Login() {
               <div className="relative">
                 <input
                   type={showPassword ? 'text' : 'password'}
+                  id="login-password"
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
@@ -145,8 +148,10 @@ function Login() {
                 <button
                   type="button"
                   onClick={() => setShowPassword((prev) => !prev)}
-                  className="absolute right-1 top-1/2 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-lg text-gray-400 transition duration-150 hover:bg-gray-50 hover:text-gray-600 active:scale-95"
-                  tabIndex={-1}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  aria-pressed={showPassword}
+                  aria-controls="login-password"
+                  className="absolute right-1 top-1/2 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-lg text-gray-600 transition duration-150 hover:bg-gray-50 hover:text-gray-600 active:scale-95"
                 >
                   {showPassword ? <IconEyeOff size={18} stroke={1.75} /> : <IconEye size={18} stroke={1.75} />}
                 </button>

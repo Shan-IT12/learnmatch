@@ -6,6 +6,7 @@ function browserSessionStorage() {
 }
 
 export function clearStudentBrowserData(storage, session = browserSessionStorage()) {
+  if (typeof window !== 'undefined') window.dispatchEvent(new Event('learnmatch:save-position'))
   invalidateAssessmentSession()
   for (const target of new Set([storage, session])) {
     if (!target) continue

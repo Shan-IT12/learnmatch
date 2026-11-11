@@ -1,7 +1,9 @@
+import { readStudentQuestionPosition, saveStudentQuestionPosition } from '../../utils/studentPosition'
 import SkeletonContent from '../../components/SkeletonContent'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import OnboardingLayout from '../../components/OnboardingLayout'
+import useAssessmentDraftSave from '../../hooks/useAssessmentDraftSave'
 import AssessmentQuestionNavigation from '../../components/AssessmentQuestionNavigation'
 import useAssessmentQuestionFocus from '../../hooks/useAssessmentQuestionFocus'
 import PersonalityResult from '../../components/PersonalityResult'
@@ -12,6 +14,7 @@ import SuccessConfirmation from '../../components/SuccessConfirmation'
 import { waitForSuccessConfirmation } from '../../utils/successConfirmation'
 import {
   ASSESSMENT_SESSION_KEYS,
+  getAssessmentAttemptId,
   assessmentHeaders,
   finishAssessmentAttempt,
   boundedQuestionIndex,
@@ -20,13 +23,14 @@ import {
   readAssessmentSession,
   writeAssessmentSession,
   readActiveAttempt,
-  saveActiveAttemptDraft,
 } from '../../utils/assessmentSession'
 
 function OnboardingPersonality() {
   const navigate = useNavigate()
 
   const storage = typeof sessionStorage === 'undefined' ? null : sessionStorage
+  const saveProgress = useAssessmentDraftSave(storage, ASSESSMENT_SESSION_KEYS.personality)
+  const saveDraft = saveProgress.save
   const initialSession = readAssessmentSession(storage, ASSESSMENT_SESSION_KEYS.personality, {})
   const [currentIndex, setCurrentIndex] = useState(() => boundedQuestionIndex(initialSession.currentIndex, mbtiQuestions.length))
   const questionRef = useAssessmentQuestionFocus(currentIndex)
@@ -41,13 +45,25 @@ function OnboardingPersonality() {
   const [submitConfirmed, setSubmitConfirmed] = useState(false)
 
   useEffect(() => {
+    let active = true
     readActiveAttempt(import.meta.env.VITE_API_URL, localStorage.getItem('token'), storage)
       .then((attempt) => {
-        if (attempt?.personalityAnswers && Object.keys(attempt.personalityAnswers).length > 0) setAnswers(attempt.personalityAnswers)
+        if (!active) return
+        if (!attempt) { setAnswers({}); return }
+        const local = readAssessmentSession(storage, ASSESSMENT_SESSION_KEYS.personality, {})
+        const savedIndex = readStudentQuestionPosition(localStorage, localStorage.getItem('userId'), 'personality', attempt.attemptId)
+        const resumeIndex = Number.isInteger(local.currentIndex) ? local.currentIndex : savedIndex
+        const restored = (local.pending ? local.answers : attempt.personalityAnswers) || {}
+        setAnswers(restored)
+        const firstMissing = firstUnansweredQuestionIndex(mbtiQuestions, restored, question => question.id)
+        setCurrentIndex(Number.isInteger(resumeIndex) ? boundedQuestionIndex(resumeIndex, mbtiQuestions.length)
+          : firstMissing < 0 ? mbtiQuestions.length - 1 : firstMissing)
+        if (local.pending) saveDraft({ personality_answers: restored }).catch(() => {})
       })
-      .catch(() => setError('Could not restore your saved Personality progress. Please refresh.'))
-      .finally(() => setAttemptLoaded(true))
-  }, [storage])
+      .catch(() => { if (active) { setError('Could not restore your saved Personality progress. Please refresh.'); setResultCheckFailed(true) } })
+      .finally(() => { if (active) setAttemptLoaded(true) })
+    return () => { active = false }
+  }, [storage, saveDraft])
 
   const currentQuestion = mbtiQuestions[currentIndex]
   const selectedRating = answers[currentQuestion.id]
@@ -56,40 +72,38 @@ function OnboardingPersonality() {
   const responseChoices = getResponseChoices(currentQuestion)
 
   useEffect(() => {
-    if (submitting || result) return
+    if (!attemptLoaded || submitting || result) return
+    saveStudentQuestionPosition(localStorage, localStorage.getItem('userId'), 'personality', getAssessmentAttemptId(storage), currentIndex)
     writeAssessmentSession(storage, ASSESSMENT_SESSION_KEYS.personality, {
       answers,
       currentIndex,
     })
-    if (!attemptLoaded) return
-    const timer = setTimeout(() => {
-      saveActiveAttemptDraft(import.meta.env.VITE_API_URL, localStorage.getItem('token'), storage, { personality_answers: answers })
-        .catch(() => console.warn('Personality draft autosave will retry on the next change.'))
-    }, 250)
-    return () => clearTimeout(timer)
   }, [answers, attemptLoaded, currentIndex, storage, submitting, result])
 
   useEffect(() => {
+    if (!attemptLoaded) return
+    let active = true
     const token = localStorage.getItem('token')
     fetch(`${import.meta.env.VITE_API_URL}/api/mbti`, {
       headers: assessmentHeaders(storage, { Authorization: `Bearer ${token}` }),
-    })
-      .then((response) => {
-        if (!response.ok) throw new Error('Could not check saved personality results.')
-        return response.json()
-      })
-      .then((savedResult) => {
-        if (savedResult.mbtiType) {
-          markAssessmentStepComplete(storage, 4)
-          setResult(savedResult)
-        }
-      })
-      .catch(() => setResultCheckFailed(true))
-      .finally(() => setCheckingResult(false))
-  }, [storage])
+    }).then(response => {
+      if (!response.ok) throw new Error('Could not check saved personality results.')
+      return response.json()
+    }).then(savedResult => {
+      if (active && savedResult.mbtiType) {
+        markAssessmentStepComplete(storage, 4)
+        setResult(savedResult)
+      }
+    }).catch(() => { if (active) setResultCheckFailed(true) })
+      .finally(() => { if (active) setCheckingResult(false) })
+    return () => { active = false }
+  }, [attemptLoaded, storage])
 
   const handleSelect = (rating) => {
-    setAnswers((prev) => ({ ...prev, [currentQuestion.id]: rating }))
+    const nextAnswers = { ...answers, [currentQuestion.id]: rating }
+    setAnswers(nextAnswers)
+    writeAssessmentSession(storage, ASSESSMENT_SESSION_KEYS.personality, { answers: nextAnswers, currentIndex })
+    saveDraft({ personality_answers: nextAnswers }).catch(() => {})
     setQuestionError('')
   }
 
@@ -130,9 +144,10 @@ function OnboardingPersonality() {
     }))
 
     try {
-      // Final submission can happen before the debounced autosave. Drain older
+      // Final submission drains older
       // writes and persist this complete snapshot before server validation.
-      await saveActiveAttemptDraft(import.meta.env.VITE_API_URL, token, storage, { personality_answers: answers })
+      await saveProgress.flush()
+      await saveDraft({ personality_answers: answers })
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/mbti`, {
         method: 'POST',
         headers: assessmentHeaders(storage, {
@@ -180,23 +195,24 @@ function OnboardingPersonality() {
   // ---------- Results screen ----------
   if (result) {
     return (
-      <OnboardingLayout currentStep={4} isComplete={true} showFooterNavigation={false}>
-        <PersonalityResult result={result} onContinue={handleContinue} />
+      <OnboardingLayout currentStep={4} stickyChrome isComplete={true} onNext={handleContinue} nextLabel="Next" navigationStatus={<p className="text-xs text-gray-500">Next: Recommendations</p>}>
+        <PersonalityResult result={result} />
       </OnboardingLayout>
     )
   }
 
   // ---------- Question screen ----------
   return (
-    <OnboardingLayout currentStep={4} isComplete={answeredCount === mbtiQuestions.length} showFooterNavigation={false}>
-      <SkeletonContent loading={checkingResult} label="Loading personality result..."><div className="max-w-3xl mx-auto px-5 sm:px-8 py-8 sm:py-12">
+    <OnboardingLayout currentStep={4} stickyChrome isComplete={false} onNext={handleContinue} nextLabel="Next" navigationBusy={submitting}
+      saveProgress={saveProgress} navigationStatus={<p className="text-xs leading-5 text-gray-500">Complete and submit Personality to continue.</p>}>
+      <SkeletonContent loading={checkingResult || !attemptLoaded} label="Loading personality result..."><div className="max-w-3xl mx-auto px-5 sm:px-8 py-8 sm:py-12">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between mb-6">
           <div>
             <div className="inline-flex items-center gap-2 rounded-full bg-orange-50 px-3 py-1.5 text-xs font-semibold text-orange-700 mb-3">
               <span className="h-1.5 w-1.5 rounded-full bg-orange-500" />
               Personal reflection
             </div>
-            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900 mb-2">Personality Assessment</h2>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900 mb-2">Personality Assessment</h1>
             <p className="text-gray-500 text-sm">
               Choose the response that feels most natural to you. There are no right or wrong answers.
             </p>
@@ -233,7 +249,7 @@ function OnboardingPersonality() {
 
           {/* Likert scale choices */}
           <div className="sm:px-2">
-            <div className="hidden sm:flex items-center justify-between text-[11px] font-semibold uppercase tracking-wider text-gray-400 mb-3 px-1">
+            <div className="hidden sm:flex items-center justify-between text-[11px] font-semibold uppercase tracking-wider text-gray-600 mb-3 px-1">
               <span>Disagree</span>
               <span>Agree</span>
             </div>
@@ -254,7 +270,7 @@ function OnboardingPersonality() {
                     selectedRating === choice.value
                       ? 'border-white bg-white text-orange-600'
                       : index === 2
-                        ? 'border-gray-300 bg-gray-50 text-gray-400 group-hover:border-orange-300'
+                        ? 'border-gray-300 bg-gray-50 text-gray-600 group-hover:border-orange-300'
                         : 'border-orange-200 bg-orange-50 text-orange-500 group-hover:border-orange-400'
                   }`}>
                     <span className={`assessment-choice-dot rounded-full bg-current ${selectedRating === choice.value ? 'h-2.5 w-2.5' : 'h-1.5 w-1.5'}`} />

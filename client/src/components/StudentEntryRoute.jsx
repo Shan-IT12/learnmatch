@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import { clearUserAuth } from '../utils/userAuth'
+import { lastStudentPath } from '../utils/studentPosition'
 
 // Only entry pages restore sessions. Public links and admin routes stay independent.
 export default function StudentEntryRoute({ children }) {
@@ -52,7 +53,7 @@ export default function StudentEntryRoute({ children }) {
     }
   }, [attempt])
 
-  if (status === 'authenticated') return <Navigate to="/dashboard" replace />
+  if (status === 'authenticated') return <Navigate to={lastStudentPath(localStorage, localStorage.getItem('userId')) || '/dashboard'} replace />
   if (status === 'guest') return children
   return (
     <main className="flex min-h-screen items-center justify-center bg-[#fbf8f3] px-6 text-gray-900">

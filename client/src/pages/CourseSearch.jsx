@@ -1,7 +1,7 @@
 import SkeletonContent from '../components/SkeletonContent'
 import { recommendationPlaceholders } from '../data/loadingPlaceholders'
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
+import { Link, useLocation, useSearchParams } from 'react-router-dom'
 import { getCourseCatalogUrl } from '../utils/courseCatalog'
 import useActiveCollegePhase from '../hooks/useActiveCollegePhase'
 import PublicHeader from '../components/PublicHeader'
@@ -12,7 +12,6 @@ const apiUrl = import.meta.env.VITE_API_URL || ''
 const COURSES_PER_PAGE = 18
 
 function CourseSearch() {
-  const navigate = useNavigate()
   const location = useLocation()
   const [searchParams, setSearchParams] = useSearchParams()
   const fromDashboard = searchParams.get('source') === 'dashboard' || location.state?.entryContext === 'dashboard'
@@ -115,13 +114,10 @@ function CourseSearch() {
 
   return (
     <div ref={pageTopRef} className="min-h-screen bg-gray-50">
-      <PublicHeader activeCollegePhase={hasActiveCollegePhase} showDashboard={fromDashboard || fromSummary} dashboardPath={dashboardPath} />
+      <PublicHeader activeCollegePhase={hasActiveCollegePhase} showDashboard={fromDashboard || fromSummary} dashboardPath={dashboardPath}
+        returnNavigation={fromDashboard || fromSummary ? { path: dashboardPath, label: fromSummary ? 'Back to Summary Dashboard' : 'Back to Dashboard' } : null} />
       <main className="max-w-5xl mx-auto px-5 sm:px-10 py-10 sm:py-14">
-        {fromDashboard || fromSummary ? (
-          <button onClick={() => navigate(dashboardPath)} className="lm-action mb-6">
-            ← {fromSummary ? 'Back to Summary Dashboard' : 'Back to Dashboard'}
-          </button>
-        ) : (
+        {!fromDashboard && !fromSummary && (
           <Link to="/" className="lm-action mb-6">
             ← Back to Landing Page
           </Link>

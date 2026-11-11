@@ -2,6 +2,7 @@ import SkeletonContent from '../../components/SkeletonContent'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import OnboardingLayout from '../../components/OnboardingLayout'
+import useAssessmentDraftSave from '../../hooks/useAssessmentDraftSave'
 import interestGroups, {
   isInterestStateComplete,
   MAX_INTEREST_SELECTIONS,
@@ -22,11 +23,13 @@ import {
   writeAssessmentSession,
   assessmentHeaders,
   restoreInterestAttempt,
-  saveActiveAttemptDraft,
 } from '../../utils/assessmentSession'
 
 function OnboardingInterests() {
   const navigate = useNavigate()
+  const storage = typeof sessionStorage === 'undefined' ? null : sessionStorage
+  const saveProgress = useAssessmentDraftSave(storage, ASSESSMENT_SESSION_KEYS.interests)
+  const saveDraft = saveProgress.save
 
   const [interestState, setInterestState] = useState(() => restoreInterestState(readAssessmentSession(
     typeof sessionStorage === 'undefined' ? null : sessionStorage,
@@ -42,26 +45,32 @@ function OnboardingInterests() {
   const [saveConfirmed, setSaveConfirmed] = useState(false)
 
   useEffect(() => {
-    const storage = typeof sessionStorage === 'undefined' ? null : sessionStorage
+    let active = true
     restoreInterestAttempt(import.meta.env.VITE_API_URL, localStorage.getItem('token'), storage)
       .then((attempt) => {
+        if (!active) return
         const local = readAssessmentSession(storage, ASSESSMENT_SESSION_KEYS.interests, {})
-        setInterestState(restoreInterestState(local, attempt?.interests))
+        const restored = restoreInterestState(local, attempt?.interests)
+        setInterestState(restored)
+        if (local.pending) saveDraft({ interests_json: restored }).catch(() => {})
         setAttemptLoaded(true)
       })
       .catch(() => {
+        if (!active) return
         setRestoreFailed(true)
         setError('Could not restore your saved assessment progress. Please refresh.')
       })
-  }, [])
+    return () => { active = false }
+  }, [storage, saveDraft])
 
   useEffect(() => {
+    if (!attemptLoaded) return
     writeAssessmentSession(
       typeof sessionStorage === 'undefined' ? null : sessionStorage,
       ASSESSMENT_SESSION_KEYS.interests,
       interestState
     )
-  }, [interestState])
+  }, [interestState, attemptLoaded])
 
   const isComplete = isInterestStateComplete(interestState)
   const selectionLimitReached = selected.length >= MAX_INTEREST_SELECTIONS
@@ -78,8 +87,7 @@ function OnboardingInterests() {
     setInterestState(nextState)
     writeAssessmentSession(sessionStorage, ASSESSMENT_SESSION_KEYS.interests, nextState)
     // Start saving before Back/step navigation can unmount this screen.
-    saveActiveAttemptDraft(import.meta.env.VITE_API_URL, localStorage.getItem('token'), sessionStorage, { interests_json: nextState })
-      .catch(() => setError('Your latest answers are saved on this device, but autosave failed. Use Next to retry saving before leaving.'))
+    saveDraft({ interests_json: nextState }).catch(() => {})
     if (isInterestStateComplete(result)) setError('')
   }
 
@@ -111,7 +119,7 @@ function OnboardingInterests() {
   const token = localStorage.getItem('token')
 
   try {
-    await saveActiveAttemptDraft(import.meta.env.VITE_API_URL, token, sessionStorage, { interests_json: interestState })
+    await saveDraft({ interests_json: interestState })
     const response = await fetch(`${import.meta.env.VITE_API_URL}/api/interests`, {
       method: 'POST',
       headers: assessmentHeaders(sessionStorage, {
@@ -148,11 +156,15 @@ function OnboardingInterests() {
   return (
     <OnboardingLayout
       currentStep={2}
+      saveProgress={saveProgress}
       isComplete={attemptLoaded && isComplete && !submitting}
       stickyChrome
-      showFooterNavigation={false}
+      onNext={handleNext}
+      nextLabel={submitting ? 'Saving...' : 'Next'}
+      navigationBusy={submitting}
+      navigationStatus={<p className="text-xs leading-5 text-gray-500">{isComplete ? 'Next: Academic Skills' : 'Choose an activity or No interests first.'}</p>}
     >
-      <SkeletonContent loading={!attemptLoaded && !restoreFailed} label="Loading your interests..."><div className={`max-w-3xl mx-auto px-5 sm:px-8 pt-8 sm:pt-12 ${selectionLimitReached ? 'pb-36' : 'pb-8'}`}>
+      <SkeletonContent loading={!attemptLoaded && !restoreFailed} label="Loading your interests..."><div className="max-w-3xl mx-auto px-5 sm:px-8 pt-8 sm:pt-12 pb-8">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between mb-8">
           <div>
             <div className="inline-flex items-center gap-2 rounded-full bg-orange-50 px-3 py-1.5 text-xs font-semibold text-orange-700 mb-3">
@@ -161,7 +173,7 @@ function OnboardingInterests() {
               </svg>
               Tell us what you enjoy
             </div>
-            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900 mb-2">Interests & Hobbies <RequiredMark /></h2>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900 mb-2">Interests & Hobbies <RequiredMark /></h1>
             <p className="max-w-xl text-gray-500 text-sm leading-relaxed">
               Choose at least one activity that fits you, or check No interests or hobbies. You can select up to 10 activities. You do not need to select activities in every category.
             </p>
@@ -204,8 +216,8 @@ function OnboardingInterests() {
                   {String(groupIndex + 1).padStart(2, '0')}
                 </span>
                 <div>
-                  <h3 id={`interest-category-${groupIndex}`} className="text-sm font-bold text-gray-900">{group.group}</h3>
-                  <p className="text-xs text-gray-400">Choose any that feel like you</p>
+                  <h2 id={`interest-category-${groupIndex}`} className="text-sm font-bold text-gray-900">{group.group}</h2>
+                  <p className="text-xs text-gray-600">Choose any that feel like you</p>
                 </div>
               </div>
               <div className="grid sm:grid-cols-2 gap-2.5">
@@ -244,30 +256,10 @@ function OnboardingInterests() {
           <FieldError id="interests-error">{error}</FieldError>
         </div>
 
-        <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 sm:gap-5">
-          <button
-            type="button"
-            onClick={() => navigate('/onboarding/profile')}
-            className="min-h-11 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-600 transition hover:border-gray-300 hover:bg-gray-50 hover:text-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 sm:px-5"
-          >
-            Back
-          </button>
-          <div role="status" className="min-w-0 text-center text-xs leading-5">
-            <p className="text-gray-500">{selected.length} / {MAX_INTEREST_SELECTIONS} activities selected</p>
-          </div>
-          <button
-            type="button"
-            onClick={handleNext}
-            disabled={!attemptLoaded || !isComplete || submitting}
-            className="min-h-11 rounded-xl bg-orange-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-orange-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400 disabled:shadow-none sm:px-6"
-          >
-            {submitting ? 'Saving...' : 'Next'}
-          </button>
-        </div>
 
       </div></SkeletonContent>
       {attemptLoaded && (
-        <div role="status" aria-live="polite" aria-atomic="true" aria-hidden={!showLimitNotice} className={`pointer-events-none fixed bottom-4 left-1/2 z-50 flex w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 items-start gap-3 rounded-2xl border border-orange-200 bg-white p-4 shadow-lg shadow-gray-900/10 transition-[opacity,translate] duration-300 ease-out motion-reduce:transition-none motion-reduce:translate-y-0 ${showLimitNotice ? 'translate-y-0 opacity-100' : 'translate-y-3 opacity-0'}`}>
+        <div role="status" aria-live="polite" aria-atomic="true" aria-hidden={!showLimitNotice} className={`pointer-events-none fixed bottom-24 left-1/2 z-50 flex w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 items-start gap-3 rounded-2xl border border-orange-200 bg-white p-4 shadow-lg shadow-gray-900/10 transition-[opacity,translate] duration-300 ease-out motion-reduce:transition-none motion-reduce:translate-y-0 ${showLimitNotice ? 'translate-y-0 opacity-100' : 'translate-y-3 opacity-0'}`}>
           <span aria-hidden="true" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-orange-100 text-orange-700">
             <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
