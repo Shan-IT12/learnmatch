@@ -11,7 +11,6 @@ export const MONTH_PARTS = ['early', 'middle', 'late']
 export const ALIGNMENT_RULES = Object.freeze({
   passingGwa: 75,
   highAlignmentPercent: 70,
-  onTrackMismatchExclusive: 30,
   monitorMismatchExclusive: 60,
 })
 
@@ -337,7 +336,7 @@ export function determineAlignmentStatus(alignmentPercent, { phase, gwa = null }
     if (passing || highAlignment) return 'Monitor'
     return 'Needs Attention'
   }
-  if (mismatchScore < ALIGNMENT_RULES.onTrackMismatchExclusive) return 'On Track'
+  if (alignmentPercent >= ALIGNMENT_RULES.highAlignmentPercent) return 'On Track'
   if (mismatchScore < ALIGNMENT_RULES.monitorMismatchExclusive) return 'Monitor'
   return 'Needs Attention'
 }

@@ -8,3 +8,7 @@ postman/
 
 .vercel
 .env*
+
+# Locally generated document artifacts and scratch files.
+/output/
+/tmp/

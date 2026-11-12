@@ -18,7 +18,7 @@ const ALIGNMENT_STATUS_SQL = `CASE
         OR ROUND(sc.alignment_score * 100) >= ${ALIGNMENT_RULES.highAlignmentPercent} THEN 'Monitor'
       ELSE 'Needs Attention'
     END
-  WHEN 100 - ROUND(sc.alignment_score * 100) < ${ALIGNMENT_RULES.onTrackMismatchExclusive} THEN 'On Track'
+  WHEN ROUND(sc.alignment_score * 100) >= ${ALIGNMENT_RULES.highAlignmentPercent} THEN 'On Track'
   WHEN 100 - ROUND(sc.alignment_score * 100) < ${ALIGNMENT_RULES.monitorMismatchExclusive} THEN 'Monitor'
   ELSE 'Needs Attention'
 END`
