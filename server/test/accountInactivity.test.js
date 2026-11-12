@@ -213,7 +213,7 @@ test('initial OTP authentication records login in the activation transaction', a
     release() {},
     async query(sql) {
       operations.push(sql)
-      if (sql.includes('SELECT user_id')) return [[{ user_id: 1, username: 'student', is_active: 0 }]]
+      if (sql.includes('SELECT user_id')) return [[{ user_id: 1, username: 'student', password: 'synthetic-password-hash', is_active: 0 }]]
       if (sql.includes('SELECT otp_id')) return [[{ otp_id: 1, otp_code: '123456', failed_attempts: 0, expires_at: new Date(Date.now() + 60000) }]]
       return [{ affectedRows: 1 }]
     },

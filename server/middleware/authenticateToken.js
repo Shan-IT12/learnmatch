@@ -15,6 +15,7 @@
 import jwt from 'jsonwebtoken'
 import pool from '../config/db.js'
 import { USER_JWT_AUDIENCE, jwtVerifyOptions } from '../config/security.js'
+import { matchesPasswordSession } from '../services/sessionVersionService.js'
 
 async function authenticateToken(req, res, next) {
   res.setHeader('Cache-Control', 'no-store')
@@ -44,11 +45,14 @@ async function authenticateToken(req, res, next) {
 
   try {
     const [users] = await pool.query(
-      'SELECT user_id FROM USER_ACCOUNT WHERE user_id = ? AND is_active = 1 LIMIT 1',
+      'SELECT user_id, password FROM USER_ACCOUNT WHERE user_id = ? AND is_active = 1 LIMIT 1',
       [decoded.userId]
     )
     if (users.length !== 1) {
       return res.status(403).json({ message: 'Account is inactive or unavailable. Please log in again.' })
+    }
+    if (!matchesPasswordSession(decoded.sessionVersion, users[0].password)) {
+      return res.status(403).json({ message: 'Your session has expired. Please log in again.' })
     }
     req.user = decoded // { userId: 1, username: '...', iat: ..., exp: ... }
     return next()

@@ -12,6 +12,7 @@ import { validateUsername } from '../services/usernameValidationService.js'
 import { normalizeRegistrationEmail, isDisposableEmail, DISPOSABLE_EMAIL_MESSAGE } from '../services/registrationEmailService.js'
 import { TERMS_VERSION, PRIVACY_NOTICE_VERSION } from '../shared/legalDocuments.js'
 import { recordSuccessfulLogin } from '../services/accountInactivityService.js'
+import { passwordSessionVersion } from '../services/sessionVersionService.js'
 
 const sendResendMail = async ({ to, subject, html }) => {
   if (!process.env.RESEND_API_KEY) {
@@ -81,6 +82,7 @@ const createUserAuthPayload = (user, message) => ({
     {
       userId: user.user_id,
       username: user.username,
+      sessionVersion: passwordSessionVersion(user.password),
     },
     process.env.JWT_SECRET,
     jwtSignOptions(USER_JWT_AUDIENCE, '7d')
@@ -257,7 +259,7 @@ export const verifyOtp = async (req, res) => {
 
     const [users] = await connection.query(
       `
-      SELECT user_id, username, is_active
+      SELECT user_id, username, password, is_active
       FROM USER_ACCOUNT
       WHERE user_id = ?
       FOR UPDATE

@@ -24,6 +24,7 @@ import directionsRoutes from './routes/directionsRoutes.js'
 import { getSelectedInterestNames, normalizeInterestResponse, validateInterestSubmission } from './services/interestSubmissionService.js'
 import { validatePersonalitySubmission } from './services/personalitySubmissionService.js'
 import { calculateMbtiResult } from './services/mbtiScoringService.js'
+import { AssessmentValidationError, validatedAssessmentDraft, validateQuestionSet, validateSkillAnswerSet } from './services/assessmentValidationService.js'
 import {
   getAdminCourses,
   getCourseRecommendationReadiness,
@@ -187,10 +188,16 @@ app.patch('/api/assessment-attempts/current', authenticateToken, async (req, res
   if (draft.skill_answers !== undefined && !Array.isArray(draft.skill_answers)) return res.status(400).json({ message: 'skill_answers must be an array.' })
   if (draft.personality_answers !== undefined && (!draft.personality_answers || typeof draft.personality_answers !== 'object' || Array.isArray(draft.personality_answers))) return res.status(400).json({ message: 'personality_answers must be an object.' })
   try {
-    const saved = await updateCurrentAttemptDraft(pool, req.user.userId, draft, requestedAttemptId(req))
+    const attemptId = requestedAttemptId(req)
+    if (!attemptId) return res.status(400).json({ message: 'A valid assessment attempt is required.' })
+    const attempt = await getOwnedAttempt(pool, req.user.userId, attemptId)
+    if (!attempt || attempt.status !== 'IN_PROGRESS') return res.status(404).json({ message: 'No active assessment attempt exists for this user.' })
+    const safeDraft = await validatedAssessmentDraft(pool, draft, attempt)
+    const saved = await updateCurrentAttemptDraft(pool, req.user.userId, safeDraft, attemptId)
     if (!saved) return res.status(404).json({ message: 'No active assessment attempt exists for this user.' })
     res.json({ saved: true })
   } catch (error) {
+    if (error instanceof AssessmentValidationError) return res.status(400).json({ message: error.message })
     console.error('Assessment attempt draft save error:', error)
     res.status(500).json({ message: 'Could not save assessment progress.' })
   }
@@ -301,6 +308,8 @@ app.get('/api/quiz', async (req, res) => {
 })
 
 app.post('/api/quiz', authenticateToken, async (req, res) => {
+  const requestedId = requestedAttemptId(req)
+  if (!requestedId) return res.status(400).json({ message: 'A valid assessment attempt is required.' })
   const validation = validateSkillQuiz(req.body?.answers)
   if (!validation.valid) return res.status(400).json({ message: validation.message })
   const answers = validation.answers
@@ -311,13 +320,14 @@ app.post('/api/quiz', authenticateToken, async (req, res) => {
     const placeholders = questionIds.map(() => '?').join(',')
 
     const [questions] = await pool.query(
-      `SELECT question_id, correct_answer, dimension FROM QUESTION WHERE question_id IN (${placeholders})`,
+      `SELECT question_id, correct_answer, dimension FROM QUESTION WHERE is_active = 1 AND question_id IN (${placeholders})`,
       questionIds
     )
 
     if (questions.length !== answers.length) {
       return res.status(400).json({ message: 'One or more question IDs are invalid.' })
     }
+    validateQuestionSet(questions)
 
     const { scoredAnswers, correctCount, domainScores } = scoreSkillAnswers(answers, questions)
     const attemptId = requestedAttemptId(req)
@@ -335,6 +345,7 @@ app.post('/api/quiz', authenticateToken, async (req, res) => {
           await connection.rollback()
           return res.status(409).json({ message: 'Academic Skills has already been finalized for this assessment attempt.' })
         }
+        validateSkillAnswerSet(answers, parseAttemptJson(attempt.skill_questions, []))
         await insertFinalizedSkillResponses(connection, userId, scoredAnswers)
         await updateAttempt(connection, userId, attemptId, 'skill_answers', scoredAnswers)
         await updateAttempt(connection, userId, attemptId, 'skill_result', { totalCorrect: correctCount, totalQuestions: answers.length, domainScores })
@@ -356,6 +367,7 @@ app.post('/api/quiz', authenticateToken, async (req, res) => {
       domainScores,
     })
   } catch (error) {
+    if (error instanceof AssessmentValidationError) return res.status(400).json({ message: error.message })
     console.error('Quiz submit error:', error)
     res.status(500).json({ message: 'Server error submitting quiz' })
   }
