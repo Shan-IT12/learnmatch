@@ -29,6 +29,7 @@ export function directionsErrorMessage(code) {
     return 'Your browser could not determine your current location. Please try again.'
   }
   if (code === 'NO_ROUTE') return 'A route to this school could not be calculated.'
+  if (code === 'DIRECTIONS_RATE_LIMITED') return 'Too many directions requests. Please wait a minute and try again. School locations and the map are still available.'
   return 'Directions are temporarily unavailable. School locations and the map are still available.'
 }
 

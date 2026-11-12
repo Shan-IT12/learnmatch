@@ -11,6 +11,7 @@ import profileRoutes from './routes/profileRoutes.js'
 import pool from './config/db.js'
 import authenticateToken from './middleware/authenticateToken.js'
 import authenticateAdmin from './middleware/authenticateAdmin.js'
+import noStore from './middleware/noStore.js'
 import { loginAdmin } from './controllers/adminAuthController.js'
 import {
   adminLoginIdentityRateLimiter,
@@ -100,6 +101,8 @@ app.use(helmet({
   },
 }))
 app.use(cors(corsOptions()))
+// Cover admin login, limiter rejections and parser failures as well as data routes.
+app.use('/api/admin', noStore)
 // Signature verification must see the original bytes, before express.json().
 app.use('/api/webhooks/resend/inactivity', createInactivityWebhookRouter(pool))
 // Account deletion owns its bounded JSON parser and sanitized parser errors.
