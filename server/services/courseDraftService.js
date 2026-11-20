@@ -5,6 +5,7 @@ import { captureDraftReviewFields, bumpDraftReviewFields } from './draftSourceSe
 import { validateSourceBundle, persistSourceBundle } from './sourceBundlePersistenceService.js'
 import { sourcePublisherConfiguration } from './sourcePublisherPolicy.js'
 import { validateCareerOpportunities } from '../shared/courseCareerFields.js'
+import { bumpValidationRevision, courseValidationVersion } from './courseValidationService.js'
 
 export const courseDraftOptions = { skill_domains: SKILL_DOMAINS, riasec_dimensions: RIASEC_DIMENSIONS, max_duration_years: 5, career_opportunities_supported: true, get source_url_policy() { return sourcePublisherConfiguration() } }
 
@@ -19,12 +20,14 @@ export class CourseDraftError extends Error {
 // The old standalone editor remains available for legacy records only. New
 // drafts use the atomic draft save; published records cannot bypass read-only.
 export async function requireStandaloneCareerEditable(database, { courseId, careerId }) {
-  const [rows] = await database.query(`SELECT c.is_draft, p.course_id AS published_course_id FROM COURSE c
+  const [rows] = await database.query(`SELECT c.is_draft, p.course_id AS published_course_id,
+    (EXISTS (SELECT 1 FROM COURSE_REPLACEMENT_DRAFT r WHERE r.course_id = c.course_id)
+      OR EXISTS (SELECT 1 FROM COURSE_VALIDATION_ITEM i WHERE i.course_id = c.course_id)) AS validation_managed FROM COURSE c
     ${careerId ? 'JOIN CAREER_OPPORTUNITY k ON k.course_id = c.course_id' : ''}
     LEFT JOIN COURSE_PUBLICATION p ON p.course_id = c.course_id
     WHERE ${careerId ? 'k.opportunity_id' : 'c.course_id'} = ?`, [careerId || courseId])
   if (!rows.length) throw new CourseDraftError('Course or career opportunity not found.', 404)
-  if (rows[0].published_course_id != null) throw new CourseDraftError('Published new courses are read-only.', 409)
+  if (rows[0].published_course_id != null || rows[0].validation_managed) throw new CourseDraftError('Use a replacement draft to edit published content.', 409)
   if (Number(rows[0].is_draft) === 1) throw new CourseDraftError('Use Edit Draft and Save Draft Changes to manage this course’s careers.', 409)
 }
 
@@ -99,20 +102,27 @@ export async function saveCourseDraft(database, body, courseId = null, authentic
     const [allocator] = await connection.query('SELECT next_number FROM COURSE_CODE_ALLOCATOR WHERE allocator_id = 1 FOR UPDATE')
     if (allocator.length !== 1) throw new Error('Course code allocator has not been initialized')
     let existing = null
+    let beforeVersion, replacementFor
     if (!creating) {
       const [rows] = await connection.query('SELECT * FROM COURSE WHERE course_id = ? FOR UPDATE', [courseId])
       if (rows.length === 0) throw new CourseDraftError('Course not found.', 404)
       existing = rows[0]
       const [published] = await connection.query('SELECT course_id FROM COURSE_PUBLICATION WHERE course_id = ?', [courseId])
-      if (published.length) throw new CourseDraftError('Published new courses are read-only in the draft editor.', 409)
+      const [[replacement]] = await connection.execute('SELECT course_id FROM COURSE_REPLACEMENT_DRAFT WHERE draft_id = ?', [courseId])
+      replacementFor = replacement?.course_id
+      const [[managed]] = await connection.execute(`SELECT course_id FROM COURSE_REPLACEMENT_DRAFT WHERE course_id = ?
+        UNION SELECT course_id FROM COURSE_VALIDATION_ITEM WHERE course_id = ? LIMIT 1`, [courseId, courseId])
+      if (published.length || (!Number(existing.is_draft) && managed)) throw new CourseDraftError('Use a replacement draft to edit this published course.', 409)
+      beforeVersion = await courseValidationVersion(connection, existing)
       if (value.career_opportunities && Number(existing.is_draft) !== 1) throw new CourseDraftError('Career editing in this form is available only for new drafts.', 409)
     }
-    const [names] = await connection.query('SELECT course_id, course_code, course_name FROM COURSE')
+    const [names] = await connection.query(`SELECT c.course_id, c.course_code, c.course_name FROM COURSE c
+      LEFT JOIN COURSE_REPLACEMENT_DRAFT r ON r.draft_id = c.course_id WHERE r.published_at IS NULL`)
     const reviewFieldsBefore = Number(existing?.is_draft) === 1 ? await captureDraftReviewFields(connection, existing) : null
     const nameKey = normalizeCourseName(value.course_name)
     // Do not block an unchanged legacy name merely because legacy duplicates exist.
     if (creating || nameKey !== normalizeCourseName(existing.course_name)) {
-      const duplicates = names.filter((row) => Number(row.course_id) !== courseId && normalizeCourseName(row.course_name) === nameKey)
+      const duplicates = names.filter((row) => Number(row.course_id) !== courseId && Number(row.course_id) !== replacementFor && normalizeCourseName(row.course_name) === nameKey)
       if (duplicates.length) throw new CourseDraftError('A course with this name already exists. Review the existing record or use the full distinct program/specialization name.', 409, { duplicates })
     }
     let courseCode = existing?.course_code
@@ -169,6 +179,10 @@ export async function saveCourseDraft(database, body, courseId = null, authentic
       if (savedSources.length + bundle.length > 3) throw new CourseDraftError('Use at most three source links.', 400)
       const [savedRows] = await connection.query('SELECT * FROM COURSE WHERE course_id = ? FOR UPDATE', [courseId])
       await persistSourceBundle(connection, savedRows[0], bundle, authenticatedAdminId)
+    }
+    if (beforeVersion) {
+      const [[saved]] = await connection.execute('SELECT * FROM COURSE WHERE course_id = ?', [courseId])
+      if ((await courseValidationVersion(connection, saved)).token !== beforeVersion.token) await bumpValidationRevision(connection, courseId)
     }
     await connection.commit()
     return { courseId, course_code: courseCode, is_draft: creating || Boolean(existing.is_draft) }

@@ -89,6 +89,7 @@ export async function getAdminCourses(database) {
       `SELECT course_id, course_code, course_name, course_abbreviation, program_type, cluster_category, psced_group, is_active, is_draft,
               EXISTS(SELECT 1 FROM COURSE_PUBLICATION p WHERE p.course_id = COURSE.course_id) AS is_published_new
        FROM COURSE
+       WHERE NOT EXISTS (SELECT 1 FROM COURSE_REPLACEMENT_DRAFT r WHERE r.draft_id = COURSE.course_id AND r.published_at IS NOT NULL)
        ORDER BY course_name ASC`
     ),
     database.query('SELECT course_id, skill_domain, weight FROM COURSE_SKILL_PROFILE'),
@@ -116,9 +117,9 @@ export async function setCourseActiveStatus(database, courseId, isActive) {
   }
 
   if (isActive) {
-    const [courses] = await database.query('SELECT is_draft FROM COURSE WHERE course_id = ?', [courseId])
+    const [courses] = await database.query('SELECT is_draft, EXISTS (SELECT 1 FROM COURSE_REPLACEMENT_DRAFT r WHERE r.draft_id = COURSE.course_id) AS is_replacement FROM COURSE WHERE course_id = ?', [courseId])
     if (!courses.length) return false
-    if (Number(courses[0].is_draft) === 1) {
+    if (Number(courses[0].is_draft) === 1 || Number(courses[0].is_replacement) === 1) {
       const error = new Error('Draft courses cannot be activated in this phase.')
       error.code = 'DRAFT_COURSE'
       throw error

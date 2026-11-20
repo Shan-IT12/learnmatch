@@ -10,6 +10,7 @@ import SavedDraftCourseView from '../../components/admin/SavedDraftCourseView'
 import DraftDisclosure, { DraftGuidance } from '../../components/admin/DraftDisclosure'
 import DraftCourseSources from '../../components/admin/DraftCourseSources'
 import SourceFirstDraftSources from '../../components/admin/SourceFirstDraftSources'
+import CourseValidationPanel from '../../components/admin/CourseValidationPanel'
 import CoursePublicationPanel from '../../components/admin/CoursePublicationPanel'
 import { createDraftSource, enteredDraftSources, invalidatePendingReviews } from '../../utils/draftSourceCheckForm'
 import { validateApprovedCourseSource, hasInvalidSourceUrls } from '../../../../shared/sourceUrlPolicy'
@@ -24,6 +25,9 @@ import CourseName from '../../components/CourseName'
 import { getDisplayCourseAbbreviation } from '../../utils/courseName'
 import SuccessConfirmation from '../../components/SuccessConfirmation'
 import { waitForSuccessConfirmation } from '../../utils/successConfirmation'
+import { useWorkflowData } from '../../hooks/useCourseValidation'
+
+const noCourses = []
 
 const emptyCourseForm = {
   ...emptyDraftFields,
@@ -180,13 +184,16 @@ function ManageCourses() {
   const [restoredDraft] = useState(() => readNewCourseDraftSession(sessionStorage, draftSessionKey, emptyCourseForm))
 
   const courseLoadSequence = useRef(0)
-  const [courses, setCourses] = useState([])
-  const [draftOptions, setDraftOptions] = useState(null)
   const [editingDraft, setEditingDraft] = useState(Boolean(restoredDraft?.active))
   const [publication, setPublication] = useState(null)
+  const [batchOpen, setBatchOpen] = useState(false)
+  const [validationManaged, setValidationManaged] = useState(false)
   const [editingCourseActive, setEditingCourseActive] = useState(false)
-  const [loading, setLoading] = useState(true)
   const [view, setView] = useState(restoredDraft?.active ? 'form' : 'list')
+  const courseList = useWorkflowData(adminToken ? 'admin/courses' : null, adminToken, { interval: view === 'list' ? 10000 : 0 })
+  const { loading, error: courseListError, refresh: refreshCourses } = courseList
+  const courses = courseList.data?.courses || noCourses
+  const draftOptions = courseList.data?.draftOptions || null
   const [editingCourseId, setEditingCourseId] = useState(null)
   const [editingCourseCode, setEditingCourseCode] = useState(null)
   const [courseForm, setCourseForm] = useState(restoredDraft?.active ? restoredDraft.form : emptyCourseForm)
@@ -310,53 +317,9 @@ function ManageCourses() {
     document.title = 'Manage Courses | LearnMatch Admin'
   }, [])
 
-  const fetchCourses = async () => {
-    setLoading(true)
-
-    try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/courses`, {
-        headers: { Authorization: `Bearer ${adminToken}` },
-      })
-      if (handleUnauthorized(res, navigate)) return
-
-      const data = await res.json()
-      setCourses(data.courses || [])
-      setDraftOptions(data.draftOptions || null)
-    } catch {
-      setError('Could not load courses.')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const loadCourseList = useEffectEvent(() => {
-    if (!adminToken) {
-      navigate('/admin/login')
-      return
-    }
-
-    const loadCourses = async () => {
-      setLoading(true)
-
-      try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/courses`, {
-          headers: { Authorization: `Bearer ${adminToken}` },
-        })
-        if (handleUnauthorized(res, navigate)) return
-
-        const data = await res.json()
-        setCourses(data.courses || [])
-        setDraftOptions(data.draftOptions || null)
-      } catch {
-        setError('Could not load courses.')
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    loadCourses()
-  })
-  useEffect(() => { loadCourseList() }, [adminToken])
+  useEffect(() => {
+    if (courseListError) handleUnauthorized(courseListError, navigate)
+  }, [courseListError, navigate])
 
   const openNewCourseForm = () => {
     const saved = readNewCourseDraftSession(sessionStorage, draftSessionKey, emptyCourseForm)
@@ -392,6 +355,7 @@ function ManageCourses() {
       setEditingCourseActive(isCourseActive(data.course))
       setDraftSourceCheckAllowed(Number(data.course.is_draft) === 1 && Number(data.course.is_active) === 0 && !data.publication)
       setPublication(data.publication || null)
+      setValidationManaged(Boolean(data.validationManaged))
       setSavedDraftEditing(false)
       setEditingCourseId(courseId)
       setEditingCourseCode(data.course.course_code)
@@ -509,7 +473,7 @@ function ManageCourses() {
       setSourceRefreshKey((current) => current + 1)
       await openEditCourseForm(data.courseId || editingCourseId)
       navigate(courseListLocation(listFilters, { courseId: data.courseId || editingCourseId }), { replace: true })
-      await fetchCourses()
+      refreshCourses()
       setSaving(false)
     } catch {
       setError('Cannot connect to server.')
@@ -543,9 +507,7 @@ function ManageCourses() {
         setError([data.message || 'Could not update course status.', reasons].filter(Boolean).join(' '))
         return
       }
-      setCourses((current) => current.map((item) =>
-        item.course_id === course.course_id ? { ...item, is_active: nextStatus } : item
-      ))
+      refreshCourses()
     } catch {
       setError('Could not update course status.')
     } finally {
@@ -589,12 +551,16 @@ function ManageCourses() {
             </div>
           </div>
 
-          {error && (
+          {(error || courseListError) && (
             <div className="bg-red-50 border border-red-100 text-red-600 px-4 py-3 rounded-xl text-sm mb-6" role="alert">
-              {error}
+              {error || courseListError.message}
             </div>
           )}
 
+          {!draftsView && !archivedView && <div className="mb-5 space-y-3">
+            <button type="button" className="lm-action" aria-expanded={batchOpen} onClick={() => setBatchOpen(open => !open)}>{batchOpen ? 'Close cluster validation' : 'Validate a cluster'}</button>
+            {batchOpen && <CourseValidationPanel token={adminToken} clusters={clusterOptions} />}
+          </div>}
           <SkeletonContent loading={loading} label="Loading courses...">
             <>
               <div className="bg-white border border-orange-100 rounded-2xl p-4 sm:p-5 shadow-sm mb-5">
@@ -729,14 +695,15 @@ function ManageCourses() {
     <main className="mx-auto w-full max-w-6xl space-y-5 px-5 py-10 sm:px-8">
       <button type="button" onClick={backToList} className="lm-action"><IconArrowLeft size={16} /> {draftsView ? 'Back to Drafts' : 'Back to Courses'}</button>
       {error && <p role="alert" className="text-sm text-red-600">{error}</p>}
-      <SavedDraftCourseView form={courseForm} courseCode={editingCourseCode} publication={publication} catalog={!editingDraft && !publication} active={editingCourseActive} canonicalCareers={canonicalCareers} identityNotice={archivedCourseLabel(courses.find(course => Number(course.course_id) === Number(editingCourseId)) || {})} onEdit={() => setSavedDraftEditing(true)} onReview={() => {
+      <SavedDraftCourseView form={courseForm} courseCode={editingCourseCode} publication={publication} catalog={!editingDraft && !publication} active={editingCourseActive} validationManaged={validationManaged} canonicalCareers={canonicalCareers} identityNotice={archivedCourseLabel(courses.find(course => Number(course.course_id) === Number(editingCourseId)) || {})} onEdit={() => setSavedDraftEditing(true)} onReview={() => {
         document.getElementById('saved-publication')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
         document.querySelector('#saved-publication button')?.focus({ preventScroll: true })
       }}>
         {editingDraft && !publication && <DraftCourseSources readOnly key={`${editingCourseId}-${sourceRefreshKey}`} courseId={editingCourseId} adminToken={adminToken} sourceUrlPolicy={draftOptions?.source_url_policy} courseDirty={false} refreshKey={sourceRefreshKey} onUnauthorized={onSourceUnauthorized} />}
         {!editingDraft && !publication && <CatalogCourseSources catalogReferences={catalogReferences} />}
       </SavedDraftCourseView>
-      {editingDraft && !publication && <div id="saved-publication"><CoursePublicationPanel key={`${editingCourseId}-${sourceRefreshKey}`} courseId={editingCourseId} adminToken={adminToken} courseDirty={false} onUnauthorized={onSourceUnauthorized} onPublished={async () => { await openEditCourseForm(editingCourseId); await fetchCourses() }} /></div>}
+      {(editingDraft || editingCourseActive) && <div id="course-validation"><CourseValidationPanel key={`validation-${editingCourseId}-${sourceRefreshKey}`} token={adminToken} courseId={editingCourseId} onOpenCourse={goToCourse} /></div>}
+      {editingDraft && !publication && <div id="saved-publication"><CoursePublicationPanel key={`${editingCourseId}-${sourceRefreshKey}`} courseId={editingCourseId} adminToken={adminToken} courseDirty={false} onUnauthorized={onSourceUnauthorized} onPublished={async (result) => { if (Number(result.course_id) !== Number(editingCourseId)) goToCourse(result.course_id); else await openEditCourseForm(editingCourseId); refreshCourses() }} /></div>}
     </main>
   </div>
 
@@ -875,7 +842,7 @@ function ManageCourses() {
           </fieldset>
         </form>
 
-        {editingDraft && editingCourseId && !draftSourceCheckAllowed && <CoursePublicationPanel key={`${editingCourseId}-${sourceRefreshKey}`} courseId={editingCourseId} adminToken={adminToken} courseDirty={JSON.stringify(courseForm) !== JSON.stringify(initialCourseForm)} onUnauthorized={onSourceUnauthorized} onPublished={async () => { await openEditCourseForm(editingCourseId); await fetchCourses() }} />}
+        {editingDraft && editingCourseId && !draftSourceCheckAllowed && <CoursePublicationPanel key={`${editingCourseId}-${sourceRefreshKey}`} courseId={editingCourseId} adminToken={adminToken} courseDirty={JSON.stringify(courseForm) !== JSON.stringify(initialCourseForm)} onUnauthorized={onSourceUnauthorized} onPublished={async (result) => { if (Number(result.course_id) !== Number(editingCourseId)) goToCourse(result.course_id); else await openEditCourseForm(editingCourseId); refreshCourses() }} />}
 
 
         {editingCourseId && !draftSourceCheckAllowed && (

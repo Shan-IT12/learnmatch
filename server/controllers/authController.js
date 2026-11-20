@@ -14,39 +14,7 @@ import { TERMS_VERSION, PRIVACY_NOTICE_VERSION } from '../shared/legalDocuments.
 import { recordSuccessfulLogin } from '../services/accountInactivityService.js'
 import { passwordSessionVersion } from '../services/sessionVersionService.js'
 
-const sendResendMail = async ({ to, subject, html }) => {
-  if (!process.env.RESEND_API_KEY) {
-    throw new Error('RESEND_API_KEY is missing')
-  }
-
-  if (!process.env.RESEND_FROM_EMAIL) {
-    throw new Error('RESEND_FROM_EMAIL is missing')
-  }
-
-  const response = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      from: `LearnMatch <${process.env.RESEND_FROM_EMAIL}>`,
-      to: [to],
-      subject,
-      html,
-    }),
-  })
-
-  if (!response.ok) {
-    await response.text()
-    const error = new Error(`Email provider request failed with status ${response.status}`)
-    error.code = 'EMAIL_PROVIDER_ERROR'
-    error.status = response.status
-    throw error
-  }
-
-  return response.json()
-}
+import { sendResendMail } from '../services/resendEmailService.js'
 
 export const MAX_OTP_FAILED_ATTEMPTS = 5
 

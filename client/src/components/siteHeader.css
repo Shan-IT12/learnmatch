@@ -78,7 +78,7 @@
   overflow-wrap: anywhere;
 }
 @media (min-width: 1024px) {
-  .lm-admin-navigation { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .lm-admin-navigation { grid-template-columns: repeat(7, minmax(0, 1fr)); }
 }
 @media (max-width: 359px) {
   .lm-admin-navigation { grid-template-columns: repeat(2, minmax(0, 1fr)); }

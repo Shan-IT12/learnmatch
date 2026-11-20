@@ -24,6 +24,7 @@ function AdminHeader({ currentPage }) {
           <Link to="/admin" className={navClass('dashboard')} aria-current={currentPage === 'dashboard' ? 'page' : undefined}>Dashboard</Link>
           <Link to="/admin/users" className={navClass('users')} aria-current={currentPage === 'users' ? 'page' : undefined}>Users</Link>
           <Link to="/admin/courses" className={navClass('courses')} aria-current={currentPage === 'courses' ? 'page' : undefined}>Manage Courses</Link>
+          <Link to="/admin/validators" className={navClass('validators')} aria-current={currentPage === 'validators' ? 'page' : undefined}>Validators</Link>
           <Link to="/admin/analytics" className={navClass('analytics')} aria-current={currentPage === 'analytics' ? 'page' : undefined}>Analytics</Link>
           <Link to="/admin/feedback" className={navClass('feedback')} aria-current={currentPage === 'feedback' ? 'page' : undefined}>Feedback</Link>
           <LogoutButton onConfirm={handleLogout} className="lm-action lm-action-danger">

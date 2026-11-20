@@ -262,7 +262,7 @@ function Landing() {
         </section>
       </main>
 
-      <PublicFooter />
+      <PublicFooter showStaffAccess />
     </div>
   )
 }

@@ -1,5 +1,6 @@
 import { isCurrentIndependentCourse } from './courseIdentityService.js'
 import { getPublicCourse, searchPublicCourses } from './publicCourseService.js'
+import { withLocalLegacyCatalog } from './localLegacyCatalog.js'
 
 const normalize = value => String(value || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim()
 const compact = value => normalize(value).replace(/ /g, '')
@@ -27,9 +28,10 @@ export async function searchActiveCollegeCourses(database, value) {
 
   const searchTerm = `%${query}%`
   const compactSearchTerm = `%${query.replace(/[.\s]/g, '')}%`
-  const [courses] = await database.query(
+  const load = (replacementField) => database.query(
     `SELECT course_id, course_code, course_name, course_abbreviation, cluster_category, program_duration_years,
-            EXISTS(SELECT 1 FROM COURSE_PUBLICATION p WHERE p.course_id = COURSE.course_id) AS is_published_new
+            EXISTS(SELECT 1 FROM COURSE_PUBLICATION p WHERE p.course_id = COURSE.course_id) AS is_published_new,
+            ${replacementField} AS is_replacement
      FROM COURSE
      WHERE (
        LOWER(course_name) LIKE LOWER(?)
@@ -41,13 +43,17 @@ export async function searchActiveCollegeCourses(database, value) {
      ORDER BY course_name, course_code`,
     [searchTerm, searchTerm, searchTerm, compactSearchTerm, ...catalogCodes]
   )
+  const [courses] = await withLocalLegacyCatalog(database,
+    () => load('EXISTS(SELECT 1 FROM COURSE_REPLACEMENT_DRAFT r WHERE r.course_id = COURSE.course_id AND r.published_at IS NOT NULL)'),
+    () => load('0'))
 
   return courses
     .filter(({ course_code, is_published_new }) => isCurrentIndependentCourse(course_code) && (getPublicCourse(course_code) || Number(is_published_new) === 1))
-    .map((course) => ({
+    .map(({ is_replacement, ...course }) => ({
       ...course,
       course_abbreviation: course.course_abbreviation || getPublicCourse(course.course_code)?.course_abbreviation || null,
-      program_duration_years: getPublicCourse(course.course_code)?.program_duration_years || course.program_duration_years || null,
+      program_duration_years: Number(is_replacement) === 1 ? course.program_duration_years
+        : getPublicCourse(course.course_code)?.program_duration_years || course.program_duration_years || null,
     }))
     .sort((left, right) => {
       const exact = course => [course, getPublicCourse(course.course_code)].filter(Boolean)

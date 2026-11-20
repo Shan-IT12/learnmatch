@@ -2,6 +2,7 @@ import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import pool from '../config/db.js'
+import { withLocalLegacyCatalog } from './localLegacyCatalog.js'
 import {
   COURSE_IDENTITY_METADATA,
   isCurrentIndependentCourse,
@@ -47,7 +48,7 @@ const publicCourse = (course, includeDetails = false) => {
   }
 
   if (includeDetails) {
-    const enrichment = enrichmentByCourseId.get(course.course_id) || course
+    const enrichment = course.is_replacement ? course : enrichmentByCourseId.get(course.course_id) || course
     result.obtainable_skills = course.obtainable_skills || []
     result.career_paths = course.career_paths || []
     result.program_duration_years = enrichment.program_duration_years
@@ -88,8 +89,9 @@ function fieldScore(field, phrase, tokens, weight) {
 }
 
 export function searchPublicCourses(query, { limit, courseCodes = null, additionalCourses = [] } = {}) {
-  const extra = additionalCourses.filter((course) => !enrichmentByCourseId.has(course.course_id)).map(indexCourse)
-  const available = [...currentIndexedCourses, ...extra].filter(({ course }) => isCurrentIndependentCourse(course.course_id))
+  const extra = additionalCourses.filter((course) => course.is_replacement || !enrichmentByCourseId.has(course.course_id)).map(indexCourse)
+  const overrides = new Set(extra.map(({ course }) => course.course_id))
+  const available = [...currentIndexedCourses.filter(({ course }) => !overrides.has(course.course_id)), ...extra].filter(({ course }) => isCurrentIndependentCourse(course.course_id))
   const phrase = normalize(query)
   const normalizedLimit = Math.max(0, Math.min(
     Number(limit) || available.length,
@@ -163,6 +165,7 @@ export async function searchAvailablePublicCourses(query, options = {}, database
 // Only explicitly published new records supplement the unchanged bundled catalog.
 export function publishedCatalogRecord(row) {
   return {
+    is_replacement: Boolean(row.is_replacement),
     course_id: row.course_code, course_name: row.course_name,
     course_abbreviation: row.course_abbreviation, parent_cluster: row.cluster_category,
     course_description: row.description,
@@ -175,11 +178,18 @@ export function publishedCatalogRecord(row) {
   }
 }
 async function publishedCourses(database, courseCode = null) {
-  const [rows] = await database.query(
+  const courseFilter = courseCode ? ' AND c.course_code = ?' : ''
+  const params = courseCode ? [courseCode] : []
+  const [rows] = await withLocalLegacyCatalog(database, () => database.query(
+    `SELECT c.*, EXISTS (SELECT 1 FROM COURSE_REPLACEMENT_DRAFT r WHERE r.course_id = c.course_id
+       AND r.published_at IS NOT NULL) AS is_replacement FROM COURSE c
+     LEFT JOIN COURSE_PUBLICATION p ON p.course_id = c.course_id
+     WHERE c.is_active = 1 AND c.is_draft = 0
+       AND (p.course_id IS NOT NULL OR EXISTS (SELECT 1 FROM COURSE_REPLACEMENT_DRAFT r WHERE r.course_id = c.course_id AND r.published_at IS NOT NULL))
+       ${courseFilter}`, params), () => database.query(
     `SELECT c.* FROM COURSE c JOIN COURSE_PUBLICATION p ON p.course_id = c.course_id
-     WHERE c.is_active = 1 AND c.is_draft = 0${courseCode ? ' AND c.course_code = ?' : ''}`,
-    courseCode ? [courseCode] : [])
-  const eligible = rows.filter((row) => !enrichmentByCourseId.has(row.course_code) && isCurrentIndependentCourse(row.course_code))
+     WHERE c.is_active = 1 AND c.is_draft = 0${courseFilter}`, params))
+  const eligible = rows.filter((row) => (row.is_replacement || !enrichmentByCourseId.has(row.course_code)) && isCurrentIndependentCourse(row.course_code))
   if (!eligible.length) return []
   const [careers] = await database.query(`SELECT * FROM CAREER_OPPORTUNITY WHERE course_id IN (${eligible.map(() => '?').join(',')}) ORDER BY opportunity_id ASC`, eligible.map(row => row.course_id))
   return eligible.map(row => publishedCatalogRecord({ ...row, careers: careers.filter(career => Number(career.course_id) === Number(row.course_id)) }))
@@ -189,11 +199,10 @@ export async function getAvailablePublicCourse(courseCode, database = pool) {
   const resolvedCourseCodes = resolveCanonicalCourseIds(courseCode)
   if (resolvedCourseCodes.length !== 1) return null
 
+  const published = await publishedCourses(database, resolvedCourseCodes[0])
+  if (published.length === 1) return publicCourse(published[0], true)
   const course = getPublicCourse(resolvedCourseCodes[0])
-  if (!course) {
-    const published = await publishedCourses(database, resolvedCourseCodes[0])
-    return published.length === 1 ? publicCourse(published[0], true) : null
-  }
+  if (!course) return null
 
   const activeCourseCodes = await getActivePublicCourseCodes(database)
   return activeCourseCodes.has(course.course_code) ? course : null

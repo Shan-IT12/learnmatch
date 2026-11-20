@@ -1,5 +1,7 @@
 import jwt from 'jsonwebtoken'
 import pool from '../config/db.js'
+import { matchesPasswordSession } from '../services/sessionVersionService.js'
+import { withLocalLegacyCatalog } from '../services/localLegacyCatalog.js'
 import { ADMIN_JWT_AUDIENCE, jwtVerifyOptions } from '../config/security.js'
 
 const authenticateAdmin = async (req, res, next) => {
@@ -29,11 +31,17 @@ const authenticateAdmin = async (req, res, next) => {
   }
 
   try {
-    const [admins] = await pool.query(
-      'SELECT admin_id FROM ADMIN WHERE admin_id = ? LIMIT 1',
+    const [admins] = await withLocalLegacyCatalog(pool, () => pool.query(
+      'SELECT admin_id, email, password_hash FROM ADMIN WHERE admin_id = ? LIMIT 1',
       [decoded.adminId]
-    )
-    if (admins.length !== 1) return res.status(403).json({ message: 'Invalid or expired token' })
+    ), () => pool.query(
+      'SELECT admin_id, NULL AS email, password_hash FROM ADMIN WHERE admin_id = ? LIMIT 1',
+      [decoded.adminId]
+    ), 'ER_BAD_FIELD_ERROR')
+    const admin = admins[0]
+    if (!admin || (decoded.sessionVersion ? !matchesPasswordSession(decoded.sessionVersion, admin.password_hash) : admin.email != null)) {
+      return res.status(403).json({ message: 'Invalid or expired token' })
+    }
     req.admin = decoded
     return next()
   } catch {

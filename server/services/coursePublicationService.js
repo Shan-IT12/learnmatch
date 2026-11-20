@@ -1,4 +1,7 @@
 import crypto from 'node:crypto'
+import { courseValidationVersion, exactApproval } from './courseValidationService.js'
+import { publishReplacement } from './courseReplacementService.js'
+import { WorkflowError } from './workflowSupport.js'
 import { validateCourse } from './requestValidationService.js'
 import { evaluateRecommendationReadiness } from './adminCourseService.js'
 import { validateDraftInput } from './courseDraftService.js'
@@ -47,7 +50,7 @@ export function publicationFieldErrors(course, fields, sources) {
   return errors
 }
 
-async function context(connection, course) {
+export async function buildPublicationContext(connection, course) {
   const fields = await captureDraftReviewFields(connection, course)
   const revisions = await revisionMap(connection, course.course_id)
   const [sourceRows] = await connection.query('SELECT * FROM COURSE_DRAFT_SOURCE WHERE course_id = ? ORDER BY source_id', [course.course_id])
@@ -68,6 +71,7 @@ async function context(connection, course) {
 async function transaction(database, courseId, action) {
   const connection = await database.getConnection()
   try {
+    await connection.query('SET TRANSACTION ISOLATION LEVEL READ COMMITTED')
     await connection.beginTransaction()
     // Draft edits and source mutations lock this same row before changing review state.
     const [courses] = await connection.query('SELECT * FROM COURSE WHERE course_id = ? FOR UPDATE', [courseId])
@@ -95,17 +99,19 @@ export async function getPublicationReview(database, courseId) {
   return transaction(database, courseId, async (connection, course, published) => {
     if (published) return { published, read_only: true }
     requireDraft(course, published)
-    const current = await context(connection, course)
+    const current = await buildPublicationContext(connection, course)
     const fieldErrors = publicationFieldErrors(course, current.fields, current.sources)
+    const version = await courseValidationVersion(connection, course, current)
+    if (!await exactApproval(connection, courseId, version.token)) fieldErrors.expert_validation = 'Get a signed approval for the current saved version.'
     if (!current.matchingReview) fieldErrors.matching_review = 'Separately review and confirm the matching profile for this saved revision.'
-    return { course, careers: current.snapshot.careers, review_token: current.token, fields: current.fields, sources: current.sources, matching_review: current.matchingReview, matching_history: current.history, fieldErrors, ready: !Object.keys(fieldErrors).length }
+    return { course, careers: current.snapshot.careers, review_token: current.token, validation_version: version.token, fields: current.fields, sources: current.sources, matching_review: current.matchingReview, matching_history: current.history, fieldErrors, ready: !Object.keys(fieldErrors).length }
   })
 }
 export async function confirmMatchingReview(database, courseId, input, adminId) {
   return transaction(database, courseId, async (connection, course, published) => {
     const reviewer = await admin(connection, adminId)
     requireDraft(course, published)
-    const current = await context(connection, course)
+    const current = await buildPublicationContext(connection, course)
     requireRevision(input, current)
     if (input.confirmed !== true) throw new CoursePublicationError('Explicit matching-profile review confirmation is required.')
     // Validate the saved profile using the same rules as draft saves/WSM; never generate weights.
@@ -121,15 +127,27 @@ export async function publishCourse(database, courseId, input, adminId) {
   return transaction(database, courseId, async (connection, course, published) => {
     const publisher = await admin(connection, adminId)
     requireDraft(course, published)
-    const current = await context(connection, course)
+    const current = await buildPublicationContext(connection, course)
     requireRevision(input, current)
+    const version = await courseValidationVersion(connection, course, current)
+    if (input.expected_validation_version !== version.token) throw new CoursePublicationError('The saved validation version changed. Reload Review & Publish.', 409)
+    const approval = await exactApproval(connection, courseId, version.token)
     const errors = publicationFieldErrors(course, current.fields, current.sources)
+    if (!approval) errors.expert_validation = 'Get a signed approval for the current saved version.'
     if (!current.matchingReview) errors.matching_review = 'A separate current matching-profile confirmation is required.'
     if (input.publish_confirmed !== true) errors.publish_confirmation = 'Explicitly confirm publication.'
     if (Object.keys(errors).length) throw new CoursePublicationError('Publication is blocked. Correct the listed fields and review again.', 422, errors)
-    await connection.query('INSERT INTO COURSE_PUBLICATION (course_id, matching_review_id, context_token, publication_snapshot, published_by, publisher_label) VALUES (?, ?, ?, ?, ?, ?)', [courseId, current.matchingReview.matching_review_id, current.token, JSON.stringify(current.snapshot), adminId, publisher.username])
-    const [updated] = await connection.query('UPDATE COURSE SET is_draft = 0, is_active = 1 WHERE course_id = ? AND is_draft = 1 AND is_active = 0', [courseId])
+    let replacement
+    try { replacement = await publishReplacement(connection, course) }
+    catch (error) {
+      if (error instanceof WorkflowError) throw new CoursePublicationError(error.message, error.status)
+      throw error
+    }
+    await connection.query(`INSERT INTO COURSE_PUBLICATION (course_id, matching_review_id, context_token, publication_snapshot,
+      published_by, publisher_label, validation_item_id) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    [courseId, current.matchingReview.matching_review_id, current.token, JSON.stringify(current.snapshot), adminId, publisher.username, approval.item_id])
+    const [updated] = await connection.query('UPDATE COURSE SET is_draft = 0, is_active = ? WHERE course_id = ? AND is_draft = 1 AND is_active = 0', [replacement ? 0 : 1, courseId])
     if (updated.affectedRows !== 1) throw new CoursePublicationError('The draft state changed. Reload publication review.', 409)
-    return { course_id: courseId, course_code: course.course_code, published: true }
+    return { course_id: replacement?.course_id ?? courseId, course_code: replacement?.course_code ?? course.course_code, published: true }
   })
 }

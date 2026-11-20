@@ -32,6 +32,9 @@ const SummaryDashboard = lazy(() => import('./pages/SummaryDashboard'))
 const CareerPath = lazy(() => import('./pages/CareerPath'))
 const Feedback = lazy(() => import('./pages/Feedback'))
 const AdminLogin = lazy(() => import('./pages/AdminLogin'))
+const StaffAccount = lazy(() => import('./pages/StaffAccount'))
+const ValidatorPortal = lazy(() => import('./pages/ValidatorPortal'))
+const AdminValidators = lazy(() => import('./pages/admin/AdminValidators'))
 const ManageCourses = lazy(() => import('./pages/admin/ManageCourses'))
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'))
 const AdminUsers = lazy(() => import('./pages/admin/AdminUsers'))
@@ -98,6 +101,13 @@ function App() {
       <Route path="/results/career-path/:courseCode" element={<CareerPath />} />
       <Route path="/feedback" element={<Feedback />} />
       <Route path="/admin/login" element={<AdminLogin />} />
+      <Route path="/admin/account/:action" element={<StaffAccount role="admin" />} />
+      <Route path="/admin/validators" element={<AdminRoute><AdminValidators /></AdminRoute>} />
+      <Route path="/validator/login" element={<StaffAccount role="validator" initialAction="login" />} />
+      <Route path="/validator/account/:action" element={<StaffAccount role="validator" />} />
+      <Route path="/validator" element={<ValidatorPortal />} />
+      <Route path="/validator/:section" element={<ValidatorPortal />} />
+      <Route path="/validator/reviews/:assignmentId" element={<ValidatorPortal />} />
       <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
       <Route path="/admin/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />
       <Route path="/admin/users/:userId" element={<AdminRoute><AdminUserDetail /></AdminRoute>} />

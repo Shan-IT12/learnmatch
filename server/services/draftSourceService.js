@@ -1,4 +1,5 @@
 import crypto from 'node:crypto'
+import { bumpValidationRevision } from './courseValidationService.js'
 import { COURSE_SOURCE_FIELDS } from '../shared/courseSourceFields.js'
 import { validateAdminCourseSource, checkedSourceOriginError } from './sourcePublisherPolicy.js'
 import { sourceAnalysisBinding } from '../shared/pendingSourceReview.js'
@@ -113,15 +114,19 @@ export async function saveDraftSource(database, courseId, input, sourceId = null
       const activeSources = (await sourceRows(connection, courseId)).filter((source) => !Number(source.is_removed))
       if (activeSources.length >= 3) throw new DraftSourceError('Use at most three source links.', 400)
       const [result] = await connection.query('INSERT INTO COURSE_DRAFT_SOURCE (course_id, title, url, supported_fields, notes) VALUES (?, ?, ?, ?, ?)', [courseId, value.title, value.url, JSON.stringify(value.supported_fields), value.notes])
+      await bumpValidationRevision(connection, courseId)
       return { source_id: result.insertId }
     }
     const source = (await sourceRows(connection, courseId)).find((row) => row.source_id === sourceId && !row.is_removed)
     if (!source) throw new DraftSourceError('Source not found.', 404)
     if (input.source_revision !== source.source_revision) throw new DraftSourceError('This source changed. Reload before saving.', 409)
     const old = { title: source.title, url: source.url, supported_fields: parseJson(source.supported_fields), notes: source.notes }
-    if (stableJson(old) !== stableJson(value)) await connection.query(
+    if (stableJson(old) !== stableJson(value)) {
+      await connection.query(
       `UPDATE COURSE_DRAFT_SOURCE SET title = ?, url = ?, supported_fields = ?, notes = ?, source_revision = source_revision + 1${source.url !== value.url ? ', check_digest = NULL' : ''}
        WHERE course_id = ? AND source_id = ?`, [value.title, value.url, JSON.stringify(value.supported_fields), value.notes, courseId, sourceId])
+      await bumpValidationRevision(connection, courseId)
+    }
     return { source_id: sourceId }
   })
 }
@@ -131,6 +136,7 @@ export async function removeDraftSource(database, courseId, sourceId, revision) 
     if (!source) throw new DraftSourceError('Source not found.', 404)
     if (revision !== source.source_revision) throw new DraftSourceError('This source changed. Reload before removing it.', 409)
     await connection.query('UPDATE COURSE_DRAFT_SOURCE SET is_removed = 1, source_revision = source_revision + 1 WHERE course_id = ? AND source_id = ?', [courseId, sourceId])
+    await bumpValidationRevision(connection, courseId)
   })
 }
 export async function reviewDraftSource(database, courseId, sourceId, input, authenticatedAdminId) {
@@ -159,5 +165,6 @@ export async function appendSourceReview(connection, source, context, authentica
     `INSERT INTO COURSE_DRAFT_SOURCE_REVIEW (source_id, source_revision, context_token, field_revisions, source_snapshot, claim_snapshot, reviewer_id, reviewer_label)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
     [source.source_id, source.source_revision, context.token, JSON.stringify(context.fieldRevisions), JSON.stringify(context.snapshot), JSON.stringify(context.claims), authenticatedAdminId, admins[0].username])
+  await bumpValidationRevision(connection, source.course_id)
   return { review_id: result.insertId }
 }

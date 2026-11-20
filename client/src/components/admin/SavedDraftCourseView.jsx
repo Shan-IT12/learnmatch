@@ -2,7 +2,7 @@ import DraftDisclosure from './DraftDisclosure'
 import { validateCourseSource } from '../../../../shared/courseSourceFields'
 
 const riasec = { R: 'Realistic', I: 'Investigative', A: 'Artistic', S: 'Social', E: 'Enterprising', C: 'Conventional' }
-export default function SavedDraftCourseView({ form, courseCode, publication, onEdit, onReview, children, catalog = false, active = false, canonicalCareers = [], identityNotice = '' }) {
+export default function SavedDraftCourseView({ form, courseCode, publication, onEdit, onReview, children, catalog = false, active = false, canonicalCareers = [], validationManaged = false, identityNotice = '' }) {
   let publishedSources = []
   try {
     const snapshot = typeof publication?.publication_snapshot === 'string' ? JSON.parse(publication.publication_snapshot) : publication?.publication_snapshot
@@ -12,9 +12,10 @@ export default function SavedDraftCourseView({ form, courseCode, publication, on
     <section className="rounded-xl border border-orange-200 bg-white p-5">
       <p className="text-xs font-semibold uppercase tracking-wide text-orange-700">{catalog ? identityNotice ? 'Archived catalog identity' : `Catalog course - ${active ? 'Active' : 'Inactive'}` : publication ? 'Published course · Read-only' : 'Saved draft · Inactive'}</p>
       <h1 className="mt-2 break-words text-2xl font-bold">{form.course_name}</h1><p className="mt-1 text-sm text-gray-600">Stable course code: {courseCode}</p>
-      {!publication && !catalog && <><p className="mt-3 text-sm text-gray-700"><strong>Save Draft</strong> stores your work. <strong>Publish course</strong> is the final action that makes the reviewed course available to students.</p><p className="mt-2 text-xs text-gray-600">1. Save Draft → 2. Review requirements and confirmations → 3. Publish course</p><div className="mt-4 flex flex-wrap gap-3"><button type="button" onClick={onReview} className="rounded-lg bg-orange-500 px-4 py-2 text-sm text-white">Continue to Review &amp; Publish</button><button type="button" onClick={onEdit} className="rounded-lg border border-orange-200 px-4 py-2 text-sm">Edit Draft</button></div></>}
+      {!publication && !catalog && <><p className="mt-3 text-sm text-gray-700"><strong>Save Draft</strong> stores your work. <strong>Publish course</strong> is the final action that makes the reviewed course available to students.</p><p className="mt-2 text-sm text-gray-600">Complete the saved draft and sources, send it for validation and publish after signed approval.</p><div className="mt-4 flex flex-wrap gap-3"><button type="button" onClick={onReview} className="rounded-lg bg-orange-500 px-4 py-2 text-sm text-white">Continue to Review &amp; Publish</button><a className="lm-action" href="#course-validation">Course validation</a><button type="button" onClick={onEdit} className="rounded-lg border border-orange-200 px-4 py-2 text-sm">Edit Draft</button></div></>}
       {catalog && identityNotice && <p className="mt-3 rounded-lg bg-amber-50 p-3 text-sm text-amber-900">{identityNotice}. Excluded from independent-course discovery; retained to preserve linked history.</p>}
-      {catalog && <div className="mt-4"><button type="button" onClick={onEdit} className="rounded-lg border border-orange-200 px-4 py-2 text-sm">Edit Course</button><p className="mt-2 text-xs text-gray-600">Viewing the saved catalog record. Use Edit Course to make changes.</p></div>}
+      {catalog && !validationManaged && <div className="mt-4"><button type="button" onClick={onEdit} className="rounded-lg border border-orange-200 px-4 py-2 text-sm">Edit Course</button><p className="mt-2 text-xs text-gray-600">Viewing the saved catalog record. Use Edit Course to make changes.</p></div>}
+      {catalog && validationManaged && <p className="mt-3 text-sm text-gray-700">Open Course Validation to stage corrections in a replacement draft.</p>}
       {publication && <p className="mt-3 text-sm text-gray-600">Published by {publication.publisher_label} on {new Date(publication.published_at).toLocaleString('en-US')}. Published new courses are read-only.</p>}
     </section>
     <DraftDisclosure title="Course Details" defaultOpen><dl className="grid grid-cols-1 gap-4 text-sm md:grid-cols-2">

@@ -55,7 +55,7 @@ export function createLoginIdentityRateLimiter(identityFromRequest, {
 }
 
 const userIdentity = (req) => loginIdentityKey('user-login', req.body?.identifier)
-const adminIdentity = (req) => loginIdentityKey('admin-login', req.body?.username)
+const adminIdentity = (req) => loginIdentityKey('admin-login', req.body?.email || req.body?.username)
 
 export const userLoginIpRateLimiter = createLoginIpRateLimiter({
   max: USER_LOGIN_IP_RATE_LIMIT_MAX,

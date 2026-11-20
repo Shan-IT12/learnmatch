@@ -3,6 +3,7 @@ import { createCheckinReminderRouter } from './routes/checkinReminderRoutes.js'
 import cors from 'cors'
 import helmet from 'helmet'
 import dotenv from 'dotenv'
+import { pathToFileURL } from 'node:url'
 import authRoutes from './routes/authRoutes.js'
 import { createAccountRouter } from './routes/accountRoutes.js'
 import { createProxyTrust } from './config/proxyTrust.js'
@@ -13,6 +14,9 @@ import authenticateToken from './middleware/authenticateToken.js'
 import authenticateAdmin from './middleware/authenticateAdmin.js'
 import noStore from './middleware/noStore.js'
 import { loginAdmin } from './controllers/adminAuthController.js'
+import { mountCourseValidationRoutes } from './routes/courseValidationRoutes.js'
+import { bumpValidationRevision, publicStatus } from './services/courseValidationService.js'
+import { workflowTransaction } from './services/workflowSupport.js'
 import {
   adminLoginIdentityRateLimiter,
   adminLoginIpRateLimiter,
@@ -79,8 +83,7 @@ import {
 
 dotenv.config()
 
-const app = express()
-const PORT = process.env.PORT || 5000
+export const app = express()
 
 // Direct connections by default; only explicitly verified ingress peers may
 // supply a forwarded client address. Railway does not establish a fixed hop count.
@@ -107,6 +110,7 @@ app.use('/api/admin', noStore)
 app.use('/api/webhooks/resend/inactivity', createInactivityWebhookRouter(pool))
 // Account deletion owns its bounded JSON parser and sanitized parser errors.
 app.use('/api/account', createAccountRouter(pool, authenticateToken))
+mountCourseValidationRoutes(app, pool, authenticateAdmin)
 // Source receipts carry bounded excerpts and exact-content confirmation snapshots.
 app.use(['/api/admin/courses', '/api/admin/course-sources'], express.json({ limit: '512kb' }))
 app.use(express.json({ limit: '100kb' }))
@@ -204,17 +208,6 @@ app.patch('/api/assessment-attempts/current', authenticateToken, async (req, res
     console.error('Assessment attempt draft save error:', error)
     res.status(500).json({ message: 'Could not save assessment progress.' })
   }
-})
-
-app.listen(PORT, (error) => {
-  if (error) {
-    console.error(error.code === 'EADDRINUSE'
-      ? `Cannot start server: port ${PORT} is already in use. Stop the existing backend before running node server.js again.`
-      : `Cannot start server (${error.code || 'LISTEN_ERROR'}).`)
-    process.exitCode = 1
-    return
-  }
-  console.log(`Server running on http://localhost:${PORT}`)
 })
 
 app.get('/api/search', async (req, res) => {
@@ -674,14 +667,15 @@ app.get('/api/quiz/results', authenticateToken, async (req, res) => {
 
 app.get('/api/courses/:id', async (req, res) => {
   try {
-    const [rows] = await pool.query(
-      'SELECT course_id, course_name, description, cluster_category FROM COURSE WHERE course_id = ? AND is_active = 1 AND is_draft = 0',
-      [req.params.id]
-    )
-    if (rows.length === 0) {
-      return res.status(404).json({ message: 'Course not found' })
-    }
-    res.json({ course: rows[0] })
+    const id = positiveInteger(req.params.id)
+    const course = id && await workflowTransaction(pool, async (connection) => {
+      const [[row]] = await connection.execute('SELECT * FROM COURSE WHERE course_id = ? AND is_active = 1 AND is_draft = 0 FOR SHARE', [id])
+      if (!row) return null
+      const { course_id, course_name, description, cluster_category } = row
+      return { course_id, course_name, description, cluster_category, validation: await publicStatus(connection, row) }
+    })
+    if (!course) return res.status(404).json({ message: 'Course not found' })
+    res.json({ course })
   } catch (error) {
     console.error('Course fetch error:', error)
     res.status(500).json({ message: 'Server error fetching course' })
@@ -920,7 +914,11 @@ app.get('/api/admin/courses/:id', authenticateAdmin, async (req, res) => {
       pool.query('SELECT riasec_type, weight, evidence FROM COURSE_RIASEC_PROFILE WHERE course_id = ? ORDER BY riasec_type', [req.params.id]),
     ])
     const course = courseRows[0]
-    const [publication] = await pool.query('SELECT * FROM COURSE_PUBLICATION WHERE course_id = ?', [req.params.id])
+    const [[replacement]] = await pool.execute(`SELECT draft_id, published_at FROM COURSE_REPLACEMENT_DRAFT WHERE course_id = ?
+      ORDER BY draft_id DESC LIMIT 1`, [req.params.id])
+    const [[latestPublished]] = await pool.execute(`SELECT draft_id FROM COURSE_REPLACEMENT_DRAFT WHERE course_id = ?
+      AND published_at IS NOT NULL ORDER BY draft_id DESC LIMIT 1`, [req.params.id])
+    const [publication] = await pool.query('SELECT * FROM COURSE_PUBLICATION WHERE course_id = ?', [latestPublished?.draft_id ?? req.params.id])
     // Legacy duration remains sourced from canonical enrichment until explicitly saved.
     const storedYears = typeof course.year_levels === 'string' ? JSON.parse(course.year_levels) : course.year_levels
     res.json({
@@ -933,6 +931,10 @@ app.get('/api/admin/courses/:id', authenticateAdmin, async (req, res) => {
       catalogReferences: Number(course.is_draft) !== 1 && !publication[0] ? getCatalogCourseReferences(course.course_code) : null,
       recommendationReadiness: readiness,
       publication: publication[0] || null,
+      replacementDraft: replacement && !replacement.published_at ? replacement.draft_id : null,
+      validationManaged: Boolean(publication.length || replacement || (await pool.execute(
+        'SELECT item_id FROM COURSE_VALIDATION_ITEM WHERE course_id = ? LIMIT 1', [req.params.id],
+      ))[0].length),
     })
   } catch (error) {
     console.error('Admin course detail fetch error:', error)
@@ -961,23 +963,26 @@ app.patch('/api/admin/courses/:id/status', authenticateAdmin, async (req, res) =
   const courseId = positiveInteger(req.params.id)
   if (!courseId) return res.status(400).json({ message: 'Invalid course ID.' })
   try {
-    if (req.body.is_active === true) {
-      const readiness = await getCourseRecommendationReadiness(pool, courseId)
-      if (!readiness) return res.status(404).json({ message: 'Course not found' })
-      if (!readiness.ready) {
-        return res.status(422).json({
+    const isActive = req.body?.is_active
+    const result = await workflowTransaction(pool, async (connection) => {
+      const [[course]] = await connection.execute('SELECT course_id FROM COURSE WHERE course_id = ? FOR UPDATE', [courseId])
+      if (!course) return { status: 404, body: { message: 'Course not found' } }
+      if (isActive === true) {
+        const readiness = await getCourseRecommendationReadiness(connection, courseId)
+        if (!readiness.ready) return { status: 422, body: {
           message: 'Course is not recommendation-ready and cannot be activated.',
           reasons: readiness.reasons,
           recommendationReadiness: readiness,
-        })
+        } }
       }
-    }
-    const updated = await setCourseActiveStatus(pool, courseId, req.body.is_active)
-    if (!updated) return res.status(404).json({ message: 'Course not found' })
+      await setCourseActiveStatus(connection, courseId, isActive)
+      return null
+    })
+    if (result) return res.status(result.status).json(result.body)
 
     res.json({
-      message: req.body.is_active ? 'Course reactivated successfully' : 'Course deactivated successfully',
-      is_active: req.body.is_active,
+      message: isActive ? 'Course reactivated successfully' : 'Course deactivated successfully',
+      is_active: isActive,
     })
   } catch (error) {
     if (error.code === 'DRAFT_COURSE') return res.status(422).json({ message: error.message })
@@ -1055,12 +1060,14 @@ app.post('/api/admin/courses/:id/careers', authenticateAdmin, async (req, res) =
   const { job_title, salary_range, description } = validation.value
 
   try {
-    await requireStandaloneCareerEditable(pool, { courseId })
-    const [result] = await pool.query(
-      `INSERT INTO CAREER_OPPORTUNITY (course_id, job_title, salary_range, description)
-       VALUES (?, ?, ?, ?)`,
-      [courseId, job_title, salary_range, description]
-    )
+    const [result] = await workflowTransaction(pool, async (connection) => {
+      await connection.execute('SELECT course_id FROM COURSE WHERE course_id = ? FOR UPDATE', [courseId])
+      await requireStandaloneCareerEditable(connection, { courseId })
+      const result = await connection.execute(`INSERT INTO CAREER_OPPORTUNITY (course_id, job_title, salary_range, description)
+         VALUES (?, ?, ?, ?)`, [courseId, job_title, salary_range, description])
+      await bumpValidationRevision(connection, courseId)
+      return result
+    })
     res.status(201).json({ message: 'Career opportunity added', opportunityId: result.insertId })
   } catch (error) {
     if (error instanceof CourseDraftError) return res.status(error.status).json({ message: error.message })
@@ -1076,11 +1083,15 @@ app.put('/api/admin/careers/:careerId', authenticateAdmin, async (req, res) => {
   const { job_title, salary_range, description } = validation.value
 
   try {
-    await requireStandaloneCareerEditable(pool, { careerId })
-    await pool.query(
-      `UPDATE CAREER_OPPORTUNITY SET job_title = ?, salary_range = ?, description = ? WHERE opportunity_id = ?`,
-      [job_title, salary_range, description, careerId]
-    )
+    await workflowTransaction(pool, async (connection) => {
+      const [[career]] = await connection.execute('SELECT course_id FROM CAREER_OPPORTUNITY WHERE opportunity_id = ?', [careerId])
+      if (!career) throw new CourseDraftError('Career opportunity not found.', 404)
+      await connection.execute('SELECT course_id FROM COURSE WHERE course_id = ? FOR UPDATE', [career.course_id])
+      await requireStandaloneCareerEditable(connection, { careerId })
+      const [update] = await connection.execute(`UPDATE CAREER_OPPORTUNITY SET job_title = ?, salary_range = ?, description = ? WHERE opportunity_id = ?`,
+        [job_title, salary_range, description, careerId])
+      if (update.changedRows) await bumpValidationRevision(connection, career.course_id)
+    })
     res.json({ message: 'Career opportunity updated' })
   } catch (error) {
     if (error instanceof CourseDraftError) return res.status(error.status).json({ message: error.message })
@@ -1093,8 +1104,14 @@ app.delete('/api/admin/careers/:careerId', authenticateAdmin, async (req, res) =
   const careerId = positiveInteger(req.params.careerId)
   if (!careerId) return res.status(400).json({ message: 'Invalid career ID.' })
   try {
-    await requireStandaloneCareerEditable(pool, { careerId })
-    await pool.query('DELETE FROM CAREER_OPPORTUNITY WHERE opportunity_id = ?', [careerId])
+    await workflowTransaction(pool, async (connection) => {
+      const [[career]] = await connection.execute('SELECT course_id FROM CAREER_OPPORTUNITY WHERE opportunity_id = ?', [careerId])
+      if (!career) throw new CourseDraftError('Career opportunity not found.', 404)
+      await connection.execute('SELECT course_id FROM COURSE WHERE course_id = ? FOR UPDATE', [career.course_id])
+      await requireStandaloneCareerEditable(connection, { careerId })
+      await connection.execute('DELETE FROM CAREER_OPPORTUNITY WHERE opportunity_id = ?', [careerId])
+      await bumpValidationRevision(connection, career.course_id)
+    })
     res.json({ message: 'Career opportunity deleted' })
   } catch (error) {
     if (error instanceof CourseDraftError) return res.status(error.status).json({ message: error.message })
@@ -1102,4 +1119,18 @@ app.delete('/api/admin/careers/:careerId', authenticateAdmin, async (req, res) =
     res.status(500).json({ message: 'Server error deleting career opportunity' })
   }
 })
+
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  const port = process.env.PORT || 5000
+  app.listen(port, (error) => {
+    if (error) {
+      console.error(error.code === 'EADDRINUSE'
+        ? `Cannot start server: port ${port} is already in use. Stop the existing backend before running node server.js again.`
+        : `Cannot start server (${error.code || 'LISTEN_ERROR'}).`)
+      process.exitCode = 1
+      return
+    }
+    console.log(`Server running on http://localhost:${port}`)
+  })
+}
 

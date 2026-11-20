@@ -1,15 +1,14 @@
 import SkeletonContent from '../components/SkeletonContent'
 import { coursePlaceholder } from '../data/loadingPlaceholders'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { Link, useLocation, useParams } from 'react-router-dom'
 import PublicHeader from '../components/PublicHeader'
 import CourseName from '../components/CourseName'
 import { getDisplayCourseAbbreviation } from '../utils/courseName'
 import { getCourseOverviewBackNavigation } from '../utils/courseOverviewNavigation'
 import useActiveCollegePhase from '../hooks/useActiveCollegePhase'
+import { useWorkflowData } from '../hooks/useCourseValidation'
 import { SITE_URL } from '../seo'
-
-const apiUrl = import.meta.env.VITE_API_URL || ''
 
 function setMetaDescription(content) {
   let meta = document.querySelector('meta[name="description"]')
@@ -32,58 +31,32 @@ function PublicCourseDetails() {
   const resultsContext = !fromSummary && (hasActiveCollegePhase || source === 'results' || location.state?.entryContext === 'results')
   const backNavigation = getCourseOverviewBackNavigation(location.state, location.search, hasActiveCollegePhase)
   const locatorSourceSearch = fromSummary ? '?source=summary' : resultsContext ? '?source=results' : fromDashboard ? '?source=dashboard' : '?source=public-search'
-  const [savedCourse, setCourse] = useState(null)
-  const [status, setStatus] = useState('loading')
-  const [resolvedCourseCode, setResolvedCourseCode] = useState(null)
-  const displayStatus = resolvedCourseCode === courseCode ? status : 'loading'
+  const { data, error, loading } = useWorkflowData(`public/courses/${encodeURIComponent(courseCode)}`, undefined, { interval: 10000 })
+  const savedCourse = data?.course
+  const displayStatus = loading ? 'loading' : savedCourse ? 'success' : error?.status === 404 ? 'not-found' : 'error'
   const course = displayStatus === 'loading' ? coursePlaceholder : savedCourse
 
   useEffect(() => {
-    const controller = new AbortController()
-    fetch(`${apiUrl}/api/public/courses/${encodeURIComponent(courseCode)}`, {
-      signal: controller.signal,
-    })
-      .then(async (response) => {
-        if (response.status === 404) return null
-        if (!response.ok) throw new Error('Course request failed')
-        return response.json()
-      })
-      .then((data) => {
-        if (!data) {
-          document.title = 'Course Not Found | LearnMatch'
-          setStatus('not-found')
-          setResolvedCourseCode(courseCode)
-          return
-        }
-        setCourse(data.course)
-        setStatus('success')
-        setResolvedCourseCode(courseCode)
-        document.title = `${getDisplayCourseAbbreviation(data.course.course_name, data.course.course_abbreviation) || data.course.course_name} | LearnMatch`
-        setMetaDescription((data.course.description || `Explore ${data.course.course_name} on LearnMatch`).slice(0, 160))
-        document.querySelector('meta[name="robots"]').content = 'index, follow'
-        const canonical = document.createElement('link')
-        canonical.rel = 'canonical'
-        canonical.href = `${SITE_URL}/courses/${encodeURIComponent(courseCode)}`
-        document.querySelector('link[rel="canonical"]')?.remove()
-        document.head.append(canonical)
-        document.querySelector('meta[property="og:title"]').content = document.title
-        document.querySelector('meta[property="og:description"]').content = document.querySelector('meta[name="description"]').content
-        document.querySelector('meta[property="og:url"]').content = canonical.href
-      })
-      .catch((error) => {
-        if (error.name !== 'AbortError') {
-          setStatus('error')
-          setResolvedCourseCode(courseCode)
-        }
-      })
-    return () => controller.abort()
-  }, [courseCode])
+    if (displayStatus === 'not-found') document.title = 'Course Not Found | LearnMatch'
+    if (!savedCourse) return
+    document.title = `${getDisplayCourseAbbreviation(savedCourse.course_name, savedCourse.course_abbreviation) || savedCourse.course_name} | LearnMatch`
+    setMetaDescription((savedCourse.description || `Explore ${savedCourse.course_name} on LearnMatch`).slice(0, 160))
+    document.querySelector('meta[name="robots"]').content = 'index, follow'
+    const canonical = document.createElement('link')
+    canonical.rel = 'canonical'
+    canonical.href = `${SITE_URL}/courses/${encodeURIComponent(courseCode)}`
+    document.querySelector('link[rel="canonical"]')?.remove()
+    document.head.append(canonical)
+    document.querySelector('meta[property="og:title"]').content = document.title
+    document.querySelector('meta[property="og:description"]').content = document.querySelector('meta[name="description"]').content
+    document.querySelector('meta[property="og:url"]').content = canonical.href
+  }, [courseCode, displayStatus, savedCourse])
 
   return (
     <div className="min-h-screen bg-gray-50">
       <PublicHeader activeCollegePhase={hasActiveCollegePhase} showDashboard={fromDashboard || fromSummary} dashboardPath={fromSummary ? '/dashboard/summary' : '/dashboard'} />
       <main className="max-w-5xl mx-auto px-5 sm:px-10 py-10 sm:py-14">
-        {displayStatus === 'error' && <div role="alert" className="bg-red-50 border border-red-100 text-red-700 rounded-xl p-5">We couldn’t load this course. Check your connection and refresh the page to try again.</div>}
+        {displayStatus === 'error' && <div role="alert" className="bg-red-50 border border-red-100 text-red-700 rounded-xl p-5">We couldn’t load this course. We’ll try again shortly.</div>}
         {displayStatus === 'not-found' && (
           <div className="bg-white border border-gray-100 rounded-2xl p-8 text-center">
             <h1 className="text-2xl font-bold text-gray-900">Course not found</h1>
@@ -107,6 +80,11 @@ function PublicCourseDetails() {
                 {course.course_abbreviation && <span className="text-xs font-bold text-orange-700 bg-orange-50 px-3 py-1.5 rounded-full">{getDisplayCourseAbbreviation(course.course_name, course.course_abbreviation)}</span>}
               </div>
               <CourseName as="h1" name={course.course_name} className="text-3xl sm:text-4xl font-bold text-gray-900 leading-tight" secondaryClassName="mt-2 text-lg font-medium text-gray-500" />
+              {course.validation && <p className="mt-3 inline-block rounded-full border border-orange-100 bg-orange-50 px-3 py-1 text-xs font-medium text-orange-900">
+                {course.validation.status === 'validated' ? <>Expert Validated{course.validation.validated_on && <> · <time dateTime={course.validation.validated_on}>{new Date(course.validation.validated_on).toLocaleDateString(undefined, { timeZone: 'UTC' })}</time></>}</> :
+                  course.validation.status === 'needs_changes' ? 'Under Review · Updates Requested' :
+                  course.validation.status === 'under_review' ? 'Under Review' : 'Pending Validation'}
+              </p>}
               {course.description && <p className="text-gray-600 leading-7 whitespace-pre-line mt-6">{course.description}</p>}
 
               {hasActiveCollegePhase === null ? (

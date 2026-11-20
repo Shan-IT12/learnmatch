@@ -14,7 +14,7 @@ export function publicationFieldLabel(field, sources = []) {
   const source = /^source_(\d+)$/.exec(field)
   if (source) return `Source: ${sources.find(row => Number(row.source_id) === Number(source[1]))?.title || `reference ${source[1]}`}`
   if (field.startsWith('source_') && COURSE_SOURCE_FIELDS[field.slice(7)]) return `Source support: ${COURSE_SOURCE_FIELDS[field.slice(7)]}`
-  const labels = { matching_profiles: 'Matching profiles', skill_profile: 'Skill profile', riasec_profile: 'RIASEC profile', matching_review: 'Matching-profile review', sources: 'Sources', program_duration_years: 'Program duration', year_levels: 'Year levels' }
+  const labels = { expert_validation: 'Expert validation', matching_profiles: 'Matching profiles', skill_profile: 'Skill profile', riasec_profile: 'RIASEC profile', matching_review: 'Matching-profile review', sources: 'Sources', program_duration_years: 'Program duration', year_levels: 'Year levels' }
   return labels[field] || field.replaceAll('_', ' ')
 }
 
@@ -22,7 +22,10 @@ export function publicationFieldLabel(field, sources = []) {
 export function publicationChecklist(review) {
   const errors = Object.entries(review.fieldErrors || {})
   const covered = new Set()
-  const rows = groups.map(group => {
+  const checks = review.validation_version || Object.hasOwn(review.fieldErrors || {}, 'expert_validation')
+    ? [...groups, { id: 'validation', label: 'Signed expert approval for this revision', keys: ['expert_validation'] }]
+    : groups
+  const rows = checks.map(group => {
     const failures = errors.filter(([field]) => group.keys?.includes(field) || group.matches?.(field))
     failures.forEach(([field]) => covered.add(field))
     return { id: group.id, label: group.label, passed: !failures.length }

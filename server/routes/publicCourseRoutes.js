@@ -1,6 +1,7 @@
 import express from 'express'
+import pool from '../config/db.js'
+import { validatedPublicCourse } from '../services/courseValidationService.js'
 import {
-  getAvailablePublicCourse,
   searchAvailablePublicCourses,
 } from '../services/publicCourseService.js'
 import { countAvailableLocatorSchools, getSchoolsForCourse } from '../services/schoolLocatorService.js'
@@ -55,7 +56,7 @@ router.get('/:courseCode/schools', async (req, res) => {
 
 router.get('/:courseCode', async (req, res) => {
   try {
-    const course = await getAvailablePublicCourse(req.params.courseCode)
+    const course = await validatedPublicCourse(pool, req.params.courseCode)
     if (!course) return res.status(404).json({ message: 'Course not found' })
     res.json({ course })
   } catch (error) {
