@@ -60,8 +60,8 @@ function OnboardingPersonality() {
           : firstMissing < 0 ? mbtiQuestions.length - 1 : firstMissing)
         if (local.pending) saveDraft({ personality_answers: restored }).catch(() => {})
       })
+      .then(() => { if (active) setAttemptLoaded(true) })
       .catch(() => { if (active) { setError('Could not restore your saved Personality progress. Please refresh.'); setResultCheckFailed(true) } })
-      .finally(() => { if (active) setAttemptLoaded(true) })
     return () => { active = false }
   }, [storage, saveDraft])
 

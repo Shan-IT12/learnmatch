@@ -203,8 +203,8 @@ function OnboardingSkills() {
         if (local.pending) saveDraft({ skill_questions: restoredQuestions, skill_answers: Object.entries(restoredAnswers || {}).map(
           ([id, selected_option]) => ({ question_id: Number(id), selected_option })) }).catch(() => {})
       })
+      .then(() => { if (active) setAttemptLoaded(true) })
       .catch(() => { if (active) setAssessmentAccessError('Could not restore your saved Skills progress. Please refresh.') })
-      .finally(() => { if (active) setAttemptLoaded(true) })
     return () => { active = false }
   }, [storage, saveDraft])
 
@@ -436,7 +436,7 @@ function OnboardingSkills() {
     )
   }
 
-  if (loading || !attemptLoaded) {
+  if (!assessmentAccessError && (loading || !attemptLoaded)) {
     return (
       <OnboardingLayout currentStep={3} isComplete={false} showFooterNavigation={false}>
         <SkeletonContent label="Loading Academic Skills questions..."><div className="max-w-2xl mx-auto px-5 sm:px-8 py-8 sm:py-12">

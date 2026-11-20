@@ -30,24 +30,39 @@ export async function readActiveAttempt(apiUrl, token, storage) {
     headers: assessmentHeaders(storage, { Authorization: `Bearer ${token}` }),
     cache: 'no-store',
   })
+  let inactive = await isInactiveAttemptResponse(response)
   // A stale, completed or foreign browser ID must never select another user's
   // draft. Fall back to the server's authenticated current-attempt lookup.
-  if (response.status === 404 && originalId && generation === sessionGeneration) {
+  if (inactive && originalId && generation === sessionGeneration && getAssessmentAttemptId(storage) === originalId) {
     response = await fetch(`${apiUrl}/api/assessment-attempts/current`, {
       headers: { Authorization: `Bearer ${token}` }, cache: 'no-store',
     })
+    inactive = await isInactiveAttemptResponse(response)
   }
   if (generation !== sessionGeneration) return null
-  if (response.status === 404) {
+  if (inactive) {
+    if (getAssessmentAttemptId(storage) !== originalId) throw new Error('Assessment progress changed while loading.')
     finishAssessmentAttempt(storage)
     return null
   }
   if (!response.ok) throw new Error('Could not load assessment progress.')
   const data = await response.json()
   if (generation !== sessionGeneration) return null
-  if (!Number.isSafeInteger(data.attemptId) || data.attemptId <= 0) throw new Error('Invalid assessment progress response.')
-  if (data.attemptId !== getAssessmentAttemptId(storage)) beginAssessmentAttempt(storage, data.attemptId)
+  if (!Number.isSafeInteger(data?.attemptId) || data.attemptId <= 0) throw new Error('Invalid assessment progress response.')
+  const currentId = getAssessmentAttemptId(storage)
+  if (data.attemptId !== currentId) {
+    if (currentId !== originalId) throw new Error('Assessment progress changed while loading.')
+    beginAssessmentAttempt(storage, data.attemptId)
+  }
   return data
+}
+
+async function isInactiveAttemptResponse(response) {
+  if (response.status !== 404) return false
+  const data = await response.json().catch(() => null)
+  return data?.code === 'ASSESSMENT_ATTEMPT_NOT_ACTIVE' ||
+    // Support the previous backend during a staggered rollout.
+    (data?.code === undefined && data?.message === 'Assessment progress is no longer active.')
 }
 
 // Recover a missing browser session before allowing structured interest answers.
@@ -67,8 +82,12 @@ export async function restoreInterestAttempt(apiUrl, token, storage) {
     }
     const { ok, data } = await attemptRecoveries.get(key)
     if (generation !== sessionGeneration) return null
-    if (!ok || !Number.isSafeInteger(data.attemptId) || data.attemptId <= 0) {
-      throw new Error(data.message || 'Could not restore your assessment session.')
+    if (!ok || !Number.isSafeInteger(data?.attemptId) || data.attemptId <= 0) {
+      throw new Error(data?.message || 'Could not restore your assessment session.')
+    }
+    const currentId = getAssessmentAttemptId(storage)
+    if (currentId && currentId !== data.attemptId) {
+      throw new Error('Assessment progress changed while loading.')
     }
     // Keep local interest answers while attaching the recovered attempt.
     storage?.setItem(ASSESSMENT_SESSION_KEYS.attemptId, String(data.attemptId))

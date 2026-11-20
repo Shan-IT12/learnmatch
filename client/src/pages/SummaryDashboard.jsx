@@ -9,13 +9,13 @@ import SkeletonContent from '../components/SkeletonContent'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { IconArrowLeft, IconArrowRight, IconRefresh, IconSchool, IconHistory, IconUser, IconHeart, IconBrain, IconShieldCheck, IconStar, IconCompass } from '@tabler/icons-react'
-import { beginAssessmentAttempt } from '../utils/assessmentSession'
+import { beginAssessmentAttempt, readActiveAttempt } from '../utils/assessmentSession'
+import { getAttemptResumeRoute } from '../utils/assessmentNavigation'
 import { getDimensionResults, MBTI_TYPE_CONTENT } from '../data/mbtiResultContent'
 import CourseName from '../components/CourseName'
 import ActionConfirmationModal from '../components/ActionConfirmationModal'
 import { collegePhasePath, hasSavedAssessmentSummary } from '../utils/assessmentSummaryNavigation'
 import useActiveCollegePhase from '../hooks/useActiveCollegePhase'
-import useAssessmentResume from '../hooks/useAssessmentResume'
 
 const personalFactorLabels = {
   factor_physical_impact: 'Physical / accessibility',
@@ -42,13 +42,12 @@ function SummaryDashboard() {
   const userId = localStorage.getItem('userId')
   const username = localStorage.getItem('username')
   const hasActiveCollegePhase = useActiveCollegePhase()
-  const assessmentResume = useAssessmentResume()
-
   const [loading, setLoading] = useState(true)
+  const [checkingAttempt, setCheckingAttempt] = useState(false)
   const [showRetakeConfirmation, setShowRetakeConfirmation] = useState(false)
   const [startingRetake, setStartingRetake] = useState(false)
   const [retakeError, setRetakeError] = useState('')
-  const retakePendingRef = useRef(false)
+  const assessmentActionRef = useRef(null)
   const [savedTopRecommendation, setTopRecommendation] = useState(null)
   const [savedTopCourseDetail, setTopCourseDetail] = useState(null)
   const [interests, setInterests] = useState([])
@@ -58,6 +57,8 @@ function SummaryDashboard() {
   const [savedDomainScores, setDomainScores] = useState({})
   const [savedProfile, setProfile] = useState(null)
   const [savedMbti, setMbti] = useState(null)
+
+  useEffect(() => () => { assessmentActionRef.current = null }, [token])
 
   useEffect(() => {
     if (!token) {
@@ -117,9 +118,36 @@ function SummaryDashboard() {
     navigate('/login')
   }
 
+  const handleAssessmentAction = async () => {
+    if (loading || !savedTopRecommendation || !token || assessmentActionRef.current) return
+    const request = {}
+    assessmentActionRef.current = request
+    setCheckingAttempt(true)
+    setRetakeError('')
+    try {
+      // Saved results can coexist with a retake. Check only when the student
+      // chooses to continue or retake, including from a browser with no cached ID.
+      const attempt = await readActiveAttempt(apiUrl, token, sessionStorage)
+      if (assessmentActionRef.current !== request || localStorage.getItem('token') !== token) return
+      const route = getAttemptResumeRoute(attempt)
+      if (route) navigate(route)
+      else setShowRetakeConfirmation(true)
+    } catch {
+      if (assessmentActionRef.current === request && localStorage.getItem('token') === token) {
+        setRetakeError('Could not check for an unfinished assessment. Please try again.')
+      }
+    } finally {
+      if (assessmentActionRef.current === request) {
+        assessmentActionRef.current = null
+        setCheckingAttempt(false)
+      }
+    }
+  }
+
   const handleRetake = async () => {
-    if (!showRetakeConfirmation || retakePendingRef.current) return
-    retakePendingRef.current = true
+    if (!showRetakeConfirmation || !token || assessmentActionRef.current) return
+    const request = {}
+    assessmentActionRef.current = request
     setStartingRetake(true)
     setRetakeError('')
     try {
@@ -127,6 +155,7 @@ function SummaryDashboard() {
         method: 'POST', headers: { Authorization: `Bearer ${token}` },
       })
       const data = await response.json().catch(() => ({}))
+      if (assessmentActionRef.current !== request || localStorage.getItem('token') !== token) return
       if (!response.ok || !Number.isSafeInteger(data.attemptId) || data.attemptId <= 0) {
         throw new Error(data.message || 'Could not start a new assessment. Please try again.')
       }
@@ -134,10 +163,14 @@ function SummaryDashboard() {
       setShowRetakeConfirmation(false)
       navigate('/onboarding/profile')
     } catch (error) {
-      setRetakeError(error.message || 'Could not start a new assessment. Please try again.')
+      if (assessmentActionRef.current === request && localStorage.getItem('token') === token) {
+        setRetakeError(error.message || 'Could not start a new assessment. Please try again.')
+      }
     } finally {
-      retakePendingRef.current = false
-      setStartingRetake(false)
+      if (assessmentActionRef.current === request) {
+        assessmentActionRef.current = null
+        setStartingRetake(false)
+      }
     }
   }
  
@@ -441,15 +474,15 @@ function SummaryDashboard() {
           <h2 className="mt-1 text-xl font-bold tracking-tight text-gray-950">Continue your LearnMatch journey</h2>
         </div>
         <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-          {assessmentResume.error && <p role="alert" className="w-full text-sm text-red-700">{assessmentResume.error}</p>}
-          {assessmentResume.route ? <button type="button" className="lm-action" onClick={() => navigate(assessmentResume.route)}>Continue Assessment</button> :
+          {!showRetakeConfirmation && retakeError && <p role="alert" className="w-full text-sm text-red-700">{retakeError}</p>}
           <button
-            disabled={assessmentResume.loading || Boolean(assessmentResume.error)}
-            onClick={() => { setRetakeError(''); setShowRetakeConfirmation(true) }}
+            type="button"
+            disabled={checkingAttempt || loading || !savedTopRecommendation}
+            onClick={handleAssessmentAction}
             className="flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-5 py-3 text-sm font-semibold text-gray-700 shadow-sm transition duration-150 hover:border-orange-200 hover:bg-orange-50 hover:text-orange-700"
           >
-            <IconRefresh size={16} stroke={2} /> Retake Assessment
-          </button>}
+            <IconRefresh size={16} stroke={2} /> {checkingAttempt ? 'Checking for an unfinished assessment…' : 'Continue or Retake Assessment'}
+          </button>
           {hasActiveCollegePhase !== true && <button
             disabled={hasActiveCollegePhase === null}
             onClick={() => navigate(collegePhasePath({ active: hasActiveCollegePhase }))}
@@ -472,7 +505,7 @@ function SummaryDashboard() {
         action={showRetakeConfirmation ? 'retake' : null}
         processing={startingRetake}
         error={retakeError}
-        onCancel={() => { if (!retakePendingRef.current) { setShowRetakeConfirmation(false); setRetakeError('') } }}
+        onCancel={() => { if (!assessmentActionRef.current) { setShowRetakeConfirmation(false); setRetakeError('') } }}
         onConfirm={handleRetake}
       />
     </div>

@@ -129,6 +129,42 @@ export async function ensureAttemptPersonalFactors(database, userId, attemptId) 
   return await setAttemptPersonalFactors(database, userId, attemptId, snapshot) ? snapshot : null
 }
 
+export async function startOrRecoverAssessmentAttempt(pool, userId, { recover = false } = {}) {
+  const connection = await pool.getConnection()
+  const lockName = `learnmatch:assessment-start:${userId}`
+  let acquired
+  try {
+    // A connection-scoped lock keeps the lookup and insert ordered across
+    // browser tabs and API replicas without locking the assessment's answers.
+    const [[lock]] = await connection.query('SELECT GET_LOCK(?, 5) AS acquired', [lockName])
+    acquired = lock.acquired
+    if (acquired !== 1) throw new Error('Could not obtain the assessment start lock')
+
+    const current = recover ? await getCurrentAttempt(connection, userId) : null
+    if (current) {
+      const personalFactors = await ensureAttemptPersonalFactors(connection, userId, current.attempt_id)
+      return { attemptId: current.attempt_id, personalFactors, recovered: true }
+    }
+    const attempt = await createAssessmentAttempt(connection, userId)
+    return { ...attempt, recovered: false }
+  } finally {
+    if (acquired === 1) {
+      // A pool release alone leaves connection-scoped locks in place.
+      let released
+      try {
+        const [[lock]] = await connection.query('SELECT RELEASE_LOCK(?) AS released', [lockName])
+        released = lock.released
+      } catch { /* Discard a connection with an uncertain lock state. */ }
+      if (released === 1) connection.release()
+      else connection.destroy()
+    } else if (acquired === 0) {
+      connection.release()
+    } else {
+      connection.destroy()
+    }
+  }
+}
+
 export function scoreSkillAnswers(answers, questions) {
   const questionMap = new Map(questions.map((question) => [Number(question.question_id), question]))
   let correctCount = 0

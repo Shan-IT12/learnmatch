@@ -21,6 +21,7 @@ function Dashboard() {
   const [hasSkills, setHasSkills] = useState(false)
   const [hasPersonality, setHasPersonality] = useState(false)
   const [assessmentResumeRoute, setAssessmentResumeRoute] = useState(null)
+  const [statusError, setStatusError] = useState(false)
   const token = localStorage.getItem('token')
   const username = localStorage.getItem('username')
   const { greeting, formattedDate } = getPhilippineDateTime()
@@ -38,26 +39,26 @@ function Dashboard() {
         const response = await fetch(`${import.meta.env.VITE_API_URL}/api/dashboard/status`, {
           headers: { Authorization: `Bearer ${token}` },
         })
+        if (!response.ok) throw new Error('Could not load dashboard status.')
         const data = await response.json()
-        const attempt = data.isCollegePhase ? null
-          : await readActiveAttempt(import.meta.env.VITE_API_URL, token, sessionStorage)
-        const resumeRoute = getAttemptResumeRoute(attempt)
         if (!active) return
-        if (data.isCollegePhase) navigate('/college')
-        else if (data.hasCompletedAssessment || (data.hasInterests && data.hasSkills && data.hasPersonality)) navigate('/dashboard/summary')
-        else {
-          // Leaving an assessment returns here. Resume only on an explicit
-          // Continue action; redirecting to the draft would trap the user.
-          setAssessmentResumeRoute(resumeRoute)
-          setHasProfile(data.hasProfile)
-          setHasInterests(attempt ? hasSubmittedAssessmentInterests(attempt) : data.hasInterests)
-          setHasSkills(data.hasSkills)
-          setHasPersonality(data.hasPersonality)
-          setLoading(false)
-        }
+        if (data.isCollegePhase) return navigate('/college')
+        if (data.hasCompletedAssessment || (data.hasInterests && data.hasSkills && data.hasPersonality)) return navigate('/dashboard/summary')
+        const attempt = await readActiveAttempt(import.meta.env.VITE_API_URL, token, sessionStorage)
+        if (!active) return
+        // Leaving an assessment returns here. Resume only on an explicit
+        // Continue action; redirecting to the draft would trap the user.
+        setStatusError(false)
+        setAssessmentResumeRoute(getAttemptResumeRoute(attempt))
+        setHasProfile(data.hasProfile)
+        setHasInterests(attempt ? hasSubmittedAssessmentInterests(attempt) : data.hasInterests)
+        setHasSkills(data.hasSkills)
+        setHasPersonality(data.hasPersonality)
+        setLoading(false)
       } catch (error) {
         if (!active) return
         console.error('Dashboard status fetch error:', error)
+        setStatusError(true)
         setLoading(false)
       }
     }
@@ -99,6 +100,7 @@ function Dashboard() {
       </nav>
 
       <SkeletonContent loading={loading} label="Loading Dashboard..."><main className="max-w-[1240px] mx-auto px-5 sm:px-8 lg:px-12 py-8 sm:py-10 lg:py-12">
+        {statusError ? <p role="alert" className="text-red-700">Could not check your assessment progress. Please refresh to try again.</p> : <>
         {!hasProfile && (
           <div className="rounded-2xl bg-orange-50 border border-orange-100 px-5 sm:px-7 py-5 mb-7 flex flex-col sm:flex-row gap-4 sm:justify-between sm:items-center shadow-sm">
             <div>
@@ -164,6 +166,7 @@ function Dashboard() {
           </section>
         </div>
 
+        </>}
         <div className="mb-4 flex items-center gap-3"><p className="shrink-0 text-xs font-bold uppercase tracking-[0.16em] text-gray-500">More ways to explore</p><div className="h-px w-full bg-gray-200/70" /></div>
         <div className="motion-stagger grid gap-5 md:grid-cols-2">
           <section className="dashboard-option group flex flex-col rounded-3xl border border-gray-200/80 bg-white p-6 shadow-sm sm:p-7">

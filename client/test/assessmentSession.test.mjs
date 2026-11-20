@@ -12,13 +12,14 @@ function storage() {
     getItem: key => data.get(key) ?? null, setItem: (key, value) => data.set(key, String(value)), removeItem: key => data.delete(key) }
 }
 const json = (body, status = 200) => new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } })
+const inactive = () => json({ code: 'ASSESSMENT_ATTEMPT_NOT_ACTIVE' }, 404)
 
 test('missing and stale browser identifiers recover only through authenticated reads, without creating attempts', async t => {
   const session = storage(), requests = []
   session.setItem(keys.skills, JSON.stringify({ answers: { foreign: 'A' } }))
   t.mock.method(globalThis, 'fetch', async (url, options) => {
     requests.push({ url, options })
-    if (options.headers['X-Assessment-Attempt-Id'] === '999') return json({}, 404)
+    if (options.headers['X-Assessment-Attempt-Id'] === '999') return inactive()
     return json({ attemptId: 12, skillAnswers: [{ question_id: 2, selected_option: 'B' }] })
   })
   const recovered = await readActiveAttempt('', 'user-A', session)
@@ -33,9 +34,67 @@ test('missing and stale browser identifiers recover only through authenticated r
 test('no unfinished attempt clears stale browser data without creating a new attempt', async t => {
   const session = storage()
   beginAssessmentAttempt(session, 12)
-  t.mock.method(globalThis, 'fetch', async () => json({}, 404))
+  t.mock.method(globalThis, 'fetch', async () => inactive())
   assert.equal(await readActiveAttempt('', 'user-A', session), null)
   assert.equal(getAssessmentAttemptId(session), null)
+})
+
+test('the exact legacy 404 retries an authenticated lookup before clearing a stale browser attempt', async t => {
+  const session = storage()
+  const requests = []
+  let ownedAttempt = { attemptId: 12, personalityAnswers: { 1: 4 } }
+  const endpoint = 'https://precious-renewal-production-b034.up.railway.app'
+  t.mock.method(globalThis, 'fetch', async (url, options) => {
+    assert.equal(url, `${endpoint}/api/assessment-attempts/current`)
+    assert.equal(options.method, undefined)
+    assert.equal(options.headers.Authorization, 'Bearer user-A')
+    const id = options.headers['X-Assessment-Attempt-Id']
+    requests.push(id)
+    if (id || !ownedAttempt) return json({ message: 'Assessment progress is no longer active.' }, 404)
+    return json(ownedAttempt)
+  })
+
+  beginAssessmentAttempt(session, 99)
+  assert.deepEqual(await readActiveAttempt(endpoint, 'user-A', session), ownedAttempt)
+  assert.equal(getAssessmentAttemptId(session), 12)
+  ownedAttempt = null
+  writeAssessmentSession(session, keys.personality, { answers: { 1: 4 } })
+  assert.equal(await readActiveAttempt(endpoint, 'user-A', session), null)
+  assert.equal(getAssessmentAttemptId(session), null)
+  assert.equal(session.getItem(keys.personality), null)
+  assert.deepEqual(requests, ['99', undefined, '12', undefined])
+})
+
+test('unrelated 404s, auth failures and invalid data preserve drafts and prevent recovery writes', async t => {
+  const session = storage()
+  beginAssessmentAttempt(session, 12)
+  const draft = { answers: { 1: 4 }, pending: true }
+  writeAssessmentSession(session, keys.personality, draft)
+  const mock = t.mock.method(globalThis, 'fetch')
+  for (const response of [new Response('<html>Not found</html>', { status: 404 }), json({ message: 'Route not found' }, 404), json({}, 401), json({}, 403), json({}, 500), json(null)]) {
+    mock.mock.mockImplementation(async (_url, options) => {
+      assert.equal(options.method, undefined)
+      return response
+    })
+    await assert.rejects(restoreInterestAttempt('', 'user-A', session), /assessment progress/)
+    assert.equal(getAssessmentAttemptId(session), 12)
+    assert.deepEqual(readAssessmentSession(session, keys.personality, {}), draft)
+  }
+  assert.equal(mock.mock.callCount(), 6)
+})
+
+test('late inactive and active responses cannot replace a newer browser attempt', async t => {
+  const session = storage()
+  let respond
+  t.mock.method(globalThis, 'fetch', () => new Promise(resolve => { respond = resolve }))
+  for (const response of [inactive(), json({ attemptId: 12 })]) {
+    beginAssessmentAttempt(session, 12)
+    const read = readActiveAttempt('', 'user-A', session)
+    beginAssessmentAttempt(session, 20)
+    respond(response)
+    await assert.rejects(read, /Assessment progress changed/)
+    assert.equal(getAssessmentAttemptId(session), 20)
+  }
 })
 
 test('concurrent initial interest recovery shares creation instead of starting duplicate attempts', async t => {
@@ -48,11 +107,37 @@ test('concurrent initial interest recovery shares creation instead of starting d
       created = true
       return json({ attemptId: 12 })
     }
-    return created ? json({ attemptId: 12, interests: [] }) : json({}, 404)
+    return created ? json({ attemptId: 12, interests: [] }) : inactive()
   })
   const attempts = await Promise.all([restoreInterestAttempt('', 'A', session), restoreInterestAttempt('', 'A', session)])
   assert.equal(postCount, 1)
   assert.ok(attempts.every(attempt => attempt.attemptId === 12))
+})
+
+test('a late recovery response cannot reattach a draft to an older attempt', async t => {
+  const session = storage()
+  let finishRecovery
+  const recovering = new Promise(resolve => { finishRecovery = resolve })
+  let respond
+  const fetchMock = t.mock.method(globalThis, 'fetch', async (_url, options) => {
+    if (options.method !== 'POST') return inactive()
+    return new Promise(resolve => {
+      respond = resolve
+      finishRecovery()
+    })
+  })
+
+  const pending = restoreInterestAttempt('', 'user-A', session)
+  await recovering
+  beginAssessmentAttempt(session, 20)
+  const draft = { selected: ['Drawing'], pending: true }
+  writeAssessmentSession(session, keys.interests, draft)
+  respond(json({ attemptId: 12 }))
+
+  await assert.rejects(pending, /Assessment progress changed/)
+  assert.equal(getAssessmentAttemptId(session), 20)
+  assert.deepEqual(readAssessmentSession(session, keys.interests, {}), draft)
+  assert.equal(fetchMock.mock.callCount(), 2)
 })
 
 test('ordered writes capture their original attempt and token across navigation', async t => {

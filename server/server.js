@@ -63,7 +63,7 @@ import {
   getAssessmentHistory,
   getAssessmentHistoryDetail,
 } from './services/assessmentHistoryService.js'
-import { createAssessmentAttempt, ensureAttemptPersonalFactors, ensureFinalizedSkillResponses, getCurrentAttempt, getOwnedAttempt, hasCompletePersonalityPrerequisites, hasSubmittedAttemptInterests, insertFinalizedSkillResponses, parseAttemptJson, requestedAttemptId, scoreSkillAnswers, submittedInterestResponse, updateAttempt, updateCurrentAttemptDraft } from './services/assessmentAttemptService.js'
+import { ensureAttemptPersonalFactors, ensureFinalizedSkillResponses, getCurrentAttempt, getOwnedAttempt, hasCompletePersonalityPrerequisites, hasSubmittedAttemptInterests, insertFinalizedSkillResponses, parseAttemptJson, requestedAttemptId, scoreSkillAnswers, startOrRecoverAssessmentAttempt, submittedInterestResponse, updateAttempt, updateCurrentAttemptDraft } from './services/assessmentAttemptService.js'
 import {
   CollegeTrackingError,
   changeCollegeProgram,
@@ -126,7 +126,7 @@ app.use('/api/college/notifications', createCheckinReminderRouter(pool, authenti
 
 app.post('/api/assessment-attempts', authenticateToken, async (req, res) => {
   try {
-    const attempt = await createAssessmentAttempt(pool, req.user.userId)
+    const attempt = await startOrRecoverAssessmentAttempt(pool, req.user.userId)
     res.status(201).json({ attemptId: attempt.attemptId, personalFactorsSnapshotted: Boolean(attempt.personalFactors) })
   } catch (error) {
     console.error('Assessment attempt start error:', error)
@@ -136,13 +136,12 @@ app.post('/api/assessment-attempts', authenticateToken, async (req, res) => {
 
 app.post('/api/assessment-attempts/recover', authenticateToken, async (req, res) => {
   try {
-    const current = await getCurrentAttempt(pool, req.user.userId)
-    if (current) {
-      const personalFactors = await ensureAttemptPersonalFactors(pool, req.user.userId, current.attempt_id)
-      return res.json({ attemptId: current.attempt_id, recovered: true, personalFactorsSnapshotted: Boolean(personalFactors) })
-    }
-    const attempt = await createAssessmentAttempt(pool, req.user.userId)
-    res.status(201).json({ attemptId: attempt.attemptId, recovered: false, personalFactorsSnapshotted: Boolean(attempt.personalFactors) })
+    const attempt = await startOrRecoverAssessmentAttempt(pool, req.user.userId, { recover: true })
+    res.status(attempt.recovered ? 200 : 201).json({
+      attemptId: attempt.attemptId,
+      recovered: attempt.recovered,
+      personalFactorsSnapshotted: Boolean(attempt.personalFactors),
+    })
   } catch (error) {
     console.error('Assessment attempt recovery error:', error)
     res.status(500).json({ message: 'Could not continue the assessment. Please try again.' })
@@ -153,7 +152,12 @@ app.get('/api/assessment-attempts/current', authenticateToken, async (req, res) 
   try {
     const requestedId = requestedAttemptId(req)
     const attempt = await getCurrentAttempt(pool, req.user.userId)
-    if (!attempt || (requestedId && attempt.attempt_id !== requestedId)) return res.status(404).json({ message: 'Assessment progress is no longer active.' })
+    if (!attempt || (requestedId && attempt.attempt_id !== requestedId)) {
+      return res.status(404).json({
+        code: 'ASSESSMENT_ATTEMPT_NOT_ACTIVE',
+        message: 'Assessment progress is no longer active.',
+      })
+    }
     res.json({
       attemptId: attempt.attempt_id,
       interests: parseAttemptJson(attempt.interests, []),

@@ -46,9 +46,9 @@ import {
 import { FieldError, RequiredMark } from '../../components/FormValidation'
 import { scrollToFirstInvalidField } from '../../utils/formValidation'
 import { getCalendarTerms, resolveCalendarTerm } from '../../constants/academicCalendars'
-import { beginAssessmentAttempt } from '../../utils/assessmentSession'
+import { beginAssessmentAttempt, readActiveAttempt } from '../../utils/assessmentSession'
+import { getAttemptResumeRoute } from '../../utils/assessmentNavigation'
 import { hasSavedAssessmentSummary } from '../../utils/assessmentSummaryNavigation'
-import useAssessmentResume from '../../hooks/useAssessmentResume'
 import useCollegeCompletionNotice from '../../hooks/useCollegeCompletionNotice'
 import useStudentView from '../../hooks/useStudentView'
 import { collegeCompletionNoticeKey } from '../../utils/collegeCompletionNotice'
@@ -262,7 +262,6 @@ function CollegeDashboard() {
   const notificationEntry = new URLSearchParams(location.search).get('notifications') === '1'
   const token = localStorage.getItem('token')
   const username = localStorage.getItem('username')
-  const assessmentResume = useAssessmentResume()
 
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -288,6 +287,8 @@ function CollegeDashboard() {
   const [lifecyclePending, setLifecyclePending] = useState(false)
   const [nextTermErrors, setNextTermErrors] = useState({})
   const [startingAssessment, setStartingAssessment] = useState(false)
+  const assessmentRequestRef = useRef(null)
+  useEffect(() => () => { assessmentRequestRef.current = null }, [token])
   const [activeView, setActiveView] = useStudentView('college-tab', 'overview', value => ['overview', 'roadmap', 'history'].includes(value))
   const viewButtonsRef = useRef([])
   const [showFullHistory, setShowFullHistory] = useStudentView('college-full-history', false, value => typeof value === 'boolean')
@@ -461,21 +462,32 @@ function CollegeDashboard() {
   }
 
   const handleTakeAssessment = async () => {
-    if (startingAssessment) return
+    if (!token || assessmentRequestRef.current) return
+    const request = {}
+    assessmentRequestRef.current = request
+    const isCurrent = () => assessmentRequestRef.current === request && localStorage.getItem('token') === token
     setStartingAssessment(true)
     setError('')
     try {
+      const route = getAttemptResumeRoute(await readActiveAttempt(import.meta.env.VITE_API_URL, token, sessionStorage))
+      if (!isCurrent()) return
+      if (route) { navigate(route); return }
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/assessment-attempts`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
       })
       const payload = await response.json().catch(() => ({}))
+      if (!isCurrent()) return
       if (!response.ok || !payload.attemptId) throw new Error(payload.message || 'Could not start the assessment.')
       beginAssessmentAttempt(sessionStorage, payload.attemptId)
       navigate('/onboarding/profile')
     } catch (requestError) {
-      setError(requestError.message || 'Could not start the assessment.')
-      setStartingAssessment(false)
+      if (isCurrent()) setError(requestError.message || 'Could not start the assessment.')
+    } finally {
+      if (assessmentRequestRef.current === request) {
+        assessmentRequestRef.current = null
+        setStartingAssessment(false)
+      }
     }
   }
 
@@ -879,11 +891,9 @@ function CollegeDashboard() {
           </summary>
           {lifecycleStatus === 'active' ? (
 <section className="flex flex-wrap gap-3 border-t border-gray-100 px-5 py-5 sm:px-7">
-            {assessmentResume.error && <p role="alert" className="w-full text-sm text-red-700">{assessmentResume.error}</p>}
-            {assessmentResume.route ? <button type="button" className="lm-action" onClick={() => navigate(assessmentResume.route)}>Continue Assessment</button> :
-            <button type="button" disabled={startingAssessment || assessmentResume.loading || Boolean(assessmentResume.error)} onClick={handleTakeAssessment} className="inline-flex items-center gap-2 rounded-xl border border-orange-200 bg-orange-50 px-4 py-2.5 text-sm font-semibold text-orange-700 disabled:cursor-not-allowed disabled:opacity-50">
-              <IconRefresh size={16} stroke={2} /> {startingAssessment ? 'Starting Assessment...' : 'Take Assessment Again'}
-            </button>}
+            <button type="button" disabled={startingAssessment} onClick={handleTakeAssessment} className="inline-flex items-center gap-2 rounded-xl border border-orange-200 bg-orange-50 px-4 py-2.5 text-sm font-semibold text-orange-700 disabled:cursor-not-allowed disabled:opacity-50">
+              <IconRefresh size={16} stroke={2} /> {startingAssessment ? 'Checking assessment…' : 'Continue or Retake Assessment'}
+            </button>
             <button type="button" disabled={lifecyclePending} onClick={() => setPendingLifecycleAction('pause')} className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-700 disabled:opacity-50">Pause Tracking</button>
             <button type="button" disabled={lifecyclePending} onClick={() => setPendingLifecycleAction('change')} className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-700 disabled:opacity-50">Change Program</button>
             {!programTrackingComplete && <button type="button" disabled={lifecyclePending} onClick={() => setPendingLifecycleAction('end')} className="rounded-xl border border-red-200 px-4 py-2.5 text-sm font-semibold text-red-700 disabled:opacity-50">End Tracking</button>}
