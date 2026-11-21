@@ -8,7 +8,8 @@
     "test": "node --test",
     "update:disposable-emails": "node scripts/updateDisposableEmailDomains.mjs",
     "reminders": "node scripts/runCheckinReminders.mjs",
-    "inactivity": "node scripts/runAccountInactivity.mjs"
+    "inactivity": "node scripts/runAccountInactivity.mjs",
+    "purge:monitoring": "node scripts/purgeMonitoringLogs.mjs"
   },
   "keywords": [],
   "author": "",

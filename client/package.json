@@ -5,12 +5,15 @@
   "type": "module",
   "scripts": {
     "test": "node --test test/*.test.mjs",
+    "predev": "node scripts/copyMediapipeWasm.mjs",
     "dev": "vite",
+    "prebuild": "node scripts/copyMediapipeWasm.mjs",
     "build": "node scripts/build.mjs",
     "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@mediapipe/tasks-vision": "^1.2.3",
     "@tabler/icons-react": "^3.46.0",
     "@tailwindcss/vite": "^4.3.1",
     "chart.js": "^4.5.1",

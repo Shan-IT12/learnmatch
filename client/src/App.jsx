@@ -9,6 +9,7 @@ import AdminRoute from './components/AdminRoute'
 import PageTransition from './components/PageTransition'
 import StudentEntryRoute from './components/StudentEntryRoute'
 import StudentPosition from './components/StudentPosition'
+import AssessmentMonitoringOverlay from './components/AssessmentMonitoringOverlay'
 
 const Login = lazy(() => import('./pages/Login'))
 const Register = lazy(() => import('./pages/Register'))
@@ -62,7 +63,7 @@ function ReadyRouteEffects() {
     })
     return () => cancelAnimationFrame(frame)
   }, [location.pathname, location.hash])
-  return <><RouteMetadata /><SkipNavigation /><StudentPosition /></>
+  return <><RouteMetadata /><SkipNavigation /><StudentPosition /><AssessmentMonitoringOverlay /></>
 }
 
 function App() {

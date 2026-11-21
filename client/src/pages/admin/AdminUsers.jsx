@@ -1,16 +1,19 @@
 import SkeletonContent from '../../components/SkeletonContent'
-import { useEffect, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
+  IconChevronDown,
   IconChevronLeft,
   IconChevronLeftPipe,
   IconChevronRight,
   IconChevronRightPipe,
+  IconChevronUp,
   IconSearch,
   IconUserSearch,
   IconX,
 } from '@tabler/icons-react'
 import AdminHeader from '../../components/AdminHeader'
+import AdminAttemptLogsSection, { AdminMonitoringBadge } from '../../components/admin/AdminAttemptMonitoringPanel'
 
 const PAGE_SIZE = 10
 
@@ -69,6 +72,7 @@ function AdminUsers() {
   const [alignment, setAlignment] = useState('')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [expandedUserId, setExpandedUserId] = useState(null)
 
   useEffect(() => {
     document.title = 'Users | LearnMatch Admin'
@@ -251,25 +255,63 @@ function AdminUsers() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
-                  {(loading ? [1, 2, 3, 4, 5].map(userId => ({ userId, username: 'username', accountStatus: 'Active', assessmentStatus: 'Completed', recommendationStatus: 'Available', trackingStatus: 'Active', latestAlignment: 'Aligned', registeredAt: '2026-01-01T00:00:00Z' })) : users).map((user) => (
-                    <tr key={user.userId} className="transition hover:bg-orange-50/30">
-                      <td className="px-5 py-4 align-top">
-                        <p className="font-bold tabular-nums text-slate-950">#{user.userId}</p>
-                        {user.username && <p className="mt-1 truncate text-xs font-medium text-slate-500">@{user.username}</p>}
-                        {user.email && <p className="mt-1 break-all text-xs text-slate-500">{user.email}</p>}
-                      </td>
-                      <td className="px-4 py-4 align-top"><StatusBadge>{user.accountStatus}</StatusBadge></td>
-                      <td className="px-4 py-4 align-top">
-                        <StatusBadge>{user.assessmentStatus}</StatusBadge>
-                        <p className="mt-1.5 break-words text-xs leading-5 text-slate-500">Recommendation: {user.recommendationStatus}</p>
-                      </td>
-                      <td className="px-4 py-4 align-top">
-                        <StatusBadge>{user.trackingStatus}</StatusBadge>
-                        <p className="mt-1.5 break-words text-xs leading-5 text-slate-500">Alignment: {user.latestAlignment || 'No Check-in'}</p>
-                      </td>
-                      <td className="whitespace-nowrap px-5 py-4 align-top text-slate-600">{formatDate(user.registeredAt)}</td>
-                    </tr>
-                  ))}
+                  {(loading ? [1, 2, 3, 4, 5].map(userId => ({ userId, username: 'username', accountStatus: 'Active', assessmentStatus: 'Completed', recommendationStatus: 'Available', trackingStatus: 'Active', latestAlignment: 'Aligned', registeredAt: '2026-01-01T00:00:00Z', latestAttempt: null, attempts: [] })) : users).map((user) => {
+                    const isExpanded = expandedUserId === user.userId
+                    return (
+                      <Fragment key={user.userId}>
+                        <tr className="transition hover:bg-orange-50/30">
+                          <td className="px-5 py-4 align-top">
+                            <button
+                              type="button"
+                              onClick={() => navigate(`/admin/users/${user.userId}`)}
+                              className="font-bold tabular-nums text-slate-950 underline decoration-orange-300 underline-offset-2 hover:text-orange-700"
+                            >
+                              #{user.userId}
+                            </button>
+                            {user.username && <p className="mt-1 truncate text-xs font-medium text-slate-500">@{user.username}</p>}
+                            {user.email && <p className="mt-1 break-all text-xs text-slate-500">{user.email}</p>}
+                          </td>
+                          <td className="px-4 py-4 align-top"><StatusBadge>{user.accountStatus}</StatusBadge></td>
+                          <td className="px-4 py-4 align-top">
+                            <div className="flex flex-wrap items-center gap-1.5">
+                              <StatusBadge>{user.assessmentStatus}</StatusBadge>
+                              {user.latestAttempt && (
+                                <AdminMonitoringBadge
+                                  cameraEnabled={user.latestAttempt.cameraEnabled}
+                                  mode={user.latestAttempt.mode}
+                                  flagCount={user.latestAttempt.flagCount}
+                                />
+                              )}
+                            </div>
+                            <p className="mt-1.5 break-words text-xs leading-5 text-slate-500">Recommendation: {user.recommendationStatus}</p>
+                            {user.attempts?.length > 0 && (
+                              <button
+                                type="button"
+                                onClick={() => setExpandedUserId(isExpanded ? null : user.userId)}
+                                aria-expanded={isExpanded}
+                                className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-orange-700 underline hover:text-orange-800"
+                              >
+                                {isExpanded ? 'Hide Monitoring Logs' : `View Monitoring Logs (${user.attempts.length})`}
+                                {isExpanded ? <IconChevronUp size={13} aria-hidden="true" /> : <IconChevronDown size={13} aria-hidden="true" />}
+                              </button>
+                            )}
+                          </td>
+                          <td className="px-4 py-4 align-top">
+                            <StatusBadge>{user.trackingStatus}</StatusBadge>
+                            <p className="mt-1.5 break-words text-xs leading-5 text-slate-500">Alignment: {user.latestAlignment || 'No Check-in'}</p>
+                          </td>
+                          <td className="whitespace-nowrap px-5 py-4 align-top text-slate-600">{formatDate(user.registeredAt)}</td>
+                        </tr>
+                        {isExpanded && (
+                          <tr className="bg-orange-50/20">
+                            <td colSpan={5} className="px-5 py-4">
+                              <AdminAttemptLogsSection attempts={user.attempts} />
+                            </td>
+                          </tr>
+                        )}
+                      </Fragment>
+                    )
+                  })}
                 </tbody>
               </table>
             </div>
@@ -289,9 +331,38 @@ function AdminUsers() {
                     </div>
                   </div>
                   <dl className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <div><dt className="text-xs font-semibold uppercase tracking-wide text-slate-400">Assessment Status</dt><dd className="mt-1.5"><StatusBadge>{user.assessmentStatus}</StatusBadge><p className="mt-2 text-xs text-slate-500">Recommendation: {user.recommendationStatus}</p></dd></div>
+                    <div>
+                      <dt className="text-xs font-semibold uppercase tracking-wide text-slate-400">Assessment Status</dt>
+                      <dd className="mt-1.5">
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          <StatusBadge>{user.assessmentStatus}</StatusBadge>
+                          {user.latestAttempt && (
+                            <AdminMonitoringBadge
+                              cameraEnabled={user.latestAttempt.cameraEnabled}
+                              mode={user.latestAttempt.mode}
+                              flagCount={user.latestAttempt.flagCount}
+                            />
+                          )}
+                        </div>
+                        <p className="mt-2 text-xs text-slate-500">Recommendation: {user.recommendationStatus}</p>
+                        {user.attempts?.length > 0 && (
+                          <button
+                            type="button"
+                            onClick={() => setExpandedUserId(expandedUserId === user.userId ? null : user.userId)}
+                            className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-orange-700 underline hover:text-orange-800"
+                          >
+                            {expandedUserId === user.userId ? 'Hide Monitoring Logs' : `View Monitoring Logs (${user.attempts.length})`}
+                          </button>
+                        )}
+                      </dd>
+                    </div>
                     <div><dt className="text-xs font-semibold uppercase tracking-wide text-slate-400">College Phase</dt><dd className="mt-1.5"><StatusBadge>{user.trackingStatus}</StatusBadge><p className="mt-2 text-xs text-slate-500">Alignment: {user.latestAlignment || 'No Check-in'}</p></dd></div>
                   </dl>
+                  {expandedUserId === user.userId && user.attempts?.length > 0 && (
+                    <div className="mt-4 border-t border-slate-100 pt-4">
+                      <AdminAttemptLogsSection attempts={user.attempts} />
+                    </div>
+                  )}
                   <div className="mt-5 border-t border-slate-100 pt-4">
                     <p className="text-sm text-slate-500">Registered {formatDate(user.registeredAt)}</p>
                   </div>

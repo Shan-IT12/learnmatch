@@ -2,11 +2,14 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { readFile, readdir } from 'node:fs/promises'
 
-test('browser policy disables unused capture APIs but preserves School Locator location access', async () => {
+test('browser policy allows only same-origin camera (no microphone) and preserves School Locator location access', async () => {
   const config = JSON.parse(await readFile(new URL('../vercel.json', import.meta.url), 'utf8'))
   const headers = config.headers.find(rule => rule.source === '/(.*)').headers
   const policy = headers.find(header => header.key.toLowerCase() === 'permissions-policy')?.value
-  assert.equal(policy, 'camera=(), microphone=(), geolocation=(self)')
+  assert.equal(policy, 'camera=(self), microphone=(), geolocation=(self)')
+  const csp = headers.find(header => header.key === 'Content-Security-Policy').value
+  assert.match(csp, /script-src 'self' 'wasm-unsafe-eval'(;|$)/) // self-hosted MediaPipe WebAssembly only, no CDN
+  assert.ok(!/https?:\/\/[^;]*(?:jsdelivr|googleapis|unpkg|cdn)/i.test(csp))
   assert.ok(headers.some(header => header.key === 'Content-Security-Policy'))
   assert.ok(headers.some(header => header.key === 'X-Content-Type-Options' && header.value === 'nosniff'))
 })

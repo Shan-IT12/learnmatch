@@ -5,6 +5,7 @@ import {
   IconArrowLeft,
   IconBook2,
   IconBrain,
+  IconCamera,
   IconCheck,
   IconClipboardCheck,
   IconMail,
@@ -14,6 +15,7 @@ import {
 } from '@tabler/icons-react'
 import AdminHeader from '../../components/AdminHeader'
 import CourseName from '../../components/CourseName'
+import AdminAttemptLogsSection, { AdminMonitoringBadge } from '../../components/admin/AdminAttemptMonitoringPanel'
 
 const alignmentStyles = {
   'On Track': 'border-emerald-200 bg-emerald-50 text-emerald-700',
@@ -156,6 +158,16 @@ function AdminUserDetail() {
               </SectionCard>
 
               <SectionCard title="Assessment" subtitle={user.assessment.status} icon={IconBrain}>
+                {user.assessment.latestAttempt && (
+                  <div className="mb-3 flex flex-wrap items-center justify-between gap-2 rounded-lg border border-slate-100 bg-slate-50/70 px-3.5 py-2.5">
+                    <span className="text-xs font-semibold text-slate-600">Latest attempt monitoring</span>
+                    <AdminMonitoringBadge
+                      cameraEnabled={user.assessment.latestAttempt.cameraEnabled}
+                      mode={user.assessment.latestAttempt.mode}
+                      flagCount={user.assessment.latestAttempt.flagCount}
+                    />
+                  </div>
+                )}
                 <div className="grid gap-3 sm:grid-cols-2">
                   <ComponentState label="Profile" complete={user.assessment.components.profile} detail={user.assessment.components.profile ? 'Profile information recorded' : 'Not started'} />
                   <ComponentState label="Interests" complete={user.assessment.components.interests} detail={user.assessment.components.interests ? `${user.assessment.interestCount} interests recorded` : 'Not started'} />
@@ -164,6 +176,14 @@ function AdminUserDetail() {
                 </div>
               </SectionCard>
             </div>
+
+            <SectionCard
+              title="Assessment Attempts & Camera Monitoring"
+              subtitle="Verified vs. Standard assessment mode and metadata event logs per attempt"
+              icon={IconCamera}
+            >
+              <AdminAttemptLogsSection attempts={user.assessment.attempts || []} />
+            </SectionCard>
 
             <SectionCard title="Recommendation" subtitle="Latest persisted recommendation result" icon={IconBook2}>
               {user.recommendation.available ? (

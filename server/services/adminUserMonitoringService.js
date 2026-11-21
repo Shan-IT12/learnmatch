@@ -133,7 +133,45 @@ function buildFilters({ search = '', account = '', assessment = '', tracking = '
   }
 }
 
-function shapeListUser(row) {
+function shapeAttemptSummary(row) {
+  const cameraEnabled = Boolean(row.camera_enabled)
+  return {
+    attemptId: Number(row.attempt_id),
+    userId: Number(row.user_id),
+    status: row.status === 'COMPLETED' ? 'Completed' : 'In Progress',
+    cameraEnabled,
+    mode: cameraEnabled ? 'Verified' : 'Standard',
+    flagCount: Number(row.flag_count || 0),
+    startedAt: row.started_at || null,
+    completedAt: row.completed_at || null,
+  }
+}
+
+async function fetchAttemptsByUserIds(database, userIds) {
+  const ids = [...new Set(userIds.map(Number).filter(id => Number.isSafeInteger(id) && id > 0))]
+  const byUser = new Map(ids.map(id => [id, []]))
+  if (!ids.length) return byUser
+  const placeholders = ids.map(() => '?').join(',')
+  try {
+    const [rows] = await database.query(
+      `SELECT a.attempt_id, a.user_id, a.status, a.camera_enabled, a.started_at, a.completed_at,
+              (SELECT COUNT(*) FROM assessment_monitoring_logs l WHERE l.attempt_id = a.attempt_id) AS flag_count
+       FROM ASSESSMENT_ATTEMPT a
+       WHERE a.user_id IN (${placeholders})
+       ORDER BY a.attempt_id DESC`,
+      ids
+    )
+    for (const row of rows) {
+      const shaped = shapeAttemptSummary(row)
+      byUser.get(shaped.userId)?.push(shaped)
+    }
+  } catch {
+    // Graceful fallback if monitoring migration is not yet applied in an isolated test schema.
+  }
+  return byUser
+}
+
+function shapeListUser(row, attempts = []) {
   return {
     userId: Number(row.user_id),
     username: row.username,
@@ -144,6 +182,8 @@ function shapeListUser(row) {
     trackingStatus: Number(row.tracking_started) === 1 ? 'Tracking Started' : 'Not Started',
     latestAlignment: row.alignment_status || null,
     registeredAt: row.created_at,
+    latestAttempt: attempts[0] || null,
+    attempts,
   }
 }
 
@@ -172,9 +212,10 @@ export async function getAdminUsers(database, options = {}) {
 
   const countRow = countResult[0][0]
   const rows = usersResult[0]
+  const attemptsByUser = await fetchAttemptsByUserIds(database, rows.map(row => row.user_id))
   const total = Number(countRow?.total || 0)
   return {
-    users: rows.map(shapeListUser),
+    users: rows.map(row => shapeListUser(row, attemptsByUser.get(Number(row.user_id)) || [])),
     pagination: {
       page,
       pageSize,
@@ -214,6 +255,7 @@ export async function getAdminUserDetail(database, userId) {
     [recommendationRows],
     [termRows],
     [alignmentRows],
+    attemptsByUser,
   ] = await Promise.all([
     database.query(
       `SELECT mbti_type, taken_at
@@ -289,7 +331,9 @@ export async function getAdminUserDetail(database, userId) {
           ORDER BY COALESCE(checkin_date, created_at) DESC, checkin_id DESC LIMIT 1) AS latest_checkin_at`,
       [normalizedUserId]
     ),
+    fetchAttemptsByUserIds(database, [normalizedUserId]),
   ])
+  const userAttempts = attemptsByUser.get(normalizedUserId) || []
 
   let tracking = termRows[0] || null
   if (!tracking) {
@@ -356,6 +400,8 @@ export async function getAdminUserDetail(database, userId) {
             percent: Math.round((Number(latestSkills.correct_count) / Number(latestSkills.answer_count)) * 100),
           }
         : null,
+      latestAttempt: userAttempts[0] || null,
+      attempts: userAttempts,
     },
     recommendation: {
       available: recommendationRows.length > 0,

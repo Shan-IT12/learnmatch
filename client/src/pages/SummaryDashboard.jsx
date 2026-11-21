@@ -16,6 +16,8 @@ import CourseName from '../components/CourseName'
 import ActionConfirmationModal from '../components/ActionConfirmationModal'
 import { collegePhasePath, hasSavedAssessmentSummary } from '../utils/assessmentSummaryNavigation'
 import useActiveCollegePhase from '../hooks/useActiveCollegePhase'
+import { fetchAttemptMonitoring } from '../utils/assessmentMonitoringApi'
+import PersonalFocusSummaryCard, { AssessmentModeBadge } from '../components/PersonalFocusSummaryCard'
 
 const personalFactorLabels = {
   factor_physical_impact: 'Physical / accessibility',
@@ -57,6 +59,7 @@ function SummaryDashboard() {
   const [savedDomainScores, setDomainScores] = useState({})
   const [savedProfile, setProfile] = useState(null)
   const [savedMbti, setMbti] = useState(null)
+  const [monitoringSummary, setMonitoringSummary] = useState(null)
 
   useEffect(() => () => { assessmentActionRef.current = null }, [token])
 
@@ -69,12 +72,13 @@ function SummaryDashboard() {
     const fetchSummary = async () => {
       try {
         const headers = { Authorization: `Bearer ${token}` }
-        const [resultsRes, interestsRes, quizRes, profileRes, mbtiRes] = await Promise.all([
+        const [resultsRes, interestsRes, quizRes, profileRes, mbtiRes, latestMonitoring] = await Promise.all([
           fetch(`${import.meta.env.VITE_API_URL}/api/recommendations/latest`, { headers }),
           fetch(`${import.meta.env.VITE_API_URL}/api/interests`, { headers }),
           fetch(`${import.meta.env.VITE_API_URL}/api/quiz/results`, { headers }),
           fetch(`${import.meta.env.VITE_API_URL}/api/profile?userId=${userId}`, { headers }),
           fetch(`${import.meta.env.VITE_API_URL}/api/mbti`, { headers }),
+          fetchAttemptMonitoring({ apiUrl: import.meta.env.VITE_API_URL, token, attemptId: 'latest' }),
         ])
 
         const resultsData = await resultsRes.json()
@@ -102,6 +106,7 @@ function SummaryDashboard() {
         if (profileData.username) localStorage.setItem('username', profileData.username)
         setProfile(profileData.profile ? { ...profileData.profile, username: profileData.username } : null)
         setMbti(mbtiData.mbtiType ? mbtiData : null)
+        setMonitoringSummary(latestMonitoring || null)
       } catch (error) {
         console.error('Summary fetch error:', error)
         setSummaryError('We could not load your saved assessment summary. Please try again later.')
@@ -241,7 +246,10 @@ function SummaryDashboard() {
 
         <div className="mb-7">
           <p className="mb-2 text-xs font-bold uppercase tracking-[0.18em] text-orange-600">Assessment Summary</p>
-          <h1 className="text-3xl font-bold tracking-[-0.03em] text-gray-950 sm:text-4xl">Your LearnMatch report</h1>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h1 className="text-3xl font-bold tracking-[-0.03em] text-gray-950 sm:text-4xl">Your LearnMatch report</h1>
+            {!loading && <AssessmentModeBadge summary={monitoringSummary} />}
+          </div>
           <p className="mt-2 max-w-2xl text-sm leading-relaxed text-gray-500">A consolidated view of your profile, assessment results, personal considerations, and recommended direction.</p>
         </div>
  
@@ -255,8 +263,11 @@ function SummaryDashboard() {
                 <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-orange-100"><IconStar size={15} fill="currentColor" stroke={1.7} /></span> Top Recommendation
               </p>
               <CourseName name={topRecommendation.course_name} abbreviation={topRecommendation.course_abbreviation} className="mb-4 block max-w-3xl text-xl font-bold leading-snug tracking-tight text-gray-950 sm:text-2xl" secondaryClassName="mt-1 text-base font-medium text-gray-500" />
-              <div className="inline-flex items-center gap-2 rounded-full border border-orange-200 bg-orange-50 px-3 py-1.5 text-sm font-semibold text-orange-800">
-                <span className="h-2 w-2 rounded-full bg-orange-500" /> {topRecommendation.match_score}% overall match
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="inline-flex items-center gap-2 rounded-full border border-orange-200 bg-orange-50 px-3 py-1.5 text-sm font-semibold text-orange-800">
+                  <span className="h-2 w-2 rounded-full bg-orange-500" /> {topRecommendation.match_score}% overall match
+                </div>
+                {!loading && <AssessmentModeBadge summary={monitoringSummary} />}
               </div>
             </div>
             <button
@@ -397,6 +408,10 @@ function SummaryDashboard() {
           )}
         </section>
  
+        <div className="mb-10">
+          <PersonalFocusSummaryCard summary={monitoringSummary} />
+        </div>
+
         {/* Career Path preview for top recommendation */}
         {topRecommendation && (
           <section className="mb-10">

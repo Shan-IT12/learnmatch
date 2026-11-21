@@ -1,5 +1,7 @@
 import express from 'express'
 import { createCheckinReminderRouter } from './routes/checkinReminderRoutes.js'
+import { createAssessmentMonitoringRouter } from './routes/assessmentMonitoringRoutes.js'
+import { startMonitoringRetention } from './services/assessmentMonitoringService.js'
 import cors from 'cors'
 import helmet from 'helmet'
 import dotenv from 'dotenv'
@@ -123,6 +125,7 @@ app.use('/api/admin/course-sources', createSourceCheckRouter(authenticateAdmin, 
 app.use('/api/admin/courses/:courseId/publication', createCoursePublicationRouter(pool, authenticateAdmin))
 app.use('/api/public/directions', directionsRoutes)
 app.use('/api/college/notifications', createCheckinReminderRouter(pool, authenticateToken))
+app.use(createAssessmentMonitoringRouter(pool, authenticateToken, authenticateAdmin))
 
 app.post('/api/assessment-attempts', authenticateToken, async (req, res) => {
   try {
@@ -1135,6 +1138,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
       return
     }
     console.log(`Server running on http://localhost:${port}`)
+    startMonitoringRetention(pool)
   })
 }
 

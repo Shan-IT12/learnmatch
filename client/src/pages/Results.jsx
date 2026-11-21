@@ -15,6 +15,8 @@ import { feedbackPromptKey, setActiveFeedbackPromptKey } from '../utils/feedback
 import { readRecommendationResponse } from '../utils/recommendationProgress'
 import { hasSavedAssessmentSummary } from '../utils/assessmentSummaryNavigation'
 import { careerPathFromResultsSearch } from '../utils/careerPathNavigation'
+import { fetchAttemptMonitoring } from '../utils/assessmentMonitoringApi'
+import PersonalFocusSummaryCard, { AssessmentModeBadge } from '../components/PersonalFocusSummaryCard'
 
 const RECOMMENDATIONS_TIMEOUT_MS = 30000
 
@@ -57,6 +59,7 @@ function Results() {
   const [rankingPending, setRankingPending] = useState(false)
   const [retryCount, setRetryCount] = useState(0)
   const [assessment, setAssessment] = useState({ interests: [], domainScores: {}, mbti: null, profile: null })
+  const [monitoringSummary, setMonitoringSummary] = useState(null)
   const [collegeStatus, setCollegeStatus] = useState(null)
   const returnDestination = getAssessmentReturnDestination(collegeStatus, returnTo)
   const savedResultsPath = getSavedResultsPath(searchParams.toString(), returnDestination.path)
@@ -127,7 +130,7 @@ function Results() {
         let completedDetails = 0
         const trackDetail = request => request.finally(() => {
           completedDetails += 1
-          if (!controller.signal.aborted) setLoadingProgress({ percent: Math.min(99, 80 + Math.floor(completedDetails / 6 * 20)), label: 'Loading your results overview' })
+          if (!controller.signal.aborted) setLoadingProgress({ percent: Math.min(99, 80 + Math.floor(completedDetails / 7 * 20)), label: 'Loading your results overview' })
         })
         const headers = { Authorization: `Bearer ${token}` }
         const userId = localStorage.getItem('userId')
@@ -140,6 +143,7 @@ function Results() {
             .then(async (res) => res.ok ? res.json() : null),
           savedOnly ? Promise.resolve(data) : fetch(`${import.meta.env.VITE_API_URL}/api/recommendations/latest`, { headers, signal: controller.signal })
             .then(async (res) => res.ok ? res.json() : null),
+          fetchAttemptMonitoring({ apiUrl: import.meta.env.VITE_API_URL, token, attemptId: 'latest', signal: controller.signal }),
         ].map(trackDetail))
         if (controller.signal.aborted) throw new DOMException('Results request cancelled', 'AbortError')
 
@@ -154,6 +158,7 @@ function Results() {
             profile: valueAt(3).profile || null,
           })
           setCollegeStatus(valueAt(4))
+          setMonitoringSummary(assessmentResponses[6]?.status === 'fulfilled' ? assessmentResponses[6].value : null)
           const promptKey = feedbackPromptKey(userId, valueAt(5)?.recommendation?.recommendation_id)
           setFeedbackMilestoneKey(promptKey)
           setActiveFeedbackPromptKey(localStorage, promptKey)
@@ -220,7 +225,10 @@ function Results() {
 
       <main id="main-content" tabIndex={-1} aria-busy={loading || undefined} className={loading ? 'lm-results-loading' : 'max-w-6xl mx-auto px-5 sm:px-8 py-8 sm:py-12'}>
         {!loading && <>
-        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900 mb-2">Your Recommended Courses</h1>
+        <div className="mb-2 flex flex-wrap items-center justify-between gap-3">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900">Your Recommended Courses</h1>
+          {!error && recommendations.length > 0 && <AssessmentModeBadge summary={monitoringSummary} />}
+        </div>
         <p className="text-gray-500 text-sm mb-6">
           {recommendations[0]?.interests_available === false
             ? 'These recommendations are based on your skills, personality, and personal factors because you selected no activity interests.'
@@ -395,6 +403,7 @@ function Results() {
             </div>
             <PersonalFactorExplanation factors={personalFactorDetails} />
           </section>
+          <PersonalFocusSummaryCard summary={monitoringSummary} />
 
           </>
         )}

@@ -91,6 +91,7 @@ export async function restoreInterestAttempt(apiUrl, token, storage) {
     }
     // Keep local interest answers while attaching the recovered attempt.
     storage?.setItem(ASSESSMENT_SESSION_KEYS.attemptId, String(data.attemptId))
+    notifyAttemptChange()
   }
   return readActiveAttempt(apiUrl, token, storage)
 }
@@ -155,15 +156,43 @@ async function sendAttemptDraft(apiUrl, headers, body, generation) {
   throw new Error('Could not save assessment progress.')
 }
 
+export const MONITORING_CHOICE_KEY = 'learnmatch:assessment:monitoring-choice'
+
+function notifyAttemptChange() {
+  if (typeof window !== 'undefined') window.dispatchEvent(new Event('learnmatch:assessment-attempt'))
+}
+
+function isOnActiveOnboardingStep() {
+  if (typeof window === 'undefined') return false
+  const path = window.location?.pathname || ''
+  return path === '/onboarding/profile' || path === '/onboarding/interests' || path === '/onboarding/skills'
+}
+
 export function beginAssessmentAttempt(storage, attemptId) {
   if (!storage) return
+  const previousAttemptId = getAssessmentAttemptId(storage)
+  const previousChoice = storage.getItem(MONITORING_CHOICE_KEY)
   Object.values(ASSESSMENT_SESSION_KEYS).forEach((key) => storage.removeItem(key))
   storage.setItem(ASSESSMENT_SESSION_KEYS.attemptId, String(attemptId))
+  // Never wipe an active camera choice while the student is already inside an onboarding step.
+  if (
+    previousChoice === 'completed' ||
+    (!isOnActiveOnboardingStep() && previousAttemptId && previousAttemptId !== Number(attemptId))
+  ) {
+    storage.removeItem(MONITORING_CHOICE_KEY)
+  }
+  notifyAttemptChange()
 }
 
 export function finishAssessmentAttempt(storage) {
   if (!storage) return
   Object.values(ASSESSMENT_SESSION_KEYS).forEach((key) => storage.removeItem(key))
+  if (typeof window !== 'undefined' && window.location?.pathname === '/onboarding/personality') {
+    storage.setItem(MONITORING_CHOICE_KEY, 'completed')
+  } else if (!isOnActiveOnboardingStep()) {
+    storage.removeItem(MONITORING_CHOICE_KEY)
+  }
+  notifyAttemptChange()
 }
 
 export function readAssessmentSession(storage, key, fallback) {
