@@ -113,17 +113,6 @@ export const registerUser = async (req, res) => {
       })
     }
 
-    const [existingUsername] = await pool.query(
-      'SELECT user_id FROM USER_ACCOUNT WHERE username = ?',
-      [normalizedUsername]
-    )
-
-    if (existingUsername.length > 0) {
-      return res.status(400).json({
-        message: 'Username already taken',
-      })
-    }
-
     const hashedPassword = await bcrypt.hash(password, 10)
 
     const [result] = await pool.query(
@@ -407,12 +396,15 @@ export const resendOtp = async (req, res) => {
   }
 }
 
-export const loginUser = async (req, res) => {
-  const { identifier, password } = req.body
+export const loginUser = async (req, res, next) => {
+  const emailInput = typeof (req.body?.email ?? req.body?.identifier) === 'string'
+    ? (req.body.email ?? req.body.identifier).trim()
+    : ''
+  const { password } = req.body || {}
 
-  if (!identifier || !password) {
+  if (!emailInput || !password) {
     return res.status(400).json({
-      message: 'Email/username and password are required',
+      message: 'Email and password are required',
     })
   }
 
@@ -422,14 +414,14 @@ export const loginUser = async (req, res) => {
       SELECT *
       FROM USER_ACCOUNT
       WHERE email = ?
-      OR username = ?
+      LIMIT 1
       `,
-      [identifier, identifier]
+      [emailInput]
     )
 
     if (rows.length === 0) {
       return res.status(400).json({
-        message: 'Invalid email/username or password',
+        message: 'Invalid email or password',
       })
     }
 
@@ -442,7 +434,7 @@ export const loginUser = async (req, res) => {
 
     if (!passwordMatch) {
       return res.status(400).json({
-        message: 'Invalid email/username or password',
+        message: 'Invalid email or password',
       })
     }
 
@@ -458,11 +450,7 @@ export const loginUser = async (req, res) => {
     await recordSuccessfulLogin(pool, user.user_id)
     return res.json(authPayload)
   } catch (error) {
-    console.error('Login error:', error)
-
-    return res.status(500).json({
-      message: 'Server error during login',
-    })
+    return next(error)
   }
 }
 

@@ -3,7 +3,7 @@ import { IconArrowLeft, IconArrowRight, IconBriefcase, IconChevronDown, IconRout
 import './careerPath.css'
 import { getYearTabIndex } from '../utils/careerRoadmap'
 
-const SALARY_DISCLAIMER = 'Salary figures are estimates for the Philippines and may vary by employer, experience, location, and industry.'
+const SALARY_DISCLAIMER = 'Salary figures (Est. 2025-2026) are estimates for the Philippines and may vary by employer, experience, location, and industry.'
 
 function CourseEnrichmentSections({ course, compact = false }) {
   const yearLevels = course?.year_levels || []
@@ -78,7 +78,7 @@ function CourseEnrichmentSections({ course, compact = false }) {
             <summary className="cursor-pointer list-none p-5 outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-orange-500 sm:p-6">
               <div className="mb-5 flex items-center justify-between"><span className="flex h-10 w-10 items-center justify-center rounded-xl border border-orange-100 bg-orange-50 text-orange-600 transition-colors group-hover:bg-orange-100"><IconBriefcase size={20} stroke={1.6} /></span><span className="text-[10px] font-bold uppercase tracking-[0.14em] text-gray-400">Career {String(index + 1).padStart(2, '0')}</span></div>
               <h3 className="text-lg font-bold leading-6 text-gray-950">{career.career_title}</h3>
-              {career.estimated_monthly_salary_php?.display && <div className="mt-4 rounded-xl border border-gray-100 bg-gray-50/80 px-3 py-3"><p className="mb-1 text-[10px] font-bold uppercase tracking-wide text-gray-400">Estimated monthly salary</p><p className="text-sm font-semibold leading-6 text-orange-700">{career.estimated_monthly_salary_php.display}</p></div>}
+              {career.estimated_monthly_salary_php?.display && <div className="mt-4 rounded-xl border border-gray-100 bg-gray-50/80 px-3 py-3"><div className="mb-1 flex flex-wrap items-center justify-between gap-1.5"><p className="text-[10px] font-bold uppercase tracking-wide text-gray-400">Estimated monthly salary</p><span className="rounded-md bg-orange-100/80 px-1.5 py-0.5 text-[10px] font-semibold text-orange-800">Est. 2025-2026</span></div><p className="text-sm font-semibold leading-6 text-orange-700">{career.estimated_monthly_salary_php.display}</p></div>}
               <div className="mt-5 flex items-center justify-between border-t border-gray-100 pt-4 text-xs font-semibold text-orange-600"><span className="group-open:hidden">Explore this role</span><span className="hidden group-open:inline">Close details</span><IconChevronDown size={17} className="transition-transform duration-200 group-open:rotate-180" /></div>
             </summary>
             <div className="career-year-content border-t border-orange-100 bg-orange-50/30 px-5 py-5 sm:px-6"><p className="text-sm leading-7 text-gray-600">{career.philippines_description || 'A role description is not yet available.'}</p></div>

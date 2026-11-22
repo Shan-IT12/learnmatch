@@ -36,6 +36,12 @@ export async function workflowApi(path, options) {
   return data
 }
 
+export async function fetchReviewImageUrl(path, token) {
+  const response = await request(path, { token })
+  if (!response.ok) throw new Error('This private image is unavailable.')
+  return URL.createObjectURL(await response.blob())
+}
+
 export async function downloadReviewImage(path, token, name) {
   const response = await request(path, { token })
   if (!response.ok) throw new Error('This private image is unavailable.')

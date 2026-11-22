@@ -43,6 +43,7 @@ const AdminUserDetail = lazy(() => import('./pages/admin/AdminUserDetail'))
 const AdminAnalytics = lazy(() => import('./pages/admin/AdminAnalytics'))
 const AdminFeedback = lazy(() => import('./pages/admin/AdminFeedback'))
 const AdminFeedbackDetail = lazy(() => import('./pages/admin/AdminFeedbackDetail'))
+const AdminAccounts = lazy(() => import('./pages/admin/AdminAccounts'))
 const CourseSearch = lazy(() => import('./pages/CourseSearch'))
 const PublicCourseDetails = lazy(() => import('./pages/PublicCourseDetails'))
 const SchoolLocator = lazy(() => import('./pages/SchoolLocator'))
@@ -105,6 +106,7 @@ function App() {
       <Route path="/admin/account/:action" element={<StaffAccount role="admin" />} />
       <Route path="/admin/validators" element={<AdminRoute><AdminValidators /></AdminRoute>} />
       <Route path="/validator/login" element={<StaffAccount role="validator" initialAction="login" />} />
+      <Route path="/validator/register" element={<StaffAccount role="validator" initialAction="invite" />} />
       <Route path="/validator/account/:action" element={<StaffAccount role="validator" />} />
       <Route path="/validator" element={<ValidatorPortal />} />
       <Route path="/validator/:section" element={<ValidatorPortal />} />
@@ -116,6 +118,7 @@ function App() {
       <Route path="/admin/analytics" element={<AdminRoute><AdminAnalytics /></AdminRoute>} />
       <Route path="/admin/feedback" element={<AdminRoute><AdminFeedback /></AdminRoute>} />
       <Route path="/admin/feedback/:feedbackId" element={<AdminRoute><AdminFeedbackDetail /></AdminRoute>} />
+      <Route path="/admin/accounts" element={<AdminRoute><AdminAccounts /></AdminRoute>} />
       <Route path="*" element={<main id="main-content" tabIndex={-1} className="p-8"><h1 className="text-3xl font-bold">Page not found</h1><Link to="/" className="public-text-link">Return to LearnMatch</Link></main>} />
     </Routes></PageTransition></RouteNavigation></>
   )

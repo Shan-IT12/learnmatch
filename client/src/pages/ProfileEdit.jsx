@@ -69,7 +69,7 @@ export default function ProfileEdit() {
       const data = await response.json()
       if (response.status === 401 || response.status === 403) { navigate('/login', { replace: true }); return }
       if (data.code === 'PROFILE_SAVE_OUTCOME_UNKNOWN') { setSaveOutcomeUnknown(true); setError(data.message); return }
-      if (!response.ok) { if (data.field === 'username') { setFieldErrors((current) => ({ ...current, username: data.message || 'Username is already taken.' })); scrollToFirstInvalidField(['username']); return }; setError(data.message || 'Could not save your profile.'); return }
+      if (!response.ok) { if (data.field === 'username') { setFieldErrors((current) => ({ ...current, username: data.message || 'Please enter a valid username.' })); scrollToFirstInvalidField(['username']); return }; setError(data.message || 'Could not save your profile.'); return }
       localStorage.setItem('username', data.username || formData.username)
       setSaveConfirmed(true)
       await waitForSuccessConfirmation()

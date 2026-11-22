@@ -862,7 +862,12 @@ function ManageCourses() {
                   <article key={career.career_id || career.career_title} className="rounded-xl border border-gray-100 px-4 py-3">
                     <p className="text-sm font-medium text-gray-900">{career.career_title}</p>
                     {career.estimated_monthly_salary_php?.display && (
-                      <p className="mt-1 text-xs font-medium text-orange-600">{career.estimated_monthly_salary_php.display}</p>
+                      <p className="mt-1 text-xs font-medium text-orange-600">
+                        {career.estimated_monthly_salary_php.display}{' '}
+                        <span className="ml-1 rounded bg-orange-50 px-1.5 py-0.5 text-[10px] font-semibold text-orange-800">
+                          Est. 2025-2026
+                        </span>
+                      </p>
                     )}
                     {career.philippines_description && (
                       <p className="mt-2 text-xs leading-5 text-gray-500">{career.philippines_description}</p>

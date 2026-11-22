@@ -27,7 +27,7 @@ function Login() {
     e.preventDefault()
     setError('')
     const nextErrors = {}
-    if (!formData.identifier.trim()) nextErrors.identifier = 'Please enter your email or username.'
+    if (!formData.identifier.trim()) nextErrors.identifier = 'Please enter your email address.'
     if (!formData.password) nextErrors.password = 'Please enter your password.'
     if (Object.keys(nextErrors).length) { setFieldErrors(nextErrors); scrollToFirstInvalidField(Object.keys(nextErrors)); return }
     setFieldErrors({})
@@ -105,10 +105,11 @@ function Login() {
           <form onSubmit={handleSubmit} noValidate className="space-y-4">
             <div className="group/field" data-validation-field="identifier">
               <label htmlFor="login-identifier" className="block text-sm font-medium text-gray-700 mb-2">
-                Email or Username <RequiredMark />
+                Email <RequiredMark />
               </label>
               <input
-                type="text"
+                type="email"
+                autoComplete="email"
                 id="login-identifier"
                 name="identifier"
                 value={formData.identifier}

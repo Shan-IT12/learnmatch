@@ -11,6 +11,8 @@ import {
 } from '@tabler/icons-react'
 import AdminHeader from '../../components/AdminHeader'
 import CourseName from '../../components/CourseName'
+import SystemErrorLogsPanel from '../../components/admin/SystemErrorLogsPanel'
+import { ADMIN_ROLES, getStoredAdminRole } from '../../utils/adminRole'
 import { parseCourseName } from '../../utils/courseName'
 
 ChartJS.register(
@@ -156,12 +158,39 @@ function formatRegistrationDate(value) {
 
 function AdminDashboard() {
   const navigate = useNavigate()
+  const isSystemDeveloper = getStoredAdminRole() === ADMIN_ROLES.SYSTEM_DEVELOPER
+  const [adminProfile, setAdminProfile] = useState(() => ({
+    fullName: localStorage.getItem('adminFullName') || '',
+    username: localStorage.getItem('adminUsername') || '',
+  }))
+  const [activeTab, setActiveTab] = useState(isSystemDeveloper ? 'system-logs' : 'overview')
   const [dashboard, setDashboard] = useState(null)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(!isSystemDeveloper)
   const [error, setError] = useState('')
   const [retryKey, setRetryKey] = useState(0)
 
   useEffect(() => {
+    const token = localStorage.getItem('adminToken')
+    if (!token) return
+    let cancelled = false
+    fetch(`${import.meta.env.VITE_API_URL}/api/admin/me`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!cancelled && data?.admin) {
+          setAdminProfile({
+            fullName: data.admin.fullName || '',
+            username: data.admin.username || '',
+          })
+        }
+      })
+      .catch(() => {})
+    return () => { cancelled = true }
+  }, [])
+
+  useEffect(() => {
+    if (isSystemDeveloper) return
     const controller = new AbortController()
     const loadDashboard = async () => {
       try {
@@ -173,6 +202,7 @@ function AdminDashboard() {
         if (response.status === 401 || response.status === 403) {
           localStorage.removeItem('adminToken')
           localStorage.removeItem('adminUsername')
+          localStorage.removeItem('adminRole')
           navigate('/admin/login', { replace: true })
           return
         }
@@ -189,7 +219,7 @@ function AdminDashboard() {
 
     loadDashboard()
     return () => controller.abort()
-  }, [navigate, retryKey])
+  }, [isSystemDeveloper, navigate, retryKey])
 
   const retryDashboard = () => {
     setLoading(true)
@@ -235,12 +265,65 @@ function AdminDashboard() {
     <div className="min-h-screen bg-[#fcfaf7]">
       <AdminHeader currentPage="dashboard" />
       <main className="mx-auto max-w-[1440px] px-5 py-8 sm:px-8 sm:py-10 lg:px-10">
-        <div className="mb-7 border-b border-slate-200 pb-6">
-          <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-orange-600">Administration</p>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-950">Dashboard</h1>
-          <p className="mt-2 text-sm text-slate-600">Student assessment and saved recommendation overview</p>
+        <div className="mb-7 flex flex-col justify-between gap-4 border-b border-slate-200 pb-6 sm:flex-row sm:items-end">
+          <div>
+            <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-orange-600">
+              {isSystemDeveloper ? 'System Developer Console' : 'Administration'}
+            </p>
+            <h1 className="text-3xl font-bold tracking-tight text-slate-950">
+              {adminProfile.fullName || adminProfile.username
+                ? `Welcome back, ${adminProfile.fullName || adminProfile.username}`
+                : (isSystemDeveloper ? 'System Error Logs & Diagnostics' : 'Dashboard')}
+            </h1>
+            <p className="mt-2 text-sm text-slate-600">
+              {isSystemDeveloper
+                ? 'Technical runtime error monitoring, full stack traces, and system diagnostics'
+                : 'Student assessment, saved recommendation overview, and reportable system error logs'}
+            </p>
+          </div>
+          {!isSystemDeveloper && (
+            <div role="tablist" aria-label="Dashboard sections" className="inline-flex rounded-xl border border-slate-200 bg-white p-1 shadow-xs">
+              <button
+                type="button"
+                role="tab"
+                aria-selected={activeTab === 'overview'}
+                onClick={() => setActiveTab('overview')}
+                className={`rounded-lg px-4 py-2 text-sm font-semibold transition ${
+                  activeTab === 'overview'
+                    ? 'bg-orange-500 text-white shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                Overview
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={activeTab === 'system-logs'}
+                onClick={() => setActiveTab('system-logs')}
+                className={`rounded-lg px-4 py-2 text-sm font-semibold transition ${
+                  activeTab === 'system-logs'
+                    ? 'bg-orange-500 text-white shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                System Logs
+              </button>
+            </div>
+          )}
         </div>
 
+        {isSystemDeveloper || activeTab === 'system-logs' ? (
+          <SystemErrorLogsPanel
+            onUnauthorized={() => {
+              localStorage.removeItem('adminToken')
+              localStorage.removeItem('adminUsername')
+              localStorage.removeItem('adminRole')
+              navigate('/admin/login', { replace: true })
+            }}
+          />
+        ) : (
+          <>
         {loading && <LoadingState />}
 
         {!loading && error && (
@@ -342,6 +425,8 @@ function AdminDashboard() {
               ) : <EmptyState>No registered students yet.</EmptyState>}
             </ChartCard>
           </div>
+        )}
+          </>
         )}
       </main>
     </div>

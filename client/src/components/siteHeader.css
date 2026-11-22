@@ -78,7 +78,23 @@
   overflow-wrap: anywhere;
 }
 @media (min-width: 1024px) {
-  .lm-admin-navigation { grid-template-columns: repeat(7, minmax(0, 1fr)); }
+  .lm-admin-navigation {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: .45rem;
+    flex: 1 1 auto;
+  }
+  .lm-admin-navigation > .lm-action {
+    width: auto;
+    height: auto;
+    min-height: 40px;
+    padding: .5rem .85rem;
+    font-size: 13.5px;
+    white-space: nowrap;
+    overflow-wrap: normal;
+  }
 }
 @media (max-width: 359px) {
   .lm-admin-navigation { grid-template-columns: repeat(2, minmax(0, 1fr)); }

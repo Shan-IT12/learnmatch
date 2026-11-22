@@ -78,20 +78,6 @@ export const saveProfileWithDependencies = async (
     }
 
     if (accounts[0].username !== username) {
-      const [duplicates] = await connection.query(
-        'SELECT user_id FROM USER_ACCOUNT WHERE username = ? AND user_id <> ? LIMIT 1',
-        [username, userId]
-      )
-      if (duplicates.length > 0) {
-        if (transactionStarted) {
-          await connection.rollback()
-          transactionStarted = false
-        }
-        return res.status(409).json({
-          field: 'username',
-          message: 'Username is already taken.',
-        })
-      }
       const [accountWrite] = await connection.query(
         'UPDATE USER_ACCOUNT SET username = ? WHERE user_id = ?',
         [username, userId]
@@ -206,12 +192,6 @@ export const saveProfileWithDependencies = async (
     if (transactionStarted) {
       try { await connection.rollback() } catch { connection.destroy(); destroyed = true }
       transactionStarted = false
-    }
-    if (error?.code === 'ER_DUP_ENTRY') {
-      return res.status(409).json({
-        field: 'username',
-        message: 'Username is already taken.',
-      })
     }
     if (['ER_LOCK_DEADLOCK', 'ER_LOCK_WAIT_TIMEOUT', 'PROFILE_WRITE_CONFLICT'].includes(error?.code)) {
       return res.status(409).json({ code: 'PROFILE_SAVE_CONFLICT', message: 'Your profile was not saved because another update conflicted with it. Please reload and try again.' })

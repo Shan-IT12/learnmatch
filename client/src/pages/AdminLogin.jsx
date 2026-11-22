@@ -47,6 +47,7 @@ function AdminLogin() {
 
       localStorage.setItem('adminToken', data.token)
       localStorage.setItem('adminUsername', data.username)
+      localStorage.setItem('adminRole', data.role || 'system_developer')
       navigate('/admin')
     } catch {
       setError('Cannot connect to server. Please try again.')

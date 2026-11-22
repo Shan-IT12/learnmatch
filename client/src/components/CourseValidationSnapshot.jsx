@@ -21,8 +21,8 @@ export default function CourseValidationSnapshot({ snapshot }) {
     </SnapshotBlock>
     <div className="grid gap-4 lg:grid-cols-2">
       <SnapshotBlock title="Career and salary information">
-        {snapshot.careers.map(row => <p key={row.opportunity_id} className="whitespace-pre-wrap"><strong>{row.job_title}</strong> {row.salary_range && `· ${row.salary_range}`} {row.description}</p>)}
-        {catalog?.career_opportunities?.map(row => <p key={row.career_id || row.career_title} className="whitespace-pre-wrap"><strong>{row.career_title}</strong> {row.estimated_monthly_salary_php?.display && `· ${row.estimated_monthly_salary_php.display}`} {row.philippines_description}
+        {snapshot.careers.map(row => <p key={row.opportunity_id} className="whitespace-pre-wrap"><strong>{row.job_title}</strong> {row.salary_range && `· ${row.salary_range} (Est. 2025-2026)`} {row.description}</p>)}
+        {catalog?.career_opportunities?.map(row => <p key={row.career_id || row.career_title} className="whitespace-pre-wrap"><strong>{row.career_title}</strong> {row.estimated_monthly_salary_php?.display && `· ${row.estimated_monthly_salary_php.display} (Est. 2025-2026)`} {row.philippines_description}
           {catalogReferenceHref(row.salary_basis?.source_url) && <> · <a className={referenceLink} href={row.salary_basis.source_url} target="_blank" rel="noreferrer">{row.salary_basis.source_title || 'Salary reference'}{row.reference_year && ` (${row.reference_year})`}</a></>}
         </p>)}
         {!snapshot.careers.length && !catalog?.career_opportunities?.length && <p>No career entries are recorded.</p>}

@@ -68,6 +68,20 @@ function duration(minutes) {
   return `${count} ${unit}${count === 1 ? '' : 's'}`
 }
 
+export function buildStaffLink(purpose, token, env = process.env) {
+  if (typeof token !== 'string' || !/^[a-zA-Z0-9_-]{43}$/.test(token)) throw new Error('Invalid staff email token')
+  const { path } = templates[purpose]
+  let origin
+  try {
+    origin = staffEmailOrigin(env)
+  } catch {
+    origin = env?.FRONTEND_URL || productionOrigin
+  }
+  const link = new URL(path, origin)
+  link.hash = token
+  return link.href
+}
+
 export function buildStaffEmail(purpose, to, token, env = process.env) {
   if (typeof token !== 'string' || !/^[a-zA-Z0-9_-]{43}$/.test(token)) throw new Error('Invalid staff email token')
   const { path, subject, heading, message, action, minutes } = templates[purpose]

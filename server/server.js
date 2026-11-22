@@ -14,6 +14,10 @@ import profileRoutes from './routes/profileRoutes.js'
 import pool from './config/db.js'
 import authenticateToken from './middleware/authenticateToken.js'
 import authenticateAdmin from './middleware/authenticateAdmin.js'
+import authorizeRoles, { STAFF_ROLES } from './middleware/authorizeRoles.js'
+import { createErrorHandler } from './middleware/errorHandler.js'
+import { createAdminAccountRouter } from './routes/adminAccountRoutes.js'
+import { createSystemLogRouter } from './routes/systemLogRoutes.js'
 import noStore from './middleware/noStore.js'
 import { loginAdmin } from './controllers/adminAuthController.js'
 import { mountCourseValidationRoutes } from './routes/courseValidationRoutes.js'
@@ -110,9 +114,12 @@ app.use(cors(corsOptions()))
 app.use('/api/admin', noStore)
 // Signature verification must see the original bytes, before express.json().
 app.use('/api/webhooks/resend/inactivity', createInactivityWebhookRouter(pool))
+const requireSystemAdmin = authorizeRoles(STAFF_ROLES.SYSTEM_ADMIN)
+const systemAdminOnly = [authenticateAdmin, requireSystemAdmin]
+
 // Account deletion owns its bounded JSON parser and sanitized parser errors.
 app.use('/api/account', createAccountRouter(pool, authenticateToken))
-mountCourseValidationRoutes(app, pool, authenticateAdmin)
+mountCourseValidationRoutes(app, pool, systemAdminOnly)
 // Source receipts carry bounded excerpts and exact-content confirmation snapshots.
 app.use(['/api/admin/courses', '/api/admin/course-sources'], express.json({ limit: '512kb' }))
 app.use(express.json({ limit: '100kb' }))
@@ -120,12 +127,16 @@ app.use(express.json({ limit: '100kb' }))
 app.use('/api/auth', authRoutes)
 app.use('/api/profile', profileRoutes)
 app.use('/api/public/courses', publicCourseRoutes)
-app.use('/api/admin/courses/:courseId/sources', createDraftSourceRouter(pool, authenticateAdmin))
-app.use('/api/admin/course-sources', createSourceCheckRouter(authenticateAdmin, undefined, pool))
-app.use('/api/admin/courses/:courseId/publication', createCoursePublicationRouter(pool, authenticateAdmin))
+app.use('/api/admin/courses/:courseId/sources', createDraftSourceRouter(pool, systemAdminOnly))
+app.use('/api/admin/course-sources', createSourceCheckRouter(systemAdminOnly, undefined, pool))
+app.use('/api/admin/courses/:courseId/publication', createCoursePublicationRouter(pool, systemAdminOnly))
 app.use('/api/public/directions', directionsRoutes)
 app.use('/api/college/notifications', createCheckinReminderRouter(pool, authenticateToken))
-app.use(createAssessmentMonitoringRouter(pool, authenticateToken, authenticateAdmin))
+app.use(createAssessmentMonitoringRouter(pool, authenticateToken, systemAdminOnly))
+app.use(createAdminAccountRouter(pool, authenticateAdmin))
+app.use(createSystemLogRouter(pool, authenticateAdmin))
+
+const requireAdminOperator = requireSystemAdmin
 
 app.post('/api/assessment-attempts', authenticateToken, async (req, res) => {
   try {
@@ -822,81 +833,81 @@ app.post(
 
 // ============ ADMIN: COURSE MANAGEMENT ============
 
-app.get('/api/admin/dashboard', authenticateAdmin, async (req, res) => {
+app.get('/api/admin/dashboard', authenticateAdmin, requireAdminOperator, async (req, res, next) => {
   try {
     const dashboard = await getAdminDashboard(pool)
     res.json(dashboard)
   } catch (error) {
-    console.error('Admin dashboard fetch error:', error)
-    res.status(500).json({ message: 'Server error fetching dashboard analytics' })
+    error.publicMessage = 'Server error fetching dashboard analytics'
+    next(error)
   }
 })
 
-app.get('/api/admin/analytics', authenticateAdmin, async (req, res) => {
+app.get('/api/admin/analytics', authenticateAdmin, requireAdminOperator, async (req, res, next) => {
   try {
     const analytics = await getAdminAnalytics(pool)
     res.json(analytics)
   } catch (error) {
-    console.error('Admin analytics fetch error:', error)
-    res.status(500).json({ message: 'Server error fetching analytics' })
+    error.publicMessage = 'Server error fetching analytics'
+    next(error)
   }
 })
 
-app.get('/api/admin/feedback', authenticateAdmin, async (req, res) => {
+app.get('/api/admin/feedback', authenticateAdmin, requireAdminOperator, async (req, res, next) => {
   try {
     const result = await getAdminFeedback(pool, req.query)
     res.json(result)
   } catch (error) {
-    console.error('Admin feedback fetch error:', error)
-    res.status(500).json({ message: 'Server error fetching feedback' })
+    error.publicMessage = 'Server error fetching feedback'
+    next(error)
   }
 })
 
-app.get('/api/admin/feedback/:feedbackId', authenticateAdmin, async (req, res) => {
+app.get('/api/admin/feedback/:feedbackId', authenticateAdmin, requireAdminOperator, async (req, res, next) => {
   try {
     const feedback = await getAdminFeedbackDetail(pool, req.params.feedbackId)
     if (!feedback) return res.status(404).json({ message: 'Feedback not found' })
     res.json({ feedback })
   } catch (error) {
-    console.error('Admin feedback detail fetch error:', error)
-    res.status(500).json({ message: 'Server error fetching feedback details' })
+    error.publicMessage = 'Server error fetching feedback details'
+    next(error)
   }
 })
 
-app.get('/api/admin/users', authenticateAdmin, async (req, res) => {
+app.get('/api/admin/users', authenticateAdmin, requireAdminOperator, async (req, res, next) => {
   try {
     const result = await getAdminUsers(pool, req.query)
     res.json(result)
   } catch (error) {
-    console.error('Admin users fetch error:', error)
-    res.status(500).json({ message: 'Server error fetching users' })
+    error.publicMessage = 'Server error fetching users'
+    next(error)
   }
 })
 
-app.get('/api/admin/users/:userId', authenticateAdmin, async (req, res) => {
+app.get('/api/admin/users/:userId', authenticateAdmin, requireAdminOperator, async (req, res, next) => {
   try {
     const user = await getAdminUserDetail(pool, req.params.userId)
     if (!user) return res.status(404).json({ message: 'User not found' })
     res.json({ user })
   } catch (error) {
-    console.error('Admin user detail fetch error:', error)
-    res.status(500).json({ message: 'Server error fetching user details' })
+    error.publicMessage = 'Server error fetching user details'
+    next(error)
   }
 })
 
 // Get all courses (for the admin course list table)
-app.get('/api/admin/courses', authenticateAdmin, async (req, res) => {
+app.get('/api/admin/courses', authenticateAdmin, requireAdminOperator, async (req, res, next) => {
   try {
     const courses = await getAdminCourses(pool)
     res.json({ courses, draftOptions: courseDraftOptions })
   } catch (error) {
-    console.error('Admin courses fetch error:', error)
-    res.status(500).json({ message: 'Server error fetching courses' })
+    error.publicMessage = 'Server error fetching courses'
+    next(error)
   }
 })
 
 // Get one course's full details, including its career opportunities
-app.get('/api/admin/courses/:id', authenticateAdmin, async (req, res) => {
+app.get('/api/admin/courses/:id', authenticateAdmin, requireAdminOperator, async (req, res, next) => {
   try {
     const [courseRows] = await pool.query(
       'SELECT * FROM COURSE WHERE course_id = ?',
@@ -944,13 +955,13 @@ app.get('/api/admin/courses/:id', authenticateAdmin, async (req, res) => {
       ))[0].length),
     })
   } catch (error) {
-    console.error('Admin course detail fetch error:', error)
-    res.status(500).json({ message: 'Server error fetching course' })
+    error.publicMessage = 'Server error fetching course'
+    next(error)
   }
 })
 
 // Course writes are atomic; new records always remain inactive drafts.
-const saveAdminCourse = (creating) => async (req, res) => {
+const saveAdminCourse = (creating) => async (req, res, next) => {
   const courseId = creating ? null : positiveInteger(req.params.id)
   if (!creating && !courseId) return res.status(400).json({ message: 'Invalid course ID.' })
   try {
@@ -958,15 +969,15 @@ const saveAdminCourse = (creating) => async (req, res) => {
     res.status(creating ? 201 : 200).json({ ...result, message: creating ? 'Course saved as an inactive draft.' : 'Course updated successfully.' })
   } catch (error) {
     if (error instanceof CourseDraftError || error instanceof DraftSourceError) return res.status(error.status).json({ message: error.message, ...error.details })
-    console.error('Admin course save error:', error)
-    res.status(500).json({ message: 'Server error saving course.' })
+    error.publicMessage = 'Server error saving course.'
+    next(error)
   }
 }
-app.post('/api/admin/courses', authenticateAdmin, saveAdminCourse(true))
-app.put('/api/admin/courses/:id', authenticateAdmin, saveAdminCourse(false))
+app.post('/api/admin/courses', authenticateAdmin, requireAdminOperator, saveAdminCourse(true))
+app.put('/api/admin/courses/:id', authenticateAdmin, requireAdminOperator, saveAdminCourse(false))
 
 // Activate or deactivate a course without deleting its catalog row
-app.patch('/api/admin/courses/:id/status', authenticateAdmin, async (req, res) => {
+app.patch('/api/admin/courses/:id/status', authenticateAdmin, requireAdminOperator, async (req, res, next) => {
   const courseId = positiveInteger(req.params.id)
   if (!courseId) return res.status(400).json({ message: 'Invalid course ID.' })
   try {
@@ -996,8 +1007,8 @@ app.patch('/api/admin/courses/:id/status', authenticateAdmin, async (req, res) =
     if (error.code === 'INVALID_COURSE_STATUS') {
       return res.status(400).json({ message: error.message })
     }
-    console.error('Admin course status update error:', error)
-    res.status(500).json({ message: 'Server error updating course status' })
+    error.publicMessage = 'Server error updating course status'
+    next(error)
   }
 })
 
@@ -1060,7 +1071,7 @@ app.delete('/api/admin/courses/:id', authenticateAdmin, (req, res) => {
 
 // ============ ADMIN: CAREER OPPORTUNITIES (per course) ============
 
-app.post('/api/admin/courses/:id/careers', authenticateAdmin, async (req, res) => {
+app.post('/api/admin/courses/:id/careers', authenticateAdmin, requireAdminOperator, async (req, res, next) => {
   const courseId = positiveInteger(req.params.id)
   const validation = validateCareer(req.body)
   if (!courseId || !validation.valid) return res.status(400).json({ message: validation.message || 'Invalid course ID.' })
@@ -1078,12 +1089,12 @@ app.post('/api/admin/courses/:id/careers', authenticateAdmin, async (req, res) =
     res.status(201).json({ message: 'Career opportunity added', opportunityId: result.insertId })
   } catch (error) {
     if (error instanceof CourseDraftError) return res.status(error.status).json({ message: error.message })
-    console.error('Admin career create error:', error)
-    res.status(500).json({ message: 'Server error adding career opportunity' })
+    error.publicMessage = 'Server error adding career opportunity'
+    next(error)
   }
 })
 
-app.put('/api/admin/careers/:careerId', authenticateAdmin, async (req, res) => {
+app.put('/api/admin/careers/:careerId', authenticateAdmin, requireAdminOperator, async (req, res, next) => {
   const careerId = positiveInteger(req.params.careerId)
   const validation = validateCareer(req.body)
   if (!careerId || !validation.valid) return res.status(400).json({ message: validation.message || 'Invalid career ID.' })
@@ -1102,12 +1113,12 @@ app.put('/api/admin/careers/:careerId', authenticateAdmin, async (req, res) => {
     res.json({ message: 'Career opportunity updated' })
   } catch (error) {
     if (error instanceof CourseDraftError) return res.status(error.status).json({ message: error.message })
-    console.error('Admin career update error:', error)
-    res.status(500).json({ message: 'Server error updating career opportunity' })
+    error.publicMessage = 'Server error updating career opportunity'
+    next(error)
   }
 })
 
-app.delete('/api/admin/careers/:careerId', authenticateAdmin, async (req, res) => {
+app.delete('/api/admin/careers/:careerId', authenticateAdmin, requireAdminOperator, async (req, res, next) => {
   const careerId = positiveInteger(req.params.careerId)
   if (!careerId) return res.status(400).json({ message: 'Invalid career ID.' })
   try {
@@ -1122,10 +1133,13 @@ app.delete('/api/admin/careers/:careerId', authenticateAdmin, async (req, res) =
     res.json({ message: 'Career opportunity deleted' })
   } catch (error) {
     if (error instanceof CourseDraftError) return res.status(error.status).json({ message: error.message })
-    console.error('Admin career delete error:', error)
-    res.status(500).json({ message: 'Server error deleting career opportunity' })
+    error.publicMessage = 'Server error deleting career opportunity'
+    next(error)
   }
 })
+
+// Global centralized system error-handling middleware (logs to system_error_logs)
+app.use(createErrorHandler(pool))
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const port = process.env.PORT || 5000

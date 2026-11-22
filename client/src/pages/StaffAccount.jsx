@@ -48,9 +48,15 @@ export default function StaffAccount({ role, initialAction }) {
 
 function StaffAccountForm({ role, action }) {
   const isVerification = role === 'validator' && action === 'verify'
-  const [raw] = useState(() => window.location.hash.slice(1))
+  const [raw] = useState(() => {
+    const fromHash = window.location.hash.slice(1)
+    if (fromHash) return fromHash
+    return new URLSearchParams(window.location.search).get('token') || ''
+  })
   const [approvalToken, setApprovalToken] = useState(() => isVerification && !raw ? readApprovalToken() : null)
   const [invitation, setInvitation] = useState(null)
+  const [inviteError, setInviteError] = useState('')
+  const [loadingInvite, setLoadingInvite] = useState(() => role === 'validator' && action === 'invite' && Boolean(raw))
   const [completed, setCompleted] = useState(false)
   const [clusterError, setClusterError] = useState('')
   const form = useWorkflowAction()
@@ -60,8 +66,17 @@ function StaffAccountForm({ role, action }) {
   const account = `/${role}/account`
   const path = role === 'admin' ? 'admin/account' : 'validator'
   useEffect(() => {
-    if (raw && !isVerification) window.history.replaceState(window.history.state, '', window.location.pathname + window.location.search)
+    if (raw && !isVerification) window.history.replaceState(window.history.state, '', window.location.pathname)
   }, [raw, isVerification])
+  useEffect(() => {
+    if (role !== 'validator' || action !== 'invite' || !raw) return
+    let cancelled = false
+    workflowApi('validator/invite', { body: { token: raw } })
+      .then((result) => { if (!cancelled) setInvitation(result) })
+      .catch((error) => { if (!cancelled) setInviteError(error?.message || 'This invitation link is invalid or expired.') })
+      .finally(() => { if (!cancelled) setLoadingInvite(false) })
+    return () => { cancelled = true }
+  }, [role, action, raw])
 
   const submit = (event) => {
     event.preventDefault()
@@ -122,8 +137,8 @@ function StaffAccountForm({ role, action }) {
   </>
   return <StaffAccessLayout role={role} wide={Boolean(registering)} title={waitingForApproval ? 'Application status' : registering ? 'Validator application' : titles[action] || 'Account access'}
     description={!waitingForApproval && !missing && !completed ? description : undefined} footer={footer}>
-        {waitingForApproval ? <ApprovalStatus token={approvalToken} /> : <WorkflowFeedback busy={form.busy} error={missing ? 'Open the link from your LearnMatch email to continue.' : form.error} message={form.message || (action === 'login' ? state?.approvalMessage : undefined)} />}
-        {!waitingForApproval && !completed && !missing && <form className="space-y-5" onSubmit={submit}>
+        {waitingForApproval ? <ApprovalStatus token={approvalToken} /> : <WorkflowFeedback loading={loadingInvite} busy={form.busy} error={missing ? 'Open the invitation link shared by your LearnMatch Administrator to continue.' : (inviteError || form.error)} message={form.message || (action === 'login' ? state?.approvalMessage : undefined)} />}
+        {!waitingForApproval && !completed && !missing && !loadingInvite && !inviteError && <form className="space-y-5" onSubmit={submit}>
           {(!usesLink || registering || ['reset','setup'].includes(action)) && <RequiredFieldsNote />}
           {['login','forgot','resend'].includes(action) && <WorkflowField label="Email"><input type="email" name="email" required autoComplete="email" maxLength={254} className={workflowInput} /></WorkflowField>}
           {action === 'login' && <WorkflowField label="Password"><input type="password" name="password" required autoComplete="current-password" className={workflowInput} /></WorkflowField>}

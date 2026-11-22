@@ -1,16 +1,32 @@
-import { useState } from 'react'
-import { IconMailPlus } from '@tabler/icons-react'
+import { useEffect, useState } from 'react'
+import { IconCheck, IconCopy, IconEye, IconMailPlus, IconX } from '@tabler/icons-react'
 import AdminHeader from '../../components/AdminHeader'
 import { ClusterChoices, WorkflowFeedback, WorkflowField, WorkflowStatus, workflowCard, workflowInput } from '../../components/CourseValidationForms'
 import { useWorkflowAction, useWorkflowData } from '../../hooks/useCourseValidation'
-import { accountLabels, downloadReviewImage, reviewDate, workflowApi } from '../../utils/courseValidationApi'
+import { accountLabels, fetchReviewImageUrl, reviewDate, workflowApi } from '../../utils/courseValidationApi'
 
 export default function AdminValidators() {
   const token = localStorage.getItem('adminToken')
   const list = useWorkflowData('admin/validators', token)
   const [id, setId] = useState(null)
   const [removingId, setRemovingId] = useState(null)
+  const [generatedInvite, setGeneratedInvite] = useState(null)
+  const [copiedLink, setCopiedLink] = useState(false)
+  const [credentialPreview, setCredentialPreview] = useState(null)
   const application = useWorkflowData(id ? `admin/validators/${id}` : null, token)
+
+  useEffect(() => {
+    return () => {
+      if (credentialPreview?.url) URL.revokeObjectURL(credentialPreview.url)
+    }
+  }, [credentialPreview])
+
+  const closeCredentialPreview = () => {
+    setCredentialPreview((current) => {
+      if (current?.url) URL.revokeObjectURL(current.url)
+      return null
+    })
+  }
   const action = useWorkflowAction()
   const invite = useWorkflowAction()
   const removal = useWorkflowAction()
@@ -22,12 +38,26 @@ export default function AdminValidators() {
     event.preventDefault()
     const form = event.currentTarget
     const email = new FormData(form).get('email')
+    setCopiedLink(false)
     invite.run(async () => {
       const result = await workflowApi('admin/validators/invite', { token, body: { email } })
       form.reset()
       list.refresh()
+      if (result?.inviteUrl) {
+        setGeneratedInvite({ email: result.email || email, inviteUrl: result.inviteUrl })
+      }
       return result
     })
+  }
+  const copyInviteUrl = async () => {
+    if (!generatedInvite?.inviteUrl) return
+    try {
+      await navigator.clipboard.writeText(generatedInvite.inviteUrl)
+      setCopiedLink(true)
+      setTimeout(() => setCopiedLink(false), 2500)
+    } catch {
+      /* Clipboard unavailable. */
+    }
   }
   const decide = event => {
     event.preventDefault()
@@ -42,7 +72,13 @@ export default function AdminValidators() {
       return { message: 'Decision recorded.' }
     })
   }
-  const credential = credentialId => action.run(() => downloadReviewImage(`admin/validators/${id}/credentials/${credentialId}`, token, 'validator-credential'))
+  const credential = (credentialId, label = 'Validator Credential') => action.run(async () => {
+    const url = await fetchReviewImageUrl(`admin/validators/${id}/credentials/${credentialId}`, token)
+    setCredentialPreview((current) => {
+      if (current?.url) URL.revokeObjectURL(current.url)
+      return { url, label }
+    })
+  })
   const toggleDetails = validatorId => setId(current => current === validatorId ? null : validatorId)
   const remove = (event, row) => {
     event.preventDefault()
@@ -72,9 +108,35 @@ export default function AdminValidators() {
         </div>
         <form className="grid max-w-xl gap-3 sm:grid-cols-[1fr_auto] sm:items-end" onSubmit={send}>
           <WorkflowField label="Expert email"><input type="email" name="email" maxLength={254} className={workflowInput} required /></WorkflowField>
-          <button className="lm-action lm-action-selected min-h-11" disabled={invite.busy}>Send invitation</button>
+          <button className="lm-action lm-action-selected min-h-11" disabled={invite.busy}>Generate Invite Link</button>
         </form>
         <WorkflowFeedback {...invite} />
+        {generatedInvite?.inviteUrl && (
+          <div className="mt-3 max-w-2xl rounded-xl border border-orange-200 bg-orange-50/60 p-3.5">
+            <p className="text-xs font-semibold text-orange-950">
+              Copy-pastable invite link for <span className="break-all">{generatedInvite.email}</span>
+            </p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              <input
+                type="text"
+                readOnly
+                value={generatedInvite.inviteUrl}
+                onFocus={(e) => e.target.select()}
+                className="min-w-0 flex-1 rounded-lg border border-orange-200 bg-white px-3 py-2 font-mono text-xs text-slate-800"
+              />
+              <button
+                type="button"
+                onClick={copyInviteUrl}
+                className={`inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-xs font-semibold transition ${
+                  copiedLink ? 'bg-emerald-600 text-white' : 'bg-orange-500 text-white hover:bg-orange-600'
+                }`}
+              >
+                {copiedLink ? <IconCheck size={15} /> : <IconCopy size={15} />}
+                {copiedLink ? 'Copied!' : 'Copy Invite Link'}
+              </button>
+            </div>
+          </div>
+        )}
       </section>
       <WorkflowFeedback {...list} />
       {list.data && <section className={workflowCard}>
@@ -113,7 +175,10 @@ export default function AdminValidators() {
               ['Requested clusters', account.requested_clusters.join(' · ')], ['Approved clusters', account.approved_clusters.join(' · ') || 'None'],
               ['Email verified', reviewDate(account.verified_at) || 'Awaiting verification']].map(([label, value]) => <div key={label}><dt className="font-semibold">{label}</dt><dd className="whitespace-pre-wrap">{value}</dd></div>)}
           </dl>
-          <button className="lm-action" type="button" disabled={action.busy} onClick={() => credential(account.credential_id)}>Download private credential</button>
+          <button className="lm-action" type="button" disabled={action.busy} onClick={() => credential(account.credential_id, `${account.full_name} — Supporting Credential`)}>
+            <IconEye size={16} aria-hidden="true" />
+            View Credential
+          </button>
           {account.status === 'pending' && <ApplicationDecision key={`${account.validator_id}:${account.credential_id}`} account={account} busy={action.busy} onSubmit={decide} />}
           {!!account.assignments?.length && <details className="text-sm">
             <summary className="cursor-pointer font-semibold">Assignments</summary>
@@ -129,7 +194,7 @@ export default function AdminValidators() {
               <p className="font-semibold">{accountLabels[row.status]} · {reviewDate(row.decided_at)}</p>
               <p className="whitespace-pre-wrap">{row.remarks}</p>
               {!!row.approved_clusters?.length && <p>{row.approved_clusters.join(' · ')}</p>}
-              {row.credential_id !== account.credential_id && <button className="underline" onClick={() => credential(row.credential_id)}>Download credential reviewed</button>}
+              {row.credential_id !== account.credential_id && <button type="button" className="underline" onClick={() => credential(row.credential_id, `${account.full_name} — Reviewed Credential`)}>View credential reviewed</button>}
             </article>)}
           </section>}
         </>}
@@ -145,6 +210,46 @@ export default function AdminValidators() {
         </ul>
       </section>}
     </main>
+    {credentialPreview && (
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-xs"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="credential-preview-title"
+        onClick={closeCredentialPreview}
+      >
+        <div
+          className="w-full max-w-3xl overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-2xl"
+          onClick={(event) => event.stopPropagation()}
+        >
+          <div className="flex items-center justify-between border-b border-stone-100 px-5 py-3.5">
+            <div>
+              <h2 id="credential-preview-title" className="text-sm font-bold text-slate-950">
+                {credentialPreview.label}
+              </h2>
+              <p className="text-xs text-slate-500">
+                Viewed securely in-memory — not saved to your device.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={closeCredentialPreview}
+              aria-label="Close credential preview"
+              className="rounded-lg p-1.5 text-slate-500 hover:bg-stone-100"
+            >
+              <IconX size={18} />
+            </button>
+          </div>
+          <div className="flex max-h-[75vh] items-center justify-center overflow-auto bg-stone-50 p-4">
+            <img
+              src={credentialPreview.url}
+              alt={credentialPreview.label}
+              className="max-h-[70vh] w-auto rounded-lg border border-stone-200 bg-white object-contain shadow-xs"
+            />
+          </div>
+        </div>
+      </div>
+    )}
   </div>
 }
 

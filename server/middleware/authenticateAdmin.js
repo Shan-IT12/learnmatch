@@ -3,6 +3,9 @@ import pool from '../config/db.js'
 import { matchesPasswordSession } from '../services/sessionVersionService.js'
 import { withLocalLegacyCatalog } from '../services/localLegacyCatalog.js'
 import { ADMIN_JWT_AUDIENCE, jwtVerifyOptions } from '../config/security.js'
+import { ADMIN_PANEL_ROLES, normalizeAdminRole } from './authorizeRoles.js'
+
+const ACCEPTED_ADMIN_TOKEN_ROLES = new Set(['admin', ...ADMIN_PANEL_ROLES])
 
 const authenticateAdmin = async (req, res, next) => {
   res.setHeader('Cache-Control', 'no-store')
@@ -20,7 +23,7 @@ const authenticateAdmin = async (req, res, next) => {
       process.env.JWT_SECRET,
       jwtVerifyOptions(ADMIN_JWT_AUDIENCE)
     )
-    if (decoded.role !== 'admin') {
+    if (!ACCEPTED_ADMIN_TOKEN_ROLES.has(decoded.role)) {
       return res.status(403).json({ message: 'Admin access only' })
     }
     if (!Number.isInteger(decoded.adminId)) {
@@ -31,18 +34,31 @@ const authenticateAdmin = async (req, res, next) => {
   }
 
   try {
-    const [admins] = await withLocalLegacyCatalog(pool, () => pool.query(
-      'SELECT admin_id, email, password_hash FROM ADMIN WHERE admin_id = ? LIMIT 1',
-      [decoded.adminId]
-    ), () => pool.query(
-      'SELECT admin_id, NULL AS email, password_hash FROM ADMIN WHERE admin_id = ? LIMIT 1',
-      [decoded.adminId]
-    ), 'ER_BAD_FIELD_ERROR')
+    let admins
+    try {
+      ;[admins] = await pool.query(
+        'SELECT admin_id, email, password_hash, role FROM ADMIN WHERE admin_id = ? LIMIT 1',
+        [decoded.adminId]
+      )
+    } catch (queryError) {
+      if (queryError?.code !== 'ER_BAD_FIELD_ERROR') throw queryError
+      ;[admins] = await withLocalLegacyCatalog(pool, () => pool.query(
+        "SELECT admin_id, email, password_hash, 'system_developer' AS role FROM ADMIN WHERE admin_id = ? LIMIT 1",
+        [decoded.adminId]
+      ), () => pool.query(
+        "SELECT admin_id, NULL AS email, password_hash, 'system_developer' AS role FROM ADMIN WHERE admin_id = ? LIMIT 1",
+        [decoded.adminId]
+      ), 'ER_BAD_FIELD_ERROR')
+    }
     const admin = admins[0]
     if (!admin || (decoded.sessionVersion ? !matchesPasswordSession(decoded.sessionVersion, admin.password_hash) : admin.email != null)) {
       return res.status(403).json({ message: 'Invalid or expired token' })
     }
-    req.admin = decoded
+    const normalizedRole = normalizeAdminRole(admin.role)
+    if (!ADMIN_PANEL_ROLES.includes(normalizedRole)) {
+      return res.status(403).json({ message: 'Admin access only' })
+    }
+    req.admin = { ...decoded, role: normalizedRole }
     return next()
   } catch {
     return res.status(503).json({ message: 'Session verification is temporarily unavailable. Please try again.' })

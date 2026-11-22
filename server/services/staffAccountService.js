@@ -9,8 +9,9 @@ import { matchesPasswordSession, passwordSessionVersion } from './sessionVersion
 import { parseJson } from './draftSourceService.js'
 import { reviewImage } from './privateReviewImage.js'
 import { withLocalLegacyCatalog } from './localLegacyCatalog.js'
-import { buildStaffEmail, staffTokenLifetime } from './staffEmailService.js'
+import { buildStaffEmail, buildStaffLink, staffTokenLifetime } from './staffEmailService.js'
 import { WorkflowError, workflowId, workflowText, workflowTransaction } from './workflowSupport.js'
+import { normalizeAdminRole } from '../middleware/authorizeRoles.js'
 
 const validatorAudience = 'learnmatch-validator'
 const validatorApprovalAudience = 'learnmatch-validator-approval'
@@ -82,8 +83,17 @@ export async function inviteValidator(database, send, rawEmail, adminId) {
     if (existing.length) throw new WorkflowError('This email already has a validator application.', 409)
     return raw
   })
-  if (!await deliverStaffToken(send, 'validator_invite', email, raw)) throw new WorkflowError('Email delivery failed. Send a new invitation to retry.', 503)
-  return { message: 'Invitation sent.' }
+  const inviteUrl = buildStaffLink('validator_invite', raw)
+  const emailSent = await deliverStaffToken(send, 'validator_invite', email, raw)
+  return {
+    message: emailSent
+      ? 'Invitation sent and invite link generated.'
+      : 'Invite link generated. Copy and share the link below with the validator.',
+    inviteUrl,
+    email,
+    emailSent,
+    expiresInDays: Math.round(staffTokenLifetime('validator_invite') / 1440),
+  }
 }
 
 export async function invitationEmail(database, raw) {
@@ -194,24 +204,35 @@ export async function loginStaff(database, role, input) {
   const email = staffEmail(input?.email)
   const password = input?.password
   if ((!email && !legacy) || legacy.length > 254 || typeof password !== 'string' || !password || Buffer.byteLength(password) > 1024) throw invalid()
-  const [rows] = isAdmin
-    ? await withLocalLegacyCatalog(database, () => database.execute(email
-      ? 'SELECT admin_id, username, password_hash FROM ADMIN WHERE email = ?'
-      : 'SELECT admin_id, username, password_hash FROM ADMIN WHERE username = ? AND email IS NULL', [email || legacy]), () => {
-      if (email) throw new WorkflowError('This local database supports existing username sign-in. Use the migrated demo for email sign-in.', 503)
-      return database.execute('SELECT admin_id, username, password_hash FROM ADMIN WHERE username = ?', [legacy])
-    }, 'ER_BAD_FIELD_ERROR')
-    : await database.execute('SELECT validator_id, password_hash, status FROM VALIDATOR_ACCOUNT WHERE email = ?', [email])
+  let rows
+  if (isAdmin) {
+    try {
+      ;[rows] = await database.execute(email
+        ? 'SELECT admin_id, username, password_hash, role FROM ADMIN WHERE email = ?'
+        : 'SELECT admin_id, username, password_hash, role FROM ADMIN WHERE username = ? AND email IS NULL', [email || legacy])
+    } catch (queryError) {
+      if (queryError?.code !== 'ER_BAD_FIELD_ERROR') throw queryError
+      ;[rows] = await withLocalLegacyCatalog(database, () => database.execute(email
+        ? "SELECT admin_id, username, password_hash, 'system_developer' AS role FROM ADMIN WHERE email = ?"
+        : "SELECT admin_id, username, password_hash, 'system_developer' AS role FROM ADMIN WHERE username = ? AND email IS NULL", [email || legacy]), () => {
+        if (email) throw new WorkflowError('This local database supports existing username sign-in. Use the migrated demo for email sign-in.', 503)
+        return database.execute("SELECT admin_id, username, password_hash, 'system_developer' AS role FROM ADMIN WHERE username = ?", [legacy])
+      }, 'ER_BAD_FIELD_ERROR')
+    }
+  } else {
+    ;[rows] = await database.execute('SELECT validator_id, password_hash, status FROM VALIDATOR_ACCOUNT WHERE email = ?', [email])
+  }
   const row = rows[0]
   // The fixed dummy cost avoids a fast response for unknown addresses.
   const match = await bcrypt.compare(password, row?.password_hash || '$2b$10$CKfgQpHSo6lNzUHvSL38OeWdLVhUKETnyYYm9mukq4566mEiQBZVq')
   if (!row || !match) throw invalid()
   if (row.status === 'deactivated') throw invalid()
   if (row.status === 'unverified') throw new WorkflowError('Verify your email before signing in.', 403)
+  const resolvedRole = isAdmin ? normalizeAdminRole(row.role) : role
   const claims = isAdmin ? { adminId: row.admin_id, username: row.username } : { validatorId: row.validator_id }
-  const token = jwt.sign({ ...claims, role, sessionVersion: passwordSessionVersion(row.password_hash) },
+  const token = jwt.sign({ ...claims, role: resolvedRole, sessionVersion: passwordSessionVersion(row.password_hash) },
     process.env.JWT_SECRET, jwtSignOptions(isAdmin ? ADMIN_JWT_AUDIENCE : validatorAudience, '2h'))
-  return { token, ...(isAdmin ? { username: row.username } : {}) }
+  return { token, ...(isAdmin ? { username: row.username, role: resolvedRole } : {}) }
 }
 
 export function createValidatorAuth(database) {

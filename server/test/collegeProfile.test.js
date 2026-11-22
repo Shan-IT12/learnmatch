@@ -69,7 +69,7 @@ test('College username edit commits without touching assessment, profile, recomm
   assert.deepEqual(f.calls.filter(({ sql }) => /^\s*(UPDATE|INSERT)/.test(sql)).map(({ sql }) => sql), ['UPDATE USER_ACCOUNT SET username = ? WHERE user_id = ?'])
 })
 
-test('College username validation and duplicate protection remain enforced', async () => {
+test('College username validation remains enforced while duplicate usernames are allowed', async () => {
   const invalid = fixture()
   await invalid.save({ username: '!' })
   assert.equal(invalid.res.statusCode, 400)
@@ -77,9 +77,9 @@ test('College username validation and duplicate protection remain enforced', asy
   assert.equal(invalid.calls.length, 0)
   const duplicate = fixture({ duplicate: true })
   await duplicate.save({ username: 'existing_user' })
-  assert.equal(duplicate.res.statusCode, 409)
-  assert.equal(duplicate.res.body.field, 'username')
-  assert.ok(duplicate.calls.every(({ sql }) => /^\s*SELECT/.test(sql)))
+  assert.equal(duplicate.res.statusCode, 200)
+  assert.equal(duplicate.res.body.username, 'existing_user')
+  assert.equal(duplicate.state().committed, true)
 })
 
 test('a non-College profile still requires and saves validated Personal Factors', async () => {
