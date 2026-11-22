@@ -3,11 +3,14 @@ import RecommendationsLoadingState from '../components/RecommendationsLoadingSta
 import CompatibilityDisclaimer from '../components/CompatibilityDisclaimer'
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { IconSchool, IconSparkles, IconArrowUpRight, IconBrain, IconChartBar, IconActivity, IconBulb } from '@tabler/icons-react'
+import { IconSchool, IconSparkles, IconArrowUpRight, IconAward, IconBrain, IconChartBar, IconActivity, IconBulb, IconDownload, IconX } from '@tabler/icons-react'
 import FeedbackPopup from '../components/FeedbackPopup'
 import CourseName from '../components/CourseName'
 import CourseSchoolAction from '../components/CourseSchoolAction'
 import PersonalFactorExplanation from '../components/PersonalFactorExplanation'
+import LearnMatchCertificate from '../components/LearnMatchCertificate'
+import { fetchCourseOverviewsForPdf, formatLongDate, generateResultsPdf, isVerifiedAssessment } from '../utils/resultsPdf'
+import { generateCertificatePdf } from '../utils/certificatePdf'
 import { getPersonalFactorExplanation } from '../../../shared/personalFactorExplanation'
 import { MBTI_TYPE_CONTENT, getExpandedType } from '../data/mbtiResultContent'
 import { getAssessmentReturnDestination, getSavedResultsPath } from '../utils/assessmentReturnDestination'
@@ -58,9 +61,12 @@ function Results() {
   const [error, setError] = useState('')
   const [rankingPending, setRankingPending] = useState(false)
   const [retryCount, setRetryCount] = useState(0)
-  const [assessment, setAssessment] = useState({ interests: [], domainScores: {}, mbti: null, profile: null })
+  const [assessment, setAssessment] = useState({ interests: [], domainScores: {}, mbti: null, profile: null, username: '' })
+  const [recommendationMeta, setRecommendationMeta] = useState(null)
   const [monitoringSummary, setMonitoringSummary] = useState(null)
   const [collegeStatus, setCollegeStatus] = useState(null)
+  const [downloadingResultsPdf, setDownloadingResultsPdf] = useState(false)
+  const [certificateModalOpen, setCertificateModalOpen] = useState(false)
   const returnDestination = getAssessmentReturnDestination(collegeStatus, returnTo)
   const savedResultsPath = getSavedResultsPath(searchParams.toString(), returnDestination.path)
   const [feedbackMilestoneKey, setFeedbackMilestoneKey] = useState(null)
@@ -156,7 +162,9 @@ function Results() {
             domainScores: valueAt(1).domainScores || {},
             mbti: valueAt(2).mbtiType || null,
             profile: valueAt(3).profile || null,
+            username: valueAt(3).username || localStorage.getItem('username') || '',
           })
+          setRecommendationMeta(valueAt(5)?.recommendation || null)
           setCollegeStatus(valueAt(4))
           setMonitoringSummary(assessmentResponses[6]?.status === 'fulfilled' ? assessmentResponses[6].value : null)
           const promptKey = feedbackPromptKey(userId, valueAt(5)?.recommendation?.recommendation_id)
@@ -208,6 +216,42 @@ function Results() {
     .sort(([, left], [, right]) => right.correct / right.total - left.correct / left.total)
     .slice(0, 2)
   const personalFactorDetails = getPersonalFactorExplanation(assessment.profile || {}, recommendations)
+  const studentDisplayName = assessment.profile?.full_name || assessment.username || localStorage.getItem('username') || 'LearnMatch Student'
+  const assessmentDateRaw = recommendationMeta?.created_at || new Date().toISOString()
+  const formattedAssessmentDate = formatLongDate(assessmentDateRaw)
+  const isVerified = isVerifiedAssessment(monitoringSummary)
+  const certificateVariant = isVerified ? 'verified' : 'standard'
+  const certificateYear = new Date(assessmentDateRaw).getFullYear() || new Date().getFullYear()
+  const certificateRefNumber = String(recommendationMeta?.recommendation_id || monitoringSummary?.attemptId || localStorage.getItem('userId') || '1').padStart(6, '0')
+  const certificateId = `LM-${certificateYear}-${certificateRefNumber}`
+
+  const handleDownloadResultsPdf = async () => {
+    if (downloadingResultsPdf || !recommendations.length) return
+    setDownloadingResultsPdf(true)
+    try {
+      const courseDetailsByCode = await fetchCourseOverviewsForPdf(import.meta.env.VITE_API_URL || '', recommendations)
+      generateResultsPdf({
+        studentName: studentDisplayName,
+        assessmentDate: assessmentDateRaw,
+        monitoringSummary,
+        recommendations,
+        courseDetailsByCode,
+        assessment,
+      })
+    } finally {
+      setDownloadingResultsPdf(false)
+    }
+  }
+
+  const handleDownloadCertificatePdf = () => {
+    generateCertificatePdf({
+      studentName: studentDisplayName,
+      formattedDate: formattedAssessmentDate,
+      certificateId,
+      variant: certificateVariant,
+      type: 'assessment',
+    })
+  }
 
   return (
     <div ref={pageRef} data-session-path={!loading && !error && recommendations.length ? savedResultsPath : undefined} className="min-h-screen bg-gray-50">
@@ -226,8 +270,35 @@ function Results() {
       <main id="main-content" tabIndex={-1} aria-busy={loading || undefined} className={loading ? 'lm-results-loading' : 'max-w-6xl mx-auto px-5 sm:px-8 py-8 sm:py-12'}>
         {!loading && <>
         <div className="mb-2 flex flex-wrap items-center justify-between gap-3">
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900">Your Recommended Courses</h1>
-          {!error && recommendations.length > 0 && <AssessmentModeBadge summary={monitoringSummary} />}
+          <div className="flex flex-wrap items-center gap-3">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900">Your Recommended Courses</h1>
+            {!error && recommendations.length > 0 && <AssessmentModeBadge summary={monitoringSummary} />}
+          </div>
+          {!error && recommendations.length > 0 && (
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={handleDownloadResultsPdf}
+                disabled={downloadingResultsPdf}
+                className="inline-flex items-center gap-1.5 rounded-xl border border-stone-200 bg-white px-3.5 py-2 text-xs font-semibold text-stone-700 shadow-xs transition hover:border-orange-300 hover:text-orange-700 disabled:opacity-50 sm:text-sm"
+              >
+                <IconDownload size={16} aria-hidden="true" />
+                {downloadingResultsPdf ? 'Preparing PDF...' : 'Download Results (PDF)'}
+              </button>
+              <button
+                type="button"
+                onClick={() => setCertificateModalOpen(true)}
+                className={`inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-semibold shadow-xs transition sm:text-sm ${
+                  isVerified
+                    ? 'border border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-100'
+                    : 'border border-orange-200 bg-orange-50 text-orange-800 hover:bg-orange-100'
+                }`}
+              >
+                <IconAward size={16} aria-hidden="true" />
+                Download Certificate
+              </button>
+            </div>
+          )}
         </div>
         <p className="text-gray-500 text-sm mb-6">
           {recommendations[0]?.interests_available === false
@@ -413,6 +484,61 @@ function Results() {
         promptKey={feedbackMilestoneKey}
         milestoneReached={!loading && !error && recommendations.length > 0}
       />
+
+      {certificateModalOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-xs"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="certificate-modal-title"
+          onClick={() => setCertificateModalOpen(false)}
+        >
+          <div
+            className="max-h-[92vh] w-full max-w-5xl overflow-y-auto rounded-2xl border border-stone-200 bg-white p-5 shadow-2xl sm:p-7"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="mb-5 flex flex-wrap items-center justify-between gap-3 border-b border-stone-100 pb-4">
+              <div>
+                <h2 id="certificate-modal-title" className="text-lg font-bold text-slate-950">
+                  {isVerified ? 'Verified Assessment Certificate' : 'Assessment Certificate of Completion'}
+                </h2>
+                <p className="mt-0.5 text-xs text-slate-500">
+                  {isVerified
+                    ? 'Official Camera-Monitored Verified LearnMatch Certificate · Reference '
+                    : 'Official Standard LearnMatch Certificate · Reference '}
+                  <span className="font-mono font-semibold text-slate-700">{certificateId}</span>
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleDownloadCertificatePdf}
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-orange-500 px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-orange-600 sm:text-sm"
+                >
+                  <IconDownload size={16} aria-hidden="true" />
+                  Download Certificate (PDF)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCertificateModalOpen(false)}
+                  aria-label="Close certificate preview"
+                  className="rounded-lg p-1.5 text-slate-500 hover:bg-stone-100"
+                >
+                  <IconX size={18} />
+                </button>
+              </div>
+            </div>
+
+            <LearnMatchCertificate
+              studentName={studentDisplayName}
+              formattedDate={formattedAssessmentDate}
+              certificateId={certificateId}
+              variant={certificateVariant}
+              type="assessment"
+            />
+          </div>
+        </div>
+      )}
     </div>
   )
 }

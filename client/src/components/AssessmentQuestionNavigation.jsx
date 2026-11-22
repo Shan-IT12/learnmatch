@@ -5,6 +5,8 @@ export default function AssessmentQuestionNavigation({
   allAnswered,
   submitting,
   finalLabel,
+  nextLabel = 'Next Question',
+  backLabel = 'Back to Previous Question',
   onBack,
   onNext,
   onSubmit,
@@ -21,7 +23,7 @@ export default function AssessmentQuestionNavigation({
           onClick={onBack}
           className="min-h-11 w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-600 transition hover:border-gray-300 hover:bg-gray-50 hover:text-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 sm:w-auto sm:px-5"
         >
-          Back to Previous Question
+          {backLabel}
         </button>
       ) : <span aria-hidden="true" />}
 
@@ -37,7 +39,7 @@ export default function AssessmentQuestionNavigation({
       >
         {isLastQuestion
           ? submitting ? 'Submitting...' : finalLabel
-          : 'Next Question'}
+          : nextLabel}
       </button>
     </div>
   )

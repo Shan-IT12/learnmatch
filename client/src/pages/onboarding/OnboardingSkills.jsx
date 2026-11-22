@@ -2,6 +2,7 @@ import { readStudentQuestionPosition, saveStudentQuestionPosition } from '../../
 import SkeletonContent, { SkeletonBlock } from '../../components/SkeletonContent'
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { IconArrowRight, IconCheck, IconLayoutGrid } from '@tabler/icons-react'
 import OnboardingLayout from '../../components/OnboardingLayout'
 import useAssessmentDraftSave from '../../hooks/useAssessmentDraftSave'
 import AssessmentQuestionNavigation from '../../components/AssessmentQuestionNavigation'
@@ -12,6 +13,7 @@ import { FieldError, RequiredMark } from '../../components/FormValidation'
 import { scrollToFirstInvalidField } from '../../utils/formValidation'
 import SuccessConfirmation from '../../components/SuccessConfirmation'
 import { waitForSuccessConfirmation } from '../../utils/successConfirmation'
+import { getDomainQuestionPosition, getDomainSummaries } from '../../utils/skillDomains'
 import {
   ASSESSMENT_SESSION_KEYS,
   getAssessmentAttemptId,
@@ -182,6 +184,7 @@ function OnboardingSkills() {
   const [assessmentAccessError, setAssessmentAccessError] = useState('')
   const [attemptLoaded, setAttemptLoaded] = useState(false)
   const [submitConfirmed, setSubmitConfirmed] = useState(false)
+  const [viewMode, setViewMode] = useState(() => (Object.keys(initialSession.answers || {}).length > 0 ? 'question' : 'selector'))
 
   useEffect(() => {
     let active = true
@@ -197,6 +200,8 @@ function OnboardingSkills() {
           (attempt.skillAnswers || []).map(answer => [answer.question_id, answer.selected_option]))
         setQuestions(restoredQuestions || [])
         setAnswers(restoredAnswers || {})
+        const hasAnyAnswer = Object.keys(restoredAnswers || {}).length > 0
+        setViewMode(hasAnyAnswer ? 'question' : 'selector')
         const firstMissing = firstUnansweredQuestionIndex(restoredQuestions || [], restoredAnswers || {}, question => question.question_id)
         setCurrentIndex(Number.isInteger(resumeIndex) ? boundedQuestionIndex(resumeIndex, restoredQuestions?.length || 0)
           : Math.max(0, firstMissing < 0 ? (restoredQuestions?.length || 1) - 1 : firstMissing))
@@ -273,23 +278,46 @@ function OnboardingSkills() {
     setQuestionError('')
   }
 
+  const domainPosition = getDomainQuestionPosition(questions, currentIndex)
+
+  const openDomain = (domainSummary) => {
+    const targetIndex = domainSummary.firstUnansweredIndex >= 0
+      ? domainSummary.firstUnansweredIndex
+      : domainSummary.questionIndices[0]
+    if (typeof targetIndex === 'number' && targetIndex >= 0) {
+      setCurrentIndex(targetIndex)
+      setShowExplanation(false)
+      setQuestionError('')
+      setViewMode('question')
+    }
+  }
+
   const handleNext = () => {
     if (!answers[questions[currentIndex]?.question_id]) {
       setQuestionError('Please select an answer.')
       scrollToFirstInvalidField(['skillQuestion'])
       return
     }
-    if (currentIndex < questions.length - 1) {
-      setCurrentIndex(currentIndex + 1)
+    if (domainPosition.nextIndexInDomain >= 0) {
+      setCurrentIndex(domainPosition.nextIndexInDomain)
       setShowExplanation(false)
+      return
     }
+    // Finished the last question of this domain: return to the 6-domain selector to pick the next unfinished domain
+    setShowExplanation(false)
+    setQuestionError('')
+    setViewMode('selector')
   }
 
   const handleBack = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex(currentIndex - 1)
+    if (domainPosition.prevIndexInDomain >= 0) {
+      setCurrentIndex(domainPosition.prevIndexInDomain)
       setShowExplanation(false)
+      return
     }
+    setShowExplanation(false)
+    setQuestionError('')
+    setViewMode('selector')
   }
 
   const handleSubmit = async () => {
@@ -472,13 +500,141 @@ function OnboardingSkills() {
 
   const currentQuestion = questions[currentIndex]
   const selectedChoice = answers[currentQuestion.question_id]
-  const isLastQuestion = currentIndex === questions.length - 1
   const answeredCount = Object.keys(answers).length
+  const allAnswered = answeredCount === questions.length
+  const domainSummaries = getDomainSummaries(questions, answers)
+  const completedDomainsCount = domainSummaries.filter((d) => d.completed).length
+  const isLastInDomainAndAllDone = domainPosition.isLastInDomain && allAnswered
   const questionGuide = currentQuestion.explanation || getQuestionGuide(currentQuestion)
 
   const figurePresentation = getSkillFigurePresentation(currentQuestion)
   const promptImage = figurePresentation && 'promptImage' in figurePresentation
     ? figurePresentation.promptImage : currentQuestion.image_url
+
+  if (viewMode === 'selector') {
+    return (
+      <OnboardingLayout
+        currentStep={3}
+        stickyChrome
+        isComplete={false}
+        onNext={handleContinue}
+        navigationBusy={submitting}
+        saveProgress={saveProgress}
+        navigationStatus={<p className="text-xs leading-5 text-gray-500">Complete all 6 Academic Skills domains and submit to continue.</p>}
+      >
+        <div className="mx-auto max-w-4xl px-5 py-8 sm:px-8 sm:py-12">
+          <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+            <div>
+              <div className="mb-3 inline-flex items-center gap-2 rounded-lg bg-orange-50 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-orange-700">
+                <IconLayoutGrid size={14} aria-hidden="true" />
+                Skills check · 6 Domains
+              </div>
+              <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
+                Choose a Domain to Answer
+              </h1>
+              <p className="mt-2 text-sm text-gray-600">
+                You can answer the 6 Academic Skills domains in any order. Complete all 6 domains ({answeredCount}/{questions.length} questions answered) to submit.
+              </p>
+            </div>
+            <div className="shrink-0 rounded-xl border border-orange-100 bg-orange-50/70 px-4 py-2.5 text-center">
+              <p className="text-[10px] font-bold uppercase tracking-wide text-orange-700">Domains Completed</p>
+              <p className="text-lg font-bold text-slate-900">
+                <span className="text-orange-600">{completedDomainsCount}</span> / {domainSummaries.length}
+              </p>
+            </div>
+          </div>
+
+          <div className="mb-6 h-2 overflow-hidden rounded-full bg-gray-100">
+            <div
+              className="h-full rounded-full bg-orange-500 transition-all duration-300"
+              style={{ width: `${questions.length ? (answeredCount / questions.length) * 100 : 0}%` }}
+            />
+          </div>
+
+          {error && (
+            <div className="mb-6 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-600">
+              {error}
+            </div>
+          )}
+
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {domainSummaries.map((domain) => {
+              const isCompleted = domain.status === 'completed'
+              const isInProgress = domain.status === 'in_progress'
+              return (
+                <button
+                  key={domain.name}
+                  type="button"
+                  onClick={() => openDomain(domain)}
+                  className={`group flex flex-col rounded-2xl border p-5 text-left transition duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500 ${
+                    isCompleted
+                      ? 'border-emerald-200 bg-emerald-50/40 hover:border-emerald-300'
+                      : isInProgress
+                        ? 'border-orange-300 bg-orange-50/40 shadow-sm hover:border-orange-400'
+                        : 'border-gray-200 bg-white hover:border-orange-300 hover:shadow-sm'
+                  }`}
+                >
+                  <div className="mb-3 flex items-center justify-between gap-2">
+                    <span
+                      className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${
+                        isCompleted
+                          ? 'bg-emerald-100 text-emerald-800'
+                          : isInProgress
+                            ? 'bg-orange-100 text-orange-800'
+                            : 'bg-gray-100 text-gray-600'
+                      }`}
+                    >
+                      {isCompleted && <IconCheck size={12} aria-hidden="true" />}
+                      {isCompleted ? 'Completed' : isInProgress ? 'In Progress' : 'Not Started'}
+                    </span>
+                    <span className="text-xs font-bold tabular-nums text-gray-600">
+                      {domain.answered}/{domain.total}
+                    </span>
+                  </div>
+                  <h2 className="text-base font-bold text-gray-900 group-hover:text-orange-700">
+                    {domain.shortLabel}
+                  </h2>
+                  <p className="mt-1.5 flex-1 text-xs leading-5 text-gray-600">
+                    {domain.description}
+                  </p>
+                  <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-gray-200/70">
+                    <div
+                      className={`h-full rounded-full transition-all ${isCompleted ? 'bg-emerald-500' : 'bg-orange-500'}`}
+                      style={{ width: `${domain.total ? (domain.answered / domain.total) * 100 : 0}%` }}
+                    />
+                  </div>
+                  <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-orange-600">
+                    {isCompleted ? 'Review answers' : isInProgress ? 'Continue domain' : 'Start domain'}
+                    <IconArrowRight size={14} aria-hidden="true" />
+                  </span>
+                </button>
+              )
+            })}
+          </div>
+
+          {allAnswered && (
+            <div className="mt-8 flex flex-col items-center justify-between gap-4 rounded-2xl border border-emerald-200 bg-emerald-50/70 p-5 sm:flex-row">
+              <div>
+                <p className="text-sm font-bold text-emerald-950">All 6 domains completed!</p>
+                <p className="mt-0.5 text-xs text-emerald-800">
+                  You have answered all {questions.length} Academic Skills questions. Submit now to see your breakdown.
+                </p>
+              </div>
+              <button
+                type="button"
+                disabled={submitting}
+                onClick={handleSubmit}
+                className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-orange-500 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-orange-600 disabled:opacity-50"
+              >
+                {submitting ? 'Submitting...' : 'Submit Academic Skills'}
+                <IconArrowRight size={16} aria-hidden="true" />
+              </button>
+            </div>
+          )}
+        </div>
+      </OnboardingLayout>
+    )
+  }
 
   return (
     <OnboardingLayout currentStep={3} stickyChrome isComplete={false} onNext={handleContinue} navigationBusy={submitting}
@@ -486,17 +642,29 @@ function OnboardingSkills() {
       <div className="max-w-2xl mx-auto px-5 sm:px-8 py-8 sm:py-12">
         <div className="flex items-start justify-between gap-4 mb-5">
           <div>
-            <div className="inline-flex items-center gap-2 rounded-lg bg-orange-50 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-orange-700 mb-3">
-              <svg className="h-3.5 w-3.5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5s3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18s-3.332.477-4.5 1.253" />
-              </svg>
-              Skills check
+            <div className="flex flex-wrap items-center gap-2 mb-3">
+              <div className="inline-flex items-center gap-2 rounded-lg bg-orange-50 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-orange-700">
+                <svg className="h-3.5 w-3.5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5s3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18s-3.332.477-4.5 1.253" />
+                </svg>
+                {currentQuestion.dimension}
+              </div>
+              <button
+                type="button"
+                onClick={() => { setShowExplanation(false); setQuestionError(''); setViewMode('selector') }}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-2.5 py-1.5 text-[11px] font-semibold text-gray-700 hover:border-orange-300 hover:text-orange-700"
+              >
+                <IconLayoutGrid size={13} aria-hidden="true" />
+                All Domains ({completedDomainsCount}/{domainSummaries.length})
+              </button>
             </div>
             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900">Academic Skills Assessment</h1>
           </div>
           <div className="shrink-0 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-center">
-            <p className="text-[10px] font-semibold uppercase tracking-wide text-gray-600">Question</p>
-            <p className="text-sm font-bold text-gray-900"><span className="text-orange-600">{currentIndex + 1}</span> of {questions.length}</p>
+            <p className="text-[10px] font-semibold uppercase tracking-wide text-gray-600">Domain Item</p>
+            <p className="text-sm font-bold text-gray-900">
+              <span className="text-orange-600">{domainPosition.indexInDomain + 1}</span> of {domainPosition.totalInDomain}
+            </p>
           </div>
         </div>
 
@@ -504,10 +672,10 @@ function OnboardingSkills() {
           <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-gray-100">
             <div
               className="h-full rounded-full bg-orange-500 transition-all duration-300"
-              style={{ width: `${((currentIndex + 1) / questions.length) * 100}%` }}
+              style={{ width: `${questions.length ? (answeredCount / questions.length) * 100 : 0}%` }}
             />
           </div>
-          <span className="shrink-0 text-xs font-semibold text-gray-600">{currentQuestion.dimension}</span>
+          <span className="shrink-0 text-xs font-semibold text-gray-600">{answeredCount}/{questions.length} overall</span>
         </div>
 
         {error && (
@@ -570,11 +738,13 @@ function OnboardingSkills() {
         </div>
 
         <AssessmentQuestionNavigation
-          currentIndex={currentIndex}
-          isLastQuestion={isLastQuestion}
+          currentIndex={domainPosition.isFirstInDomain ? 1 : domainPosition.indexInDomain}
+          isLastQuestion={isLastInDomainAndAllDone}
           currentAnswered={Boolean(selectedChoice)}
-          allAnswered={answeredCount === questions.length}
+          allAnswered={allAnswered}
           submitting={submitting}
+          nextLabel={domainPosition.isLastInDomain ? 'Next Domain' : 'Next'}
+          backLabel={domainPosition.isFirstInDomain ? 'All Domains' : 'Previous'}
           finalLabel="Submit Academic Skills"
           onBack={handleBack}
           onNext={handleNext}

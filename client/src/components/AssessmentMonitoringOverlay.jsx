@@ -361,7 +361,6 @@ function AssessmentMonitoringOverlay() {
 
   const showConsentScreen = !effectiveChoice
   const showFloatingPreview = effectiveChoice === 'verified' && (status === 'active' || status === 'starting')
-  const showEnableCameraPill = effectiveChoice && !showFloatingPreview
   const failureText = cameraErrorMessage(status)
   const liveStatus = describeLiveStatus(liveState)
   const compactPreview = previewWidth < 232
@@ -472,22 +471,6 @@ function AssessmentMonitoringOverlay() {
           </div>
         )}
       </div>
-
-      {/* Compact pill when camera is off so student can enable camera monitoring at any time */}
-      {showEnableCameraPill && (
-        <div className="fixed bottom-20 right-3 z-30 flex items-center gap-2 rounded-full border border-stone-200/90 bg-white/95 px-3 py-1.5 shadow-md backdrop-blur-sm sm:bottom-24 sm:right-6">
-          <span className="text-[11px] font-medium text-stone-600">Standard Assessment</span>
-          <button
-            type="button"
-            onClick={handleEnableCameraAndStart}
-            disabled={startingCamera}
-            className="inline-flex items-center gap-1 rounded-full bg-orange-500 px-2.5 py-1 text-[11px] font-semibold text-white transition hover:bg-orange-600 disabled:opacity-60"
-          >
-            <IconCamera size={12} aria-hidden="true" />
-            {startingCamera ? 'Starting...' : 'Enable Camera'}
-          </button>
-        </div>
-      )}
 
       {/* Centered Auto-Blur Overlay for Active Camera Conditions and Tab Switch */}
       {!showConsentScreen && centeredAlert && (
