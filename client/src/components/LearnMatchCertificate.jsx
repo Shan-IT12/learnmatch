@@ -8,27 +8,22 @@ function CornerStar({ color, className = '' }) {
   )
 }
 
-function LearnMatchMonogram({ verified = false }) {
-  const accentPrimary = verified ? '#b45309' : '#e06918'
-  const accentSecondary = verified ? '#047857' : '#f97316'
+function LearnMatchMonogram() {
   return (
     <div className="flex flex-col items-center">
       <svg viewBox="0 0 64 44" className="h-9 w-12 sm:h-11 sm:w-14" aria-hidden="true">
         <defs>
-          <linearGradient id={`lm-cert-grad-${verified ? 'v' : 's'}`} x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor={accentSecondary} />
-            <stop offset="100%" stopColor={accentPrimary} />
+          <linearGradient id="lm-cert-brand-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#f97316" />
+            <stop offset="100%" stopColor="#e06918" />
           </linearGradient>
         </defs>
         <path
           d="M8 6h8v24h14v8H8V6zm22 0h8l8 13 8-13h8v32h-8V19l-8 12-8-12v19h-8V6z"
-          fill={`url(#lm-cert-grad-${verified ? 'v' : 's'})`}
+          fill="url(#lm-cert-brand-grad)"
         />
       </svg>
-      <span
-        className="mt-0.5 text-xs font-bold tracking-tight sm:text-sm"
-        style={{ color: verified ? '#065f46' : '#9a3412' }}
-      >
+      <span className="mt-0.5 text-xs font-bold tracking-tight text-[#9a3412] sm:text-sm">
         LearnMatch
       </span>
     </div>
@@ -43,56 +38,57 @@ export default function LearnMatchCertificate({
   type = 'assessment',
 }) {
   const isVerified = variant === 'verified'
-  const outerStroke = isVerified ? '#b8860b' : '#e06918'
-  const innerStroke = isVerified ? '#047857' : '#ea7a2a'
-  const accentText = isVerified ? '#065f46' : '#b45309'
+  const outerStroke = '#e06918'
+  const innerStroke = isVerified ? '#d4a017' : '#ea7a2a'
+  const starColor = isVerified ? '#d4a017' : '#e06918'
+  const accentText = '#b45309'
   const bodyText = getCertificateBody({ type, variant, formattedDate })
 
   return (
     <div
       className={`relative mx-auto aspect-[1.414/1] w-full max-w-4xl select-none overflow-hidden rounded-xl shadow-lg ${
         isVerified
-          ? 'bg-gradient-to-br from-[#fffdf7] via-white to-[#f2fbf7]'
+          ? 'bg-gradient-to-br from-[#fffdf7] via-white to-[#fff8ee]'
           : 'bg-white'
       }`}
     >
       {/* Double-line outer frame */}
       <div
         className="pointer-events-none absolute inset-4 sm:inset-5"
-        style={{ border: `1.75px solid ${outerStroke}` }}
+        style={{ border: `${isVerified ? '2px' : '1.75px'} solid ${outerStroke}` }}
       />
       <div
         className="pointer-events-none absolute inset-[22px] sm:inset-[26px]"
-        style={{ border: `1px solid ${innerStroke}` }}
+        style={{ border: `1.25px solid ${innerStroke}` }}
       />
 
       {/* Corner cutouts + 4-point stars matching official LearnMatch certificate */}
       <div className={`absolute left-2 top-2 flex h-9 w-9 items-center justify-center sm:h-11 sm:w-11 ${isVerified ? 'bg-[#fffdf7]' : 'bg-white'}`}>
-        <CornerStar color={outerStroke} />
+        <CornerStar color={starColor} />
       </div>
       <div className={`absolute right-2 top-2 flex h-9 w-9 items-center justify-center sm:h-11 sm:w-11 ${isVerified ? 'bg-[#fffdf7]' : 'bg-white'}`}>
-        <CornerStar color={outerStroke} />
+        <CornerStar color={starColor} />
       </div>
-      <div className={`absolute bottom-2 left-2 flex h-9 w-9 items-center justify-center sm:h-11 sm:w-11 ${isVerified ? 'bg-[#f8fcf9]' : 'bg-white'}`}>
-        <CornerStar color={outerStroke} />
+      <div className={`absolute bottom-2 left-2 flex h-9 w-9 items-center justify-center sm:h-11 sm:w-11 ${isVerified ? 'bg-[#fffaf2]' : 'bg-white'}`}>
+        <CornerStar color={starColor} />
       </div>
-      <div className={`absolute bottom-2 right-2 flex h-9 w-9 items-center justify-center sm:h-11 sm:w-11 ${isVerified ? 'bg-[#f2fbf7]' : 'bg-white'}`}>
-        <CornerStar color={outerStroke} />
+      <div className={`absolute bottom-2 right-2 flex h-9 w-9 items-center justify-center sm:h-11 sm:w-11 ${isVerified ? 'bg-[#fff8ee]' : 'bg-white'}`}>
+        <CornerStar color={starColor} />
       </div>
 
       {/* Top center cutout for LM monogram */}
       <div
         className={`absolute left-1/2 top-2 -translate-x-1/2 px-6 py-1 sm:px-8 ${
-          isVerified ? 'bg-[#fffdf9]' : 'bg-white'
+          isVerified ? 'bg-[#fffdf8]' : 'bg-white'
         }`}
       >
-        <LearnMatchMonogram verified={isVerified} />
+        <LearnMatchMonogram />
       </div>
 
       {/* Bottom center cutout */}
       <div
         className={`absolute bottom-2 left-1/2 -translate-x-1/2 px-6 py-1 text-center ${
-          isVerified ? 'bg-[#f7fcfa]' : 'bg-white'
+          isVerified ? 'bg-[#fffaf2]' : 'bg-white'
         }`}
       >
         <span className="text-[9px] font-medium tracking-wider text-slate-400 sm:text-[10px]">

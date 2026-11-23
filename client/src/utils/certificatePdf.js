@@ -25,11 +25,11 @@ function drawFourPointStar(doc, cx, cy, outerR, innerR, fillRgb) {
   doc.lines(lines, points[0][0], points[0][1], [1, 1], 'F', true)
 }
 
-function drawMonogram(doc, cx, topY, verified) {
-  const primary = verified ? [180, 83, 9] : [224, 105, 24]
-  const secondary = verified ? [4, 120, 87] : [249, 115, 22]
+function drawMonogram(doc, cx, topY) {
+  const primary = [224, 105, 24]
+  const secondary = [249, 115, 22]
 
-  // Stylized LM monogram block
+  // Stylized LM monogram block (always LearnMatch orange)
   doc.setFillColor(...primary)
   doc.rect(cx - 10, topY, 3, 10, 'F')
   doc.rect(cx - 10, topY + 7.4, 8, 2.6, 'F')
@@ -41,7 +41,7 @@ function drawMonogram(doc, cx, topY, verified) {
 
   doc.setFont('helvetica', 'bold')
   doc.setFontSize(11)
-  doc.setTextColor(...(verified ? [6, 95, 70] : [154, 52, 18]))
+  doc.setTextColor(154, 52, 18)
   doc.text('LearnMatch', cx, topY + 14.5, { align: 'center' })
 }
 
@@ -59,9 +59,10 @@ export function generateCertificatePdf({
   const cx = w / 2
 
   const bgRgb = isVerified ? [255, 253, 247] : [255, 255, 255]
-  const outerRgb = isVerified ? [184, 134, 11] : [224, 105, 24]
-  const innerRgb = isVerified ? [4, 120, 87] : [234, 122, 42]
-  const accentTextRgb = isVerified ? [6, 95, 70] : [180, 83, 9]
+  const outerRgb = [224, 105, 24]
+  const innerRgb = isVerified ? [212, 160, 23] : [234, 122, 42]
+  const starRgb = isVerified ? [212, 160, 23] : [224, 105, 24]
+  const accentTextRgb = [180, 83, 9]
 
   // Page background
   doc.setFillColor(...bgRgb)
@@ -69,11 +70,11 @@ export function generateCertificatePdf({
 
   // Double-line border frame
   doc.setDrawColor(...outerRgb)
-  doc.setLineWidth(0.75)
+  doc.setLineWidth(isVerified ? 0.85 : 0.75)
   doc.rect(10, 10, w - 20, h - 20)
 
   doc.setDrawColor(...innerRgb)
-  doc.setLineWidth(0.35)
+  doc.setLineWidth(0.4)
   doc.rect(13, 13, w - 26, h - 26)
 
   // Corner cutouts + 4-point stars
@@ -86,13 +87,13 @@ export function generateCertificatePdf({
   for (const [sx, sy] of corners) {
     doc.setFillColor(...bgRgb)
     doc.rect(sx - 6.5, sy - 6.5, 13, 13, 'F')
-    drawFourPointStar(doc, sx, sy, 4.2, 1.3, outerRgb)
+    drawFourPointStar(doc, sx, sy, 4.2, 1.3, starRgb)
   }
 
   // Top-center white cutout + LM monogram
   doc.setFillColor(...bgRgb)
   doc.rect(cx - 28, 5, 56, 20, 'F')
-  drawMonogram(doc, cx, 10.5, isVerified)
+  drawMonogram(doc, cx, 10.5)
 
   // Bottom-center white cutout + Certificate Reference ID
   doc.setFillColor(...bgRgb)

@@ -45,7 +45,7 @@ function SummaryDashboard() {
   const username = localStorage.getItem('username')
   const hasActiveCollegePhase = useActiveCollegePhase()
   const [loading, setLoading] = useState(true)
-  const [checkingAttempt, setCheckingAttempt] = useState(false)
+  const [activeAttemptRoute, setActiveAttemptRoute] = useState(null)
   const [showRetakeConfirmation, setShowRetakeConfirmation] = useState(false)
   const [startingRetake, setStartingRetake] = useState(false)
   const [retakeError, setRetakeError] = useState('')
@@ -72,13 +72,14 @@ function SummaryDashboard() {
     const fetchSummary = async () => {
       try {
         const headers = { Authorization: `Bearer ${token}` }
-        const [resultsRes, interestsRes, quizRes, profileRes, mbtiRes, latestMonitoring] = await Promise.all([
+        const [resultsRes, interestsRes, quizRes, profileRes, mbtiRes, latestMonitoring, activeAttempt] = await Promise.all([
           fetch(`${import.meta.env.VITE_API_URL}/api/recommendations/latest`, { headers }),
           fetch(`${import.meta.env.VITE_API_URL}/api/interests`, { headers }),
           fetch(`${import.meta.env.VITE_API_URL}/api/quiz/results`, { headers }),
           fetch(`${import.meta.env.VITE_API_URL}/api/profile?userId=${userId}`, { headers }),
           fetch(`${import.meta.env.VITE_API_URL}/api/mbti`, { headers }),
           fetchAttemptMonitoring({ apiUrl: import.meta.env.VITE_API_URL, token, attemptId: 'latest' }),
+          readActiveAttempt(apiUrl, token, sessionStorage).catch(() => null),
         ])
 
         const resultsData = await resultsRes.json()
@@ -107,6 +108,7 @@ function SummaryDashboard() {
         setProfile(profileData.profile ? { ...profileData.profile, username: profileData.username } : null)
         setMbti(mbtiData.mbtiType ? mbtiData : null)
         setMonitoringSummary(latestMonitoring || null)
+        setActiveAttemptRoute(getAttemptResumeRoute(activeAttempt) || null)
       } catch (error) {
         console.error('Summary fetch error:', error)
         setSummaryError('We could not load your saved assessment summary. Please try again later.')
@@ -123,30 +125,15 @@ function SummaryDashboard() {
     navigate('/login')
   }
 
-  const handleAssessmentAction = async () => {
+  const handleContinueAssessment = () => {
+    if (loading || !activeAttemptRoute) return
+    navigate(activeAttemptRoute)
+  }
+
+  const handleOpenRetakeModal = () => {
     if (loading || !savedTopRecommendation || !token || assessmentActionRef.current) return
-    const request = {}
-    assessmentActionRef.current = request
-    setCheckingAttempt(true)
     setRetakeError('')
-    try {
-      // Saved results can coexist with a retake. Check only when the student
-      // chooses to continue or retake, including from a browser with no cached ID.
-      const attempt = await readActiveAttempt(apiUrl, token, sessionStorage)
-      if (assessmentActionRef.current !== request || localStorage.getItem('token') !== token) return
-      const route = getAttemptResumeRoute(attempt)
-      if (route) navigate(route)
-      else setShowRetakeConfirmation(true)
-    } catch {
-      if (assessmentActionRef.current === request && localStorage.getItem('token') === token) {
-        setRetakeError('Could not check for an unfinished assessment. Please try again.')
-      }
-    } finally {
-      if (assessmentActionRef.current === request) {
-        assessmentActionRef.current = null
-        setCheckingAttempt(false)
-      }
-    }
+    setShowRetakeConfirmation(true)
   }
 
   const handleRetake = async () => {
@@ -492,11 +479,24 @@ function SummaryDashboard() {
           {!showRetakeConfirmation && retakeError && <p role="alert" className="w-full text-sm text-red-700">{retakeError}</p>}
           <button
             type="button"
-            disabled={checkingAttempt || loading || !savedTopRecommendation}
-            onClick={handleAssessmentAction}
-            className="flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-5 py-3 text-sm font-semibold text-gray-700 shadow-sm transition duration-150 hover:border-orange-200 hover:bg-orange-50 hover:text-orange-700"
+            disabled={loading || !activeAttemptRoute}
+            onClick={handleContinueAssessment}
+            title={activeAttemptRoute ? 'Resume your unfinished assessment' : 'No unfinished assessment to continue'}
+            className={`flex items-center justify-center gap-2 rounded-xl border px-5 py-3 text-sm font-semibold transition duration-150 ${
+              activeAttemptRoute && !loading
+                ? 'border-orange-200 bg-orange-50 text-orange-700 shadow-sm hover:border-orange-300 hover:bg-orange-100'
+                : 'cursor-not-allowed border-gray-200 bg-gray-100 text-gray-400'
+            }`}
           >
-            <IconRefresh size={16} stroke={2} /> {checkingAttempt ? 'Checking for an unfinished assessment…' : 'Continue or Retake Assessment'}
+            <IconArrowRight size={16} stroke={2} /> Continue Assessment
+          </button>
+          <button
+            type="button"
+            disabled={loading || !savedTopRecommendation}
+            onClick={handleOpenRetakeModal}
+            className="flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-5 py-3 text-sm font-semibold text-gray-700 shadow-sm transition duration-150 hover:border-orange-200 hover:bg-orange-50 hover:text-orange-700 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <IconRefresh size={16} stroke={2} /> Retake Assessment
           </button>
           {hasActiveCollegePhase !== true && <button
             disabled={hasActiveCollegePhase === null}
