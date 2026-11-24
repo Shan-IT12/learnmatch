@@ -93,6 +93,8 @@ import {
   saveEnrollmentProof,
   verifyEnrollmentProofForAdmin,
 } from './services/enrollmentProofService.js'
+import { checkCourseDuplicates } from './services/courseDuplicateService.js'
+import { extractCourseFromSource } from './services/courseAutoFillService.js'
 
 dotenv.config()
 
@@ -127,6 +129,8 @@ const systemAdminOnly = [authenticateAdmin, requireSystemAdmin]
 // Account deletion owns its bounded JSON parser and sanitized parser errors.
 app.use('/api/account', createAccountRouter(pool, authenticateToken))
 mountCourseValidationRoutes(app, pool, systemAdminOnly)
+// Source auto-fill accepts up to 20 MB PDF/text uploads (base64 ~26.7 MB + metadata).
+app.use('/api/admin/courses/auto-fill', express.json({ limit: '30mb' }))
 // Source receipts carry bounded excerpts and exact-content confirmation snapshots.
 app.use(['/api/admin/courses', '/api/admin/course-sources'], express.json({ limit: '512kb' }))
 // College enrollment proof uploads are bounded to 2 MB (base64 ~2.7 MB).
@@ -981,6 +985,37 @@ app.get('/api/admin/courses', authenticateAdmin, requireAdminOperator, async (re
     res.json({ courses, draftOptions: courseDraftOptions })
   } catch (error) {
     error.publicMessage = 'Server error fetching courses'
+    next(error)
+  }
+})
+
+// Real-time duplicate course detection for Add/Edit Draft forms
+app.get('/api/admin/courses/check-duplicate', authenticateAdmin, requireAdminOperator, async (req, res, next) => {
+  try {
+    const excludeCourseId = req.query.excludeCourseId ? Number(req.query.excludeCourseId) : null
+    const result = await checkCourseDuplicates(pool, {
+      courseName: String(req.query.name || ''),
+      courseAbbreviation: String(req.query.abbreviation || ''),
+      excludeCourseId: Number.isInteger(excludeCourseId) && excludeCourseId > 0 ? excludeCourseId : null,
+    })
+    res.json(result)
+  } catch (error) {
+    error.publicMessage = 'Server error checking duplicate courses'
+    next(error)
+  }
+})
+
+// Source-assisted course auto-fill (populates editable draft fields; never bypasses validator approval)
+app.post('/api/admin/courses/auto-fill', authenticateAdmin, requireAdminOperator, async (req, res, next) => {
+  try {
+    const result = await extractCourseFromSource(pool, {
+      sourceText: req.body?.sourceText || '',
+      file: req.body?.file || null,
+    })
+    res.json(result)
+  } catch (error) {
+    if (error?.status) return res.status(error.status).json({ message: error.message })
+    error.publicMessage = 'Could not extract course details from the provided source.'
     next(error)
   }
 })

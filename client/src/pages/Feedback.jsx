@@ -4,13 +4,15 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { FieldError, RequiredMark } from '../components/FormValidation'
 import { scrollToFirstInvalidField } from '../utils/formValidation'
 import {
+  IconActivity,
   IconAlertTriangle,
   IconArrowLeft,
-  IconBug,
-  IconBulb,
   IconCheck,
+  IconClipboardCheck,
   IconMessageCircle,
+  IconSchool,
   IconSend,
+  IconSparkles,
   IconStar,
   IconStarFilled,
 } from '@tabler/icons-react'
@@ -23,10 +25,21 @@ import {
 import { getActiveFeedbackPromptKey, setFeedbackPromptState } from '../utils/feedbackPrompt'
 
 const categories = [
-  { value: 'Bug Report', label: 'Something is broken', icon: IconBug, iconClass: 'bg-rose-50 text-rose-500' },
-  { value: 'Suggestion', label: 'I have a suggestion', icon: IconBulb, iconClass: 'bg-amber-50 text-amber-600' },
-  { value: 'General Feedback', label: 'General feedback', icon: IconMessageCircle, iconClass: 'bg-sky-50 text-sky-600' },
+  { value: 'General', label: 'General', hint: 'Overall thoughts or suggestions', icon: IconMessageCircle, iconClass: 'bg-sky-50 text-sky-600' },
+  { value: 'System Performance', label: 'System Performance', hint: 'Speed, bugs, or technical issues', icon: IconActivity, iconClass: 'bg-rose-50 text-rose-500' },
+  { value: 'Assessment Experience', label: 'Assessment Experience', hint: 'Questions, quiz flow, or monitoring', icon: IconClipboardCheck, iconClass: 'bg-amber-50 text-amber-600' },
+  { value: 'Course Recommendations', label: 'Course Recommendations', hint: 'Matches, career info, or results', icon: IconSparkles, iconClass: 'bg-orange-50 text-orange-600' },
+  { value: 'College Phase', label: 'College Phase', hint: 'Setup, check-ins, or verification', icon: IconSchool, iconClass: 'bg-emerald-50 text-emerald-600' },
 ]
+
+function resolveDefaultCategory(entryContext, explicitCategory) {
+  if (explicitCategory && categories.some((item) => item.value === explicitCategory)) {
+    return explicitCategory
+  }
+  if (entryContext === 'college') return 'College Phase'
+  if (entryContext === 'results') return 'Course Recommendations'
+  return 'General'
+}
 
 const ratingLabels = ['', 'Poor', 'Fair', 'Good', 'Very Good', 'Excellent']
 
@@ -46,7 +59,7 @@ function Feedback() {
 
   const [rating, setRating] = useState(0)
   const [hoverRating, setHoverRating] = useState(0)
-  const [category, setCategory] = useState('')
+  const [category, setCategory] = useState(() => resolveDefaultCategory(entryContext, location.state?.feedbackCategory))
   const [comment, setComment] = useState('')
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
@@ -211,7 +224,10 @@ function Feedback() {
                 >
                   <input type="radio" name="feedback-category" value={cat.value} checked={selected} onChange={() => { setCategory(cat.value); setFieldErrors((current) => ({ ...current, category: undefined })) }} required aria-required="true" className="sr-only" />
                   <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${cat.iconClass}`}><CategoryIcon size={19} stroke={1.8} /></span>
-                  <span className="pr-5 text-sm font-semibold leading-snug text-gray-700">{cat.label}</span>
+                  <span className="pr-5">
+                    <span className="block text-sm font-semibold leading-snug text-gray-800">{cat.label}</span>
+                    {cat.hint && <span className="mt-0.5 block text-xs text-gray-500">{cat.hint}</span>}
+                  </span>
                   <span className={`absolute right-3 top-3 flex h-5 w-5 items-center justify-center rounded-full border transition ${selected ? 'border-orange-500 bg-orange-500 text-white' : 'border-gray-300 bg-white text-transparent'}`}><IconCheck size={13} stroke={2.5} /></span>
                 </label>
                 )

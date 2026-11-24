@@ -2,7 +2,7 @@ import SkeletonContent from '../../components/SkeletonContent'
 import { recommendationPlaceholders } from '../../data/loadingPlaceholders'
 import { useState, useEffect, useMemo, useCallback, useRef, useEffectEvent } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { IconPlus, IconEye, IconArrowLeft, IconSearch, IconX } from '@tabler/icons-react'
+import { IconAlertTriangle, IconArrowLeft, IconEye, IconFileUpload, IconPlus, IconSearch, IconSparkles, IconX } from '@tabler/icons-react'
 import CourseDraftFields from '../../components/admin/CourseDraftFields'
 import DraftCareerFields from '../../components/admin/DraftCareerFields'
 import CatalogCourseSources from '../../components/admin/CatalogCourseSources'
@@ -223,6 +223,15 @@ function ManageCourses() {
   const [saveSuccess, setSaveSuccess] = useState('')
   const [fieldErrors, setFieldErrors] = useState({})
   const [updatingStatusId, setUpdatingStatusId] = useState(null)
+  const [pendingStatusCourse, setPendingStatusCourse] = useState(null)
+  const [duplicateCheck, setDuplicateCheck] = useState(null)
+  const [checkingDuplicate, setCheckingDuplicate] = useState(false)
+  const [autoFillOpen, setAutoFillOpen] = useState(false)
+  const [autoFillText, setAutoFillText] = useState('')
+  const [autoFillFile, setAutoFillFile] = useState(null)
+  const [autoFilling, setAutoFilling] = useState(false)
+  const [autoFillError, setAutoFillError] = useState('')
+  const [autoFillSuccess, setAutoFillSuccess] = useState('')
   const [search, setSearch] = useState(initialLocation.search)
   const [clusterFilter, setClusterFilter] = useState(initialLocation.cluster)
   const [statusFilter, setStatusFilter] = useState(initialLocation.status)
@@ -234,6 +243,8 @@ function ManageCourses() {
   const catalogCounts = courseCatalogCounts(courses)
   const scopeTotal = courses.filter(course => matchesCatalogScope(course, catalogScope, statusFilter)).length
   const draftCount = courses.filter(course => Number(course.is_draft) === 1).length
+  const activeCourseCount = courses.filter(course => Number(course.is_draft) !== 1 && !archivedCourseIdentity(course) && isCourseActive(course)).length
+  const inactiveCourseCount = courses.filter(course => Number(course.is_draft) !== 1 && !archivedCourseIdentity(course) && !isCourseActive(course)).length
   const backToList = () => {
     if (!editingCourseId && editingDraft) writeNewCourseDraftSession(sessionStorage, draftSessionKey, courseForm, pendingSources, false)
     navigate(courseListLocation(listFilters))
@@ -413,11 +424,143 @@ function ManageCourses() {
     setFieldErrors((current) => ({ ...current, [name]: undefined }))
   }
 
+  const duplicateCheckName = String(courseForm.course_name || '').trim()
+  const duplicateCheckAbbr = String(courseForm.course_abbreviation || '').trim()
+  const shouldCheckDuplicate = view === 'form' && !publication && Boolean(adminToken)
+    && (duplicateCheckName.length >= 2 || duplicateCheckAbbr.length >= 2)
+  const activeDuplicateCheck = shouldCheckDuplicate ? duplicateCheck : null
+  const isCheckingDuplicate = shouldCheckDuplicate && checkingDuplicate
+
+  useEffect(() => {
+    if (!shouldCheckDuplicate) return undefined
+    const controller = new AbortController()
+    const timer = window.setTimeout(async () => {
+      setCheckingDuplicate(true)
+      try {
+        const params = new URLSearchParams()
+        if (duplicateCheckName) params.set('name', duplicateCheckName)
+        if (duplicateCheckAbbr) params.set('abbreviation', duplicateCheckAbbr)
+        if (editingCourseId) params.set('excludeCourseId', String(editingCourseId))
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/courses/check-duplicate?${params}`, {
+          headers: { Authorization: `Bearer ${adminToken}` },
+          signal: controller.signal,
+        })
+        if (!response.ok) return
+        const data = await response.json()
+        if (!controller.signal.aborted) setDuplicateCheck(data)
+      } catch {
+        // Non-blocking real-time check; backend still enforces on save.
+      } finally {
+        if (!controller.signal.aborted) setCheckingDuplicate(false)
+      }
+    }, 350)
+    return () => {
+      window.clearTimeout(timer)
+      controller.abort()
+    }
+  }, [adminToken, duplicateCheckAbbr, duplicateCheckName, editingCourseId, shouldCheckDuplicate])
+
+  const handleAutoFillFileSelect = (event) => {
+    const file = event.target.files?.[0]
+    setAutoFillError('')
+    if (!file) return
+    const allowed = ['application/pdf', 'text/plain', 'text/markdown', 'text/csv']
+    const extAllowed = /\.(pdf|txt|md)$/i.test(file.name)
+    if (!allowed.includes(file.type) && !extAllowed) {
+      setAutoFillError('Upload a PDF or plain text (.txt) file.')
+      event.target.value = ''
+      return
+    }
+    if (file.size > 20 * 1024 * 1024) {
+      setAutoFillError('Source file must be 20 MB or smaller.')
+      event.target.value = ''
+      return
+    }
+    const reader = new FileReader()
+    reader.onload = () => {
+      setAutoFillFile({
+        fileName: file.name,
+        mimeType: file.type || (file.name.toLowerCase().endsWith('.pdf') ? 'application/pdf' : 'text/plain'),
+        base64: String(reader.result || '').split(',')[1] || '',
+      })
+    }
+    reader.onerror = () => setAutoFillError('Could not read the selected file.')
+    reader.readAsDataURL(file)
+  }
+
+  const handleAutoFillExtract = async () => {
+    setAutoFillError('')
+    setAutoFillSuccess('')
+    if (!autoFillText.trim() && !autoFillFile) {
+      setAutoFillError('Paste course reference text or upload a PDF/text file first.')
+      return
+    }
+    setAutoFilling(true)
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/courses/auto-fill`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${adminToken}`,
+        },
+        body: JSON.stringify({
+          sourceText: autoFillText.trim() || undefined,
+          file: autoFillFile || undefined,
+        }),
+      })
+      if (handleUnauthorized(response, navigate)) return
+      const data = await response.json().catch(() => ({}))
+      if (!response.ok || !data.extracted) {
+        setAutoFillError(data.message || 'Could not extract course fields from the provided source.')
+        return
+      }
+      const ex = data.extracted
+      updateCourseForm((current) => ({
+        ...current,
+        course_name: ex.course_name || current.course_name,
+        course_abbreviation: ex.course_abbreviation || current.course_abbreviation,
+        cluster_category: ex.cluster_category || current.cluster_category,
+        description: ex.description || current.description,
+        obtainable_skills: ex.obtainable_skills || current.obtainable_skills,
+        program_duration_years: ex.program_duration_years || current.program_duration_years,
+        year_levels: Array.isArray(ex.year_levels) && ex.year_levels.length ? ex.year_levels : current.year_levels,
+        career_opportunities: Array.isArray(ex.career_opportunities) && ex.career_opportunities.length
+          ? ex.career_opportunities.map((career) => ({
+              client_id: crypto.randomUUID(),
+              job_title: career.job_title || '',
+              salary_range: career.salary_range || '',
+              description: career.description || '',
+            }))
+          : current.career_opportunities,
+      }))
+      if (data.duplicateCheck) setDuplicateCheck(data.duplicateCheck)
+      setFieldErrors({})
+      setAutoFillSuccess(
+        `Course fields auto-filled (${data.extractionMethod === 'ai_assisted' ? 'AI-assisted' : 'structured parser'}). Review and edit any field below before saving as a draft for Validator approval.`
+      )
+    } catch {
+      setAutoFillError('Cannot connect to server. Please try again.')
+    } finally {
+      setAutoFilling(false)
+    }
+  }
+
   const handleSaveCourse = async (e) => {
     e.preventDefault()
     if (publication || saving || sourceWorking) return
     if (sourceEditorOpen) { setError('Save or cancel the open source edit before saving draft changes.'); return }
     setError('')
+
+    if (activeDuplicateCheck?.hasExactDuplicate) {
+      const match = activeDuplicateCheck.exactMatches[0]
+      setFieldErrors((current) => ({
+        ...current,
+        course_name: `Duplicate course detected: "${match.course_name}" already exists (${match.status}).`,
+      }))
+      setError(`Duplicate course detected: "${match.course_name}" already exists (${match.status}). Review the existing record or enter a distinct specialization/major name.`)
+      scrollToFirstInvalidField(['course_name'])
+      return
+    }
 
     const draft = buildDraftPayload(courseForm, !editingCourseId || editingDraft, initialCourseForm)
     const nextErrors = { ...draft.errors }
@@ -483,9 +626,8 @@ function ManageCourses() {
     }
   }
 
-  const handleStatusChange = async (course) => {
+  const executeStatusChange = async (course) => {
     const nextStatus = !isCourseActive(course)
-    if (!nextStatus && !window.confirm(`Deactivate ${course.course_name}? It will be hidden from public course discovery and recommendations.`)) return
 
     setError('')
     setUpdatingStatusId(course.course_id)
@@ -507,12 +649,18 @@ function ManageCourses() {
         setError([data.message || 'Could not update course status.', reasons].filter(Boolean).join(' '))
         return
       }
+      setPendingStatusCourse(null)
       refreshCourses()
     } catch {
       setError('Could not update course status.')
     } finally {
       setUpdatingStatusId(null)
     }
+  }
+
+  const handleStatusChange = (course) => {
+    setError('')
+    setPendingStatusCourse(course)
   }
 
   if (saveSuccess) return <div className="min-h-screen bg-orange-50/40">
@@ -645,7 +793,52 @@ function ManageCourses() {
                 </div>
               </div>
 
-              <p className="mb-5 text-sm text-gray-600">{catalogCounts.original} original independent programs - {catalogCounts.published} published additions - {catalogCounts.drafts} saved drafts</p>
+              <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+                <p className="text-sm text-gray-600">{catalogCounts.original} original independent programs - {catalogCounts.published} published additions - {catalogCounts.drafts} saved drafts</p>
+                {!archivedView && (
+                  <div className="flex flex-wrap items-center gap-2 text-xs font-semibold">
+                    <button
+                      type="button"
+                      onClick={() => updateListFilters({ scope: 'current', status: statusFilter === 'active' ? 'all' : 'active' })}
+                      aria-pressed={statusFilter === 'active'}
+                      className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 transition ${
+                        statusFilter === 'active'
+                          ? 'border-emerald-500 bg-emerald-100 text-emerald-900 ring-2 ring-emerald-200'
+                          : 'border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-100'
+                      }`}
+                    >
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                      Active: {activeCourseCount}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => updateListFilters({ scope: 'current', status: statusFilter === 'inactive' ? 'all' : 'inactive' })}
+                      aria-pressed={statusFilter === 'inactive'}
+                      className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 transition ${
+                        statusFilter === 'inactive'
+                          ? 'border-slate-500 bg-slate-200 text-slate-900 ring-2 ring-slate-200'
+                          : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-100'
+                      }`}
+                    >
+                      <span className="h-1.5 w-1.5 rounded-full bg-slate-400" />
+                      Inactive: {inactiveCourseCount}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => updateListFilters({ scope: 'current', status: statusFilter === 'draft' ? 'all' : 'draft' })}
+                      aria-pressed={statusFilter === 'draft'}
+                      className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 transition ${
+                        statusFilter === 'draft'
+                          ? 'border-orange-500 bg-orange-100 text-orange-900 ring-2 ring-orange-200'
+                          : 'border-orange-200 bg-orange-50 text-orange-800 hover:bg-orange-100'
+                      }`}
+                    >
+                      <span className="h-1.5 w-1.5 rounded-full bg-orange-500" />
+                      Drafts: {draftCount}
+                    </button>
+                  </div>
+                )}
+              </div>
               {!loading && visibleCourses.length === 0 ? (
                 <div className="bg-white border border-orange-100 rounded-2xl p-10 text-center shadow-sm">
                   <h2 className="text-lg font-semibold text-gray-900">{draftsView ? 'No saved drafts found.' : 'No courses found.'}</h2>
@@ -686,6 +879,73 @@ function ManageCourses() {
             </>
           </SkeletonContent>
         </main>
+
+        {pendingStatusCourse && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4 backdrop-blur-xs"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="course-status-modal-title"
+            onClick={() => { if (!updatingStatusId) setPendingStatusCourse(null) }}
+          >
+            <div
+              className="w-full max-w-md rounded-2xl border border-stone-200 bg-white p-6 shadow-2xl"
+              onClick={(event) => event.stopPropagation()}
+            >
+              <div className="flex items-start justify-between gap-3">
+                <h2 id="course-status-modal-title" className="text-lg font-bold text-slate-950">
+                  {isCourseActive(pendingStatusCourse) ? 'Deactivate Course?' : 'Reactivate Course?'}
+                </h2>
+                <button
+                  type="button"
+                  disabled={Boolean(updatingStatusId)}
+                  onClick={() => setPendingStatusCourse(null)}
+                  aria-label="Close confirmation"
+                  className="rounded-lg p-1 text-slate-400 hover:bg-stone-100 hover:text-slate-600"
+                >
+                  <IconX size={18} />
+                </button>
+              </div>
+              <p className="mt-3 text-sm leading-6 text-slate-600">
+                {isCourseActive(pendingStatusCourse) ? (
+                  <>
+                    Deactivating <strong className="text-slate-900">{pendingStatusCourse.course_name}</strong> will hide it from public course discovery and new recommendations. Existing student recommendations and active college tracking records will remain safely preserved.
+                  </>
+                ) : (
+                  <>
+                    Reactivating <strong className="text-slate-900">{pendingStatusCourse.course_name}</strong> will make it visible again in public course discovery and eligible for new student recommendations.
+                  </>
+                )}
+              </p>
+              <div className="mt-6 flex justify-end gap-2">
+                <button
+                  type="button"
+                  disabled={Boolean(updatingStatusId)}
+                  onClick={() => setPendingStatusCourse(null)}
+                  className="rounded-xl border border-stone-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-stone-50 disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  disabled={Boolean(updatingStatusId)}
+                  onClick={() => executeStatusChange(pendingStatusCourse)}
+                  className={`rounded-xl px-4 py-2 text-sm font-semibold text-white disabled:opacity-50 ${
+                    isCourseActive(pendingStatusCourse)
+                      ? 'bg-red-600 hover:bg-red-700'
+                      : 'bg-emerald-600 hover:bg-emerald-700'
+                  }`}
+                >
+                  {updatingStatusId === pendingStatusCourse.course_id
+                    ? 'Updating...'
+                    : isCourseActive(pendingStatusCourse)
+                      ? 'Yes, Deactivate'
+                      : 'Yes, Reactivate'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     )
   }
@@ -736,6 +996,90 @@ function ManageCourses() {
         {editingDraft && !editingCourseId && <p className={`mb-5 text-sm ${sessionSaveFailed ? 'text-amber-800' : 'text-gray-600'}`} role={sessionSaveFailed ? 'alert' : undefined}>{sessionSaveFailed ? 'Browser recovery is unavailable. Save Draft before refreshing to avoid losing your inputs.' : 'Unsaved inputs are kept in this browser tab across refreshes. Use Save Draft to save them to LearnMatch.'}</p>}
         {savedDraftEditing && editingDraft && <p className="mb-5 text-sm text-gray-600">Editing a saved draft. Save Draft Changes returns to the read-only view; publication is a separate action.</p>}
 
+        {editingDraft && !editingCourseId && !publication && (
+          <section className="mb-6 rounded-2xl border border-orange-200/90 bg-white p-5 shadow-sm">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-start gap-3">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-orange-50 text-orange-600">
+                  <IconSparkles size={19} stroke={1.8} aria-hidden="true" />
+                </span>
+                <div>
+                  <h2 className="text-sm font-bold text-gray-900">Auto-Fill from Source</h2>
+                  <p className="mt-0.5 text-xs text-gray-500">
+                    Paste a CHED PSG/syllabus overview or upload a text/PDF reference to auto-populate editable draft fields. All drafts still go through Course Validator approval.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setAutoFillOpen((open) => !open)}
+                aria-expanded={autoFillOpen}
+                className="inline-flex items-center gap-1.5 rounded-xl border border-orange-200 bg-orange-50 px-3.5 py-2 text-xs font-semibold text-orange-800 hover:bg-orange-100"
+              >
+                <IconSparkles size={15} aria-hidden="true" />
+                {autoFillOpen ? 'Hide Auto-Fill' : 'Open Auto-Fill'}
+              </button>
+            </div>
+            {autoFillOpen && (
+              <div className="mt-4 space-y-3 border-t border-orange-100 pt-4">
+                <label className="block text-xs font-semibold text-gray-700">
+                  Paste course reference text (syllabus, CHED PSG, curriculum overview, or prospectus)
+                  <textarea
+                    rows={5}
+                    value={autoFillText}
+                    onChange={(event) => setAutoFillText(event.target.value)}
+                    placeholder="Program Name: Bachelor of Science in ...&#10;Description: ...&#10;Core Competencies: ...&#10;Career Opportunities: ..."
+                    className="mt-1.5 w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm font-normal text-gray-900 outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
+                  />
+                </label>
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-dashed border-stone-300 bg-stone-50 px-3.5 py-2 text-xs font-semibold text-stone-700 hover:border-orange-300 hover:bg-orange-50/50 hover:text-orange-700">
+                      <IconFileUpload size={15} aria-hidden="true" />
+                      {autoFillFile ? autoFillFile.fileName : 'Upload PDF or .txt (optional, max 20 MB)'}
+                      <input
+                        type="file"
+                        accept=".pdf,.txt,.md,application/pdf,text/plain"
+                        onChange={handleAutoFillFileSelect}
+                        className="sr-only"
+                      />
+                    </label>
+                    {autoFillFile && (
+                      <button
+                        type="button"
+                        onClick={() => setAutoFillFile(null)}
+                        aria-label="Remove uploaded source file"
+                        className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-700"
+                      >
+                        <IconX size={15} />
+                      </button>
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    disabled={autoFilling}
+                    onClick={handleAutoFillExtract}
+                    className="inline-flex items-center gap-2 rounded-xl bg-orange-500 px-4 py-2.5 text-xs font-semibold text-white shadow-xs transition hover:bg-orange-600 disabled:opacity-50"
+                  >
+                    <IconSparkles size={15} aria-hidden="true" />
+                    {autoFilling ? 'Extracting fields…' : 'Extract & Auto-Fill Form'}
+                  </button>
+                </div>
+                {autoFillError && (
+                  <p role="alert" className="rounded-xl border border-red-200 bg-red-50 px-3.5 py-2 text-xs text-red-700">
+                    {autoFillError}
+                  </p>
+                )}
+                {autoFillSuccess && (
+                  <p role="status" className="rounded-xl border border-emerald-200 bg-emerald-50 px-3.5 py-2 text-xs font-medium text-emerald-800">
+                    {autoFillSuccess}
+                  </p>
+                )}
+              </div>
+            )}
+          </section>
+        )}
+
         <form onSubmit={handleSaveCourse} noValidate className="space-y-5 mb-8 bg-white border border-orange-100 rounded-2xl p-5 sm:p-7 shadow-sm">
           {editingDraft && <p className="text-xs text-gray-600"><RequiredMark /> Required to save. Fields marked “Required to publish” may remain incomplete in a draft, but must be completed before publication. Notes and automated source checks are optional.</p>}
           <fieldset disabled={Boolean(publication) || saving} className="min-w-0 space-y-5">
@@ -759,6 +1103,61 @@ function ManageCourses() {
             />
             {!editingCourseId && <p id="draft-course-name-help" className="sr-only">Enter the full official program name from your reference, including the specialization or major when applicable.</p>}
             <FieldError id="course-name-error">{fieldErrors.course_name}</FieldError>
+            {isCheckingDuplicate && (
+              <p className="mt-1.5 text-xs text-gray-400">Checking for duplicate courses…</p>
+            )}
+            {!isCheckingDuplicate && activeDuplicateCheck?.hasExactDuplicate && (
+              <div role="alert" className="mt-2 rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-red-800">
+                <p className="flex items-center gap-1.5 font-bold">
+                  <IconAlertTriangle size={15} className="shrink-0" aria-hidden="true" />
+                  Duplicate course detected — submission blocked
+                </p>
+                <ul className="mt-1.5 space-y-1">
+                  {activeDuplicateCheck.exactMatches.map((match) => (
+                    <li key={match.course_id} className="flex flex-wrap items-center justify-between gap-2">
+                      <span>
+                        <strong>{match.course_name}</strong>
+                        {match.course_abbreviation ? ` (${match.course_abbreviation})` : ''} ·{' '}
+                        <span className="rounded bg-white px-1.5 py-0.5 font-semibold text-red-700">{match.status}</span>
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => goToCourse(match.course_id)}
+                        className="font-semibold underline hover:text-red-950"
+                      >
+                        View existing →
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {!isCheckingDuplicate && !activeDuplicateCheck?.hasExactDuplicate && activeDuplicateCheck?.hasSimilarMatch && (
+              <div role="status" className="mt-2 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900">
+                <p className="flex items-center gap-1.5 font-bold">
+                  <IconAlertTriangle size={15} className="shrink-0" aria-hidden="true" />
+                  Similar existing course{activeDuplicateCheck.similarMatches.length > 1 ? 's' : ''} found
+                </p>
+                <ul className="mt-1.5 space-y-1">
+                  {activeDuplicateCheck.similarMatches.map((match) => (
+                    <li key={match.course_id} className="flex flex-wrap items-center justify-between gap-2">
+                      <span>
+                        <strong>{match.course_name}</strong>
+                        {match.course_abbreviation ? ` (${match.course_abbreviation})` : ''} ·{' '}
+                        <span className="rounded bg-white px-1.5 py-0.5 font-semibold text-amber-800">{match.status}</span>
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => goToCourse(match.course_id)}
+                        className="font-semibold underline hover:text-amber-950"
+                      >
+                        Review →
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
 
           <div data-validation-field="cluster_category">

@@ -5,6 +5,7 @@ import {
   IconChevronLeft,
   IconChevronRight,
   IconClock,
+  IconDownload,
   IconMessageReport,
   IconRefresh,
   IconSearch,
@@ -12,8 +13,26 @@ import {
   IconX,
 } from '@tabler/icons-react'
 import AdminHeader from '../../components/AdminHeader'
+import { downloadCsv } from '../../utils/csvExport'
 
 const PAGE_SIZE = 10
+
+const CATEGORY_BADGE_STYLES = {
+  General: 'border-sky-200 bg-sky-50 text-sky-800',
+  'System Performance': 'border-rose-200 bg-rose-50 text-rose-800',
+  'Assessment Experience': 'border-amber-200 bg-amber-50 text-amber-800',
+  'Course Recommendations': 'border-orange-200 bg-orange-50 text-orange-800',
+  'College Phase': 'border-emerald-200 bg-emerald-50 text-emerald-800',
+}
+
+function CategoryBadge({ value }) {
+  const tone = CATEGORY_BADGE_STYLES[value] || 'border-slate-200 bg-slate-50 text-slate-700'
+  return (
+    <span className={`inline-flex rounded-md border px-2 py-1 text-xs font-medium ${tone}`}>
+      {value || 'General'}
+    </span>
+  )
+}
 
 function formatDate(value) {
   if (!value) return '—'
@@ -51,7 +70,9 @@ function AdminFeedback() {
   const navigate = useNavigate()
   const [feedback, setFeedback] = useState([])
   const [summary, setSummary] = useState({ totalFeedback: 0, averageRating: null, recentFeedback: 0 })
+  const [ratingDistribution, setRatingDistribution] = useState([])
   const [categories, setCategories] = useState([])
+  const [exporting, setExporting] = useState(false)
   const [pagination, setPagination] = useState({ page: 1, pageSize: PAGE_SIZE, total: 0, totalPages: 1 })
   const [page, setPage] = useState(1)
   const [searchInput, setSearchInput] = useState('')
@@ -90,6 +111,7 @@ function AdminFeedback() {
         const data = await response.json()
         setFeedback(data.feedback)
         setSummary(data.summary)
+        setRatingDistribution(Array.isArray(data.ratingDistribution) ? data.ratingDistribution : [])
         setCategories(data.categoryDistribution)
         setPagination(data.pagination)
       } catch (requestError) {
@@ -123,16 +145,73 @@ function AdminFeedback() {
     setRetryKey((current) => current + 1)
   }
 
+  const clearAllFilters = () => {
+    setSearchInput('')
+    setSearch('')
+    setCategory('')
+    setRating('')
+    setPage(1)
+  }
+
+  const handleExportCsv = async () => {
+    setExporting(true)
+    try {
+      const params = new URLSearchParams({ page: '1', pageSize: '50', sort })
+      if (search) params.set('search', search)
+      if (category) params.set('category', category)
+      if (rating) params.set('rating', rating)
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/feedback?${params}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('adminToken')}` },
+      })
+      if (!response.ok) return
+      const data = await response.json()
+      const items = Array.isArray(data.feedback) ? data.feedback : feedback
+      const today = new Date().toISOString().slice(0, 10)
+      const rows = [
+        ['LearnMatch Feedback Summary', `Exported ${today}`],
+        ['Total Feedback', summary.totalFeedback],
+        ['Average Rating', summary.averageRating === null ? 'N/A' : `${summary.averageRating}/5`],
+        ['Submitted in Last 30 Days', summary.recentFeedback],
+        [],
+        ['Feedback ID', 'User ID', 'Category', 'Rating', 'Submitted At', 'Comment'],
+        ...items.map((item) => [
+          item.feedbackId,
+          item.user?.userId ?? '',
+          item.category,
+          `${item.rating}/5`,
+          formatDate(item.submittedAt),
+          item.commentPreview || '',
+        ]),
+      ]
+      downloadCsv(`learnmatch-feedback-${today}.csv`, rows)
+    } finally {
+      setExporting(false)
+    }
+  }
+
   const filtered = Boolean(search || category || rating)
 
   return (
     <div className="min-h-screen bg-[#fcfaf7]">
       <AdminHeader currentPage="feedback" />
       <main className="mx-auto max-w-[1440px] px-5 py-8 sm:px-8 sm:py-10 lg:px-10">
-        <div className="mb-7 border-b border-slate-200 pb-6">
-          <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-orange-600">Administration</p>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-950">Feedback</h1>
-          <p className="mt-2 text-sm text-slate-600">Review feedback submitted by LearnMatch users.</p>
+        <div className="mb-7 flex flex-wrap items-end justify-between gap-4 border-b border-slate-200 pb-6">
+          <div>
+            <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-orange-600">Administration</p>
+            <h1 className="text-3xl font-bold tracking-tight text-slate-950">Feedback</h1>
+            <p className="mt-2 text-sm text-slate-600">Review feedback submitted by LearnMatch users.</p>
+          </div>
+          {!loading && !error && (
+            <button
+              type="button"
+              disabled={exporting || summary.totalFeedback === 0}
+              onClick={handleExportCsv}
+              className="inline-flex items-center gap-2 rounded-xl border border-orange-200 bg-white px-4 py-2.5 text-sm font-semibold text-orange-800 shadow-xs transition hover:bg-orange-50 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <IconDownload size={16} aria-hidden="true" />
+              {exporting ? 'Exporting…' : 'Export Feedback (CSV)'}
+            </button>
+          )}
         </div>
 
         {loading && (
@@ -179,6 +258,61 @@ function AdminFeedback() {
               </article>
             </section>
 
+            {ratingDistribution.length > 0 && (
+              <section aria-label="Rating distribution" className="rounded-xl border border-orange-100 bg-white p-5 shadow-sm">
+                <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                  <div>
+                    <h2 className="text-sm font-semibold text-slate-900">Rating Distribution</h2>
+                    <p className="text-xs text-slate-500">Click any star level to filter feedback responses.</p>
+                  </div>
+                  {rating && (
+                    <button
+                      type="button"
+                      onClick={() => { setRating(''); setPage(1) }}
+                      className="text-xs font-semibold text-orange-700 underline hover:text-orange-900"
+                    >
+                      Clear rating filter
+                    </button>
+                  )}
+                </div>
+                <div className="grid gap-2 sm:grid-cols-5">
+                  {ratingDistribution.map((entry) => {
+                    const isSelected = String(rating) === String(entry.rating)
+                    return (
+                      <button
+                        key={entry.rating}
+                        type="button"
+                        onClick={() => {
+                          setRating(isSelected ? '' : String(entry.rating))
+                          setPage(1)
+                        }}
+                        aria-pressed={isSelected}
+                        className={`rounded-xl border p-3 text-left transition ${
+                          isSelected
+                            ? 'border-orange-400 bg-orange-50/80 ring-2 ring-orange-200'
+                            : 'border-slate-100 bg-slate-50/60 hover:border-orange-200 hover:bg-orange-50/30'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between text-xs font-semibold text-slate-700">
+                          <span className="inline-flex items-center gap-1">
+                            <IconStarFilled size={13} className="text-amber-500" aria-hidden="true" />
+                            {entry.rating} Star{entry.rating === 1 ? '' : 's'}
+                          </span>
+                          <span className="tabular-nums text-slate-500">{entry.count} ({entry.percent}%)</span>
+                        </div>
+                        <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-200/80">
+                          <div
+                            className="h-full rounded-full bg-orange-500 transition-[width] duration-300"
+                            style={{ width: `${entry.percent}%` }}
+                          />
+                        </div>
+                      </button>
+                    )
+                  })}
+                </div>
+              </section>
+            )}
+
             <section className="rounded-xl border border-orange-100 bg-white p-4 shadow-sm sm:p-5" aria-label="Feedback filters">
               <div className="grid gap-3 lg:grid-cols-[minmax(260px,1fr)_220px_150px_160px]">
                 <form onSubmit={applySearch} className="flex min-w-0">
@@ -202,6 +336,48 @@ function AdminFeedback() {
                   <option value="oldest">Oldest first</option>
                 </select>
               </div>
+              {categories.length > 0 && (
+                <div className="mt-3.5 flex flex-wrap items-center gap-2 border-t border-slate-100 pt-3.5" aria-label="Quick category filter">
+                  <button
+                    type="button"
+                    onClick={() => { setCategory(''); setPage(1) }}
+                    aria-pressed={category === ''}
+                    className={`rounded-full border px-3 py-1 text-xs font-semibold transition ${
+                      category === ''
+                        ? 'border-orange-500 bg-orange-500 text-white'
+                        : 'border-slate-200 bg-white text-slate-600 hover:border-orange-200 hover:text-orange-700'
+                    }`}
+                  >
+                    All ({summary.totalFeedback})
+                  </button>
+                  {categories.map((item) => {
+                    const active = category === item.category
+                    return (
+                      <button
+                        key={item.category}
+                        type="button"
+                        onClick={() => { setCategory(active ? '' : item.category); setPage(1) }}
+                        aria-pressed={active}
+                        className={`rounded-full border px-3 py-1 text-xs font-semibold transition ${
+                          active
+                            ? 'border-orange-500 bg-orange-100 text-orange-900 ring-2 ring-orange-200'
+                            : 'border-slate-200 bg-slate-50 text-slate-700 hover:border-orange-200 hover:bg-orange-50/40'
+                        }`}
+                      >
+                        {item.category} ({item.count})
+                      </button>
+                    )
+                  })}
+                  {filtered && (
+                    <button type="button" onClick={clearAllFilters} className="lm-action ml-auto">Clear filters</button>
+                  )}
+                </div>
+              )}
+              {categories.length === 0 && filtered && (
+                <div className="mt-3 flex items-center justify-end border-t border-slate-100 pt-3">
+                  <button type="button" onClick={clearAllFilters} className="lm-action">Clear filters</button>
+                </div>
+              )}
             </section>
 
             {feedback.length === 0 ? <EmptyState filtered={filtered} /> : (
@@ -215,7 +391,7 @@ function AdminFeedback() {
                       {feedback.map((item) => (
                         <tr key={item.feedbackId} className="align-top transition hover:bg-orange-50/30">
                           <td className="px-5 py-4 font-semibold tabular-nums text-slate-900">#{item.user.userId}</td>
-                          <td className="px-5 py-4"><span className="inline-flex rounded-md border border-orange-100 bg-orange-50 px-2 py-1 text-xs font-medium text-orange-700">{item.category}</span></td>
+                          <td className="px-5 py-4"><CategoryBadge value={item.category} /></td>
                           <td className="px-5 py-4"><Rating value={item.rating} /></td>
                           <td className="px-5 py-4"><p className="line-clamp-2 break-words leading-5 text-slate-600">{item.commentPreview || 'No additional comment.'}</p></td>
                           <td className="px-5 py-4 text-xs leading-5 text-slate-500">{formatDate(item.submittedAt)}</td>
@@ -230,7 +406,7 @@ function AdminFeedback() {
                   {feedback.map((item) => (
                     <article key={item.feedbackId} className="rounded-xl border border-orange-100 bg-white p-5 shadow-sm">
                       <div className="flex items-start justify-between gap-3"><div><p className="text-xs font-semibold uppercase tracking-wide text-slate-400">User ID</p><p className="mt-1 font-semibold tabular-nums text-slate-900">#{item.user.userId}</p></div><Rating value={item.rating} /></div>
-                      <div className="mt-4 flex flex-wrap items-center gap-2"><span className="rounded-md border border-orange-100 bg-orange-50 px-2 py-1 text-xs font-medium text-orange-700">{item.category}</span><span className="text-xs text-slate-400">{formatDate(item.submittedAt)}</span></div>
+                      <div className="mt-4 flex flex-wrap items-center gap-2"><CategoryBadge value={item.category} /><span className="text-xs text-slate-400">{formatDate(item.submittedAt)}</span></div>
                       <p className="mt-4 line-clamp-3 break-words text-sm leading-6 text-slate-600">{item.commentPreview || 'No additional comment.'}</p>
                       <Link to={`/admin/feedback/${item.feedbackId}`} className="lm-action mt-4">View feedback</Link>
                     </article>

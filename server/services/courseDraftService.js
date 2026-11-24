@@ -1,5 +1,6 @@
 import { validateCourse } from './requestValidationService.js'
 import { evaluateRecommendationReadiness } from './adminCourseService.js'
+import { detectDuplicateCourses } from './courseDuplicateService.js'
 import { SKILL_DOMAINS, RIASEC_DIMENSIONS } from '../config/recommendationConfig.js'
 import { captureDraftReviewFields, bumpDraftReviewFields } from './draftSourceService.js'
 import { validateSourceBundle, persistSourceBundle } from './sourceBundlePersistenceService.js'
@@ -116,14 +117,27 @@ export async function saveCourseDraft(database, body, courseId = null, authentic
       beforeVersion = await courseValidationVersion(connection, existing)
       if (value.career_opportunities && Number(existing.is_draft) !== 1) throw new CourseDraftError('Career editing in this form is available only for new drafts.', 409)
     }
-    const [names] = await connection.query(`SELECT c.course_id, c.course_code, c.course_name FROM COURSE c
+    const [names] = await connection.query(`SELECT c.course_id, c.course_code, c.course_name, c.course_abbreviation, c.is_active, c.is_draft FROM COURSE c
       LEFT JOIN COURSE_REPLACEMENT_DRAFT r ON r.draft_id = c.course_id WHERE r.published_at IS NULL`)
     const reviewFieldsBefore = Number(existing?.is_draft) === 1 ? await captureDraftReviewFields(connection, existing) : null
     const nameKey = normalizeCourseName(value.course_name)
     // Do not block an unchanged legacy name merely because legacy duplicates exist.
     if (creating || nameKey !== normalizeCourseName(existing.course_name)) {
-      const duplicates = names.filter((row) => Number(row.course_id) !== courseId && Number(row.course_id) !== replacementFor && normalizeCourseName(row.course_name) === nameKey)
-      if (duplicates.length) throw new CourseDraftError('A course with this name already exists. Review the existing record or use the full distinct program/specialization name.', 409, { duplicates })
+      const duplicateCheck = detectDuplicateCourses(names, {
+        courseName: value.course_name,
+        courseAbbreviation: value.course_abbreviation || '',
+        excludeCourseId: courseId,
+        excludeReplacementFor: replacementFor,
+      })
+      if (duplicateCheck.hasExactDuplicate) {
+        const first = duplicateCheck.exactMatches[0]
+        const label = [first.course_name, first.course_abbreviation || first.course_code].filter(Boolean).join(' · ')
+        throw new CourseDraftError(
+          `Duplicate course detected: "${label}" already exists (${first.status}). Review the existing record or use a distinct specialization/major name.`,
+          409,
+          { duplicates: duplicateCheck.exactMatches }
+        )
+      }
     }
     let courseCode = existing?.course_code
     if (creating) {

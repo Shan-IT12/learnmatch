@@ -1,5 +1,7 @@
 import { SKILL_DOMAINS } from '../config/recommendationConfig.js'
 import { assessmentStatusSql } from './assessmentCompletionService.js'
+import { ALIGNMENT_RULES } from './collegeTrackingService.js'
+import { getEnrollmentVerificationSummary } from './enrollmentProofService.js'
 
 export const MBTI_TYPES = Object.freeze([
   'ISTJ', 'ISFJ', 'INFJ', 'INTJ',
@@ -120,6 +122,70 @@ const ALL_COURSES_QUERY = `
   GROUP BY course.course_id, course.course_code, course.course_name
   ORDER BY appearance_count DESC, course.course_name ASC, course.course_id ASC`
 
+const ASSESSMENT_MODE_QUERY = `
+  WITH latest_completed_attempt AS (
+    SELECT user_id, camera_enabled,
+           ROW_NUMBER() OVER (
+             PARTITION BY user_id
+             ORDER BY completed_at DESC, attempt_id DESC
+           ) AS attempt_rank
+    FROM ASSESSMENT_ATTEMPT
+    WHERE status = 'COMPLETED'
+  )
+  SELECT COALESCE(SUM(camera_enabled = 1), 0) AS verified_count,
+         COALESCE(SUM(camera_enabled = 0 OR camera_enabled IS NULL), 0) AS standard_count
+  FROM latest_completed_attempt
+  WHERE attempt_rank = 1`
+
+const COLLEGE_ALIGNMENT_QUERY = `
+  WITH tracked_users AS (
+    SELECT user_id FROM COLLEGE_TRACKING_CYCLE
+    UNION
+    SELECT user_id FROM COLLEGE_TERM
+    UNION
+    SELECT user_id FROM SEMESTER_CHECKIN
+  ),
+  completed_checkins AS (
+    SELECT sc.checkin_id, sc.user_id, sc.alignment_score, sc.phase, sc.gwa,
+           sc.checkin_date, sc.created_at
+    FROM SEMESTER_CHECKIN sc
+    JOIN (
+      SELECT checkin_id
+      FROM CHECKIN_ALIGNMENT_RESPONSE
+      GROUP BY checkin_id
+      HAVING COUNT(response_id) = 5
+    ) completed_response ON completed_response.checkin_id = sc.checkin_id
+    WHERE sc.alignment_score IS NOT NULL
+  ),
+  latest_alignment AS (
+    SELECT sc.user_id,
+           CASE
+             WHEN sc.phase = 'End' AND sc.gwa IS NOT NULL THEN
+               CASE
+                 WHEN sc.gwa >= ${ALIGNMENT_RULES.passingGwa}
+                  AND ROUND(sc.alignment_score * 100) >= ${ALIGNMENT_RULES.highAlignmentPercent} THEN 'On Track'
+                 WHEN sc.gwa >= ${ALIGNMENT_RULES.passingGwa}
+                   OR ROUND(sc.alignment_score * 100) >= ${ALIGNMENT_RULES.highAlignmentPercent} THEN 'Monitor'
+                 ELSE 'Needs Attention'
+               END
+             WHEN ROUND(sc.alignment_score * 100) >= ${ALIGNMENT_RULES.highAlignmentPercent} THEN 'On Track'
+             WHEN 100 - ROUND(sc.alignment_score * 100) < ${ALIGNMENT_RULES.monitorMismatchExclusive} THEN 'Monitor'
+             ELSE 'Needs Attention'
+           END AS alignment_status,
+           ROW_NUMBER() OVER (
+             PARTITION BY sc.user_id
+             ORDER BY COALESCE(sc.checkin_date, sc.created_at) DESC, sc.checkin_id DESC
+           ) AS latest_rank
+    FROM completed_checkins sc
+  )
+  SELECT COUNT(*) AS total_tracked,
+         COALESCE(SUM(la.alignment_status = 'On Track'), 0) AS on_track,
+         COALESCE(SUM(la.alignment_status = 'Monitor'), 0) AS monitor,
+         COALESCE(SUM(la.alignment_status = 'Needs Attention'), 0) AS needs_attention,
+         COALESCE(SUM(la.alignment_status IS NULL), 0) AS no_checkin
+  FROM tracked_users tu
+  LEFT JOIN latest_alignment la ON la.user_id = tu.user_id AND la.latest_rank = 1`
+
 function roundOneDecimal(value) {
   return Math.round(Number(value) * 10) / 10
 }
@@ -130,11 +196,21 @@ export async function getAdminAnalytics(database) {
     [skillRows],
     [personalityRows],
     [courseRows],
+    [modeRows],
+    [alignmentRows],
+    enrollmentVerification,
   ] = await Promise.all([
     database.query(COMPLETION_QUERY),
     database.query(AVERAGE_SKILLS_QUERY),
     database.query(PERSONALITY_QUERY),
     database.query(ALL_COURSES_QUERY),
+    database.query(ASSESSMENT_MODE_QUERY).catch(() => [[{ verified_count: 0, standard_count: 0 }]]),
+    database.query(COLLEGE_ALIGNMENT_QUERY).catch(() => [[{
+      total_tracked: 0, on_track: 0, monitor: 0, needs_attention: 0, no_checkin: 0,
+    }]]),
+    getEnrollmentVerificationSummary(database).catch(() => ({
+      totalEnrolled: 0, verified: 0, pendingReview: 0, rejected: 0, unsubmitted: 0,
+    })),
   ])
 
   const completion = completionRows[0] || {}
@@ -142,6 +218,8 @@ export async function getAdminAnalytics(database) {
   const completed = Number(completion.completed || 0)
   const inProgress = Number(completion.in_progress || 0)
   const notStarted = Number(completion.not_started || 0)
+  const modeSummary = modeRows[0] || {}
+  const alignmentSummary = alignmentRows[0] || {}
 
   const skillsByDomain = new Map(
     skillRows.map((row) => [row.dimension, {
@@ -159,6 +237,20 @@ export async function getAdminAnalytics(database) {
         ? 0
         : roundOneDecimal((completed / totalUsers) * 100),
       recommendationsGenerated: Number(completion.recommendations_generated || 0),
+    },
+    assessmentModes: {
+      verified: Number(modeSummary.verified_count || 0),
+      standard: Number(modeSummary.standard_count || 0),
+    },
+    collegeOverview: {
+      totalTracked: Number(alignmentSummary.total_tracked || 0),
+      alignment: {
+        onTrack: Number(alignmentSummary.on_track || 0),
+        monitor: Number(alignmentSummary.monitor || 0),
+        needsAttention: Number(alignmentSummary.needs_attention || 0),
+        noCheckin: Number(alignmentSummary.no_checkin || 0),
+      },
+      enrollmentVerification,
     },
     averageSkillScores: SKILL_DOMAINS
       .filter((domain) => skillsByDomain.has(domain))

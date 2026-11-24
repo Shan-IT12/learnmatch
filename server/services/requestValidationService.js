@@ -3,6 +3,12 @@ import { validateUsername } from './usernameValidationService.js'
 import { PERSONAL_FACTOR_KEYS } from '../shared/personalFactors.js'
 
 export const FEEDBACK_CATEGORIES = new Set([
+  'General',
+  'System Performance',
+  'Assessment Experience',
+  'Course Recommendations',
+  'College Phase',
+  // Legacy categories retained for backward compatibility with older cached clients
   'Bug Report',
   'Suggestion',
   'General Feedback',
@@ -50,7 +56,10 @@ export function validateFeedback(body) {
     return { valid: false, message: 'Invalid feedback.' }
   }
   const rating = Number(body.rating)
-  const category = text(body.category, { required: true, max: 40 })
+  const rawCategory = body.category === undefined || body.category === null || String(body.category).trim() === ''
+    ? 'General'
+    : body.category
+  const category = text(rawCategory, { required: true, max: 50 })
   const comment = text(body.comment, { max: 2000 })
   if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
     return { valid: false, message: 'Rating must be an integer from 1 through 5.' }

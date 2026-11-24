@@ -12,15 +12,19 @@ import {
 import { Bar, Doughnut } from 'react-chartjs-2'
 import {
   IconAlertTriangle,
+  IconCamera,
   IconChartBar,
   IconChartDonut3,
   IconChecklist,
+  IconDownload,
   IconRefresh,
+  IconSchool,
   IconSparkles,
   IconUsers,
 } from '@tabler/icons-react'
 import AdminHeader from '../../components/AdminHeader'
 import { parseCourseName } from '../../utils/courseName'
+import { downloadCsv } from '../../utils/csvExport'
 
 ChartJS.register(ArcElement, BarElement, CategoryScale, Legend, LinearScale, Tooltip)
 
@@ -269,14 +273,75 @@ function AdminAnalytics() {
     setRetryKey((current) => current + 1)
   }
 
+  const handleExportAnalyticsCsv = () => {
+    if (!analytics) return
+    const today = new Date().toISOString().slice(0, 10)
+    const modes = analytics.assessmentModes || { verified: 0, standard: 0 }
+    const college = analytics.collegeOverview || {
+      totalTracked: 0,
+      alignment: { onTrack: 0, monitor: 0, needsAttention: 0, noCheckin: 0 },
+      enrollmentVerification: { totalEnrolled: 0, verified: 0, pendingReview: 0, rejected: 0, unsubmitted: 0 },
+    }
+    const rows = [
+      ['LearnMatch Analytics Summary Report', `Exported ${today}`],
+      [],
+      ['Overview Metric', 'Value'],
+      ['Total Registered Students', analytics.summary.totalUsers],
+      ['Completed Assessments', analytics.summary.completedAssessments],
+      ['Assessment Completion Rate (%)', analytics.summary.assessmentCompletionRate],
+      ['Students With Recommendations', analytics.summary.recommendationsGenerated],
+      [],
+      ['Assessment Verification Mode (Latest Completed)', 'Students'],
+      ['Verified (Camera-Monitored)', modes.verified],
+      ['Standard Assessment', modes.standard],
+      [],
+      ['College Phase & Enrollment Verification', 'Students'],
+      ['Total College Students Tracked', college.totalTracked],
+      ['Verified Enrolled', college.enrollmentVerification?.verified || 0],
+      ['Pending Review', college.enrollmentVerification?.pendingReview || 0],
+      ['Rejected (Resubmission Requested)', college.enrollmentVerification?.rejected || 0],
+      ['Unsubmitted Proof', college.enrollmentVerification?.unsubmitted || 0],
+      ['Alignment: On Track', college.alignment?.onTrack || 0],
+      ['Alignment: Monitor', college.alignment?.monitor || 0],
+      ['Alignment: Needs Attention', college.alignment?.needsAttention || 0],
+      ['Alignment: No Check-in Yet', college.alignment?.noCheckin || 0],
+      [],
+      ['Skill Domain', 'Average Score (%)', 'Students'],
+      ...analytics.averageSkillScores.map((item) => [item.domain, item.averagePercent, item.studentCount]),
+      [],
+      ['Recommended Course', 'Course Code', 'Top 3 Appearances'],
+      ...analytics.topRecommendedCourses.map((item) => [item.courseName, item.courseCode, item.count]),
+    ]
+    downloadCsv(`learnmatch-analytics-summary-${today}.csv`, rows)
+  }
+
+  const assessmentModes = analytics?.assessmentModes || { verified: 0, standard: 0 }
+  const totalModeAttempts = assessmentModes.verified + assessmentModes.standard
+  const verifiedModePercent = totalModeAttempts > 0
+    ? Math.round((assessmentModes.verified / totalModeAttempts) * 100)
+    : 0
+  const collegeOverview = analytics?.collegeOverview || null
+
   return (
     <div className="min-h-screen bg-[#fcfaf7]">
       <AdminHeader currentPage="analytics" />
       <main className="mx-auto max-w-[1440px] px-5 py-8 sm:px-8 sm:py-10 lg:px-10">
-        <div className="mb-7 border-b border-slate-200 pb-6">
-          <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-orange-600">Administration</p>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-950">Analytics &amp; System Monitoring</h1>
-          <p className="mt-2 text-sm text-slate-600">Aggregate insights from student assessments and course recommendations.</p>
+        <div className="mb-7 flex flex-wrap items-end justify-between gap-4 border-b border-slate-200 pb-6">
+          <div>
+            <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-orange-600">Administration</p>
+            <h1 className="text-3xl font-bold tracking-tight text-slate-950">Analytics &amp; System Monitoring</h1>
+            <p className="mt-2 text-sm text-slate-600">Aggregate insights from student assessments, verification integrity, and college alignment.</p>
+          </div>
+          {!loading && analytics && (
+            <button
+              type="button"
+              onClick={handleExportAnalyticsCsv}
+              className="inline-flex items-center gap-2 rounded-xl border border-orange-200 bg-white px-4 py-2.5 text-sm font-semibold text-orange-800 shadow-xs transition hover:bg-orange-50"
+            >
+              <IconDownload size={16} aria-hidden="true" />
+              Export Summary (CSV)
+            </button>
+          )}
         </div>
 
         {loading && <LoadingState />}
@@ -311,6 +376,103 @@ function AdminAnalytics() {
                 </article>
               ))}
             </section>
+
+            <div className="grid min-w-0 gap-6 lg:grid-cols-2">
+              <ChartCard
+                title="Assessment Verification Modes"
+                subtitle="Latest completed assessments split by Verified (Camera-Monitored) vs. Standard mode"
+                icon={IconCamera}
+              >
+                {totalModeAttempts > 0 ? (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="rounded-xl border border-emerald-200 bg-emerald-50/70 p-4">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-emerald-800">Verified (Camera-Monitored)</p>
+                        <p className="mt-1.5 text-2xl font-bold tabular-nums text-emerald-950">{assessmentModes.verified.toLocaleString()}</p>
+                        <p className="mt-0.5 text-xs text-emerald-700">{verifiedModePercent}% of completed</p>
+                      </div>
+                      <div className="rounded-xl border border-slate-200 bg-slate-50/80 p-4">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-slate-600">Standard Assessment</p>
+                        <p className="mt-1.5 text-2xl font-bold tabular-nums text-slate-900">{assessmentModes.standard.toLocaleString()}</p>
+                        <p className="mt-0.5 text-xs text-slate-500">{100 - verifiedModePercent}% of completed</p>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="h-3 overflow-hidden rounded-full bg-slate-200">
+                        <div
+                          className="h-full rounded-full bg-emerald-500 transition-[width] duration-500"
+                          style={{ width: `${verifiedModePercent}%` }}
+                        />
+                      </div>
+                      <p className="mt-2 text-xs text-slate-500">
+                        Based on {totalModeAttempts.toLocaleString()} student{totalModeAttempts === 1 ? '' : 's'} with a completed assessment attempt.
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <EmptyState>No completed assessment mode records yet.</EmptyState>
+                )}
+              </ChartCard>
+
+              <ChartCard
+                title="College Phase Enrollment & Alignment"
+                subtitle="Verified enrollment status and latest Career Alignment distribution"
+                icon={IconSchool}
+                aside={collegeOverview ? (
+                  <span className="shrink-0 rounded-md bg-orange-50 px-2.5 py-1 text-xs font-semibold text-orange-800">
+                    {collegeOverview.totalTracked.toLocaleString()} tracked
+                  </span>
+                ) : null}
+              >
+                {collegeOverview && collegeOverview.totalTracked > 0 ? (
+                  <div className="space-y-4">
+                    <div>
+                      <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">Enrollment Verification</p>
+                      <div className="flex flex-wrap gap-2 text-xs font-semibold">
+                        <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-emerald-800">
+                          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                          Verified Enrolled: {collegeOverview.enrollmentVerification?.verified || 0}
+                        </span>
+                        <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-amber-800">
+                          <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
+                          Pending Review: {collegeOverview.enrollmentVerification?.pendingReview || 0}
+                        </span>
+                        <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-slate-700">
+                          <span className="h-1.5 w-1.5 rounded-full bg-slate-400" />
+                          Unverified: {(collegeOverview.enrollmentVerification?.unsubmitted || 0) + (collegeOverview.enrollmentVerification?.rejected || 0)}
+                          {(collegeOverview.enrollmentVerification?.rejected || 0) > 0
+                            ? ` (${collegeOverview.enrollmentVerification.rejected} rejected)`
+                            : ''}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="border-t border-slate-100 pt-4">
+                      <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">Latest Career Alignment</p>
+                      <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
+                        <div className="rounded-lg border border-emerald-100 bg-emerald-50/50 px-3 py-2.5">
+                          <p className="text-lg font-bold tabular-nums text-emerald-900">{collegeOverview.alignment.onTrack}</p>
+                          <p className="text-[11px] font-medium text-emerald-700">On Track</p>
+                        </div>
+                        <div className="rounded-lg border border-amber-100 bg-amber-50/50 px-3 py-2.5">
+                          <p className="text-lg font-bold tabular-nums text-amber-900">{collegeOverview.alignment.monitor}</p>
+                          <p className="text-[11px] font-medium text-amber-700">Monitor</p>
+                        </div>
+                        <div className="rounded-lg border border-rose-100 bg-rose-50/50 px-3 py-2.5">
+                          <p className="text-lg font-bold tabular-nums text-rose-900">{collegeOverview.alignment.needsAttention}</p>
+                          <p className="text-[11px] font-medium text-rose-700">Needs Attention</p>
+                        </div>
+                        <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5">
+                          <p className="text-lg font-bold tabular-nums text-slate-800">{collegeOverview.alignment.noCheckin}</p>
+                          <p className="text-[11px] font-medium text-slate-500">No Check-in</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <EmptyState>No students are currently tracked in the College Phase.</EmptyState>
+                )}
+              </ChartCard>
+            </div>
 
             <ChartCard
               title="Average Skill Scores"

@@ -44,7 +44,7 @@ function shapeFeedback(row, { includeFullComment = false } = {}) {
         }
       : { userId: Number(row.user_id) },
     rating: Number(row.rating),
-    category: row.category || 'Uncategorized',
+    category: row.category || 'General',
     submittedAt: row.submitted_at,
   }
   if (includeFullComment) feedback.comment = row.comment || ''
@@ -67,6 +67,7 @@ export async function getAdminFeedback(database, options = {}) {
   const [
     [summaryRows],
     [categoryRows],
+    [ratingRows],
     [countRows],
     [feedbackRows],
   ] = await Promise.all([
@@ -77,10 +78,16 @@ export async function getAdminFeedback(database, options = {}) {
        FROM FEEDBACK`
     ),
     database.query(
-      `SELECT COALESCE(category, 'Uncategorized') AS category, COUNT(*) AS feedback_count
+      `SELECT COALESCE(NULLIF(TRIM(category), ''), 'General') AS category, COUNT(*) AS feedback_count
        FROM FEEDBACK
-       GROUP BY COALESCE(category, 'Uncategorized')
+       GROUP BY COALESCE(NULLIF(TRIM(category), ''), 'General')
        ORDER BY feedback_count DESC, category ASC`
+    ),
+    database.query(
+      `SELECT rating, COUNT(*) AS rating_count
+       FROM FEEDBACK
+       WHERE rating BETWEEN 1 AND 5
+       GROUP BY rating`
     ),
     database.query(
       `SELECT COUNT(*) AS total ${joinSql}${filters.sql}`,
@@ -99,15 +106,26 @@ export async function getAdminFeedback(database, options = {}) {
   ])
 
   const summary = summaryRows[0] || {}
+  const totalFeedback = Number(summary.total_feedback || 0)
+  const ratingCounts = new Map(ratingRows.map((row) => [Number(row.rating), Number(row.rating_count || 0)]))
+  const ratingDistribution = [5, 4, 3, 2, 1].map((stars) => {
+    const count = ratingCounts.get(stars) || 0
+    return {
+      rating: stars,
+      count,
+      percent: totalFeedback > 0 ? Math.round((count / totalFeedback) * 100) : 0,
+    }
+  })
   const total = Number(countRows[0]?.total || 0)
   return {
     summary: {
-      totalFeedback: Number(summary.total_feedback || 0),
+      totalFeedback,
       averageRating: summary.average_rating === null || summary.average_rating === undefined
         ? null
         : Number(summary.average_rating),
       recentFeedback: Number(summary.recent_feedback || 0),
     },
+    ratingDistribution,
     categoryDistribution: categoryRows.map((row) => ({
       category: row.category,
       count: Number(row.feedback_count),
