@@ -457,6 +457,9 @@ export async function createCollegeSetup(
     approximateStart,
     approximateEnd,
     initialTrackingPhase,
+    schoolName,
+    studentIdNumber,
+    enrollmentProof,
   },
   resolveCourse = getPublicCourse
 ) {
@@ -479,7 +482,11 @@ export async function createCollegeSetup(
     initialTrackingPhase,
   }, normalizedAcademicYear)
 
-  const verification = parseEnrollmentVerificationInput(input)
+  const verification = parseEnrollmentVerificationInput({
+    schoolName,
+    studentIdNumber,
+    enrollmentProof,
+  })
 
   const connection = await pool.getConnection()
   try {
