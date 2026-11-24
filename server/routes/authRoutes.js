@@ -2,6 +2,7 @@ import express from 'express'
 import authenticateToken from '../middleware/authenticateToken.js'
 import {
   forgotPassword,
+  googleLogin,
   loginUser,
   registerUser,
   resendOtp,
@@ -49,6 +50,11 @@ router.post(
   userLoginIpRateLimiter,
   userLoginIdentityRateLimiter,
   loginUser
+)
+router.post(
+  '/google',
+  userLoginIpRateLimiter,
+  googleLogin
 )
 router.post(
   '/verify-otp',

@@ -15,6 +15,11 @@ import { recordSuccessfulLogin } from '../services/accountInactivityService.js'
 import { passwordSessionVersion } from '../services/sessionVersionService.js'
 
 import { sendResendMail } from '../services/resendEmailService.js'
+import {
+  GoogleAuthError,
+  findOrCreateGoogleStudent,
+  verifyGoogleIdToken,
+} from '../services/googleAuthService.js'
 
 export const MAX_OTP_FAILED_ATTEMPTS = 5
 
@@ -58,6 +63,24 @@ const createUserAuthPayload = (user, message) => ({
   userId: user.user_id,
   username: user.username,
 })
+
+export const googleLogin = async (req, res) => {
+  try {
+    const profile = await verifyGoogleIdToken(req.body?.credential)
+    const { user, isNewAccount } = await findOrCreateGoogleStudent(pool, profile)
+    const authPayload = createUserAuthPayload(
+      user,
+      isNewAccount ? 'Account created with Google!' : 'Logged in with Google!'
+    )
+    return res.json({ ...authPayload, isNewAccount })
+  } catch (error) {
+    if (error instanceof GoogleAuthError) {
+      return res.status(error.status).json({ message: error.message })
+    }
+    console.error('Google login error:', error)
+    return res.status(500).json({ message: 'Could not complete Google Sign-In. Please try again.' })
+  }
+}
 
 export const registerUser = async (req, res) => {
   const { email: rawEmail, username, password } = req.body || {}

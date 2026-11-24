@@ -220,3 +220,26 @@ button, input, select, textarea { max-width: 100%; }
 .lm-action-selected { border-color: var(--lm-orange-action); background: var(--lm-orange-action); color: var(--lm-orange-on-action); }
 .lm-action-selected:not(:disabled):hover { border-color: var(--lm-orange-action-hover); background: var(--lm-orange-action-hover); color: var(--lm-orange-on-action); }
 @media (prefers-reduced-motion: reduce) { .lm-action { transition: none; } }
+
+/* Landing page validator marquee */
+@keyframes lm-marquee-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.lm-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: lm-marquee-scroll 34s linear infinite;
+}
+.lm-marquee-container:hover .lm-marquee-track,
+.lm-marquee-container:focus-within .lm-marquee-track {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .lm-marquee-track {
+    animation: none;
+    flex-wrap: wrap;
+    width: auto;
+    justify-content: center;
+  }
+}

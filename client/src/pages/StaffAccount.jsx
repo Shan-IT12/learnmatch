@@ -40,6 +40,34 @@ const descriptions = {
   resend: 'Enter the email you used to apply for Course Validator access.',
 }
 
+const PROFESSION_OPTIONS = [
+  'Registered Guidance Counselor (RGC)',
+  'College Professor / Instructor',
+  'Program Chair / Department Head',
+  'Dean / Academic Director',
+  'Curriculum Specialist',
+  'Licensed Professional Teacher (LPT)',
+  'Industry Practitioner / Subject-Matter Expert',
+  'Career Advisor / Academic Coach',
+]
+
+const EXPERTISE_OPTIONS = [
+  'Engineering, Computing & Technology',
+  'Healthcare & Allied Sciences',
+  'Business, Accountancy & Management',
+  'Education & Teacher Training',
+  'Guidance & Career Counseling',
+  'Humanities, Psychology & Social Sciences',
+  'Arts, Design & Multimedia',
+  'Hospitality & Tourism Management',
+  'Criminology & Law Enforcement',
+  'Legal & Public Service',
+  'Science & Mathematics',
+  'Agriculture & Environmental Science',
+  'Aviation & Maritime',
+  'Sports & Physical Education',
+]
+
 export default function StaffAccount({ role, initialAction }) {
   const { action: pathAction } = useParams()
   const action = initialAction || pathAction
@@ -59,6 +87,8 @@ function StaffAccountForm({ role, action }) {
   const [loadingInvite, setLoadingInvite] = useState(() => role === 'validator' && action === 'invite' && Boolean(raw))
   const [completed, setCompleted] = useState(false)
   const [clusterError, setClusterError] = useState('')
+  const [professionChoice, setProfessionChoice] = useState('')
+  const [expertiseChoice, setExpertiseChoice] = useState('')
   const form = useWorkflowAction()
   const navigate = useNavigate()
   const { state } = useLocation()
@@ -99,9 +129,27 @@ function StaffAccountForm({ role, action }) {
         setInvitation(await workflowApi('validator/invite', { body: { token: raw } }))
         return
       }
+      const formatMiddleInitial = (value) => {
+        const clean = String(value || '').trim().replace(/\.+$/u, '')
+        return clean ? `${clean.toUpperCase()}.` : ''
+      }
+      const composedFullName = action === 'invite'
+        ? [String(data.firstName || '').trim(), formatMiddleInitial(data.middleInitial), String(data.lastName || '').trim()].filter(Boolean).join(' ')
+        : data.fullName
+      const resolvedProfession = professionChoice === '__other__' ? String(data.professionOther || '').trim() : professionChoice
+      const resolvedExpertise = expertiseChoice === '__other__' ? String(data.expertiseOther || '').trim() : expertiseChoice
       const body = action === 'invite' ? {
-        ...data, email: invitation.email, clusters: fields.getAll('clusters'), credential: await reviewFile(fields.get('credential')),
-        accepted: fields.has('accepted'), termsVersion: TERMS_VERSION, privacyVersion: PRIVACY_NOTICE_VERSION, token: raw,
+        ...data,
+        fullName: composedFullName,
+        profession: resolvedProfession || data.profession,
+        expertise: resolvedExpertise || data.expertise,
+        email: invitation.email,
+        clusters: fields.getAll('clusters'),
+        credential: await reviewFile(fields.get('credential')),
+        accepted: fields.has('accepted'),
+        termsVersion: TERMS_VERSION,
+        privacyVersion: PRIVACY_NOTICE_VERSION,
+        token: raw,
       } : { ...data, token: raw }
       const result = await workflowApi(`${path}/${action === 'invite' ? 'register' : action}`, { body })
       if (isVerification && result.approvalToken) {
@@ -150,11 +198,73 @@ function StaffAccountForm({ role, action }) {
             </div>
             <section aria-labelledby="application-details" className="space-y-3">
               <h2 id="application-details" className="font-semibold text-slate-950">Professional details</h2>
+              <div className="grid gap-4 sm:grid-cols-[1fr_1fr_7rem]">
+                <WorkflowField label="Last name"><input name="lastName" autoComplete="family-name" maxLength={60} required className={workflowInput} /></WorkflowField>
+                <WorkflowField label="First name"><input name="firstName" autoComplete="given-name" maxLength={60} required className={workflowInput} /></WorkflowField>
+                <WorkflowField label="M.I." required={false}><input name="middleInitial" autoComplete="additional-name" maxLength={5} placeholder="Optional" className={workflowInput} /></WorkflowField>
+              </div>
               <div className="grid gap-4 sm:grid-cols-2">
-                <WorkflowField label="Full name"><input name="fullName" autoComplete="name" maxLength={150} required className={workflowInput} /></WorkflowField>
-                <WorkflowField label="Profession"><input name="profession" autoComplete="organization-title" maxLength={150} required className={workflowInput} /></WorkflowField>
-                <WorkflowField label="Affiliation"><input name="affiliation" autoComplete="organization" maxLength={255} required className={workflowInput} /><span>Institution, company, or independent affiliation.</span></WorkflowField>
-                <WorkflowField label="Field of expertise"><input name="expertise" maxLength={500} required className={workflowInput} /></WorkflowField>
+                <WorkflowField label="Profession">
+                  <select
+                    name="profession"
+                    value={professionChoice}
+                    onChange={(event) => setProfessionChoice(event.target.value)}
+                    required
+                    className={workflowInput}
+                  >
+                    <option value="">Select profession…</option>
+                    {PROFESSION_OPTIONS.map((option) => (
+                      <option key={option} value={option}>{option}</option>
+                    ))}
+                    <option value="__other__">Other (specify)</option>
+                  </select>
+                  {professionChoice === '__other__' && (
+                    <input
+                      name="professionOther"
+                      maxLength={150}
+                      required
+                      placeholder="Enter your profession or title"
+                      className={`mt-2 ${workflowInput}`}
+                    />
+                  )}
+                </WorkflowField>
+                <WorkflowField label="Affiliation">
+                  <input
+                    name="affiliation"
+                    autoComplete="organization"
+                    maxLength={255}
+                    required
+                    placeholder="e.g. Bulacan State University or Organization"
+                    className={workflowInput}
+                  />
+                  <span>Institution, company, or independent affiliation.</span>
+                </WorkflowField>
+                <div className="sm:col-span-2">
+                  <WorkflowField label="Field of expertise">
+                    <select
+                      name="expertise"
+                      value={expertiseChoice}
+                      onChange={(event) => setExpertiseChoice(event.target.value)}
+                      required
+                      className={workflowInput}
+                    >
+                      <option value="">Select field of expertise…</option>
+                      {EXPERTISE_OPTIONS.map((option) => (
+                        <option key={option} value={option}>{option}</option>
+                      ))}
+                      <option value="__other__">Other (specify)</option>
+                    </select>
+                    {expertiseChoice === '__other__' && (
+                      <input
+                        name="expertiseOther"
+                        maxLength={500}
+                        required
+                        placeholder="Specify your field of expertise"
+                        className={`mt-2 ${workflowInput}`}
+                      />
+                    )}
+                  </WorkflowField>
+                </div>
               </div>
             </section>
             <ClusterChoices clusters={invitation.clusters} error={clusterError} onChange={() => setClusterError('')} />

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { IconEye, IconEyeOff } from '@tabler/icons-react'
 import AuthJourneyPanel from '../components/AuthJourneyPanel'
+import GoogleSignInButton from '../components/GoogleSignInButton'
 import { FieldError, RequiredMark } from '../components/FormValidation'
 import { scrollToFirstInvalidField } from '../utils/formValidation'
 import useResendCountdown from '../hooks/useResendCountdown'
@@ -355,6 +356,16 @@ function Register() {
                   )}
                 </button>
               </form>
+
+              <GoogleSignInButton
+                disabled={submitting}
+                text="signup_with"
+                onError={(msg) => setError(msg)}
+                onSuccess={(data) => {
+                  storeUserAuth(localStorage, data)
+                  navigate('/dashboard')
+                }}
+              />
 
               <p className="text-center text-sm text-gray-500 mt-6">
                 Already have an account?{' '}

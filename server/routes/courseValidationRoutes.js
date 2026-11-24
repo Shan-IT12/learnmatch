@@ -8,6 +8,7 @@ import {
   createLoginIdentityRateLimiter, createLoginIpRateLimiter, loginIdentityKey,
 } from '../middleware/loginRateLimiters.js'
 import { sendResendMail } from '../services/resendEmailService.js'
+import { getPublicValidators, updateValidatorPublicProfile } from '../services/publicValidatorService.js'
 import { sendPrivateImage } from '../services/privateReviewImage.js'
 import {
   correctCredential, createValidatorAuth, decideValidator, finishStaffPassword, invitationEmail, inviteValidator,
@@ -39,6 +40,17 @@ const parserErrors = (error, _req, res, next) => {
 }
 
 export function mountCourseValidationRoutes(app, database, admin, { send = sendResendMail } = {}) {
+  // Public read-only endpoint returning approved validator display profiles for the Landing Page marquee.
+  app.get('/api/public/validators', async (_req, res) => {
+    try {
+      const validators = await getPublicValidators(database)
+      res.setHeader('Cache-Control', 'public, max-age=120')
+      res.json({ validators })
+    } catch {
+      res.status(500).json({ message: 'Could not load public validators.' })
+    }
+  })
+
   const adminAccount = express.Router()
   adminAccount.use(noStore, body)
   adminAccount.post('/forgot', ...limits(), run(req => requestStaffLink(database, send, 'admin', 'reset', req.body?.email)))
@@ -53,6 +65,7 @@ export function mountCourseValidationRoutes(app, database, admin, { send = sendR
   accounts.post('/invite', ...limits(), run(req => inviteValidator(database, send, req.body?.email, req.admin.adminId)))
   accounts.get('/:id', run(req => staffApplication(database, workflowId(req.params.id), { adminView: true })))
   accounts.post('/:id/decision', run(req => decideValidator(database, req.admin.adminId, workflowId(req.params.id), req.body || {})))
+  accounts.patch('/:id/public-profile', withImage, run(req => updateValidatorPublicProfile(database, workflowId(req.params.id), req.body || {})))
   accounts.get('/:id/credentials/:credential', credential(database, req => workflowId(req.params.id)))
   accounts.use(parserErrors)
   app.use('/api/admin/validators', accounts)
@@ -81,6 +94,7 @@ export function mountCourseValidationRoutes(app, database, admin, { send = sendR
   validator.post('/resend', body, ...limits(), run(req => requestStaffLink(database, send, 'validator', 'verify', req.body?.email)))
   validator.use(createValidatorAuth(database))
   validator.get('/profile', run(req => staffApplication(database, req.validator.id)))
+  validator.patch('/profile/public', withImage, run(req => updateValidatorPublicProfile(database, req.validator.id, req.body || {})))
   validator.post('/profile/credential', withImage, run(req => correctCredential(database, req.validator, req.body)))
   validator.get('/profile/credentials/:credential', credential(database, req => req.validator.id))
   validator.get('/reviews', run(req => validatorAssignments(database, req.validator)))

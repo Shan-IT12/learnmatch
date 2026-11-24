@@ -2,10 +2,13 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {
   IconArrowRight,
+  IconAward,
   IconBrain,
   IconChevronRight,
   IconCompass,
+  IconSchool,
   IconSearch,
+  IconShieldCheck,
   IconTargetArrow,
   IconUserCircle,
 } from '@tabler/icons-react'
@@ -34,6 +37,55 @@ const journeySteps = [
     icon: IconCompass,
   },
 ]
+
+function SlantedCertificatePeek({ verified = false }) {
+  return (
+    <div
+      aria-hidden="true"
+      className="pointer-events-none relative mt-6 h-28 w-full overflow-hidden rounded-xl bg-gradient-to-t from-orange-50/80 via-orange-50/20 to-transparent"
+    >
+      <div
+        className={`absolute -bottom-10 right-3 w-[84%] origin-bottom-right rounded-xl border bg-white p-3.5 shadow-[0_14px_34px_-16px_rgba(120,53,15,.45)] transition-all duration-300 ease-out motion-safe:-rotate-3 motion-safe:translate-y-3 motion-safe:opacity-85 motion-safe:group-hover:-rotate-1 motion-safe:group-hover:-translate-y-1 motion-safe:group-hover:opacity-100 sm:right-5 sm:w-[78%] ${
+          verified
+            ? 'border-amber-300/90 bg-gradient-to-br from-[#fffdf8] via-white to-[#fff7ed]'
+            : 'border-orange-200/90'
+        }`}
+      >
+        <div
+          className={`pointer-events-none absolute inset-1.5 rounded-lg border ${
+            verified ? 'border-[#d4a017]/75' : 'border-orange-300/80'
+          }`}
+        />
+        {verified && (
+          <div className="absolute right-3.5 top-3.5 flex h-9 w-9 flex-col items-center justify-center rounded-full border border-[#d4a017] bg-gradient-to-br from-[#c2410c] to-[#9a3412] text-center text-[6px] font-bold uppercase leading-tight tracking-wider text-amber-100 shadow-sm">
+            <span>Official</span>
+            <span className="text-[7px] text-white">Verified</span>
+          </div>
+        )}
+        <div className="relative flex flex-col items-center pt-1 text-center">
+          <span className="bg-gradient-to-br from-orange-500 to-orange-700 bg-clip-text text-sm font-black tracking-tighter text-transparent">
+            LM
+          </span>
+          <span className="text-[8px] font-bold tracking-wide text-[#9a3412]">LearnMatch</span>
+          <p className="mt-1 font-serif text-xs font-bold tracking-[0.18em] text-slate-900">
+            CERTIFICATE
+          </p>
+          <div className="mt-0.5 flex items-center justify-center gap-1.5">
+            <span className={`h-px w-6 ${verified ? 'bg-[#d4a017]' : 'bg-orange-300'}`} />
+            <span className="text-[7px] font-bold uppercase tracking-[0.2em] text-orange-800">
+              OF COMPLETION
+            </span>
+            <span className={`h-px w-6 ${verified ? 'bg-[#d4a017]' : 'bg-orange-300'}`} />
+          </div>
+          <div className="mt-2.5 flex w-full flex-col items-center gap-1.5 pb-4 opacity-50 blur-[1.5px]">
+            <div className="h-2.5 w-28 rounded bg-slate-700/75" />
+            <div className="h-1.5 w-40 rounded-full bg-slate-300" />
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 function PathwayVisual() {
   return (
@@ -64,11 +116,13 @@ function Landing() {
   const [results, setResults] = useState(null)
   const [searching, setSearching] = useState(false)
   const [catalogStats, setCatalogStats] = useState(null)
+  const [publicValidators, setPublicValidators] = useState([])
   const navigate = useNavigate()
 
   useEffect(() => {
     const controller = new AbortController()
-    fetch(`${import.meta.env.VITE_API_URL || ''}/api/public/courses/stats`, { signal: controller.signal })
+    const base = import.meta.env.VITE_API_URL || ''
+    fetch(`${base}/api/public/courses/stats`, { signal: controller.signal })
       .then(async (response) => {
         if (!response.ok) throw new Error('Catalog statistics request failed')
         return response.json()
@@ -79,6 +133,14 @@ function Landing() {
       .catch(() => {
         // Keep unavailable counts empty instead of displaying stale totals.
       })
+    fetch(`${base}/api/public/validators`, { signal: controller.signal })
+      .then(async (response) => (response.ok ? response.json() : null))
+      .then((data) => {
+        if (!controller.signal.aborted && Array.isArray(data?.validators)) {
+          setPublicValidators(data.validators)
+        }
+      })
+      .catch(() => {})
     return () => controller.abort()
   }, [])
 
@@ -222,6 +284,75 @@ function Landing() {
           <PathwayVisual />
         </section>
 
+        {publicValidators.length > 0 && (
+          <section aria-label="Validated by subject-matter experts" className="border-t border-orange-100/70 bg-white/70 py-7">
+            <div className="mx-auto max-w-[1380px] px-5 sm:px-8 lg:px-10">
+              <div className="mb-4 flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-orange-700">
+                <IconShieldCheck size={16} aria-hidden="true" />
+                Validated by:
+              </div>
+              {publicValidators.length >= 4 ? (
+                <div className="lm-marquee-container relative overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]">
+                  <div className="lm-marquee-track gap-4 py-1">
+                    {[...publicValidators, ...publicValidators].map((validator, idx) => (
+                      <article
+                        key={`${validator.id}-${idx}`}
+                        aria-hidden={idx >= publicValidators.length ? 'true' : undefined}
+                        className="flex min-w-[240px] max-w-[280px] shrink-0 flex-col items-center justify-between rounded-2xl border border-orange-100/90 bg-white px-5 py-4 text-center shadow-xs"
+                      >
+                        <div className="flex h-11 w-full items-center justify-center">
+                          {validator.signature ? (
+                            <img
+                              src={validator.signature}
+                              alt={`${validator.name} signature`}
+                              className="max-h-10 max-w-[180px] object-contain"
+                            />
+                          ) : (
+                            <span className="font-serif text-lg italic tracking-wide text-slate-700">
+                              {validator.name}
+                            </span>
+                          )}
+                        </div>
+                        <div className="mt-2.5 w-full border-t border-orange-100/80 pt-2">
+                          <p className="truncate text-xs font-bold text-slate-900">{validator.name}</p>
+                          <p className="mt-0.5 truncate text-[11px] font-medium text-slate-500">{validator.profession}</p>
+                        </div>
+                      </article>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="flex flex-wrap items-center justify-center gap-4 py-1">
+                  {publicValidators.map((validator) => (
+                    <article
+                      key={validator.id}
+                      className="flex min-w-[240px] max-w-[280px] shrink-0 flex-col items-center justify-between rounded-2xl border border-orange-100/90 bg-white px-5 py-4 text-center shadow-xs"
+                    >
+                      <div className="flex h-11 w-full items-center justify-center">
+                        {validator.signature ? (
+                          <img
+                            src={validator.signature}
+                            alt={`${validator.name} signature`}
+                            className="max-h-10 max-w-[180px] object-contain"
+                          />
+                        ) : (
+                          <span className="font-serif text-lg italic tracking-wide text-slate-700">
+                            {validator.name}
+                          </span>
+                        )}
+                      </div>
+                      <div className="mt-2.5 w-full border-t border-orange-100/80 pt-2">
+                        <p className="truncate text-xs font-bold text-slate-900">{validator.name}</p>
+                        <p className="mt-0.5 truncate text-[11px] font-medium text-slate-500">{validator.profession}</p>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              )}
+            </div>
+          </section>
+        )}
+
         <section id="how-it-works" className="relative border-y border-orange-100/70 bg-white/48 px-5 py-16 sm:px-8 sm:py-20 lg:px-10">
           <div className="mx-auto max-w-6xl">
             <div className="mx-auto max-w-2xl text-center">
@@ -249,7 +380,59 @@ function Landing() {
           </div>
         </section>
 
-        <section className="px-5 py-14 sm:px-8 sm:py-16 lg:px-10">
+        <section aria-labelledby="certificates-heading" className="px-5 py-14 sm:px-8 sm:py-16 lg:px-10">
+          <div className="mx-auto max-w-6xl">
+            <div className="mx-auto max-w-2xl text-center">
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-orange-700">Official Recognition</p>
+              <h2 id="certificates-heading" className="mt-3 text-2xl font-bold tracking-[-0.03em] text-gray-950 sm:text-3xl">
+                Earn downloadable LearnMatch certificates.
+              </h2>
+              <p className="mt-3 text-sm leading-relaxed text-gray-600">
+                Save verifiable proof of your completed assessment and college alignment journey.
+              </p>
+            </div>
+
+            <div className="mt-9 grid gap-5 md:grid-cols-2">
+              <article className="group relative flex flex-col justify-between overflow-hidden rounded-[24px] border border-orange-200/80 bg-white/90 p-6 pb-4 shadow-[0_18px_46px_-36px_rgba(120,53,15,.45)] transition duration-200 hover:border-orange-300 hover:shadow-[0_24px_54px_-34px_rgba(234,88,12,.4)]">
+                <div>
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-orange-100 text-brand">
+                      <IconAward size={22} stroke={1.8} aria-hidden="true" />
+                    </span>
+                    <span className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-[11px] font-semibold text-emerald-800">
+                      Standard &amp; Verified Tiers
+                    </span>
+                  </div>
+                  <h3 className="mt-5 text-lg font-bold text-gray-950">Assessment Certificate</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-gray-600">
+                    Earned after completing all 6 academic skill domains, interests, and personality assessment. Camera-monitored sessions unlock the distinguished Verified Assessment Certificate.
+                  </p>
+                </div>
+                <SlantedCertificatePeek verified />
+              </article>
+
+              <article className="group relative flex flex-col justify-between overflow-hidden rounded-[24px] border border-orange-200/80 bg-white/90 p-6 pb-4 shadow-[0_18px_46px_-36px_rgba(120,53,15,.45)] transition duration-200 hover:border-orange-300 hover:shadow-[0_24px_54px_-34px_rgba(234,88,12,.4)]">
+                <div>
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-amber-100 text-amber-800">
+                      <IconSchool size={22} stroke={1.8} aria-hidden="true" />
+                    </span>
+                    <span className="rounded-full border border-orange-200 bg-orange-50 px-3 py-1 text-[11px] font-semibold text-orange-800">
+                      Verified Enrollment
+                    </span>
+                  </div>
+                  <h3 className="mt-5 text-lg font-bold text-gray-950">College Phase Certificate of Completion</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-gray-600">
+                    Unlocked upon completing your College Phase program setup, semester check-ins, and alignment review with verified college enrollment proof.
+                  </p>
+                </div>
+                <SlantedCertificatePeek verified={false} />
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section className="px-5 pb-14 pt-2 sm:px-8 sm:pb-16 lg:px-10">
           <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-6 rounded-[28px] border border-orange-200/70 bg-orange-950 px-6 py-8 text-white shadow-[0_24px_60px_-38px_rgba(67,20,7,.7)] sm:px-9 md:flex-row md:items-center">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.17em] text-orange-300">Your direction starts here</p>

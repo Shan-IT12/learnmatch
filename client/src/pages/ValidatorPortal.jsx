@@ -48,6 +48,10 @@ export default function ValidatorPortal() {
 
 function ValidatorProfile({ account, token, refresh }) {
   const action = useWorkflowAction()
+  const publicAction = useWorkflowAction()
+  const [publicProfession, setPublicProfession] = useState(account.profession || '')
+  const [publicSignature, setPublicSignature] = useState('')
+  const [signatureFileName, setSignatureFileName] = useState('')
   const submit = event => {
     event.preventDefault()
     const form = new FormData(event.currentTarget)
@@ -55,6 +59,35 @@ function ValidatorProfile({ account, token, refresh }) {
       await workflowApi('validator/profile/credential', { token, body: { credential: await reviewFile(form.get('credential')) } })
       refresh()
       return { message: 'Corrected credential submitted.' }
+    })
+  }
+  const handleSignatureFile = (event) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+    if (!['image/png', 'image/svg+xml'].includes(file.type)) return
+    if (file.size > 500 * 1024) return
+    const reader = new FileReader()
+    reader.onload = () => {
+      setPublicSignature(String(reader.result || ''))
+      setSignatureFileName(file.name)
+    }
+    reader.readAsDataURL(file)
+  }
+  const savePublicProfile = (event) => {
+    event.preventDefault()
+    publicAction.run(async () => {
+      const body = { profession: publicProfession }
+      if (publicSignature) body.signature = publicSignature
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/validator/profile/public`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify(body),
+      })
+      const data = await response.json().catch(() => ({}))
+      if (!response.ok) throw new Error(data.message || 'Could not update public display profile.')
+      refresh()
+      setSignatureFileName('')
+      return { message: 'Public Landing Page profile updated.' }
     })
   }
   return <section className={workflowCard}>
@@ -69,6 +102,27 @@ function ValidatorProfile({ account, token, refresh }) {
         <div key={label} className="min-w-0"><dt className="font-semibold text-slate-900">{label}</dt><dd className="mt-1 break-words text-slate-700">{value}</dd></div>)}
     </dl>
     <button className="lm-action" type="button" onClick={() => action.run(() => downloadReviewImage(`validator/profile/credentials/${account.credential_id}`, token, 'my-credential'))}>Download my credential</button>
+    {account.status === 'approved' && (
+      <form onSubmit={savePublicProfile} className="space-y-3 rounded-xl border border-orange-100 bg-orange-50/40 p-4">
+        <div>
+          <h2 className="text-sm font-bold text-slate-900">Public Validator Attribution (Landing Page)</h2>
+          <p className="mt-0.5 text-xs text-slate-600">Only your name, profession/title, and optional signature appear in the Landing Page “Validated by:” marquee. Your email and credentials remain private.</p>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <WorkflowField label="Display Profession / Title">
+            <input value={publicProfession} onChange={(e) => setPublicProfession(e.target.value)} maxLength={150} className={workflowInput} required />
+          </WorkflowField>
+          <WorkflowField label="Public Signature (PNG or SVG, max 500 KB)">
+            <input type="file" accept="image/png,image/svg+xml" onChange={handleSignatureFile} className={workflowFile} />
+            {signatureFileName && <p className="mt-1 text-xs text-emerald-700">Selected: {signatureFileName}</p>}
+          </WorkflowField>
+        </div>
+        <WorkflowFeedback {...publicAction} />
+        <button type="submit" disabled={publicAction.busy} className="lm-action lm-action-selected">
+          {publicAction.busy ? 'Saving…' : 'Save Public Attribution'}
+        </button>
+      </form>
+    )}
     {!!account.decisions.length && <section className="space-y-2">
       <h2 className="font-semibold">Application decisions</h2>
       {account.decisions.map(row => <article key={row.decision_id} className="rounded-xl bg-orange-50 p-3 text-sm">

@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { IconEye, IconEyeOff } from '@tabler/icons-react'
 import AuthJourneyPanel from '../components/AuthJourneyPanel'
+import GoogleSignInButton from '../components/GoogleSignInButton'
 import { FieldError, RequiredMark } from '../components/FormValidation'
 import { scrollToFirstInvalidField } from '../utils/formValidation'
 import { storeUserAuth } from '../utils/userAuth'
@@ -173,6 +174,21 @@ function Login() {
               )}
             </button>
           </form>
+
+          <GoogleSignInButton
+            disabled={submitting}
+            text="continue_with"
+            onError={(msg) => setError(msg)}
+            onSuccess={(data) => {
+              storeUserAuth(localStorage, data)
+              const returnTo = location.state?.returnTo
+              navigate(
+                typeof returnTo === 'string' && /^\/college(?:\?notifications=1|\/checkin\?reminder=\d+)?$/.test(returnTo)
+                  ? returnTo
+                  : lastStudentPath(localStorage, data.userId) || '/dashboard'
+              )
+            }}
+          />
 
           <p className="text-center text-sm text-gray-500 mt-6">
             No account yet?{' '}
