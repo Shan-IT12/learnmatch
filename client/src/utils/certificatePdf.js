@@ -207,6 +207,6 @@ export function generateCertificatePdf({
   doc.text('D A T E', rightCx, footerY + 5.5, { align: 'center' })
 
   const safeName = cleanName.replace(/[^a-zA-Z0-9_-]+/g, '_').slice(0, 40) || 'Student'
-  const tierLabel = isVerified ? 'Verified' : 'Standard'
-  doc.save(`LearnMatch_${tierLabel}_Certificate_${safeName}.pdf`)
+  const filePrefix = type === 'college' ? 'LearnMatch_College_Certificate' : `LearnMatch_${isVerified ? 'Verified' : 'Standard'}_Certificate`
+  doc.save(`${filePrefix}_${safeName}.pdf`)
 }

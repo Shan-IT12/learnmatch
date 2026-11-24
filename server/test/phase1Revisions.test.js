@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import { authorizeRoles, normalizeAdminRole, STAFF_ROLES } from '../middleware/authorizeRoles.js'
 import { createAdminAccount, listAdminAccounts } from '../services/adminAccountService.js'
 import { buildStaffLink } from '../services/staffEmailService.js'
-import { getSystemErrorLogs, logSystemError } from '../services/systemErrorLogService.js'
+import { getSystemErrorLogs, logSystemError, reportSystemErrorToDevelopers } from '../services/systemErrorLogService.js'
 import { createErrorHandler } from '../middleware/errorHandler.js'
 
 function mockRes() {
@@ -126,4 +126,41 @@ test('buildStaffLink generates a valid copy-pastable validator invite URL', () =
   const token = 'a'.repeat(43)
   const url = buildStaffLink('validator_invite', token, { NODE_ENV: 'production' })
   assert.equal(url, `https://www.learnmatch.online/validator/account/invite#${token}`)
+})
+
+test('reportSystemErrorToDevelopers emails full error details to system_developer accounts', async () => {
+  const sent = []
+  const fakeDb = {
+    async query(sql) {
+      if (sql.includes('FROM system_error_logs')) {
+        return [[{
+          id: 19,
+          source: 'BACKEND',
+          endpoint: 'GET /api/admin/accounts',
+          error_message: 'Illegal mix of collations',
+          stack_trace: 'Error: Illegal mix\n    at adminAccountService.js:52',
+          user_id: null,
+          created_at: '2026-11-22T07:31:48.000Z',
+        }]]
+      }
+      if (sql.includes('FROM ADMIN')) {
+        return [[{ email: 'dev@learnmatch.online' }]]
+      }
+      return [[]]
+    },
+  }
+
+  const result = await reportSystemErrorToDevelopers(fakeDb, {
+    logId: 19,
+    reporterUsername: 'ops_admin',
+    send: async (mail) => { sent.push(mail) },
+  })
+
+  assert.equal(result.logId, 19)
+  assert.equal(result.recipientCount, 1)
+  assert.equal(sent.length, 1)
+  assert.equal(sent[0].to, 'dev@learnmatch.online')
+  assert.match(sent[0].subject, /#19/)
+  assert.match(sent[0].text, /ops_admin/)
+  assert.match(sent[0].text, /adminAccountService\.js:52/)
 })

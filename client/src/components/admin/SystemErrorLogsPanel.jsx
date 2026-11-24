@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { IconAlertTriangle, IconCheck, IconChevronDown, IconChevronLeft, IconChevronRight, IconCopy, IconRefresh, IconTerminal2 } from '@tabler/icons-react'
+import { IconAlertTriangle, IconCheck, IconChevronDown, IconChevronLeft, IconChevronRight, IconCopy, IconRefresh, IconSend, IconTerminal2 } from '@tabler/icons-react'
 import { ADMIN_ROLES, getStoredAdminRole } from '../../utils/adminRole'
 
 function formatLogTimestamp(value) {
@@ -25,8 +25,45 @@ export default function SystemErrorLogsPanel({ onUnauthorized }) {
   const [error, setError] = useState('')
   const [expandedId, setExpandedId] = useState(null)
   const [copiedId, setCopiedId] = useState(null)
+  const [sendingId, setSendingId] = useState(null)
+  const [sentIds, setSentIds] = useState({})
+  const [reportNotice, setReportNotice] = useState(null)
   const [refreshKey, setRefreshKey] = useState(0)
   const isSystemDeveloper = getStoredAdminRole() === ADMIN_ROLES.SYSTEM_DEVELOPER
+
+  const sendErrorToDeveloper = async (log) => {
+    setSendingId(log.id)
+    setReportNotice(null)
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/admin/system-logs/${log.id}/report`,
+        {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${localStorage.getItem('adminToken')}` },
+        }
+      )
+      if (response.status === 401 || response.status === 403) {
+        onUnauthorized?.()
+        return
+      }
+      const data = await response.json().catch(() => ({}))
+      if (!response.ok) {
+        setReportNotice({ type: 'error', text: data.message || 'Could not send error report to System Developer.' })
+        return
+      }
+      setSentIds((current) => ({ ...current, [log.id]: true }))
+      setLogs((current) => current.map((item) => (
+        item.id === log.id
+          ? { ...item, reported_at: data.reportedAt || new Date().toISOString(), reported_by: data.reportedBy || 'System Administrator' }
+          : item
+      )))
+      setReportNotice({ type: 'success', text: data.message || `Error #${log.id} sent to System Developer.` })
+    } catch {
+      setReportNotice({ type: 'error', text: 'Cannot connect to server. Please try again.' })
+    } finally {
+      setSendingId(null)
+    }
+  }
 
   const copyErrorReport = async (log) => {
     const report = [
@@ -101,7 +138,7 @@ export default function SystemErrorLogsPanel({ onUnauthorized }) {
               Centralized runtime exception log ({pagination.total.toLocaleString()} total record{pagination.total === 1 ? '' : 's'})
               {isSystemDeveloper
                 ? ' · Full developer view with stack traces'
-                : ' · Copy error details to report issues to the System Developer'}
+                : ' · Send error reports directly to the System Developer or copy details'}
             </p>
           </div>
         </div>
@@ -115,6 +152,20 @@ export default function SystemErrorLogsPanel({ onUnauthorized }) {
           Refresh
         </button>
       </div>
+
+      {reportNotice && (
+        <div
+          role={reportNotice.type === 'error' ? 'alert' : 'status'}
+          className={`mx-5 mt-4 flex items-center gap-2 rounded-lg border px-4 py-2.5 text-xs font-medium ${
+            reportNotice.type === 'error'
+              ? 'border-red-200 bg-red-50 text-red-700'
+              : 'border-emerald-200 bg-emerald-50 text-emerald-800'
+          }`}
+        >
+          {reportNotice.type === 'error' ? <IconAlertTriangle size={16} className="shrink-0" /> : <IconCheck size={16} className="shrink-0" />}
+          <span>{reportNotice.text}</span>
+        </div>
+      )}
 
       {error && (
         <div role="alert" className="m-5 flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -146,8 +197,9 @@ export default function SystemErrorLogsPanel({ onUnauthorized }) {
                 const isExpanded = expandedId === log.id
                 const hasStack = isSystemDeveloper && Boolean(log.stack_trace)
                 const isCopied = copiedId === log.id
+                const isReported = Boolean(log.reported_at || sentIds[log.id])
                 return (
-                  <tr key={log.id} className="align-top hover:bg-orange-50/20">
+                  <tr key={log.id} className={`align-top ${isSystemDeveloper && isReported ? 'bg-orange-50/40 hover:bg-orange-50/60' : 'hover:bg-orange-50/20'}`}>
                     <td className="whitespace-nowrap px-5 py-3.5 text-xs text-slate-600">
                       {formatLogTimestamp(log.created_at)}
                     </td>
@@ -166,6 +218,11 @@ export default function SystemErrorLogsPanel({ onUnauthorized }) {
                       {log.endpoint}
                     </td>
                     <td className="max-w-md px-5 py-3.5 text-xs leading-5 text-slate-700">
+                      {isReported && (
+                        <span className="mb-1.5 inline-flex items-center gap-1 rounded-full border border-orange-200 bg-orange-50 px-2 py-0.5 text-[10px] font-bold text-orange-800">
+                          Reported by {log.reported_by || 'System Admin'}
+                        </span>
+                      )}
                       <p className="break-words font-medium text-slate-900">{log.error_message}</p>
                       {isExpanded && hasStack && (
                         <pre className="mt-2.5 max-h-64 overflow-auto rounded-lg border border-slate-200 bg-slate-950 p-3 font-mono text-[11px] leading-5 text-slate-100">
@@ -192,18 +249,34 @@ export default function SystemErrorLogsPanel({ onUnauthorized }) {
                           <span className="text-xs text-slate-400">—</span>
                         )
                       ) : (
-                        <button
-                          type="button"
-                          onClick={() => copyErrorReport(log)}
-                          className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-semibold transition ${
-                            isCopied
-                              ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
-                              : 'border-slate-200 bg-white text-slate-700 hover:border-orange-300 hover:text-orange-700'
-                          }`}
-                        >
-                          {isCopied ? <IconCheck size={14} /> : <IconCopy size={14} />}
-                          {isCopied ? 'Copied' : 'Copy Error Details'}
-                        </button>
+                        <div className="inline-flex items-center justify-end gap-1.5">
+                          <button
+                            type="button"
+                            disabled={sendingId === log.id || isReported}
+                            onClick={() => sendErrorToDeveloper(log)}
+                            className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-semibold transition disabled:cursor-default ${
+                              isReported
+                                ? 'border border-emerald-200 bg-emerald-50 text-emerald-800'
+                                : 'bg-orange-500 text-white hover:bg-orange-600 disabled:opacity-50'
+                            }`}
+                          >
+                            {isReported ? <IconCheck size={14} /> : <IconSend size={14} />}
+                            {sendingId === log.id ? 'Sending…' : isReported ? 'Sent to System Developer' : 'Send to System Developer'}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => copyErrorReport(log)}
+                            title="Copy error details"
+                            className={`inline-flex items-center gap-1 rounded-lg border px-2 py-1 text-xs font-semibold transition ${
+                              isCopied
+                                ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
+                                : 'border-slate-200 bg-white text-slate-600 hover:border-orange-300 hover:text-orange-700'
+                            }`}
+                          >
+                            {isCopied ? <IconCheck size={14} /> : <IconCopy size={14} />}
+                            {isCopied ? 'Copied' : 'Copy'}
+                          </button>
+                        </div>
                       )}
                     </td>
                   </tr>

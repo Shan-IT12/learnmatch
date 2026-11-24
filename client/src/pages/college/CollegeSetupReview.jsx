@@ -15,6 +15,9 @@ export function CollegeSetupReviewContent({ draft, onEdit, onConfirm, submitting
     ['Academic Calendar', ACADEMIC_CALENDARS[draft.calendarType]?.label || draft.calendarType],
     ['Current Term', draft.semester],
     [schedule.label, schedule.value],
+    ...(draft.schoolName ? [['School / University', draft.schoolName]] : []),
+    ...(draft.studentIdNumber ? [['Student ID Number', draft.studentIdNumber]] : []),
+    ['Enrollment Proof', draft.enrollmentProof?.fileName ? `${draft.enrollmentProof.fileName} (Ready to submit)` : 'Not uploaded yet (can be added later)'],
   ]
 
   return (

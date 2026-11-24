@@ -86,6 +86,13 @@ import {
   startNextSemester,
   submitCollegeCheckin,
 } from './services/collegeTrackingService.js'
+import {
+  getEnrollmentProofForAdmin,
+  getEnrollmentVerificationSummary,
+  rejectEnrollmentProofForAdmin,
+  saveEnrollmentProof,
+  verifyEnrollmentProofForAdmin,
+} from './services/enrollmentProofService.js'
 
 dotenv.config()
 
@@ -122,6 +129,8 @@ app.use('/api/account', createAccountRouter(pool, authenticateToken))
 mountCourseValidationRoutes(app, pool, systemAdminOnly)
 // Source receipts carry bounded excerpts and exact-content confirmation snapshots.
 app.use(['/api/admin/courses', '/api/admin/course-sources'], express.json({ limit: '512kb' }))
+// College enrollment proof uploads are bounded to 2 MB (base64 ~2.7 MB).
+app.use(['/api/college/setup', '/api/college/tracking/change-program', '/api/college/enrollment-proof'], express.json({ limit: '3mb' }))
 app.use(express.json({ limit: '100kb' }))
 
 app.use('/api/auth', authRoutes)
@@ -835,8 +844,13 @@ app.post(
 
 app.get('/api/admin/dashboard', authenticateAdmin, requireAdminOperator, async (req, res, next) => {
   try {
-    const dashboard = await getAdminDashboard(pool)
-    res.json(dashboard)
+    const [dashboard, enrollmentSummary] = await Promise.all([
+      getAdminDashboard(pool),
+      getEnrollmentVerificationSummary(pool).catch(() => ({
+        totalEnrolled: 0, verified: 0, pendingReview: 0, rejected: 0, unsubmitted: 0,
+      })),
+    ])
+    res.json({ ...dashboard, enrollmentSummary })
   } catch (error) {
     error.publicMessage = 'Server error fetching dashboard analytics'
     next(error)
@@ -881,6 +895,71 @@ app.get('/api/admin/users', authenticateAdmin, requireAdminOperator, async (req,
   } catch (error) {
     error.publicMessage = 'Server error fetching users'
     next(error)
+  }
+})
+
+app.post('/api/college/enrollment-proof', authenticateToken, async (req, res, next) => {
+  try {
+    const result = await saveEnrollmentProof(pool, req.user.userId, req.body || {})
+    return res.json({
+      message: result.proofStatus === 'submitted'
+        ? 'Enrollment proof submitted successfully.'
+        : 'Enrollment details updated successfully.',
+      ...result,
+    })
+  } catch (error) {
+    if (error instanceof CollegeTrackingError) {
+      return res.status(error.status).json({ message: error.message, code: error.code })
+    }
+    error.publicMessage = 'Could not save your enrollment verification details.'
+    return next(error)
+  }
+})
+
+app.get('/api/admin/users/:userId/enrollment-proof', authenticateAdmin, requireAdminOperator, async (req, res, next) => {
+  try {
+    const proof = await getEnrollmentProofForAdmin(pool, req.params.userId)
+    if (!proof) return res.status(404).json({ message: 'No enrollment proof uploaded for this student.' })
+    res.setHeader('Content-Type', proof.mimeType)
+    res.setHeader('Content-Disposition', `inline; filename="${proof.fileName.replace(/["\\r\\n]/g, '')}"`)
+    res.setHeader('Cache-Control', 'no-store')
+    res.setHeader('X-Content-Type-Options', 'nosniff')
+    return res.send(proof.buffer)
+  } catch (error) {
+    error.publicMessage = 'Could not load student enrollment proof.'
+    return next(error)
+  }
+})
+
+app.patch('/api/admin/users/:userId/enrollment-proof/verify', authenticateAdmin, requireAdminOperator, async (req, res, next) => {
+  try {
+    const result = await verifyEnrollmentProofForAdmin(pool, req.params.userId)
+    return res.json({
+      message: 'Student enrollment proof marked as verified.',
+      ...result,
+    })
+  } catch (error) {
+    if (error instanceof CollegeTrackingError) {
+      return res.status(error.status).json({ message: error.message, code: error.code })
+    }
+    error.publicMessage = 'Could not verify student enrollment proof.'
+    return next(error)
+  }
+})
+
+app.patch('/api/admin/users/:userId/enrollment-proof/reject', authenticateAdmin, requireAdminOperator, async (req, res, next) => {
+  try {
+    const result = await rejectEnrollmentProofForAdmin(pool, req.params.userId, req.body?.reason)
+    return res.json({
+      message: 'Enrollment proof rejected. The student will be prompted to resubmit.',
+      ...result,
+    })
+  } catch (error) {
+    if (error instanceof CollegeTrackingError) {
+      return res.status(error.status).json({ message: error.message, code: error.code })
+    }
+    error.publicMessage = 'Could not reject student enrollment proof.'
+    return next(error)
   }
 })
 

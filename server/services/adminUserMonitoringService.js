@@ -1,4 +1,5 @@
 import { ALIGNMENT_RULES, determineAlignmentStatus } from './collegeTrackingService.js'
+import { getEnrollmentVerificationSummary } from './enrollmentProofService.js'
 import { assessmentStatusSql, getAssessmentStatus } from './assessmentCompletionService.js'
 
 const ASSESSMENT_STATUS_SQL = assessmentStatusSql({
@@ -64,12 +65,21 @@ const USER_MONITORING_CTE = `
   recommendation_users AS (
     SELECT DISTINCT user_id FROM RECOMMENDATION
   ),
+  latest_enrollment AS (
+    SELECT c.user_id, c.enrollment_proof_status,
+           ROW_NUMBER() OVER (
+             PARTITION BY c.user_id
+             ORDER BY c.tracking_cycle_id DESC
+           ) AS cycle_rank
+    FROM COLLEGE_TRACKING_CYCLE c
+  ),
   user_monitoring AS (
     SELECT u.user_id, u.username, u.email, u.is_active, u.created_at,
            ${ASSESSMENT_STATUS_SQL} AS assessment_status,
            CASE WHEN recommendation_users.user_id IS NULL THEN 0 ELSE 1 END AS has_recommendation,
            CASE WHEN tracking_users.user_id IS NULL THEN 0 ELSE 1 END AS tracking_started,
-           latest_completed.status AS alignment_status
+           latest_completed.status AS alignment_status,
+           latest_enrollment.enrollment_proof_status AS enrollment_proof_status
     FROM USER_ACCOUNT u
     LEFT JOIN profile_stats ON profile_stats.user_id = u.user_id
     LEFT JOIN interest_stats ON interest_stats.user_id = u.user_id
@@ -79,6 +89,8 @@ const USER_MONITORING_CTE = `
     LEFT JOIN recommendation_users ON recommendation_users.user_id = u.user_id
     LEFT JOIN latest_completed
       ON latest_completed.user_id = u.user_id AND latest_completed.latest_rank = 1
+    LEFT JOIN latest_enrollment
+      ON latest_enrollment.user_id = u.user_id AND latest_enrollment.cycle_rank = 1
   )`
 
 const ACCOUNT_FILTERS = new Set(['active', 'inactive'])
@@ -95,7 +107,7 @@ const ALIGNMENT_FILTERS = new Map([
   ['no_checkin', null],
 ])
 
-function buildFilters({ search = '', account = '', assessment = '', tracking = '', alignment = '' }) {
+function buildFilters({ search = '', account = '', assessment = '', tracking = '', alignment = '', enrollmentProof = '' }) {
   const clauses = []
   const values = []
   const normalizedSearch = String(search).trim().slice(0, 100)
@@ -126,6 +138,15 @@ function buildFilters({ search = '', account = '', assessment = '', tracking = '
       clauses.push('alignment_status = ?')
       values.push(status)
     }
+  }
+  if (enrollmentProof === 'verified') {
+    clauses.push("enrollment_proof_status = 'verified'")
+  } else if (enrollmentProof === 'pending_review' || enrollmentProof === 'submitted') {
+    clauses.push("enrollment_proof_status = 'submitted'")
+  } else if (enrollmentProof === 'rejected') {
+    clauses.push("enrollment_proof_status = 'rejected'")
+  } else if (enrollmentProof === 'unverified') {
+    clauses.push("enrollment_proof_status IN ('unsubmitted', 'rejected')")
   }
   return {
     sql: clauses.length ? ` WHERE ${clauses.join(' AND ')}` : '',
@@ -181,6 +202,7 @@ function shapeListUser(row, attempts = []) {
     recommendationStatus: Number(row.has_recommendation) === 1 ? 'Available' : 'Not Yet Generated',
     trackingStatus: Number(row.tracking_started) === 1 ? 'Tracking Started' : 'Not Started',
     latestAlignment: row.alignment_status || null,
+    enrollmentProofStatus: row.enrollment_proof_status || null,
     registeredAt: row.created_at,
     latestAttempt: attempts[0] || null,
     attempts,
@@ -202,7 +224,7 @@ export async function getAdminUsers(database, options = {}) {
     database.query(
       `${USER_MONITORING_CTE}
        SELECT user_id, username, email, is_active, created_at,
-              assessment_status, has_recommendation, tracking_started, alignment_status
+              assessment_status, has_recommendation, tracking_started, alignment_status, enrollment_proof_status
        FROM user_monitoring${filters.sql}
        ORDER BY created_at DESC, user_id DESC
        LIMIT ? OFFSET ?`,
@@ -212,10 +234,16 @@ export async function getAdminUsers(database, options = {}) {
 
   const countRow = countResult[0][0]
   const rows = usersResult[0]
-  const attemptsByUser = await fetchAttemptsByUserIds(database, rows.map(row => row.user_id))
+  const [attemptsByUser, enrollmentSummary] = await Promise.all([
+    fetchAttemptsByUserIds(database, rows.map(row => row.user_id)),
+    getEnrollmentVerificationSummary(database).catch(() => ({
+      totalEnrolled: 0, verified: 0, pendingReview: 0, rejected: 0, unsubmitted: 0,
+    })),
+  ])
   const total = Number(countRow?.total || 0)
   return {
     users: rows.map(row => shapeListUser(row, attemptsByUser.get(Number(row.user_id)) || [])),
+    enrollmentSummary,
     pagination: {
       page,
       pageSize,
@@ -292,7 +320,12 @@ export async function getAdminUserDetail(database, userId) {
       [normalizedUserId]
     ),
     database.query(
-      `SELECT cycle.status AS lifecycle_status, term.term_id, term.academic_year, term.year_level, term.calendar_type, term.term_code, term.semester,
+      `SELECT cycle.status AS lifecycle_status,
+              cycle.school_name, cycle.student_id_number,
+              cycle.enrollment_proof_name, cycle.enrollment_proof_mime,
+              cycle.enrollment_proof_status, cycle.enrollment_proof_submitted_at,
+              cycle.enrollment_proof_verified_at, cycle.enrollment_proof_rejection_reason,
+              term.term_id, term.academic_year, term.year_level, term.calendar_type, term.term_code, term.semester,
               term.timing_mode, term.dates_source,
               course.course_id, course.course_code, course.course_name
        FROM COLLEGE_TRACKING_CYCLE cycle
@@ -305,7 +338,24 @@ export async function getAdminUserDetail(database, userId) {
        ORDER BY cycle.tracking_cycle_id DESC
        LIMIT 1`,
       [normalizedUserId]
-    ),
+    ).catch((err) => {
+      if (err?.code !== 'ER_BAD_FIELD_ERROR') throw err
+      return database.query(
+        `SELECT cycle.status AS lifecycle_status, term.term_id, term.academic_year, term.year_level, term.calendar_type, term.term_code, term.semester,
+                term.timing_mode, term.dates_source,
+                course.course_id, course.course_code, course.course_name
+         FROM COLLEGE_TRACKING_CYCLE cycle
+         JOIN COURSE course ON course.course_id = cycle.course_id
+         LEFT JOIN COLLEGE_TERM term ON term.term_id = (
+           SELECT MAX(current_term.term_id) FROM COLLEGE_TERM current_term
+           WHERE current_term.tracking_cycle_id = cycle.tracking_cycle_id
+         )
+         WHERE cycle.user_id = ?
+         ORDER BY cycle.tracking_cycle_id DESC
+         LIMIT 1`,
+        [normalizedUserId]
+      )
+    }),
     database.query(
       `WITH completed AS (
          SELECT sc.checkin_id, sc.alignment_score, sc.phase, sc.gwa,
@@ -435,6 +485,19 @@ export async function getAdminUserDetail(database, userId) {
       latestAlignment: alignmentStatus,
       latestAlignmentPercent: alignmentPercent,
       latestCheckinAt: alignment.latest_checkin_at || null,
+      enrollmentVerification: tracking
+        ? {
+            schoolName: tracking.school_name || null,
+            studentIdNumber: tracking.student_id_number || null,
+            proofFileName: tracking.enrollment_proof_name || null,
+            proofMime: tracking.enrollment_proof_mime || null,
+            proofStatus: tracking.enrollment_proof_status || 'unsubmitted',
+            submittedAt: tracking.enrollment_proof_submitted_at || null,
+            verifiedAt: tracking.enrollment_proof_verified_at || null,
+            rejectionReason: tracking.enrollment_proof_rejection_reason || null,
+            hasProof: Boolean(tracking.enrollment_proof_name),
+          }
+        : null,
     },
   }
 }

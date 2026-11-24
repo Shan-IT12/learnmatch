@@ -8,8 +8,10 @@ import {
   IconCamera,
   IconCheck,
   IconClipboardCheck,
+  IconEye,
   IconMail,
   IconSchool,
+  IconShieldCheck,
   IconUser,
   IconX,
 } from '@tabler/icons-react'
@@ -90,6 +92,139 @@ function AdminUserDetail() {
     tracking: { started: true, course: { courseName: 'Current enrolled program' }, lifecycleStatus: 'active', academicYear: '2026-2027', yearLevel: '1st Year', semester: '1st Semester', timingMode: 'manual', datesSource: 'manual', completedCheckins: 1, latestAlignmentPercent: 70 },
   } : savedUser
   const [error, setError] = useState('')
+  const [proofPreview, setProofPreview] = useState(null)
+  const [proofLoading, setProofLoading] = useState(false)
+  const [verifyingProof, setVerifyingProof] = useState(false)
+  const [rejectOpen, setRejectOpen] = useState(false)
+  const [rejectReason, setRejectReason] = useState('')
+  const [rejectingProof, setRejectingProof] = useState(false)
+  const [proofFeedback, setProofFeedback] = useState('')
+
+  useEffect(() => () => {
+    if (proofPreview?.url) URL.revokeObjectURL(proofPreview.url)
+  }, [proofPreview])
+
+  const closeProofPreview = () => {
+    setProofPreview((current) => {
+      if (current?.url) URL.revokeObjectURL(current.url)
+      return null
+    })
+  }
+
+  const handleViewEnrollmentProof = async () => {
+    setProofLoading(true)
+    setProofFeedback('')
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/users/${userId}/enrollment-proof`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('adminToken')}` },
+      })
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}))
+        setProofFeedback(data.message || 'Could not load enrollment proof.')
+        return
+      }
+      const blob = await response.blob()
+      const url = URL.createObjectURL(blob)
+      setProofPreview((current) => {
+        if (current?.url) URL.revokeObjectURL(current.url)
+        return {
+          url,
+          mimeType: blob.type || user?.tracking?.enrollmentVerification?.proofMime || 'image/png',
+          fileName: user?.tracking?.enrollmentVerification?.proofFileName || 'Enrollment Proof',
+        }
+      })
+    } catch {
+      setProofFeedback('Cannot connect to server to load proof.')
+    } finally {
+      setProofLoading(false)
+    }
+  }
+
+  const handleMarkProofVerified = async () => {
+    setVerifyingProof(true)
+    setProofFeedback('')
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/users/${userId}/enrollment-proof/verify`, {
+        method: 'PATCH',
+        headers: { Authorization: `Bearer ${localStorage.getItem('adminToken')}` },
+      })
+      const data = await response.json().catch(() => ({}))
+      if (!response.ok) {
+        setProofFeedback(data.message || 'Could not verify enrollment proof.')
+        return
+      }
+      setUser((current) => {
+        if (!current?.tracking?.enrollmentVerification) return current
+        return {
+          ...current,
+          tracking: {
+            ...current.tracking,
+            enrollmentVerification: {
+              ...current.tracking.enrollmentVerification,
+              proofStatus: 'verified',
+              verifiedAt: new Date().toISOString(),
+              rejectionReason: null,
+            },
+          },
+        }
+      })
+      setRejectOpen(false)
+      setRejectReason('')
+      setProofFeedback('Enrollment proof marked as verified.')
+    } catch {
+      setProofFeedback('Cannot connect to server.')
+    } finally {
+      setVerifyingProof(false)
+    }
+  }
+
+  const handleRejectProof = async (event) => {
+    event.preventDefault()
+    const trimmedReason = rejectReason.trim()
+    if (!trimmedReason) {
+      setProofFeedback('Please enter a brief reason for rejecting the enrollment proof.')
+      return
+    }
+    setRejectingProof(true)
+    setProofFeedback('')
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/users/${userId}/enrollment-proof/reject`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('adminToken')}`,
+        },
+        body: JSON.stringify({ reason: trimmedReason }),
+      })
+      const data = await response.json().catch(() => ({}))
+      if (!response.ok) {
+        setProofFeedback(data.message || 'Could not reject enrollment proof.')
+        return
+      }
+      setUser((current) => {
+        if (!current?.tracking?.enrollmentVerification) return current
+        return {
+          ...current,
+          tracking: {
+            ...current.tracking,
+            enrollmentVerification: {
+              ...current.tracking.enrollmentVerification,
+              proofStatus: 'rejected',
+              verifiedAt: null,
+              rejectionReason: data.rejectionReason || trimmedReason,
+            },
+          },
+        }
+      })
+      setRejectOpen(false)
+      setRejectReason('')
+      setProofFeedback('Enrollment proof rejected and resubmission requested.')
+    } catch {
+      setProofFeedback('Cannot connect to server.')
+    } finally {
+      setRejectingProof(false)
+    }
+  }
 
   useEffect(() => {
     const controller = new AbortController()
@@ -230,6 +365,124 @@ function AdminUserDetail() {
                     <DetailItem label="Latest alignment">{user.tracking.latestAlignmentPercent === null ? '—' : `${user.tracking.latestAlignmentPercent}%`}</DetailItem>
                     <DetailItem label="Latest check-in">{formatDate(user.tracking.latestCheckinAt, true)}</DetailItem>
                   </dl>
+
+                  {user.tracking.enrollmentVerification && (
+                    <div className="rounded-xl border border-stone-200/90 bg-stone-50/70 p-4">
+                      <div className="flex flex-wrap items-center justify-between gap-3">
+                        <div className="flex items-center gap-2">
+                          <IconShieldCheck size={17} className="text-orange-600" aria-hidden="true" />
+                          <h3 className="text-xs font-bold uppercase tracking-wide text-slate-700">
+                            Enrollment Verification
+                          </h3>
+                        </div>
+                        <span
+                          className={`inline-flex rounded-md border px-2.5 py-0.5 text-xs font-semibold ${
+                            user.tracking.enrollmentVerification.proofStatus === 'verified'
+                              ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
+                              : user.tracking.enrollmentVerification.proofStatus === 'submitted'
+                                ? 'border-amber-200 bg-amber-50 text-amber-800'
+                                : user.tracking.enrollmentVerification.proofStatus === 'rejected'
+                                  ? 'border-rose-200 bg-rose-50 text-rose-800'
+                                  : 'border-slate-200 bg-white text-slate-600'
+                          }`}
+                        >
+                          {user.tracking.enrollmentVerification.proofStatus === 'verified'
+                            ? 'Enrollment Verified'
+                            : user.tracking.enrollmentVerification.proofStatus === 'submitted'
+                              ? 'Proof Submitted (Pending Review)'
+                              : user.tracking.enrollmentVerification.proofStatus === 'rejected'
+                                ? 'Rejected (Resubmission Requested)'
+                                : 'Not Submitted'}
+                        </span>
+                      </div>
+                      <dl className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-3">
+                        <DetailItem label="School / University">{user.tracking.enrollmentVerification.schoolName || 'Not provided'}</DetailItem>
+                        <DetailItem label="Student ID Number">{user.tracking.enrollmentVerification.studentIdNumber || 'Not provided'}</DetailItem>
+                        <DetailItem label="Submitted Proof">{user.tracking.enrollmentVerification.proofFileName || 'None uploaded'}</DetailItem>
+                      </dl>
+                      {user.tracking.enrollmentVerification.proofStatus === 'rejected' && user.tracking.enrollmentVerification.rejectionReason && (
+                        <div className="mt-3 rounded-lg border border-rose-200 bg-rose-50 px-3.5 py-2.5 text-xs text-rose-900">
+                          <span className="font-semibold">Rejection reason: </span>
+                          {user.tracking.enrollmentVerification.rejectionReason}
+                        </div>
+                      )}
+                      {proofFeedback && (
+                        <p role="status" className="mt-3 text-xs font-medium text-orange-800">{proofFeedback}</p>
+                      )}
+                      {user.tracking.enrollmentVerification.hasProof && (
+                        <div className="mt-4 space-y-3">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <button
+                              type="button"
+                              disabled={proofLoading}
+                              onClick={handleViewEnrollmentProof}
+                              className="inline-flex items-center gap-1.5 rounded-lg border border-stone-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:border-orange-300 hover:text-orange-700 disabled:opacity-50"
+                            >
+                              <IconEye size={15} aria-hidden="true" />
+                              {proofLoading ? 'Loading proof...' : 'View Proof'}
+                            </button>
+                            {user.tracking.enrollmentVerification.proofStatus !== 'verified' && (
+                              <>
+                                <button
+                                  type="button"
+                                  disabled={verifyingProof || rejectingProof}
+                                  onClick={handleMarkProofVerified}
+                                  className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-700 disabled:opacity-50"
+                                >
+                                  <IconCheck size={15} aria-hidden="true" />
+                                  {verifyingProof ? 'Verifying...' : 'Mark as Verified'}
+                                </button>
+                                <button
+                                  type="button"
+                                  disabled={verifyingProof || rejectingProof}
+                                  onClick={() => {
+                                    setRejectOpen((open) => !open)
+                                    setProofFeedback('')
+                                  }}
+                                  className="inline-flex items-center gap-1.5 rounded-lg border border-rose-200 bg-rose-50 px-3 py-1.5 text-xs font-semibold text-rose-700 hover:bg-rose-100 disabled:opacity-50"
+                                >
+                                  <IconX size={15} aria-hidden="true" />
+                                  Reject / Request Resubmission
+                                </button>
+                              </>
+                            )}
+                          </div>
+                          {rejectOpen && (
+                            <form onSubmit={handleRejectProof} className="rounded-lg border border-rose-200 bg-white p-3.5">
+                              <label className="block text-xs font-semibold text-slate-700" htmlFor="enrollment-reject-reason">
+                                Reason for rejection / resubmission request
+                              </label>
+                              <textarea
+                                id="enrollment-reject-reason"
+                                rows={2}
+                                maxLength={500}
+                                value={rejectReason}
+                                onChange={(event) => setRejectReason(event.target.value)}
+                                placeholder="e.g., Document image is blurry. Please upload a clearer photo of your COR or School ID."
+                                className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-xs text-slate-900 placeholder:text-slate-400 focus:border-rose-400 focus:outline-none focus:ring-2 focus:ring-rose-200"
+                              />
+                              <div className="mt-2.5 flex items-center justify-end gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => { setRejectOpen(false); setRejectReason('') }}
+                                  className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                                >
+                                  Cancel
+                                </button>
+                                <button
+                                  type="submit"
+                                  disabled={rejectingProof}
+                                  className="rounded-lg bg-rose-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-rose-700 disabled:opacity-50"
+                                >
+                                  {rejectingProof ? 'Submitting...' : 'Confirm Rejection'}
+                                </button>
+                              </div>
+                            </form>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className="flex items-center gap-3 text-sm text-slate-500"><IconClipboardCheck size={19} className="text-slate-400" /> Tracking not started.</div>
@@ -238,6 +491,55 @@ function AdminUserDetail() {
           </div></SkeletonContent>
         )}
       </main>
+
+      {proofPreview && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-xs"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="enrollment-proof-preview-title"
+          onClick={closeProofPreview}
+        >
+          <div
+            className="w-full max-w-3xl overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-2xl"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-stone-100 px-5 py-3.5">
+              <div>
+                <h2 id="enrollment-proof-preview-title" className="text-sm font-bold text-slate-950">
+                  {proofPreview.fileName}
+                </h2>
+                <p className="text-xs text-slate-500">
+                  Private student enrollment proof — viewed in-memory only.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={closeProofPreview}
+                aria-label="Close proof preview"
+                className="rounded-lg p-1.5 text-slate-500 hover:bg-stone-100"
+              >
+                <IconX size={18} />
+              </button>
+            </div>
+            <div className="flex max-h-[75vh] items-center justify-center overflow-auto bg-stone-50 p-4">
+              {proofPreview.mimeType === 'application/pdf' ? (
+                <iframe
+                  title={proofPreview.fileName}
+                  src={proofPreview.url}
+                  className="h-[70vh] w-full rounded-lg border border-stone-200 bg-white"
+                />
+              ) : (
+                <img
+                  src={proofPreview.url}
+                  alt={proofPreview.fileName}
+                  className="max-h-[70vh] w-auto rounded-lg border border-stone-200 bg-white object-contain"
+                />
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

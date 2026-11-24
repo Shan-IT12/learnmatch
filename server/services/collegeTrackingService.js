@@ -2,6 +2,7 @@ import { generateMismatchExplanation } from './collegeMismatchExplanationService
 import { getPublicCourse, getAvailablePublicCourse } from './publicCourseService.js'
 import { isCurrentIndependentCourse } from './courseIdentityService.js'
 import { getTermDefinition, resolveActiveCalendarTerm, resolveCalendarTerm } from './academicCalendar.js'
+import { parseEnrollmentVerificationInput } from './enrollmentProofService.js'
 
 export const CHECKIN_PHASES = ['Early', 'Mid', 'End']
 export const CHECKIN_PHASE_BOUNDARIES = Object.freeze({ Mid: 0.33, End: 0.66 })
@@ -478,6 +479,8 @@ export async function createCollegeSetup(
     initialTrackingPhase,
   }, normalizedAcademicYear)
 
+  const verification = parseEnrollmentVerificationInput(input)
+
   const connection = await pool.getConnection()
   try {
     await connection.beginTransaction()
@@ -504,11 +507,34 @@ export async function createCollegeSetup(
       if (latestCycle?.status === 'paused') {
         throw new CollegeTrackingError('Resume your paused tracking instead.', 'TRACKING_PAUSED', 409)
       }
-      const [cycleResult] = await connection.query(
-        `INSERT INTO COLLEGE_TRACKING_CYCLE (user_id, course_id, status)
-         VALUES (?, ?, 'active')`,
-        [userId, normalizedCourseId]
-      )
+      let cycleResult
+      try {
+        ;[cycleResult] = await connection.query(
+          `INSERT INTO COLLEGE_TRACKING_CYCLE
+            (user_id, course_id, status, school_name, student_id_number,
+             enrollment_proof_name, enrollment_proof_mime, enrollment_proof_data,
+             enrollment_proof_status, enrollment_proof_submitted_at)
+           VALUES (?, ?, 'active', ?, ?, ?, ?, ?, ?, ?)`,
+          [
+            userId,
+            normalizedCourseId,
+            verification.schoolName,
+            verification.studentIdNumber,
+            verification.proofName,
+            verification.proofMime,
+            verification.proofData,
+            verification.hasProof ? 'submitted' : 'unsubmitted',
+            verification.hasProof ? new Date() : null,
+          ]
+        )
+      } catch (insertError) {
+        if (insertError?.code !== 'ER_BAD_FIELD_ERROR') throw insertError
+        ;[cycleResult] = await connection.query(
+          `INSERT INTO COLLEGE_TRACKING_CYCLE (user_id, course_id, status)
+           VALUES (?, ?, 'active')`,
+          [userId, normalizedCourseId]
+        )
+      }
       cycle = { tracking_cycle_id: cycleResult.insertId, course_id: normalizedCourseId, status: 'active' }
     }
 
@@ -743,11 +769,35 @@ export async function changeCollegeProgram(pool, userId, termInput, resolveCours
        WHERE tracking_cycle_id = ?`,
       [active.tracking_cycle_id]
     )
-    const [cycleResult] = await connection.query(
-      `INSERT INTO COLLEGE_TRACKING_CYCLE (user_id, course_id, status)
-       VALUES (?, ?, 'active')`,
-      [userId, courseId]
-    )
+    const verification = parseEnrollmentVerificationInput(termInput)
+    let cycleResult
+    try {
+      ;[cycleResult] = await connection.query(
+        `INSERT INTO COLLEGE_TRACKING_CYCLE
+          (user_id, course_id, status, school_name, student_id_number,
+           enrollment_proof_name, enrollment_proof_mime, enrollment_proof_data,
+           enrollment_proof_status, enrollment_proof_submitted_at)
+         VALUES (?, ?, 'active', ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          userId,
+          courseId,
+          verification.schoolName,
+          verification.studentIdNumber,
+          verification.proofName,
+          verification.proofMime,
+          verification.proofData,
+          verification.hasProof ? 'submitted' : 'unsubmitted',
+          verification.hasProof ? new Date() : null,
+        ]
+      )
+    } catch (insertError) {
+      if (insertError?.code !== 'ER_BAD_FIELD_ERROR') throw insertError
+      ;[cycleResult] = await connection.query(
+        `INSERT INTO COLLEGE_TRACKING_CYCLE (user_id, course_id, status)
+         VALUES (?, ?, 'active')`,
+        [userId, courseId]
+      )
+    }
     const term = await insertLifecycleTerm(
       connection, userId, cycleResult.insertId, courses[0], termInput, resolveCourse
     )
@@ -767,30 +817,63 @@ export async function changeCollegeProgram(pool, userId, termInput, resolveCours
 }
 
 export async function getCollegeStatus(database, userId, currentDate = new Date()) {
-  const [termRows] = await database.query(
-    `SELECT cycle.tracking_cycle_id, cycle.status AS lifecycle_status, cycle.end_reason,
-            term.term_id, term.academic_year, term.year_level, term.calendar_type, term.term_code, term.semester,
-            term.semester_start_date, term.semester_end_date, term.dates_source,
-            term.timing_mode, term.initial_tracking_phase,
-            c.course_id, c.course_code, c.course_name,
-            (SELECT previous.gwa
-             FROM SEMESTER_CHECKIN previous
-             JOIN COLLEGE_TERM previous_term ON previous_term.term_id = previous.term_id
-             WHERE previous.user_id = cycle.user_id
-               AND previous_term.tracking_cycle_id = cycle.tracking_cycle_id
-               AND previous.gwa IS NOT NULL
-             ORDER BY previous.checkin_id DESC LIMIT 1) AS latest_gwa
-     FROM COLLEGE_TRACKING_CYCLE cycle
-     JOIN COURSE c ON c.course_id = cycle.course_id
-     LEFT JOIN COLLEGE_TERM term ON term.term_id = (
-       SELECT MAX(current_term.term_id) FROM COLLEGE_TERM current_term
-       WHERE current_term.tracking_cycle_id = cycle.tracking_cycle_id
-     )
-     WHERE cycle.user_id = ?
-     ORDER BY cycle.tracking_cycle_id DESC
-     LIMIT 1`,
-    [userId]
-  )
+  let termRows
+  try {
+    ;[termRows] = await database.query(
+      `SELECT cycle.tracking_cycle_id, cycle.status AS lifecycle_status, cycle.end_reason,
+              cycle.school_name, cycle.student_id_number,
+              cycle.enrollment_proof_name, cycle.enrollment_proof_mime,
+              cycle.enrollment_proof_status, cycle.enrollment_proof_submitted_at,
+              cycle.enrollment_proof_verified_at, cycle.enrollment_proof_rejection_reason,
+              term.term_id, term.academic_year, term.year_level, term.calendar_type, term.term_code, term.semester,
+              term.semester_start_date, term.semester_end_date, term.dates_source,
+              term.timing_mode, term.initial_tracking_phase,
+              c.course_id, c.course_code, c.course_name,
+              (SELECT previous.gwa
+               FROM SEMESTER_CHECKIN previous
+               JOIN COLLEGE_TERM previous_term ON previous_term.term_id = previous.term_id
+               WHERE previous.user_id = cycle.user_id
+                 AND previous_term.tracking_cycle_id = cycle.tracking_cycle_id
+                 AND previous.gwa IS NOT NULL
+               ORDER BY previous.checkin_id DESC LIMIT 1) AS latest_gwa
+       FROM COLLEGE_TRACKING_CYCLE cycle
+       JOIN COURSE c ON c.course_id = cycle.course_id
+       LEFT JOIN COLLEGE_TERM term ON term.term_id = (
+         SELECT MAX(current_term.term_id) FROM COLLEGE_TERM current_term
+         WHERE current_term.tracking_cycle_id = cycle.tracking_cycle_id
+       )
+       WHERE cycle.user_id = ?
+       ORDER BY cycle.tracking_cycle_id DESC
+       LIMIT 1`,
+      [userId]
+    )
+  } catch (queryError) {
+    if (queryError?.code !== 'ER_BAD_FIELD_ERROR') throw queryError
+    ;[termRows] = await database.query(
+      `SELECT cycle.tracking_cycle_id, cycle.status AS lifecycle_status, cycle.end_reason,
+              term.term_id, term.academic_year, term.year_level, term.calendar_type, term.term_code, term.semester,
+              term.semester_start_date, term.semester_end_date, term.dates_source,
+              term.timing_mode, term.initial_tracking_phase,
+              c.course_id, c.course_code, c.course_name,
+              (SELECT previous.gwa
+               FROM SEMESTER_CHECKIN previous
+               JOIN COLLEGE_TERM previous_term ON previous_term.term_id = previous.term_id
+               WHERE previous.user_id = cycle.user_id
+                 AND previous_term.tracking_cycle_id = cycle.tracking_cycle_id
+                 AND previous.gwa IS NOT NULL
+               ORDER BY previous.checkin_id DESC LIMIT 1) AS latest_gwa
+       FROM COLLEGE_TRACKING_CYCLE cycle
+       JOIN COURSE c ON c.course_id = cycle.course_id
+       LEFT JOIN COLLEGE_TERM term ON term.term_id = (
+         SELECT MAX(current_term.term_id) FROM COLLEGE_TERM current_term
+         WHERE current_term.tracking_cycle_id = cycle.tracking_cycle_id
+       )
+       WHERE cycle.user_id = ?
+       ORDER BY cycle.tracking_cycle_id DESC
+       LIMIT 1`,
+      [userId]
+    )
+  }
   if (termRows.length > 0) {
     const row = termRows[0]
     return {
@@ -814,6 +897,17 @@ export async function getCollegeStatus(database, userId, currentDate = new Date(
       initialTrackingPhase: row.initial_tracking_phase,
       timingEstimated: row.timing_mode === 'approximate',
       latestGwa: row.latest_gwa === null ? null : Number(row.latest_gwa),
+      enrollmentVerification: {
+        schoolName: row.school_name || null,
+        studentIdNumber: row.student_id_number || null,
+        proofFileName: row.enrollment_proof_name || null,
+        proofMime: row.enrollment_proof_mime || null,
+        proofStatus: row.enrollment_proof_status || 'unsubmitted',
+        submittedAt: row.enrollment_proof_submitted_at || null,
+        verifiedAt: row.enrollment_proof_verified_at || null,
+        rejectionReason: row.enrollment_proof_rejection_reason || null,
+        hasProof: Boolean(row.enrollment_proof_name),
+      },
       ...calculateSemesterTiming(row.semester_start_date, row.semester_end_date, currentDate),
     }
   }

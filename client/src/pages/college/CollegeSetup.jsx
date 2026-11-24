@@ -2,7 +2,7 @@ import HeaderBrand from '../../components/HeaderBrand'
 import SkeletonContent, { SkeletonBlock } from '../../components/SkeletonContent'
 import { useState, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { IconCalendarEvent, IconSchool, IconSearch } from '@tabler/icons-react'
+import { IconCalendarEvent, IconCheck, IconFileUpload, IconSchool, IconSearch, IconShieldCheck, IconSparkles, IconX } from '@tabler/icons-react'
 import {
   approximateScheduleValue,
   buildCollegeSetupPayload,
@@ -15,6 +15,7 @@ import { ACADEMIC_CALENDARS, getCalendarTerms } from '../../constants/academicCa
 import { FieldError, RequiredMark } from '../../components/FormValidation'
 import { scrollToFirstInvalidField } from '../../utils/formValidation'
 import CourseName from '../../components/CourseName'
+import PrivacyNoticeLink from '../../components/PrivacyNoticeLink'
 import { shouldReviewCollegeSetup } from '../../utils/collegeSetupReview'
 import SuccessConfirmation from '../../components/SuccessConfirmation'
 import { waitForSuccessConfirmation } from '../../utils/successConfirmation'
@@ -138,9 +139,14 @@ function CollegeSetup() {
   const fixedCourse = lifecycleAction === 'restart' ? location.state?.course || null : null
 
   const [courses, setCourses] = useState([])
+  const [recommendedCourses, setRecommendedCourses] = useState([])
   const [search, setSearch] = useState(restoredDraft?.selectedCourse?.course_name || '')
   const [searchStatus, setSearchStatus] = useState('idle')
   const [selectedCourse, setSelectedCourse] = useState(restoredDraft?.selectedCourse || fixedCourse)
+  const [schoolName, setSchoolName] = useState(restoredDraft?.schoolName || '')
+  const [studentIdNumber, setStudentIdNumber] = useState(restoredDraft?.studentIdNumber || '')
+  const [enrollmentProof, setEnrollmentProof] = useState(restoredDraft?.enrollmentProof || null)
+  const [proofError, setProofError] = useState('')
   const [academicYear, setAcademicYear] = useState(restoredDraft?.academicYear || getCurrentAcademicYear)
   const [yearLevel, setYearLevel] = useState(restoredDraft?.yearLevel || '')
   const [semester, setSemester] = useState(restoredDraft?.semester || '')
@@ -161,6 +167,23 @@ function CollegeSetup() {
   useEffect(() => {
     if (!token) navigate('/login')
   }, [token, navigate])
+
+  useEffect(() => {
+    if (!token || isResume) return undefined
+    const controller = new AbortController()
+    fetch(`${import.meta.env.VITE_API_URL}/api/recommendations/latest`, {
+      headers: { Authorization: `Bearer ${token}` },
+      signal: controller.signal,
+    })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!controller.signal.aborted && Array.isArray(data?.recommendations)) {
+          setRecommendedCourses(data.recommendations.slice(0, 3))
+        }
+      })
+      .catch(() => {})
+    return () => controller.abort()
+  }, [token, isResume])
 
   useEffect(() => {
     if (!token || !isResume) return undefined
@@ -262,6 +285,36 @@ function CollegeSetup() {
     setSearchStatus('idle')
   }
 
+  const handleProofFileChange = (event) => {
+    const file = event.target.files?.[0]
+    setProofError('')
+    if (!file) return
+    const allowedTypes = ['image/png', 'image/jpeg', 'application/pdf']
+    if (!allowedTypes.includes(file.type)) {
+      setProofError('Please upload a PNG, JPG, or PDF file.')
+      event.target.value = ''
+      return
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      setProofError('File is too large. Maximum allowed size is 2 MB.')
+      event.target.value = ''
+      return
+    }
+    const reader = new FileReader()
+    reader.onload = () => {
+      const base64 = String(reader.result || '').split(',')[1] || ''
+      setEnrollmentProof({
+        fileName: file.name,
+        mimeType: file.type,
+        base64,
+      })
+    }
+    reader.onerror = () => {
+      setProofError('Could not read the selected file. Please try again.')
+    }
+    reader.readAsDataURL(file)
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (loading) return
@@ -283,6 +336,11 @@ function CollegeSetup() {
       approximateStart: timingChoice === 'approximate' ? approximateStart : undefined,
       approximateEnd: timingChoice === 'approximate' ? approximateEnd : undefined,
       initialTrackingPhase: timingChoice !== 'exact' ? semesterPosition : undefined,
+      ...(isResume ? {} : {
+        schoolName: schoolName.trim() || undefined,
+        studentIdNumber: studentIdNumber.trim() || undefined,
+        enrollmentProof: enrollmentProof || undefined,
+      }),
     }
 
     if (shouldReviewCollegeSetup(lifecycleAction)) {
@@ -301,6 +359,9 @@ function CollegeSetup() {
             approximateStart,
             approximateEnd,
             semesterPosition,
+            schoolName: schoolName.trim(),
+            studentIdNumber: studentIdNumber.trim(),
+            enrollmentProof,
             payload: buildCollegeSetupPayload(lifecycleAction, selectedCourse, enrollment),
           },
         },
@@ -402,11 +463,49 @@ function CollegeSetup() {
             <p className="mt-1 text-xs leading-relaxed text-amber-700">This records your actual enrollment. It is not a new LearnMatch recommendation. Your previous program history will remain unchanged.</p>
           )}
 
+          {/* Top 3 Recommended Courses quick-select */}
+          {recommendedCourses.length > 0 && !selectedCourse && (
+            <div className="space-y-2.5">
+              <p className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-orange-700">
+                <IconSparkles size={14} aria-hidden="true" />
+                Your Top 3 Recommended Courses
+              </p>
+              <div className="space-y-2">
+                {recommendedCourses.map((rec, idx) => {
+                  const rankLabels = ['Top Match', '2nd Match', '3rd Match']
+                  return (
+                    <button
+                      key={rec.course_id}
+                      type="button"
+                      onClick={() => selectCourse(rec)}
+                      className="group flex w-full items-center justify-between gap-3 rounded-2xl border border-orange-200/80 bg-orange-50/40 px-4 py-3 text-left transition hover:border-orange-400 hover:bg-orange-50 focus-visible:outline-2 focus-visible:outline-orange-500"
+                    >
+                      <div className="min-w-0">
+                        <span className="inline-block rounded-md bg-orange-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-orange-800">
+                          {rankLabels[idx] || `#${idx + 1}`}
+                        </span>
+                        <CourseName
+                          name={rec.course_name}
+                          abbreviation={rec.course_abbreviation}
+                          className="mt-1 block text-sm font-semibold text-gray-900 group-hover:text-orange-800"
+                          secondaryClassName="mt-0.5 text-xs text-gray-500"
+                        />
+                      </div>
+                      <span className="shrink-0 text-xs font-bold text-orange-700">
+                        {rec.match_score}% match
+                      </span>
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+
           {/* Course search */}
           <div data-validation-field="course" aria-invalid={fieldErrors.course ? 'true' : undefined} aria-describedby={fieldErrors.course ? 'college-course-error' : undefined}>
             <label className="mb-3 flex items-center gap-3 text-xs font-medium text-gray-500">
               <span className="h-px flex-1 bg-gray-200" />
-              Search for your enrolled course
+              {recommendedCourses.length > 0 ? 'Or search for another course' : 'Search for your enrolled course'}
               <span className="h-px flex-1 bg-gray-200" />
             </label>
             {!selectedCourse && <>
@@ -468,6 +567,94 @@ function CollegeSetup() {
               </div>
             )}
             <FieldError id="college-course-error">{fieldErrors.course}</FieldError>
+          </div>
+
+          {/* Enrollment Verification & Proof (Private) */}
+          <div className="space-y-4 rounded-2xl border border-stone-200/90 bg-stone-50/70 p-4">
+            <div className="flex items-start gap-2.5">
+              <IconShieldCheck size={18} className="mt-0.5 shrink-0 text-orange-600" aria-hidden="true" />
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wide text-stone-800">
+                  Enrollment Verification (Optional)
+                </p>
+                <p className="mt-0.5 text-xs leading-5 text-stone-500">
+                  Provide your school and enrollment proof (COR or School ID) to verify your enrollment. Stored privately and never displayed publicly.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              <label className="block text-xs font-semibold text-gray-700">
+                School / University Name
+                <input
+                  type="text"
+                  maxLength={255}
+                  value={schoolName}
+                  onChange={(e) => setSchoolName(e.target.value)}
+                  placeholder="e.g. Bulacan State University"
+                  className="mt-1.5 w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm font-normal outline-none transition focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
+                />
+              </label>
+              <label className="block text-xs font-semibold text-gray-700">
+                Student ID Number
+                <input
+                  type="text"
+                  maxLength={64}
+                  value={studentIdNumber}
+                  onChange={(e) => setStudentIdNumber(e.target.value)}
+                  placeholder="e.g. 2026-00123"
+                  className="mt-1.5 w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm font-normal outline-none transition focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
+                />
+              </label>
+            </div>
+
+            <div>
+              <span className="block text-xs font-semibold text-gray-700">
+                Enrollment Proof (COR / School ID — PNG, JPG, or PDF, max 2 MB)
+              </span>
+              {enrollmentProof ? (
+                <div className="mt-1.5 flex items-center justify-between gap-2 rounded-xl border border-emerald-200 bg-emerald-50/70 px-3.5 py-2.5 text-xs text-emerald-900">
+                  <span className="flex min-w-0 items-center gap-2 font-medium">
+                    <IconCheck size={15} className="shrink-0 text-emerald-600" aria-hidden="true" />
+                    <span className="truncate">{enrollmentProof.fileName}</span>
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => { setEnrollmentProof(null); setProofError('') }}
+                    aria-label="Remove enrollment proof"
+                    className="shrink-0 rounded-md p-1 text-emerald-800 hover:bg-emerald-100"
+                  >
+                    <IconX size={14} />
+                  </button>
+                </div>
+              ) : (
+                <label className="mt-1.5 flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-stone-300 bg-white px-4 py-3 text-xs font-semibold text-stone-700 transition hover:border-orange-300 hover:bg-orange-50/40 hover:text-orange-700">
+                  <IconFileUpload size={16} aria-hidden="true" />
+                  Upload COR or School ID
+                  <input
+                    type="file"
+                    accept="image/png,image/jpeg,application/pdf"
+                    onChange={handleProofFileChange}
+                    className="sr-only"
+                  />
+                </label>
+              )}
+              {proofError && <p role="alert" className="mt-1.5 text-xs text-red-600">{proofError}</p>}
+            </div>
+
+            <details className="rounded-xl border border-stone-200/80 bg-white/80 px-3.5 py-2.5 text-xs text-stone-600">
+              <summary className="cursor-pointer font-semibold text-orange-800 hover:text-orange-950 focus-visible:outline-none">
+                View how we handle your data
+              </summary>
+              <ul className="mt-2.5 list-disc space-y-1.5 pl-4 leading-5 text-stone-600">
+                <li><strong>Verification only:</strong> Your school name, student ID, and COR/School ID are used solely to verify your enrollment and unlock your official College Phase Certificate of Completion.</li>
+                <li><strong>Private &amp; restricted access:</strong> Files are stored privately, never displayed publicly, and reviewed only by authorized LearnMatch administrators.</li>
+                <li><strong>Your control:</strong> Uploading proof is optional to start college tracking and can be submitted or updated anytime from your College Dashboard.</li>
+              </ul>
+              <p className="mt-2.5">
+                <PrivacyNoticeLink>Read full Privacy Notice</PrivacyNoticeLink>
+              </p>
+            </details>
           </div>
           </>}
 

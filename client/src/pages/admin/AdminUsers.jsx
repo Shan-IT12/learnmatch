@@ -9,6 +9,7 @@ import {
   IconChevronRightPipe,
   IconChevronUp,
   IconSearch,
+  IconShieldCheck,
   IconUserSearch,
   IconX,
 } from '@tabler/icons-react'
@@ -61,6 +62,7 @@ function handleUnauthorized(response, navigate) {
 function AdminUsers() {
   const navigate = useNavigate()
   const [users, setUsers] = useState([])
+  const [enrollmentSummary, setEnrollmentSummary] = useState(null)
   const [pagination, setPagination] = useState({ page: 1, pageSize: PAGE_SIZE, total: 0, totalPages: 1 })
   const [page, setPage] = useState(1)
   const [searchInput, setSearchInput] = useState('')
@@ -70,6 +72,9 @@ function AdminUsers() {
   const [assessment, setAssessment] = useState('')
   const [tracking, setTracking] = useState('')
   const [alignment, setAlignment] = useState('')
+  const [enrollmentProof, setEnrollmentProof] = useState(
+    () => new URLSearchParams(window.location.search).get('enrollmentProof') || ''
+  )
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [expandedUserId, setExpandedUserId] = useState(null)
@@ -98,6 +103,7 @@ function AdminUsers() {
       if (assessment) params.set('assessment', assessment)
       if (tracking) params.set('tracking', tracking)
       if (alignment) params.set('alignment', alignment)
+      if (enrollmentProof) params.set('enrollmentProof', enrollmentProof)
 
       try {
         const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/users?${params}`, {
@@ -109,6 +115,7 @@ function AdminUsers() {
         const data = await response.json()
         if (controller.signal.aborted) return
         setUsers(data.users || [])
+        setEnrollmentSummary(data.enrollmentSummary || null)
         setPagination(data.pagination || { page: 1, pageSize: PAGE_SIZE, total: 0, totalPages: 1 })
         setError('')
       } catch (requestError) {
@@ -120,7 +127,7 @@ function AdminUsers() {
 
     loadUsers()
     return () => controller.abort()
-  }, [account, alignment, assessment, navigate, page, search, tracking, reload])
+  }, [account, alignment, assessment, enrollmentProof, navigate, page, search, tracking, reload])
 
   const changeFilter = (setter, value) => {
     setReload(value => value + 1)
@@ -145,6 +152,7 @@ function AdminUsers() {
     setAssessment('')
     setTracking('')
     setAlignment('')
+    setEnrollmentProof('')
     setPage(1)
     setLoading(true)
   }
@@ -155,7 +163,7 @@ function AdminUsers() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  const hasFilters = Boolean(search || account || assessment || tracking || alignment)
+  const hasFilters = Boolean(search || account || assessment || tracking || alignment || enrollmentProof)
 
   return (
     <div className="min-h-screen bg-[#fcfaf7]">
@@ -166,6 +174,67 @@ function AdminUsers() {
           <h1 className="text-3xl font-bold tracking-tight text-slate-950">User Monitoring</h1>
           <p className="mt-2 text-sm text-slate-600">Review registered accounts, assessment progress, recommendations, and Career Alignment status.</p>
         </div>
+
+        {enrollmentSummary && (
+          <section
+            aria-label="College enrollment verification summary"
+            className="mb-5 flex flex-wrap items-center justify-between gap-4 rounded-xl border border-orange-100 bg-white px-5 py-3.5 shadow-sm"
+          >
+            <div className="flex items-center gap-2.5">
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-orange-50 text-orange-600">
+                <IconShieldCheck size={18} stroke={1.8} aria-hidden="true" />
+              </span>
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wide text-slate-700">College Enrollment Verification</p>
+                <p className="text-xs text-slate-500">
+                  {enrollmentSummary.totalEnrolled} college {enrollmentSummary.totalEnrolled === 1 ? 'student' : 'students'} tracked · Click a status to filter
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-wrap items-center gap-2 text-xs font-semibold">
+              <button
+                type="button"
+                onClick={() => changeFilter(setEnrollmentProof, enrollmentProof === 'verified' ? '' : 'verified')}
+                aria-pressed={enrollmentProof === 'verified'}
+                className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 transition ${
+                  enrollmentProof === 'verified'
+                    ? 'border-emerald-500 bg-emerald-100 text-emerald-900 ring-2 ring-emerald-300'
+                    : 'border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-100'
+                }`}
+              >
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                Verified Enrolled: {enrollmentSummary.verified}
+              </button>
+              <button
+                type="button"
+                onClick={() => changeFilter(setEnrollmentProof, enrollmentProof === 'pending_review' ? '' : 'pending_review')}
+                aria-pressed={enrollmentProof === 'pending_review'}
+                className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 transition ${
+                  enrollmentProof === 'pending_review'
+                    ? 'border-amber-500 bg-amber-100 text-amber-950 ring-2 ring-amber-300'
+                    : 'border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100'
+                }`}
+              >
+                <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
+                Pending Review: {enrollmentSummary.pendingReview}
+              </button>
+              <button
+                type="button"
+                onClick={() => changeFilter(setEnrollmentProof, enrollmentProof === 'unverified' ? '' : 'unverified')}
+                aria-pressed={enrollmentProof === 'unverified'}
+                className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 transition ${
+                  enrollmentProof === 'unverified'
+                    ? 'border-slate-500 bg-slate-200 text-slate-900 ring-2 ring-slate-300'
+                    : 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100'
+                }`}
+              >
+                <span className="h-1.5 w-1.5 rounded-full bg-slate-400" />
+                Unverified: {(enrollmentSummary.unsubmitted || 0) + (enrollmentSummary.rejected || 0)}
+                {enrollmentSummary.rejected > 0 ? ` (${enrollmentSummary.rejected} rejected)` : ''}
+              </button>
+            </div>
+          </section>
+        )}
 
         <section className="mb-5 rounded-xl border border-orange-100 bg-white p-4 shadow-sm sm:p-5" aria-label="User filters">
           <form onSubmit={submitSearch} className="flex flex-col gap-3 lg:flex-row">
@@ -259,11 +328,14 @@ function AdminUsers() {
                     const isExpanded = expandedUserId === user.userId
                     return (
                       <Fragment key={user.userId}>
-                        <tr className="transition hover:bg-orange-50/30">
+                        <tr
+                          onClick={() => { if (!loading) navigate(`/admin/users/${user.userId}`) }}
+                          className={`transition hover:bg-orange-50/40 ${loading ? '' : 'cursor-pointer'}`}
+                        >
                           <td className="px-5 py-4 align-top">
                             <button
                               type="button"
-                              onClick={() => navigate(`/admin/users/${user.userId}`)}
+                              onClick={(event) => { event.stopPropagation(); navigate(`/admin/users/${user.userId}`) }}
                               className="font-bold tabular-nums text-slate-950 underline decoration-orange-300 underline-offset-2 hover:text-orange-700"
                             >
                               #{user.userId}
@@ -287,7 +359,7 @@ function AdminUsers() {
                             {user.attempts?.length > 0 && (
                               <button
                                 type="button"
-                                onClick={() => setExpandedUserId(isExpanded ? null : user.userId)}
+                                onClick={(event) => { event.stopPropagation(); setExpandedUserId(isExpanded ? null : user.userId) }}
                                 aria-expanded={isExpanded}
                                 className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-orange-700 underline hover:text-orange-800"
                               >
@@ -297,8 +369,34 @@ function AdminUsers() {
                             )}
                           </td>
                           <td className="px-4 py-4 align-top">
-                            <StatusBadge>{user.trackingStatus}</StatusBadge>
+                            <div className="flex flex-wrap items-center gap-1.5">
+                              <StatusBadge>{user.trackingStatus}</StatusBadge>
+                              {user.enrollmentProofStatus === 'submitted' && (
+                                <span className="inline-flex rounded-md border border-amber-200 bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-800">
+                                  Proof Pending Review
+                                </span>
+                              )}
+                              {user.enrollmentProofStatus === 'verified' && (
+                                <span className="inline-flex rounded-md border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-800">
+                                  Enrollment Verified
+                                </span>
+                              )}
+                              {user.enrollmentProofStatus === 'rejected' && (
+                                <span className="inline-flex rounded-md border border-rose-200 bg-rose-50 px-2 py-0.5 text-[11px] font-semibold text-rose-800">
+                                  Proof Rejected
+                                </span>
+                              )}
+                            </div>
                             <p className="mt-1.5 break-words text-xs leading-5 text-slate-500">Alignment: {user.latestAlignment || 'No Check-in'}</p>
+                            {user.enrollmentProofStatus === 'submitted' && (
+                              <button
+                                type="button"
+                                onClick={(event) => { event.stopPropagation(); navigate(`/admin/users/${user.userId}`) }}
+                                className="mt-1.5 inline-flex items-center gap-1 text-xs font-semibold text-orange-700 underline hover:text-orange-900"
+                              >
+                                Review Proof →
+                              </button>
+                            )}
                           </td>
                           <td className="whitespace-nowrap px-5 py-4 align-top text-slate-600">{formatDate(user.registeredAt)}</td>
                         </tr>
@@ -318,7 +416,11 @@ function AdminUsers() {
 
             <div className="grid gap-4 lg:hidden">
               {(loading ? [1, 2, 3, 4, 5].map(userId => ({ userId, username: 'username', accountStatus: 'Active', assessmentStatus: 'Completed', recommendationStatus: 'Available', trackingStatus: 'Active', latestAlignment: 'Aligned', registeredAt: '2026-01-01T00:00:00Z' })) : users).map((user) => (
-                <article key={user.userId} className="rounded-xl border border-orange-100 bg-white p-5 shadow-sm">
+                <article
+                  key={user.userId}
+                  onClick={() => { if (!loading) navigate(`/admin/users/${user.userId}`) }}
+                  className={`rounded-xl border border-orange-100 bg-white p-5 shadow-sm transition hover:border-orange-300 ${loading ? '' : 'cursor-pointer'}`}
+                >
                   <div className="flex items-start justify-between gap-4 border-b border-slate-100 pb-4">
                     <div className="min-w-0">
                       <p className="font-bold tabular-nums text-slate-950">User #{user.userId}</p>
@@ -348,7 +450,7 @@ function AdminUsers() {
                         {user.attempts?.length > 0 && (
                           <button
                             type="button"
-                            onClick={() => setExpandedUserId(expandedUserId === user.userId ? null : user.userId)}
+                            onClick={(event) => { event.stopPropagation(); setExpandedUserId(expandedUserId === user.userId ? null : user.userId) }}
                             className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-orange-700 underline hover:text-orange-800"
                           >
                             {expandedUserId === user.userId ? 'Hide Monitoring Logs' : `View Monitoring Logs (${user.attempts.length})`}
@@ -356,7 +458,39 @@ function AdminUsers() {
                         )}
                       </dd>
                     </div>
-                    <div><dt className="text-xs font-semibold uppercase tracking-wide text-slate-400">College Phase</dt><dd className="mt-1.5"><StatusBadge>{user.trackingStatus}</StatusBadge><p className="mt-2 text-xs text-slate-500">Alignment: {user.latestAlignment || 'No Check-in'}</p></dd></div>
+                    <div>
+                      <dt className="text-xs font-semibold uppercase tracking-wide text-slate-400">College Phase</dt>
+                      <dd className="mt-1.5">
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          <StatusBadge>{user.trackingStatus}</StatusBadge>
+                          {user.enrollmentProofStatus === 'submitted' && (
+                            <span className="inline-flex rounded-md border border-amber-200 bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-800">
+                              Proof Pending Review
+                            </span>
+                          )}
+                          {user.enrollmentProofStatus === 'verified' && (
+                            <span className="inline-flex rounded-md border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-800">
+                              Enrollment Verified
+                            </span>
+                          )}
+                          {user.enrollmentProofStatus === 'rejected' && (
+                            <span className="inline-flex rounded-md border border-rose-200 bg-rose-50 px-2 py-0.5 text-[11px] font-semibold text-rose-800">
+                              Proof Rejected
+                            </span>
+                          )}
+                        </div>
+                        <p className="mt-2 text-xs text-slate-500">Alignment: {user.latestAlignment || 'No Check-in'}</p>
+                        {user.enrollmentProofStatus === 'submitted' && (
+                          <button
+                            type="button"
+                            onClick={() => navigate(`/admin/users/${user.userId}`)}
+                            className="mt-1.5 inline-flex items-center gap-1 text-xs font-semibold text-orange-700 underline hover:text-orange-900"
+                          >
+                            Review Proof →
+                          </button>
+                        )}
+                      </dd>
+                    </div>
                   </dl>
                   {expandedUserId === user.userId && user.attempts?.length > 0 && (
                     <div className="mt-4 border-t border-slate-100 pt-4">

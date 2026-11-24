@@ -6,8 +6,8 @@ import {
 } from 'chart.js'
 import { Bar, Doughnut, Line } from 'react-chartjs-2'
 import {
-  IconAlertTriangle, IconChartDonut3, IconChartHistogram, IconClipboardCheck,
-  IconListNumbers, IconRefresh, IconUserPlus, IconUsers,
+  IconAlertTriangle, IconArrowRight, IconChartDonut3, IconChartHistogram, IconClipboardCheck,
+  IconListNumbers, IconRefresh, IconShieldCheck, IconUserPlus, IconUsers, IconX,
 } from '@tabler/icons-react'
 import AdminHeader from '../../components/AdminHeader'
 import CourseName from '../../components/CourseName'
@@ -168,6 +168,7 @@ function AdminDashboard() {
   const [loading, setLoading] = useState(!isSystemDeveloper)
   const [error, setError] = useState('')
   const [retryKey, setRetryKey] = useState(0)
+  const [pendingProofPopupDismissed, setPendingProofPopupDismissed] = useState(false)
 
   useEffect(() => {
     const token = localStorage.getItem('adminToken')
@@ -339,6 +340,46 @@ function AdminDashboard() {
 
         {!loading && dashboard && chartData && (
           <div className="space-y-6">
+            {!pendingProofPopupDismissed && (dashboard.enrollmentSummary?.pendingReview || 0) > 0 && (
+              <div
+                role="status"
+                className="flex flex-col justify-between gap-4 rounded-2xl border border-amber-200 bg-gradient-to-r from-amber-50 via-orange-50/70 to-white px-5 py-4 shadow-sm sm:flex-row sm:items-center"
+              >
+                <div className="flex items-start gap-3">
+                  <span className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-amber-800">
+                    <IconShieldCheck size={20} stroke={1.9} aria-hidden="true" />
+                  </span>
+                  <div>
+                    <p className="text-sm font-bold text-slate-950">
+                      {dashboard.enrollmentSummary.pendingReview} Enrollment{' '}
+                      {dashboard.enrollmentSummary.pendingReview === 1 ? 'Proof' : 'Proofs'} Pending Approval
+                    </p>
+                    <p className="mt-0.5 text-xs leading-5 text-slate-600">
+                      {dashboard.enrollmentSummary.pendingReview === 1 ? 'A student has' : 'Students have'} submitted a COR or School ID for college enrollment verification. Review to approve or request resubmission.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex shrink-0 items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => navigate('/admin/users?enrollmentProof=pending_review')}
+                    className="inline-flex items-center gap-1.5 rounded-xl bg-orange-500 px-4 py-2 text-xs font-semibold text-white shadow-xs transition hover:bg-orange-600"
+                  >
+                    Review Pending Proofs
+                    <IconArrowRight size={14} aria-hidden="true" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPendingProofPopupDismissed(true)}
+                    aria-label="Dismiss pending enrollment verification notice"
+                    className="rounded-lg p-1.5 text-slate-400 hover:bg-white hover:text-slate-600"
+                  >
+                    <IconX size={16} />
+                  </button>
+                </div>
+              </div>
+            )}
+
             <section aria-label="Student assessment summary" className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               {metricDefinitions.map(({ key, label, icon: Icon, tone }) => (
                 <article key={key} className="rounded-xl border border-orange-100 bg-white p-5 shadow-sm">

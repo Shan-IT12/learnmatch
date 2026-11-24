@@ -11,28 +11,38 @@ import SkeletonContent from '../../components/SkeletonContent'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import CourseName from '../../components/CourseName'
+import PrivacyNoticeLink from '../../components/PrivacyNoticeLink'
 import SuccessConfirmation from '../../components/SuccessConfirmation'
 import ActionConfirmationModal from '../../components/ActionConfirmationModal'
 import { waitForSuccessConfirmation } from '../../utils/successConfirmation'
 import {
   IconAlertTriangle,
   IconArrowRight,
+  IconAward,
   IconCalendar,
   IconChevronDown,
+  IconDownload,
+  IconFileUpload,
   IconHistory,
   IconLayoutDashboard,
   IconSettings,
   IconChartLine,
   IconCircleCheck,
   IconClipboardCheck,
+  IconClock,
+  IconLock,
   IconRoute,
   IconRefresh,
+  IconShieldCheck,
   IconSparkles,
   IconSchool,
   IconX,
   IconTrendingDown,
   IconTrendingUp,
 } from '@tabler/icons-react'
+import LearnMatchCertificate from '../../components/LearnMatchCertificate'
+import { generateCertificatePdf } from '../../utils/certificatePdf'
+import { formatLongDate } from '../../utils/resultsPdf'
 import {
   CHECKIN_PHASES,
   getAlignmentTrend,
@@ -135,7 +145,7 @@ function AlignmentTrendChart({ records }) {
   )
 }
 
-export function CollegeCompletionDialog({ yearLevel, termLabel, onDismiss }) {
+export function CollegeCompletionDialog({ yearLevel, termLabel, onDismiss, onOpenCertificate, enrollmentVerification, onOpenProofModal }) {
   const dialogRef = useRef(null)
   const [closing, setClosing] = useState(false)
   useEffect(() => {
@@ -176,11 +186,21 @@ export function CollegeCompletionDialog({ yearLevel, termLabel, onDismiss }) {
   return <dialog ref={dialogRef} onClose={onDismiss} onCancel={event => { event.preventDefault(); requestClose() }} onKeyDown={handleKeyDown} data-closing={closing} onAnimationEnd={event => {
     if (event.target === event.currentTarget && event.animationName === 'college-popup-out') dialogRef.current?.close()
   }} className="college-completion-dialog m-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-2xl overflow-y-auto rounded-3xl border-0 bg-transparent p-0 shadow-2xl" aria-labelledby="college-completion-title" aria-describedby="college-completion-description">
-    <CollegeCompletionBanner yearLevel={yearLevel} termLabel={termLabel} onDismiss={requestClose} />
+    <CollegeCompletionBanner
+      yearLevel={yearLevel}
+      termLabel={termLabel}
+      onDismiss={requestClose}
+      enrollmentVerification={enrollmentVerification}
+      onOpenCertificate={onOpenCertificate ? () => { requestClose(); onOpenCertificate() } : undefined}
+      onOpenProofModal={onOpenProofModal ? () => { requestClose(); onOpenProofModal() } : undefined}
+    />
   </dialog>
 }
 
-export function CollegeCompletionBanner({ yearLevel, termLabel, onDismiss }) {
+export function CollegeCompletionBanner({ yearLevel, termLabel, onDismiss, onOpenCertificate, enrollmentVerification, onOpenProofModal }) {
+  const proofStatus = enrollmentVerification?.proofStatus || 'unsubmitted'
+  const isVerified = proofStatus === 'verified'
+  const rejectionReason = enrollmentVerification?.rejectionReason
   return <section className="college-completion relative isolate overflow-hidden rounded-3xl border border-orange-200 px-6 py-9 text-center sm:px-12 sm:py-12" aria-labelledby="college-completion-title">
     <button type="button" onClick={onDismiss} aria-label="Close congratulations" className="absolute right-3 top-3 flex h-10 w-10 items-center justify-center rounded-full text-orange-900 hover:bg-orange-100 focus-visible:outline-2 focus-visible:outline-orange-600"><IconX size={20} aria-hidden="true" /></button>
     <div className="college-completion-confetti pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
@@ -207,7 +227,53 @@ export function CollegeCompletionBanner({ yearLevel, termLabel, onDismiss }) {
       <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-emerald-800"><IconCircleCheck size={16} aria-hidden="true" />College Phase completed</span>
     </div>
     <p className="mx-auto mt-5 max-w-lg text-sm leading-6 text-gray-600">Your check-in history is here whenever you want to look back on your journey.</p>
-    <button type="button" onClick={onDismiss} className="mt-6 rounded-xl bg-orange-500 px-6 py-3 text-sm font-semibold text-white hover:bg-orange-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600">Back to dashboard</button>
+    {!isVerified && onOpenProofModal && (
+      <div className={`mx-auto mt-5 max-w-lg rounded-2xl border px-4 py-3.5 text-left text-xs leading-relaxed ${
+        proofStatus === 'rejected'
+          ? 'border-rose-200 bg-rose-50 text-rose-900'
+          : proofStatus === 'submitted'
+            ? 'border-amber-200 bg-amber-50 text-amber-900'
+            : 'border-orange-200 bg-white/90 text-slate-700'
+      }`}>
+        <p className="flex items-center gap-1.5 font-bold">
+          {proofStatus === 'rejected' ? (
+            <><IconAlertTriangle size={15} aria-hidden="true" /> Certificate locked — Resubmission requested</>
+          ) : proofStatus === 'submitted' ? (
+            <><IconClock size={15} aria-hidden="true" /> Certificate locked — Pending Admin Verification</>
+          ) : (
+            <><IconLock size={15} aria-hidden="true" /> Certificate locked — Verify enrollment to unlock</>
+          )}
+        </p>
+        <p className="mt-1">
+          {proofStatus === 'rejected'
+            ? (rejectionReason ? `Admin note: ${rejectionReason}` : 'Your previous enrollment proof could not be verified. Please upload a clearer COR or School ID.')
+            : proofStatus === 'submitted'
+              ? 'Your enrollment proof has been submitted. Your Certificate of Completion will unlock automatically once verified by an administrator.'
+              : 'Upload your Certificate of Registration (COR) or School ID to verify your enrollment and unlock your official Certificate of Completion.'}
+        </p>
+      </div>
+    )}
+    <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+      {isVerified && onOpenCertificate && (
+        <button type="button" onClick={onOpenCertificate} className="inline-flex items-center gap-2 rounded-xl border border-orange-200 bg-white px-5 py-3 text-sm font-semibold text-orange-800 shadow-xs hover:bg-orange-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600">
+          <IconAward size={18} aria-hidden="true" />
+          Download Certificate of Completion
+        </button>
+      )}
+      {!isVerified && proofStatus === 'unsubmitted' && onOpenProofModal && (
+        <button type="button" onClick={onOpenProofModal} className="inline-flex items-center gap-2 rounded-xl border border-orange-200 bg-white px-5 py-3 text-sm font-semibold text-orange-800 shadow-xs hover:bg-orange-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600">
+          <IconFileUpload size={18} aria-hidden="true" />
+          Upload Enrollment Proof
+        </button>
+      )}
+      {!isVerified && proofStatus === 'rejected' && onOpenProofModal && (
+        <button type="button" onClick={onOpenProofModal} className="inline-flex items-center gap-2 rounded-xl border border-rose-200 bg-white px-5 py-3 text-sm font-semibold text-rose-800 shadow-xs hover:bg-rose-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-600">
+          <IconFileUpload size={18} aria-hidden="true" />
+          Resubmit Enrollment Proof
+        </button>
+      )}
+      <button type="button" onClick={onDismiss} className="rounded-xl bg-orange-500 px-6 py-3 text-sm font-semibold text-white hover:bg-orange-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600">Back to dashboard</button>
+    </div>
   </section>
 }
 
@@ -287,6 +353,9 @@ function CollegeDashboard() {
   const [lifecyclePending, setLifecyclePending] = useState(false)
   const [nextTermErrors, setNextTermErrors] = useState({})
   const [startingAssessment, setStartingAssessment] = useState(false)
+  const [activeAttemptRoute, setActiveAttemptRoute] = useState(null)
+  const [showRetakeConfirmation, setShowRetakeConfirmation] = useState(false)
+  const [retakeError, setRetakeError] = useState('')
   const assessmentRequestRef = useRef(null)
   useEffect(() => () => { assessmentRequestRef.current = null }, [token])
   const [activeView, setActiveView] = useStudentView('college-tab', 'overview', value => ['overview', 'roadmap', 'history'].includes(value))
@@ -296,6 +365,13 @@ function CollegeDashboard() {
   const [pendingLifecycleAction, setPendingLifecycleAction] = useState(null)
   const [pendingEarlyPhase, setPendingEarlyPhase] = useState(null)
   const lifecycleRequestRef = useRef(false)
+  const [certificateModalOpen, setCertificateModalOpen] = useState(false)
+  const [proofModalOpen, setProofModalOpen] = useState(false)
+  const [proofSchoolName, setProofSchoolName] = useState('')
+  const [proofStudentId, setProofStudentId] = useState('')
+  const [proofFile, setProofFile] = useState(null)
+  const [proofSubmitting, setProofSubmitting] = useState(false)
+  const [proofError, setProofError] = useState('')
 
   useEffect(() => {
     if (!token) {
@@ -310,6 +386,9 @@ function CollegeDashboard() {
     }).then(async response => response.ok ? response.json() : null)
       .then(data => { if (!controller.signal.aborted) setHasAssessmentSummary(hasSavedAssessmentSummary(data)) })
       .catch(() => { /* Missing/unavailable results leave the link hidden. */ })
+    readActiveAttempt(import.meta.env.VITE_API_URL, token, sessionStorage)
+      .then(attempt => { if (!controller.signal.aborted) setActiveAttemptRoute(getAttemptResumeRoute(attempt) || null) })
+      .catch(() => { /* Missing/unavailable active attempt leaves Continue disabled. */ })
     const fetchData = async () => {
       try {
         const headers = { Authorization: `Bearer ${token}` }
@@ -461,28 +540,37 @@ function CollegeDashboard() {
     updateLifecycle(action)
   }
 
-  const handleTakeAssessment = async () => {
+  const handleContinueAssessment = () => {
+    if (!activeAttemptRoute) return
+    navigate(activeAttemptRoute)
+  }
+
+  const handleOpenRetakeModal = () => {
     if (!token || assessmentRequestRef.current) return
+    setRetakeError('')
+    setShowRetakeConfirmation(true)
+  }
+
+  const handleRetakeAssessment = async () => {
+    if (!showRetakeConfirmation || !token || assessmentRequestRef.current) return
     const request = {}
     assessmentRequestRef.current = request
     const isCurrent = () => assessmentRequestRef.current === request && localStorage.getItem('token') === token
     setStartingAssessment(true)
-    setError('')
+    setRetakeError('')
     try {
-      const route = getAttemptResumeRoute(await readActiveAttempt(import.meta.env.VITE_API_URL, token, sessionStorage))
-      if (!isCurrent()) return
-      if (route) { navigate(route); return }
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/assessment-attempts`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
       })
       const payload = await response.json().catch(() => ({}))
       if (!isCurrent()) return
-      if (!response.ok || !payload.attemptId) throw new Error(payload.message || 'Could not start the assessment.')
+      if (!response.ok || !payload.attemptId) throw new Error(payload.message || 'Could not start a new assessment.')
       beginAssessmentAttempt(sessionStorage, payload.attemptId)
+      setShowRetakeConfirmation(false)
       navigate('/onboarding/profile')
     } catch (requestError) {
-      if (isCurrent()) setError(requestError.message || 'Could not start the assessment.')
+      if (isCurrent()) setRetakeError(requestError.message || 'Could not start a new assessment.')
     } finally {
       if (assessmentRequestRef.current === request) {
         assessmentRequestRef.current = null
@@ -579,6 +667,103 @@ function CollegeDashboard() {
   }
 
 
+  const collegeCertificateDateRaw = latestResult?.checkinDate || new Date().toISOString()
+  const collegeCertificateDate = formatLongDate(collegeCertificateDateRaw)
+  const collegeCertificateYear = new Date(collegeCertificateDateRaw).getFullYear() || new Date().getFullYear()
+  const collegeCertificateId = `LM-CP-${collegeCertificateYear}-${String(collegeInfo?.trackingCycleId || localStorage.getItem('userId') || '1').padStart(6, '0')}`
+  const collegeStudentName = username || 'LearnMatch Student'
+  const enrollmentVerification = collegeInfo?.enrollmentVerification || null
+  const proofStatus = enrollmentVerification?.proofStatus || 'unsubmitted'
+  const isEnrollmentVerified = proofStatus === 'verified'
+  const isCollegeCompleted = programTrackingComplete || (lifecycleStatus === 'ended' && Boolean(nextAcademicStage?.programCompleted))
+
+  const openEnrollmentProofModal = () => {
+    setProofSchoolName(enrollmentVerification?.schoolName || '')
+    setProofStudentId(enrollmentVerification?.studentIdNumber || '')
+    setProofFile(null)
+    setProofError('')
+    setProofModalOpen(true)
+  }
+
+  const handleDownloadCollegeCertificate = () => {
+    generateCertificatePdf({
+      studentName: collegeStudentName,
+      formattedDate: collegeCertificateDate,
+      certificateId: collegeCertificateId,
+      variant: 'standard',
+      type: 'college',
+    })
+  }
+
+  const handleProofFileSelect = (event) => {
+    const file = event.target.files?.[0]
+    setProofError('')
+    if (!file) return
+    if (!['image/png', 'image/jpeg', 'application/pdf'].includes(file.type)) {
+      setProofError('Upload a PNG, JPG, or PDF file.')
+      event.target.value = ''
+      return
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      setProofError('File must be 2 MB or smaller.')
+      event.target.value = ''
+      return
+    }
+    const reader = new FileReader()
+    reader.onload = () => {
+      setProofFile({
+        fileName: file.name,
+        mimeType: file.type,
+        base64: String(reader.result || '').split(',')[1] || '',
+      })
+    }
+    reader.onerror = () => setProofError('Could not read the selected file.')
+    reader.readAsDataURL(file)
+  }
+
+  const handleSubmitEnrollmentProof = async (event) => {
+    event.preventDefault()
+    setProofError('')
+    setProofSubmitting(true)
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/college/enrollment-proof`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          schoolName: proofSchoolName.trim() || undefined,
+          studentIdNumber: proofStudentId.trim() || undefined,
+          enrollmentProof: proofFile || undefined,
+        }),
+      })
+      const data = await response.json().catch(() => ({}))
+      if (!response.ok) {
+        setProofError(data.message || 'Could not submit enrollment proof.')
+        return
+      }
+      setCollegeInfo((current) => current ? ({
+        ...current,
+        enrollmentVerification: {
+          ...(current.enrollmentVerification || {}),
+          schoolName: data.schoolName ?? current.enrollmentVerification?.schoolName ?? null,
+          studentIdNumber: data.studentIdNumber ?? current.enrollmentVerification?.studentIdNumber ?? null,
+          proofFileName: data.proofFileName || current.enrollmentVerification?.proofFileName || null,
+          proofStatus: data.proofStatus || current.enrollmentVerification?.proofStatus || 'submitted',
+          rejectionReason: null,
+          hasProof: Boolean(data.proofFileName || current.enrollmentVerification?.hasProof),
+        },
+      }) : current)
+      setProofModalOpen(false)
+      setSuccessMessage(data.message || 'Enrollment verification updated.')
+    } catch {
+      setProofError('Cannot connect to server. Please try again.')
+    } finally {
+      setProofSubmitting(false)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-slate-50">
       <nav className="lm-site-header bg-white border-b border-gray-100 px-4 sm:px-8 lg:px-14 py-[18px] flex justify-between items-center">
@@ -606,19 +791,119 @@ function CollegeDashboard() {
 
         <header className="college-panel college-hero relative overflow-hidden">
           <div className="relative flex flex-col justify-between gap-5 sm:flex-row sm:items-start">
-            <div className="min-w-0"><p className="college-eyebrow">College dashboard</p><CourseName as="h1" name={collegeInfo?.courseName} className="max-w-3xl text-2xl font-bold leading-tight tracking-tight text-gray-950 sm:text-3xl" secondaryClassName="mt-2 text-base font-medium text-gray-500" /><div className="mt-4 flex flex-wrap items-center gap-2 text-sm text-gray-600">{[collegeInfo?.yearLevel, collegeInfo?.semester, collegeInfo?.academicYear ? `AY ${collegeInfo.academicYear}` : null].filter(Boolean).map(label => <span key={label} className="rounded-lg border border-gray-200/80 bg-white/80 px-3 py-1.5">{label}</span>)}</div></div>
-            <span className={`inline-flex w-fit shrink-0 items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold ${lifecycleStatus === 'active' ? 'border-emerald-100 bg-emerald-50 text-emerald-700' : 'border-gray-200 bg-gray-50 text-gray-600'}`}><span className={`h-1.5 w-1.5 rounded-full ${lifecycleStatus === 'active' ? 'bg-emerald-500' : 'bg-gray-400'}`} />Tracking status: {lifecycleStatus === 'active' ? 'Active' : lifecycleStatus === 'paused' ? 'Paused' : 'Ended / Archived'}</span>
+            <div className="min-w-0">
+              <p className="college-eyebrow">College dashboard</p>
+              <CourseName as="h1" name={collegeInfo?.courseName} className="max-w-3xl text-2xl font-bold leading-tight tracking-tight text-gray-950 sm:text-3xl" secondaryClassName="mt-2 text-base font-medium text-gray-500" />
+              <div className="mt-4 flex flex-wrap items-center gap-2 text-sm text-gray-600">
+                {[collegeInfo?.yearLevel, collegeInfo?.semester, collegeInfo?.academicYear ? `AY ${collegeInfo.academicYear}` : null, collegeInfo?.enrollmentVerification?.schoolName || null].filter(Boolean).map(label => (
+                  <span key={label} className="rounded-lg border border-gray-200/80 bg-white/80 px-3 py-1.5">{label}</span>
+                ))}
+              </div>
+            </div>
+            <div className="flex shrink-0 flex-col items-start gap-2 sm:items-end">
+              <span className={`inline-flex w-fit shrink-0 items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold ${lifecycleStatus === 'active' ? 'border-emerald-100 bg-emerald-50 text-emerald-700' : 'border-gray-200 bg-gray-50 text-gray-600'}`}>
+                <span className={`h-1.5 w-1.5 rounded-full ${lifecycleStatus === 'active' ? 'bg-emerald-500' : 'bg-gray-400'}`} />
+                Tracking status: {lifecycleStatus === 'active' ? 'Active' : lifecycleStatus === 'paused' ? 'Paused' : 'Ended / Archived'}
+              </span>
+              {!loading && enrollmentVerification && (
+                <button
+                  type="button"
+                  onClick={openEnrollmentProofModal}
+                  className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold transition ${
+                    proofStatus === 'verified'
+                      ? 'border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-100'
+                      : proofStatus === 'submitted'
+                        ? 'border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100'
+                        : proofStatus === 'rejected'
+                          ? 'border-rose-200 bg-rose-50 text-rose-800 hover:bg-rose-100'
+                          : 'border-orange-200 bg-white text-orange-700 hover:bg-orange-50'
+                  }`}
+                >
+                  {proofStatus === 'rejected' ? <IconAlertTriangle size={14} aria-hidden="true" /> : <IconShieldCheck size={14} aria-hidden="true" />}
+                  {proofStatus === 'verified'
+                    ? 'Enrollment Verified'
+                    : proofStatus === 'submitted'
+                      ? 'Pending Admin Verification'
+                      : proofStatus === 'rejected'
+                        ? 'Proof Rejected — Resubmit'
+                        : 'Submit Enrollment Proof'}
+                </button>
+              )}
+            </div>
           </div>
+          {!loading && proofStatus === 'rejected' && (
+            <div role="alert" className="relative mt-4 flex flex-col justify-between gap-3 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-900 sm:flex-row sm:items-center">
+              <div>
+                <p className="font-semibold">Enrollment proof resubmission requested</p>
+                <p className="mt-0.5 text-xs text-rose-800">
+                  {enrollmentVerification?.rejectionReason || 'Please upload a clearer COR or School ID so your enrollment can be verified.'}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={openEnrollmentProofModal}
+                className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-xl bg-rose-600 px-3.5 py-2 text-xs font-semibold text-white hover:bg-rose-700"
+              >
+                <IconFileUpload size={14} aria-hidden="true" />
+                Resubmit Enrollment Proof
+              </button>
+            </div>
+          )}
           <div className="relative mt-6 border-t border-orange-100 pt-4"><p className="text-sm font-medium leading-6 text-gray-600">Career Alignment Tracking</p><p className="text-sm leading-6 text-gray-600">Follow your course experience, complete your next check-in, and see your progress over time.</p></div>
         </header>
 
-        {hasAssessmentSummary && <nav aria-label="Assessment" className="flex flex-wrap gap-3">
+        {hasAssessmentSummary && <nav aria-label="Assessment" className="flex flex-wrap items-center gap-3">
           <button type="button" onClick={() => navigate('/dashboard/summary')} className="lm-action w-full justify-center sm:w-auto">
             <IconLayoutDashboard size={17} aria-hidden="true" /> View Assessment Summary
           </button>
+          {isCollegeCompleted && isEnrollmentVerified && (
+            <button
+              type="button"
+              onClick={() => setCertificateModalOpen(true)}
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-orange-200 bg-orange-50 px-4 py-2.5 text-sm font-semibold text-orange-800 shadow-xs transition hover:bg-orange-100 sm:w-auto"
+            >
+              <IconAward size={17} aria-hidden="true" />
+              Download Certificate of Completion
+            </button>
+          )}
+          {isCollegeCompleted && !isEnrollmentVerified && proofStatus === 'submitted' && (
+            <span className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-2.5 text-xs font-semibold text-amber-800 sm:w-auto">
+              <IconClock size={16} aria-hidden="true" />
+              Certificate Locked · Pending Admin Verification
+            </span>
+          )}
+          {isCollegeCompleted && !isEnrollmentVerified && proofStatus === 'unsubmitted' && (
+            <button
+              type="button"
+              onClick={openEnrollmentProofModal}
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-stone-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-xs transition hover:border-orange-300 hover:text-orange-700 sm:w-auto"
+            >
+              <IconLock size={16} aria-hidden="true" />
+              Upload Enrollment Proof to Unlock Certificate
+            </button>
+          )}
+          {isCollegeCompleted && !isEnrollmentVerified && proofStatus === 'rejected' && (
+            <button
+              type="button"
+              onClick={openEnrollmentProofModal}
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-sm font-semibold text-rose-800 shadow-xs transition hover:bg-rose-100 sm:w-auto"
+            >
+              <IconAlertTriangle size={16} aria-hidden="true" />
+              Resubmit Proof to Unlock Certificate
+            </button>
+          )}
         </nav>}
 
-        {completionNotice.isOpen && <CollegeCompletionDialog yearLevel={collegeInfo?.yearLevel} termLabel={collegeInfo?.semester} onDismiss={completionNotice.dismiss} />}
+        {completionNotice.isOpen && (
+          <CollegeCompletionDialog
+            yearLevel={collegeInfo?.yearLevel}
+            termLabel={collegeInfo?.semester}
+            enrollmentVerification={enrollmentVerification}
+            onDismiss={completionNotice.dismiss}
+            onOpenCertificate={() => setCertificateModalOpen(true)}
+            onOpenProofModal={openEnrollmentProofModal}
+          />
+        )}
 
         <div className="inline-flex max-w-full flex-wrap gap-1 rounded-2xl border border-gray-200/70 bg-gray-100/80 p-1.5" role="tablist" aria-label="College dashboard sections">
           {dashboardViews.map((view, index) => { const ViewIcon = view.icon; return <button key={view.id} ref={element => { viewButtonsRef.current[index] = element }} id={`college-view-${view.id}`} type="button" role="tab" aria-selected={visibleView === view.id} aria-controls={`college-panel-${view.id}`} tabIndex={visibleView === view.id ? 0 : -1} onClick={() => setActiveView(view.id)} onKeyDown={event => handleViewKey(event, index)} className="college-view-button"><ViewIcon size={17} stroke={1.7} aria-hidden="true" />{view.label}</button> })}
@@ -673,8 +958,28 @@ function CollegeDashboard() {
                 <button type="button" onClick={() => navigate(`/college/checkin/results/${latestResult.checkinId}`)} className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-5 py-3 text-sm font-semibold text-gray-800">
                   View Completed Check-in
                 </button>
+                {programTrackingComplete && isEnrollmentVerified && (
+                  <button type="button" onClick={() => setCertificateModalOpen(true)} className="inline-flex items-center justify-center gap-2 rounded-xl border border-orange-200 bg-orange-50 px-5 py-3 text-sm font-semibold text-orange-800 hover:bg-orange-100">
+                    <IconAward size={18} aria-hidden="true" />Download Certificate
+                  </button>
+                )}
+                {programTrackingComplete && !isEnrollmentVerified && proofStatus === 'submitted' && (
+                  <span className="inline-flex items-center justify-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs font-semibold text-amber-800">
+                    <IconClock size={16} aria-hidden="true" />Pending Admin Verification
+                  </span>
+                )}
+                {programTrackingComplete && !isEnrollmentVerified && proofStatus === 'unsubmitted' && (
+                  <button type="button" onClick={openEnrollmentProofModal} className="inline-flex items-center justify-center gap-2 rounded-xl border border-stone-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 hover:border-orange-300 hover:text-orange-700">
+                    <IconLock size={16} aria-hidden="true" />Upload Enrollment Proof
+                  </button>
+                )}
+                {programTrackingComplete && !isEnrollmentVerified && proofStatus === 'rejected' && (
+                  <button type="button" onClick={openEnrollmentProofModal} className="inline-flex items-center justify-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-5 py-3 text-sm font-semibold text-rose-800 hover:bg-rose-100">
+                    <IconAlertTriangle size={16} aria-hidden="true" />Resubmit Enrollment Proof
+                  </button>
+                )}
                 {programTrackingComplete && (
-                  <button type="button" onClick={completionNotice.open} className="inline-flex items-center justify-center gap-2 rounded-xl border border-orange-200 bg-orange-50 px-5 py-3 text-sm font-semibold text-orange-800"><IconSparkles size={18} aria-hidden="true" />View celebration</button>
+                  <button type="button" onClick={completionNotice.open} className="inline-flex items-center justify-center gap-2 rounded-xl border border-orange-200 bg-white px-5 py-3 text-sm font-semibold text-orange-800"><IconSparkles size={18} aria-hidden="true" />View celebration</button>
                 )}
                 {programTrackingComplete && (
                   <button type="button" disabled={lifecyclePending} onClick={() => updateLifecycle('end')} className="inline-flex items-center justify-center gap-2 rounded-xl bg-gray-950 px-5 py-3 text-sm font-semibold text-white disabled:opacity-50">
@@ -891,8 +1196,26 @@ function CollegeDashboard() {
           </summary>
           {lifecycleStatus === 'active' ? (
 <section className="flex flex-wrap gap-3 border-t border-gray-100 px-5 py-5 sm:px-7">
-            <button type="button" disabled={startingAssessment} onClick={handleTakeAssessment} className="inline-flex items-center gap-2 rounded-xl border border-orange-200 bg-orange-50 px-4 py-2.5 text-sm font-semibold text-orange-700 disabled:cursor-not-allowed disabled:opacity-50">
-              <IconRefresh size={16} stroke={2} /> {startingAssessment ? 'Checking assessment…' : 'Continue or Retake Assessment'}
+            <button
+              type="button"
+              disabled={!activeAttemptRoute}
+              onClick={handleContinueAssessment}
+              title={activeAttemptRoute ? 'Resume your unfinished assessment' : 'No unfinished assessment to continue'}
+              className={`inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition ${
+                activeAttemptRoute
+                  ? 'border-orange-200 bg-orange-50 text-orange-700 hover:bg-orange-100'
+                  : 'cursor-not-allowed border-gray-200 bg-gray-100 text-gray-400'
+              }`}
+            >
+              <IconArrowRight size={16} stroke={2} /> Continue Assessment
+            </button>
+            <button
+              type="button"
+              disabled={startingAssessment}
+              onClick={handleOpenRetakeModal}
+              className="inline-flex items-center gap-2 rounded-xl border border-orange-200 bg-white px-4 py-2.5 text-sm font-semibold text-orange-700 transition hover:bg-orange-50 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <IconRefresh size={16} stroke={2} /> Retake Assessment
             </button>
             <button type="button" disabled={lifecyclePending} onClick={() => setPendingLifecycleAction('pause')} className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-700 disabled:opacity-50">Pause Tracking</button>
             <button type="button" disabled={lifecyclePending} onClick={() => setPendingLifecycleAction('change')} className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-700 disabled:opacity-50">Change Program</button>
@@ -917,6 +1240,173 @@ function CollegeDashboard() {
         onConfirm={confirmLifecycleAction}
         processing={lifecyclePending}
       />
+      <ActionConfirmationModal
+        action={showRetakeConfirmation ? 'retake' : null}
+        processing={startingAssessment}
+        error={retakeError}
+        onCancel={() => { if (!assessmentRequestRef.current) { setShowRetakeConfirmation(false); setRetakeError('') } }}
+        onConfirm={handleRetakeAssessment}
+      />
+
+      {certificateModalOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-xs"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="college-certificate-modal-title"
+          onClick={() => setCertificateModalOpen(false)}
+        >
+          <div
+            className="max-h-[92vh] w-full max-w-5xl overflow-y-auto rounded-2xl border border-stone-200 bg-white p-5 shadow-2xl sm:p-7"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="mb-5 flex flex-wrap items-center justify-between gap-3 border-b border-stone-100 pb-4">
+              <div>
+                <h2 id="college-certificate-modal-title" className="text-lg font-bold text-slate-950">
+                  College Phase Certificate of Completion
+                </h2>
+                <p className="mt-0.5 text-xs text-slate-500">
+                  Official LearnMatch College Phase Certificate · Reference{' '}
+                  <span className="font-mono font-semibold text-slate-700">{collegeCertificateId}</span>
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleDownloadCollegeCertificate}
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-orange-500 px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-orange-600 sm:text-sm"
+                >
+                  <IconDownload size={16} aria-hidden="true" />
+                  Download Certificate (PDF)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCertificateModalOpen(false)}
+                  aria-label="Close certificate preview"
+                  className="rounded-lg p-1.5 text-slate-500 hover:bg-stone-100"
+                >
+                  <IconX size={18} />
+                </button>
+              </div>
+            </div>
+
+            <LearnMatchCertificate
+              studentName={collegeStudentName}
+              formattedDate={collegeCertificateDate}
+              certificateId={collegeCertificateId}
+              variant="standard"
+              type="college"
+            />
+          </div>
+        </div>
+      )}
+
+      {proofModalOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4 backdrop-blur-xs"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="enrollment-proof-modal-title"
+          onClick={() => { if (!proofSubmitting) setProofModalOpen(false) }}
+        >
+          <div
+            className="w-full max-w-md rounded-2xl border border-stone-200 bg-white p-6 shadow-2xl"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="mb-4 flex items-center justify-between">
+              <h2 id="enrollment-proof-modal-title" className="text-lg font-bold text-slate-950">
+                Enrollment Verification
+              </h2>
+              <button
+                type="button"
+                disabled={proofSubmitting}
+                onClick={() => setProofModalOpen(false)}
+                aria-label="Close enrollment verification modal"
+                className="rounded-lg p-1.5 text-slate-500 hover:bg-stone-100"
+              >
+                <IconX size={18} />
+              </button>
+            </div>
+            <p className="mb-3 text-xs leading-5 text-slate-600">
+              Submit your school name, student ID, and a copy of your COR or School ID (PNG, JPG, or PDF, max 2 MB). Kept private and visible only to you and LearnMatch administrators.
+            </p>
+            <details className="mb-4 rounded-xl border border-stone-200/80 bg-stone-50/80 px-3.5 py-2.5 text-xs text-slate-600">
+              <summary className="cursor-pointer font-semibold text-orange-800 hover:text-orange-950 focus-visible:outline-none">
+                View how we handle your data
+              </summary>
+              <ul className="mt-2 list-disc space-y-1.5 pl-4 leading-5 text-slate-600">
+                <li><strong>Verification only:</strong> Used solely to verify your college enrollment and unlock your official College Phase Certificate of Completion.</li>
+                <li><strong>Private &amp; restricted access:</strong> Never displayed publicly and accessible only to authorized LearnMatch administrators.</li>
+                <li><strong>Replaceable anytime:</strong> You can upload an updated copy whenever needed.</li>
+              </ul>
+              <p className="mt-2">
+                <PrivacyNoticeLink>Read full Privacy Notice</PrivacyNoticeLink>
+              </p>
+            </details>
+            {proofError && (
+              <div role="alert" className="mb-4 rounded-xl border border-red-200 bg-red-50 px-3.5 py-2.5 text-xs text-red-700">
+                {proofError}
+              </div>
+            )}
+            <form onSubmit={handleSubmitEnrollmentProof} className="space-y-4">
+              <label className="block text-xs font-semibold text-slate-700">
+                School / University Name
+                <input
+                  type="text"
+                  maxLength={255}
+                  value={proofSchoolName}
+                  onChange={(e) => setProofSchoolName(e.target.value)}
+                  placeholder="e.g. Bulacan State University"
+                  className="mt-1 w-full rounded-xl border border-stone-200 px-3.5 py-2.5 text-sm font-normal outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
+                />
+              </label>
+              <label className="block text-xs font-semibold text-slate-700">
+                Student ID Number
+                <input
+                  type="text"
+                  maxLength={64}
+                  value={proofStudentId}
+                  onChange={(e) => setProofStudentId(e.target.value)}
+                  placeholder="e.g. 2026-00123"
+                  className="mt-1 w-full rounded-xl border border-stone-200 px-3.5 py-2.5 text-sm font-normal outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
+                />
+              </label>
+              <div>
+                <span className="block text-xs font-semibold text-slate-700">
+                  Enrollment Proof (COR / School ID)
+                </span>
+                <label className="mt-1.5 flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-stone-300 bg-stone-50/70 px-4 py-3 text-xs font-semibold text-stone-700 hover:border-orange-300 hover:bg-orange-50/50 hover:text-orange-700">
+                  <IconFileUpload size={16} aria-hidden="true" />
+                  {proofFile ? proofFile.fileName : (collegeInfo?.enrollmentVerification?.proofFileName ? `Replace: ${collegeInfo.enrollmentVerification.proofFileName}` : 'Upload PNG, JPG, or PDF')}
+                  <input
+                    type="file"
+                    accept="image/png,image/jpeg,application/pdf"
+                    onChange={handleProofFileSelect}
+                    className="sr-only"
+                  />
+                </label>
+              </div>
+              <div className="flex justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  disabled={proofSubmitting}
+                  onClick={() => setProofModalOpen(false)}
+                  className="rounded-xl border border-stone-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-stone-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={proofSubmitting}
+                  className="rounded-xl bg-orange-500 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-600 disabled:opacity-50"
+                >
+                  {proofSubmitting ? 'Saving...' : 'Save Verification'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
