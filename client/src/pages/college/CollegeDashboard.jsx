@@ -545,19 +545,14 @@ function CollegeDashboard() {
     navigate(activeAttemptRoute)
   }
 
-  const handleOpenRetakeModal = () => {
+  const startFreshAssessment = async () => {
     if (!token || assessmentRequestRef.current) return
-    setRetakeError('')
-    setShowRetakeConfirmation(true)
-  }
-
-  const handleRetakeAssessment = async () => {
-    if (!showRetakeConfirmation || !token || assessmentRequestRef.current) return
     const request = {}
     assessmentRequestRef.current = request
     const isCurrent = () => assessmentRequestRef.current === request && localStorage.getItem('token') === token
     setStartingAssessment(true)
     setRetakeError('')
+    setError('')
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/assessment-attempts`, {
         method: 'POST',
@@ -570,13 +565,32 @@ function CollegeDashboard() {
       setShowRetakeConfirmation(false)
       navigate('/onboarding/profile')
     } catch (requestError) {
-      if (isCurrent()) setRetakeError(requestError.message || 'Could not start a new assessment.')
+      if (isCurrent()) {
+        const message = requestError.message || 'Could not start a new assessment.'
+        if (showRetakeConfirmation) setRetakeError(message)
+        else setError(message)
+      }
     } finally {
       if (assessmentRequestRef.current === request) {
         assessmentRequestRef.current = null
         setStartingAssessment(false)
       }
     }
+  }
+
+  const handleOpenRetakeModal = () => {
+    if (!token || assessmentRequestRef.current) return
+    if (!hasAssessmentSummary && !activeAttemptRoute) {
+      startFreshAssessment()
+      return
+    }
+    setRetakeError('')
+    setShowRetakeConfirmation(true)
+  }
+
+  const handleRetakeAssessment = async () => {
+    if (!showRetakeConfirmation) return
+    await startFreshAssessment()
   }
 
   const handleStartCheckin = async (phase = null, confirmedEarly = false) => {
@@ -1215,7 +1229,11 @@ function CollegeDashboard() {
               onClick={handleOpenRetakeModal}
               className="inline-flex items-center gap-2 rounded-xl border border-orange-200 bg-white px-4 py-2.5 text-sm font-semibold text-orange-700 transition hover:bg-orange-50 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              <IconRefresh size={16} stroke={2} /> Retake Assessment
+              {hasAssessmentSummary ? (
+                <><IconRefresh size={16} stroke={2} /> Retake Assessment</>
+              ) : (
+                <><IconClipboardCheck size={16} stroke={2} /> {startingAssessment ? 'Starting…' : 'Take Assessment'}</>
+              )}
             </button>
             <button type="button" disabled={lifecyclePending} onClick={() => setPendingLifecycleAction('pause')} className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-700 disabled:opacity-50">Pause Tracking</button>
             <button type="button" disabled={lifecyclePending} onClick={() => setPendingLifecycleAction('change')} className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-700 disabled:opacity-50">Change Program</button>
