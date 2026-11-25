@@ -98,7 +98,8 @@ export const registerUser = async (req, res) => {
     })
   }
 
-  if (isDisposableEmail(email)) {
+  const allowDisposableEmails = String(process.env.ALLOW_DISPOSABLE_EMAILS || '').toLowerCase() === 'true'
+  if (!allowDisposableEmails && isDisposableEmail(email)) {
     return res.status(400).json({ code: 'DISPOSABLE_EMAIL', message: DISPOSABLE_EMAIL_MESSAGE })
   }
 
