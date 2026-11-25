@@ -8,7 +8,8 @@ test('browser policy allows only same-origin camera (no microphone) and preserve
   const policy = headers.find(header => header.key.toLowerCase() === 'permissions-policy')?.value
   assert.equal(policy, 'camera=(self), microphone=(), geolocation=(self)')
   const csp = headers.find(header => header.key === 'Content-Security-Policy').value
-  assert.match(csp, /script-src 'self' 'wasm-unsafe-eval'(;|$)/) // self-hosted MediaPipe WebAssembly only, no CDN
+  assert.match(csp, /script-src 'self' 'wasm-unsafe-eval' https:\/\/accounts\.google\.com\/gsi\/client(;|$)/) // self-hosted MediaPipe WebAssembly + Google Identity Services only, no CDN
+  assert.match(csp, /frame-src 'self' https:\/\/accounts\.google\.com\/gsi\/(;|$)/)
   assert.ok(!/https?:\/\/[^;]*(?:jsdelivr|googleapis|unpkg|cdn)/i.test(csp))
   assert.ok(headers.some(header => header.key === 'Content-Security-Policy'))
   assert.ok(headers.some(header => header.key === 'X-Content-Type-Options' && header.value === 'nosniff'))
