@@ -15,7 +15,7 @@ import { waitForSuccessConfirmation } from '../utils/successConfirmation'
 
 export { ApplicabilityQuestion, ImpactOptions }
 
-const emptyProfile = { username: '', physical_accessibility_areas: [], physical_accessibility_difficulties: {}, factor_physical_impact: '', factor_health_impact: '', factor_financial_impact: '', factor_family_impact: '', factor_work_impact: '' }
+const emptyProfile = { username: '', physical_accessibility_areas: [], physical_accessibility_difficulties: {}, health_wellbeing_areas: [], factor_physical_impact: '', factor_health_impact: '', factor_financial_impact: '', factor_family_impact: '', factor_work_impact: '' }
 const emptyApplicability = Object.fromEntries(PERSONAL_FACTOR_KEYS.map((factor) => [factor, '']))
 const parseJsonValue = (value, fallback) => { if (value && typeof value === 'object') return value; if (typeof value !== 'string') return fallback; try { return JSON.parse(value) } catch { return fallback } }
 
@@ -48,7 +48,9 @@ export default function ProfileEdit() {
         const areas = Array.isArray(rawAreas) ? rawAreas.filter((area) => area !== 'none') : []
         const rawDifficulties = parseJsonValue(data.profile.physical_accessibility_difficulties, {})
         const difficulties = Object.fromEntries(Object.entries(rawDifficulties).filter(([area, level]) => areas.includes(area) && difficultyLevels.some(([value]) => value === level)))
-        const loaded = { personal_factor_answers: data.profile.personal_factor_answers, username: data.username || localStorage.getItem('username') || '', physical_accessibility_areas: areas, physical_accessibility_difficulties: difficulties, factor_physical_impact: data.profile.factor_physical_impact || '', factor_health_impact: data.profile.factor_health_impact || '', factor_financial_impact: data.profile.factor_financial_impact || '', factor_family_impact: data.profile.factor_family_impact || '', factor_work_impact: data.profile.factor_work_impact || '' }
+        const rawHealthAreas = parseJsonValue(data.profile.health_wellbeing_areas, [])
+        const healthAreas = Array.isArray(rawHealthAreas) ? rawHealthAreas : []
+        const loaded = { personal_factor_answers: data.profile.personal_factor_answers, username: data.username || localStorage.getItem('username') || '', physical_accessibility_areas: areas, physical_accessibility_difficulties: difficulties, health_wellbeing_areas: healthAreas, factor_physical_impact: data.profile.factor_physical_impact ?? '', factor_health_impact: data.profile.factor_health_impact ?? '', factor_financial_impact: data.profile.factor_financial_impact ?? '', factor_family_impact: data.profile.factor_family_impact ?? '', factor_work_impact: data.profile.factor_work_impact ?? '' }
         setFormData(loaded); setApplicability(deriveFactorApplicability(loaded)); setIsFirstTime(!readOnly && !isPersonalFactorsComplete(loaded))
       })
       .catch(() => setError('Could not load your profile.'))

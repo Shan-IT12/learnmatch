@@ -9,16 +9,18 @@ import SuccessConfirmation from '../../components/SuccessConfirmation'
 import { waitForSuccessConfirmation } from '../../utils/successConfirmation'
 import { assessmentHeaders, beginAssessmentAttempt, getAssessmentAttemptId } from '../../utils/assessmentSession'
 
-const emptyProfile = { username: '', physical_accessibility_areas: [], physical_accessibility_difficulties: {}, factor_physical_impact: '', factor_health_impact: '', factor_financial_impact: '', factor_family_impact: '', factor_work_impact: '' }
+const emptyProfile = { username: '', physical_accessibility_areas: [], physical_accessibility_difficulties: {}, health_wellbeing_areas: [], factor_physical_impact: '', factor_health_impact: '', factor_financial_impact: '', factor_family_impact: '', factor_work_impact: '' }
 const emptyApplicability = Object.fromEntries(PERSONAL_FACTOR_KEYS.map((factor) => [factor, '']))
 const parseJson = (value, fallback) => { if (value && typeof value === 'object') return value; try { return JSON.parse(value) } catch { return fallback } }
 const impactLabels = Object.fromEntries(impactOptions)
-const factorLabels = { physical: 'Physical / Accessibility', health: 'Health', financial: 'Financial', family: 'Family Responsibilities', work: 'Work Responsibilities' }
+const factorLabels = { physical: 'Physical / Accessibility', health: 'Health & Well-being', financial: 'Financial Constraints', family: 'Family Responsibilities', work: 'Work Responsibilities' }
 const summarizeFactor = (formData, applicability, factor) => {
-  if (!applicability[factor] || applicability[factor] === 'unknown') return 'Please answer Yes or No'
-  if (applicability[factor] === 'legacy_unknown') return 'Please answer Yes or No'
+  if (!applicability[factor] || applicability[factor] === 'unknown' || applicability[factor] === 'legacy_unknown') return 'Please select No, Yes, or Prefer not to say'
   if (applicability[factor] === 'no') return 'No'
-  return impactLabels[Number(formData[`factor_${factor}_impact`])] || 'Incomplete'
+  if (applicability[factor] === 'prefer_not_to_say') return 'Prefer not to say'
+  const raw = formData[`factor_${factor}_impact`]
+  if (raw === '' || raw === null || raw === undefined) return 'Incomplete'
+  return impactLabels[Number(raw)] || 'Incomplete'
 }
 
 function OnboardingProfile() {
@@ -45,7 +47,9 @@ function OnboardingProfile() {
         const areas = parseJson(data.profile.physical_accessibility_areas, []).filter((area) => area !== 'none')
         const rawDifficulties = parseJson(data.profile.physical_accessibility_difficulties, {})
         const difficulties = Object.fromEntries(Object.entries(rawDifficulties).filter(([area, level]) => areas.includes(area) && difficultyLevels.some(([value]) => value === level)))
-        const loaded = { personal_factor_answers: data.profile.personal_factor_answers, username: data.username || '', physical_accessibility_areas: areas, physical_accessibility_difficulties: difficulties, factor_physical_impact: data.profile.factor_physical_impact || '', factor_health_impact: data.profile.factor_health_impact || '', factor_financial_impact: data.profile.factor_financial_impact || '', factor_family_impact: data.profile.factor_family_impact || '', factor_work_impact: data.profile.factor_work_impact || '' }
+        const rawHealthAreas = parseJson(data.profile.health_wellbeing_areas, [])
+        const healthAreas = Array.isArray(rawHealthAreas) ? rawHealthAreas : []
+        const loaded = { personal_factor_answers: data.profile.personal_factor_answers, username: data.username || '', physical_accessibility_areas: areas, physical_accessibility_difficulties: difficulties, health_wellbeing_areas: healthAreas, factor_physical_impact: data.profile.factor_physical_impact ?? '', factor_health_impact: data.profile.factor_health_impact ?? '', factor_financial_impact: data.profile.factor_financial_impact ?? '', factor_family_impact: data.profile.factor_family_impact ?? '', factor_work_impact: data.profile.factor_work_impact ?? '' }
         setFormData(loaded); setApplicability(deriveFactorApplicability(loaded)); setHasSavedProfile(true); setIsEditing(Object.keys(validatePersonalFactors(loaded, deriveFactorApplicability(loaded))).length > 0)
       })
       .catch(() => setError('Could not load your Personal Factors.'))

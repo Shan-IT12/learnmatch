@@ -1,4 +1,4 @@
-import { buildExplanationContext } from './recommendationExplanationService.js'
+import { buildExplanationContext, buildPersonalFactorGuidanceContext } from './recommendationExplanationService.js'
 import { personalFactorResponses } from '../shared/personalFactors.js'
 import { normalizeInterestResponse } from './interestSubmissionService.js'
 import { parseAttemptJson } from './assessmentAttemptService.js'
@@ -29,7 +29,7 @@ import { selectDiversifiedTopThree } from './recommendationDiversityService.js'
 export function buildPersonalFactorResponses(profile = {}) {
   const responses = personalFactorResponses(profile)
   if (Object.values(responses).some(value => value === null)) {
-    throw new RecommendationInputError('Answer Yes or No for all five Personal Factors and complete the impact details before generating recommendations.')
+    throw new RecommendationInputError('Answer No, Yes, or Prefer not to say for all five Personal Factors and complete any required impact details before generating recommendations.')
   }
   return responses
 }
@@ -449,6 +449,7 @@ export async function getTopCourseRecommendations(pool, userId) {
     )
   }
   const personalFactorResponses = buildPersonalFactorResponses(profileRows[0])
+  const personalFactorGuidance = buildPersonalFactorGuidanceContext(profileRows[0])
 
   const knownClusters = new Set(PARENT_CLUSTERS)
   const eligibleCourses = filterCurrentIndependentCourses(courseRows)
@@ -520,6 +521,7 @@ export async function getTopCourseRecommendations(pool, userId) {
         mbti_type: mbtiType,
         selected_interests: interestRows.map(row => row.interest_name),
         academic_domains: studentDomainScores,
+        personal_factor_guidance: personalFactorGuidance,
       }),
       scoreBreakdown: {
         skillMatch: courseSkillMatch,

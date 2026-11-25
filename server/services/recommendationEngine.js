@@ -121,10 +121,10 @@ export function calculatePersonalityScore(mbtiType, parentCluster) {
 
 export function normalizePersonalFactorImpact(response) {
   const value = Number(response)
-  if (!Number.isInteger(value) || value < 1 || value > 4) {
-    throw new RangeError('Personal Factor impact response must be an integer from 1 to 4')
+  if (!Number.isInteger(value) || value < 0 || value > 4) {
+    throw new RangeError('Personal Factor impact response must be an integer from 0 to 4')
   }
-  return (value - 1) / 3
+  return value === 0 ? 0 : (value - 1) / 3
 }
 
 export function calculatePersonalFactorScore(responses, parentCluster) {

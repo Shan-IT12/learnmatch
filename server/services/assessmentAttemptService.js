@@ -64,6 +64,7 @@ const PERSONAL_FACTOR_FIELDS = Object.freeze([
   'personal_factor_answers',
   'physical_accessibility_areas',
   'physical_accessibility_difficulties',
+  'health_wellbeing_areas',
   'factor_physical_impact',
   'factor_health_impact',
   'factor_financial_impact',
@@ -74,11 +75,15 @@ const PERSONAL_FACTOR_FIELDS = Object.freeze([
 export function buildPersonalFactorsSnapshot(profile) {
   if (!profile) return null
   const states = deriveFactorApplicability(profile)
+  const parsedHealthAreas = parseAttemptJson(profile.health_wellbeing_areas, null)
   const candidate = {
     username: 'snapshot_user',
     personal_factor_answers: states,
     physical_accessibility_areas: parseAttemptJson(profile.physical_accessibility_areas, []),
     physical_accessibility_difficulties: parseAttemptJson(profile.physical_accessibility_difficulties, {}),
+    ...(Array.isArray(parsedHealthAreas) && (states.health !== 'yes' || parsedHealthAreas.length > 0)
+      ? { health_wellbeing_areas: parsedHealthAreas }
+      : {}),
     ...Object.fromEntries(Object.entries(states).map(([factor, state]) => [
       `factor_${factor}_impact`, state === 'yes' ? Number(profile[`factor_${factor}_impact`]) : null,
     ])),

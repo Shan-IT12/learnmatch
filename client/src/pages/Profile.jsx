@@ -31,7 +31,9 @@ export default function Profile() {
         const rawAreas = parseJsonValue(data.profile?.physical_accessibility_areas, [])
         const areas = Array.isArray(rawAreas) ? rawAreas.filter((area) => area !== 'none') : []
         const rawDifficulties = parseJsonValue(data.profile?.physical_accessibility_difficulties, {})
-        const loaded = { ...data.profile, physical_accessibility_areas: areas, physical_accessibility_difficulties: rawDifficulties && typeof rawDifficulties === 'object' ? rawDifficulties : {} }
+        const rawHealthAreas = parseJsonValue(data.profile?.health_wellbeing_areas, [])
+        const healthAreas = Array.isArray(rawHealthAreas) ? rawHealthAreas : []
+        const loaded = { ...data.profile, physical_accessibility_areas: areas, physical_accessibility_difficulties: rawDifficulties && typeof rawDifficulties === 'object' ? rawDifficulties : {}, health_wellbeing_areas: healthAreas }
         if (!data.personalFactorsReadOnly && !isPersonalFactorsComplete(loaded)) { navigate(`/profile/edit${profileSearch}`, { replace: true }); return }
         setProfile(loaded)
       })

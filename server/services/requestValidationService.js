@@ -28,6 +28,12 @@ export const PHYSICAL_DIFFICULTY_LEVELS = Object.freeze([
   'cannot_do',
 ])
 
+export const HEALTH_WELLBEING_AREAS = Object.freeze([
+  'physical_health',
+  'mental_emotional',
+  'other_health',
+])
+
 export const PERSONAL_FACTOR_IMPACT_FIELDS = Object.freeze([
   'factor_physical_impact',
   'factor_health_impact',
@@ -106,8 +112,8 @@ export function validateProfile(body) {
   const areas = body.physical_accessibility_areas
   const answers = body.personal_factor_answers
   if (!answers || typeof answers !== 'object' || Array.isArray(answers)
-    || PERSONAL_FACTOR_KEYS.some(factor => !['yes', 'no'].includes(answers[factor]))) {
-    return { valid: false, message: 'Select Yes or No for each of the five Personal Factors.' }
+    || PERSONAL_FACTOR_KEYS.some(factor => !['yes', 'no', 'prefer_not_to_say'].includes(answers[factor]))) {
+    return { valid: false, message: 'Select No, Yes, or Prefer not to say for each of the five Personal Factors.' }
   }
   if (!Array.isArray(areas) || (areas.length === 0 && answers.physical === 'yes')) {
     return { valid: false, message: 'Select at least one physical or accessibility area when the factor applies.' }
@@ -133,15 +139,35 @@ export function validateProfile(body) {
     return { valid: false, message: 'Provide one valid difficulty level for each selected area.' }
   }
 
-  if (answers.physical === 'no' && (areas.length || difficultyAreas.length)) {
-    return { valid: false, message: 'A No answer for physical factors must not include accessibility details.' }
+  if (answers.physical !== 'yes' && (areas.length || difficultyAreas.length)) {
+    return { valid: false, message: 'Physical accessibility details must not be included unless the answer is Yes.' }
   }
+
+  const rawHealthAreas = body.health_wellbeing_areas
+  let healthAreas = []
+  if (rawHealthAreas !== undefined && rawHealthAreas !== null) {
+    if (!Array.isArray(rawHealthAreas)
+      || new Set(rawHealthAreas).size !== rawHealthAreas.length
+      || rawHealthAreas.some((area) => !HEALTH_WELLBEING_AREAS.includes(area))) {
+      return { valid: false, message: 'Invalid health and well-being areas.' }
+    }
+    if (answers.health === 'yes' && rawHealthAreas.length === 0) {
+      return { valid: false, message: 'Select at least one health or well-being area when the factor applies.' }
+    }
+    if (answers.health !== 'yes' && rawHealthAreas.length > 0) {
+      return { valid: false, message: 'Health and well-being details must not be included unless the answer is Yes.' }
+    }
+    healthAreas = [...rawHealthAreas]
+  }
+
   for (const factor of PERSONAL_FACTOR_KEYS) {
     const field = `factor_${factor}_impact`
-    if (answers[factor] === 'yes' && (!Number.isInteger(body[field]) || body[field] < 1 || body[field] > 4)) {
-      return { valid: false, message: `${field} must be an integer from 1 to 4.` }
+    if (answers[factor] === 'yes' && (!Number.isInteger(body[field]) || body[field] < 0 || body[field] > 4)) {
+      return { valid: false, message: `${field} must be an integer from 0 to 4.` }
     }
-    if (answers[factor] === 'no' && body[field] !== null) return { valid: false, message: `${field} must be empty when the answer is No.` }
+    if (answers[factor] !== 'yes' && body[field] !== null) {
+      return { valid: false, message: `${field} must be empty unless the answer is Yes.` }
+    }
   }
   return {
     valid: true,
@@ -150,6 +176,7 @@ export function validateProfile(body) {
       personal_factor_answers: Object.fromEntries(PERSONAL_FACTOR_KEYS.map(factor => [factor, answers[factor]])),
       physical_accessibility_areas: [...areas],
       physical_accessibility_difficulties: { ...difficulties },
+      health_wellbeing_areas: healthAreas,
       ...Object.fromEntries(PERSONAL_FACTOR_IMPACT_FIELDS.map((field) => [field, body[field]])),
     },
   }

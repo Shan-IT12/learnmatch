@@ -1,12 +1,13 @@
-import { PERSONAL_FACTOR_KEYS, deriveFactorApplicability } from '../../../shared/personalFactors.js'
-export { PERSONAL_FACTOR_KEYS, deriveFactorApplicability }
+import { PERSONAL_FACTOR_KEYS, VALID_APPLICABILITY_ANSWERS, deriveFactorApplicability } from '../../../shared/personalFactors.js'
+export { PERSONAL_FACTOR_KEYS, VALID_APPLICABILITY_ANSWERS, deriveFactorApplicability }
 
 const impactField = (factor) => `factor_${factor}_impact`
+const isValidImpact = (raw) => raw !== '' && raw !== null && raw !== undefined && [0, 1, 2, 3, 4].includes(Number(raw))
 
 export function isPersonalFactorsComplete(profile = {}) {
   const applicability = deriveFactorApplicability(profile)
-  if (PERSONAL_FACTOR_KEYS.some((factor) => !['yes', 'no'].includes(applicability[factor]))) return false
-  if (PERSONAL_FACTOR_KEYS.some((factor) => applicability[factor] === 'yes' && ![1, 2, 3, 4].includes(Number(profile[impactField(factor)])))) return false
+  if (PERSONAL_FACTOR_KEYS.some((factor) => !VALID_APPLICABILITY_ANSWERS.includes(applicability[factor]))) return false
+  if (PERSONAL_FACTOR_KEYS.some((factor) => applicability[factor] === 'yes' && !isValidImpact(profile[impactField(factor)]))) return false
   if (applicability.physical === 'yes') {
     const areas = Array.isArray(profile.physical_accessibility_areas) ? profile.physical_accessibility_areas : []
     const difficulties = profile.physical_accessibility_difficulties && typeof profile.physical_accessibility_difficulties === 'object' ? profile.physical_accessibility_difficulties : {}
@@ -21,6 +22,9 @@ export function applyFactorApplicability(profile, factor, answer) {
     next.physical_accessibility_areas = []
     next.physical_accessibility_difficulties = {}
   }
+  if (factor === 'health' && answer !== 'yes') {
+    next.health_wellbeing_areas = []
+  }
   return next
 }
 
@@ -33,8 +37,9 @@ export function buildProfilePayload(profile, applicability = deriveFactorApplica
   return {
     username: profile.username.trim(),
     personal_factor_answers: answers,
-    physical_accessibility_areas: answers.physical === 'yes' ? profile.physical_accessibility_areas : [],
-    physical_accessibility_difficulties: answers.physical === 'yes' ? profile.physical_accessibility_difficulties : {},
+    physical_accessibility_areas: answers.physical === 'yes' ? (profile.physical_accessibility_areas || []) : [],
+    physical_accessibility_difficulties: answers.physical === 'yes' ? (profile.physical_accessibility_difficulties || {}) : {},
+    health_wellbeing_areas: answers.health === 'yes' ? (profile.health_wellbeing_areas || []) : [],
     ...Object.fromEntries(PERSONAL_FACTOR_KEYS.map(factor => [impactField(factor),
       answers[factor] === 'yes' ? Number(profile[impactField(factor)]) : null])),
   }

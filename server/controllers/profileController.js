@@ -29,6 +29,7 @@ export const saveProfileWithDependencies = async (
     personal_factor_answers,
     physical_accessibility_areas,
     physical_accessibility_difficulties,
+    health_wellbeing_areas,
     factor_physical_impact,
     factor_health_impact,
     factor_financial_impact,
@@ -100,7 +101,7 @@ export const saveProfileWithDependencies = async (
     const [existing] = await connection.query(
       `SELECT profile_id, personal_factor_answers, factor_physical_impact, factor_health_impact,
               factor_financial_impact, factor_family_impact, factor_work_impact,
-              physical_accessibility_areas, physical_accessibility_difficulties
+              physical_accessibility_areas, physical_accessibility_difficulties, health_wellbeing_areas
        FROM PROFILE WHERE user_id = ? FOR UPDATE`,
       [userId]
     )
@@ -117,17 +118,18 @@ export const saveProfileWithDependencies = async (
       ]
       const json = value => typeof value === 'string' ? JSON.parse(value) : value
       const personalFactorScoreChanged = !isDeepStrictEqual(json(existing[0].personal_factor_answers), personal_factor_answers) || impactFields.some(
-        (field, index) => Number(existing[0][field]) !== Number(impactValues[index])
+        (field, index) => existing[0][field] !== impactValues[index]
       )
       const [profileWrite] = await connection.query(
         `UPDATE PROFILE SET 
-          physical_accessibility_areas = ?, physical_accessibility_difficulties = ?,
+          physical_accessibility_areas = ?, physical_accessibility_difficulties = ?, health_wellbeing_areas = ?,
           factor_physical_impact = ?, factor_health_impact = ?, factor_financial_impact = ?,
           factor_family_impact = ?, factor_work_impact = ?, personal_factor_answers = ?
         WHERE user_id = ?`,
         [
           JSON.stringify(physical_accessibility_areas),
           JSON.stringify(physical_accessibility_difficulties),
+          JSON.stringify(health_wellbeing_areas || []),
           factor_physical_impact, factor_health_impact, factor_financial_impact,
           factor_family_impact, factor_work_impact, JSON.stringify(personal_factor_answers), userId,
         ]
@@ -139,6 +141,7 @@ export const saveProfileWithDependencies = async (
           && isDeepStrictEqual(json(existing[0].personal_factor_answers), personal_factor_answers)
           && isDeepStrictEqual(json(existing[0].physical_accessibility_areas), physical_accessibility_areas)
           && isDeepStrictEqual(json(existing[0].physical_accessibility_difficulties), physical_accessibility_difficulties)
+          && isDeepStrictEqual(json(existing[0].health_wellbeing_areas) || [], health_wellbeing_areas || [])
           && impactFields.every((field, index) => existing[0][field] === impactValues[index])
         if (!same) throw conflict()
       }
@@ -160,16 +163,17 @@ export const saveProfileWithDependencies = async (
         (user_id, full_name, height_cm, weight_kg, factor_physical, factor_health, 
          factor_financial, factor_family, factor_distance, factor_working_student, factor_others,
          factor_others_classification_status, factor_others_classification,
-         physical_accessibility_areas, physical_accessibility_difficulties,
+         physical_accessibility_areas, physical_accessibility_difficulties, health_wellbeing_areas,
          factor_physical_impact, factor_health_impact, factor_financial_impact,
          factor_family_impact, factor_work_impact, personal_factor_answers)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         userId, null, null, null,
         false, false, false, false, false, false,
         null, null, null,
         JSON.stringify(physical_accessibility_areas),
         JSON.stringify(physical_accessibility_difficulties),
+        JSON.stringify(health_wellbeing_areas || []),
         factor_physical_impact, factor_health_impact, factor_financial_impact,
         factor_family_impact, factor_work_impact, JSON.stringify(personal_factor_answers),
       ]
@@ -225,7 +229,7 @@ export const getProfileWithDependencies = async (
       `SELECT profile_id, user_id, full_name, height_cm, weight_kg,
               factor_physical, factor_health, factor_financial, factor_family,
               factor_distance, factor_working_student,
-              physical_accessibility_areas, physical_accessibility_difficulties,
+              physical_accessibility_areas, physical_accessibility_difficulties, health_wellbeing_areas,
               factor_physical_impact, factor_health_impact, factor_financial_impact,
               factor_family_impact, factor_work_impact, created_at, updated_at,
               personal_factor_answers
