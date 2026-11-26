@@ -250,7 +250,7 @@ function ReviewForm({ assignment, id, token, refresh }) {
             <option value="typed">Type my full name</option><option value="drawn">Draw my signature</option><option value="uploaded">Upload my signature</option>
           </select></WorkflowField>
           {method === 'typed' && <WorkflowField label="Full name as shown in your profile"><input name="signatureName" className={workflowInput} maxLength={150} required /></WorkflowField>}
-          {method === 'uploaded' && <WorkflowField label="Signature PNG (up to 1 MB)"><input name="signatureImage" type="file" accept="image/png,.png" className={workflowFile} required /></WorkflowField>}
+          {method === 'uploaded' && <WorkflowField label="Signature PNG or JPG (up to 10 MB)"><input name="signatureImage" type="file" accept="image/png,image/jpeg,.png,.jpg,.jpeg" className={workflowFile} required /></WorkflowField>}
           {method === 'drawn' && <SignatureCanvas onDraw={setDrawn} />}
           <WorkflowCheck name="confirmed">I personally reviewed and approve the exact saved course versions marked Approve and sign above. Apply this signature to those approvals.</WorkflowCheck>
         </>}

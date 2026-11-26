@@ -24,11 +24,21 @@ import { getTopCourseRecommendations } from '../services/recommendationService.j
 import { PERSONAL_FACTOR_KEYS } from '../shared/personalFactors.js'
 
 const png = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGNQcEgAAAFEAMELjZZCAAAAAElFTkSuQmCC'
-test('private review images require valid bounded PNG data rather than file extensions', () => {
+const jpg = Buffer.from([
+  0xff, 0xd8, // SOI
+  0xff, 0xe0, 0x00, 0x10, 0x4a, 0x46, 0x49, 0x46, 0x00, 0x01, 0x01, 0x00, 0x00, 0x01, 0x00, 0x01, 0x00, 0x00, // APP0 JFIF
+  0xff, 0xc0, 0x00, 0x0b, 0x08, 0x00, 0x01, 0x00, 0x01, 0x01, 0x01, 0x11, 0x00, // SOF0 1x1
+  0xff, 0xda, 0x00, 0x08, 0x01, 0x01, 0x00, 0x00, 0x3f, 0x00, // SOS
+  0x7f, // minimal entropy-coded byte
+  0xff, 0xd9, // EOI
+]).toString('base64')
+test('private review images require valid bounded PNG or JPG data rather than file extensions', () => {
   assert.ok(reviewImage(png).length)
-  assert.throws(() => reviewImage(Buffer.from('<svg><script>invalid</script></svg>').toString('base64')), /valid PNG/)
-  assert.throws(() => reviewImage(Buffer.concat([Buffer.from(png, 'base64'), Buffer.from('trailing bytes')]).toString('base64')), /valid PNG/)
-  assert.throws(() => reviewImage('A'.repeat(1500000)), /valid PNG/)
+  assert.ok(reviewImage(jpg).length)
+  assert.throws(() => reviewImage(Buffer.from('<svg><script>invalid</script></svg>').toString('base64')), /valid PNG or JPG/)
+  assert.throws(() => reviewImage(Buffer.concat([Buffer.from(png, 'base64'), Buffer.from('trailing bytes')]).toString('base64')), /valid PNG or JPG/)
+  assert.throws(() => reviewImage(Buffer.concat([Buffer.from(jpg, 'base64'), Buffer.from('trailing')]).toString('base64')), /valid PNG or JPG/)
+  assert.throws(() => reviewImage('A'.repeat(14500000)), /valid PNG or JPG/)
 })
 
 const schema = process.env.COURSE_VALIDATION_TEST_SCHEMA

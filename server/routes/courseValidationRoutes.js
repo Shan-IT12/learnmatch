@@ -19,7 +19,7 @@ import { createReplacementDraft } from '../services/courseReplacementService.js'
 import { workflowHandler as run, workflowId } from '../services/workflowSupport.js'
 
 const body = express.json({ limit: '48kb' })
-const withImage = express.json({ limit: '1600kb' })
+const withImage = express.json({ limit: '15mb' })
 const limits = () => [createEmailIpRateLimiter(), createEmailIdentityRateLimiter(req => emailIdentityKey('staff-email', req.body?.email))]
 const loginLimits = [
   createLoginIpRateLimiter({ max: 10 }),

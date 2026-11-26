@@ -83,7 +83,7 @@ export function ClusterChoices({ clusters, defaults = [], error, onChange }) {
 
 export function CredentialInput() {
   return <WorkflowField label="Supporting credential">
-    <input type="file" name="credential" accept="image/png,.png" className={workflowFile} required />
-    <span>Upload one diploma, license, or employment certificate as a PNG up to 1 MB.</span>
+    <input type="file" name="credential" accept="image/png,image/jpeg,.png,.jpg,.jpeg" className={workflowFile} required />
+    <span>Upload one diploma, license, or employment certificate as a PNG or JPG up to 10 MB.</span>
   </WorkflowField>
 }

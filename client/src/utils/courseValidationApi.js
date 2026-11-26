@@ -45,16 +45,21 @@ export async function fetchReviewImageUrl(path, token) {
 export async function downloadReviewImage(path, token, name) {
   const response = await request(path, { token })
   if (!response.ok) throw new Error('This private image is unavailable.')
+  const contentType = (response.headers.get('content-type') || '').toLowerCase()
+  const ext = contentType.includes('jpeg') || contentType.includes('jpg') ? 'jpg' : 'png'
   const url = URL.createObjectURL(await response.blob())
   const link = document.createElement('a')
   link.href = url
-  link.download = `${name}.png`
+  link.download = `${name}.${ext}`
   link.click()
   setTimeout(() => URL.revokeObjectURL(url), 1000)
 }
 
 export async function reviewFile(file) {
-  if (!file || file.size > 1048576 || (file.type && file.type !== 'image/png')) throw new Error('Select a PNG image up to 1 MB.')
+  const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg']
+  if (!file || file.size > 10 * 1024 * 1024 || (file.type && !allowedTypes.includes(file.type.toLowerCase()))) {
+    throw new Error('Select a PNG or JPG image up to 10 MB.')
+  }
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
     reader.onload = () => resolve(String(reader.result).split(',')[1])
